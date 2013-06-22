@@ -2,7 +2,7 @@
 #define MESH_H
 
 #include"D3DUtility.h"
-//#include"Object.h"
+#include"IReferenceCounted.h"
 #include"Bound.h"
 #include<map>
 #include<vector>
@@ -10,7 +10,7 @@
 enum UVMappingMode { SphereUV };
 enum MeshFileFormat { OBJ };
 
-class Mesh// : public Object
+class Mesh : public IReferenceCounted
 {
 public:
 	Mesh()

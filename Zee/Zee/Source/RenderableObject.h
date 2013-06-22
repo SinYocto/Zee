@@ -19,7 +19,14 @@ public:
 		,material(_material)
 		,displayMode(Textured)
 	{
+		mesh->Grab();
+		material->Grab();
+	}
 
+	~RenderableObject()
+	{
+		mesh->Drop();
+		material->Drop();
 	}
 
 	void Draw(Camera* camera);

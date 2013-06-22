@@ -196,14 +196,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Cube.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Cube.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\D3DUtility.cpp"
 				>
 			</File>
@@ -236,7 +228,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\IReferenceCounted.h"
+				RelativePath=".\Source\IReferenceCounted.h"
 				>
 			</File>
 			<File

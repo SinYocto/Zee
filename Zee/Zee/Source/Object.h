@@ -4,6 +4,7 @@
 #include "D3DUtility.h"
 #include"Math.h"
 #include <list>
+#include <algorithm>
 
 // 注意区分3个坐标系: object space(自身坐标系), local space(父对象坐标系), world space
 // 另外还需注意, 像RotateLocal, LocalVectorToWorld, LocalToWorldMatrix这里面的local含义可能会引发歧义,
@@ -18,20 +19,89 @@ public:
 		,relativeOrientation(rotation)
 		,relativeScale(Vector3(1.0f, 1.0f, 1.0f))
 	{
-		if(NULL != parent)
-			parent->AddChild(this);
-
 		updateWorldPosition();
 		updateWorldOrientation();
 		updateWorldScale();
-
 		updateLocalAxis();
+
+		if(NULL != parent)
+		{
+			parent->AddChild(this);
+		}
+	}
+
+	~Object()
+	{
+		Detach();
+
+		for(std::list<Object*>::iterator iter = children.begin(); iter != children.end(); ++iter)
+		{
+			(*iter)->Detach();
+		}
 	}
 
 	void AddChild(Object* child)
 	{
 		_Assert(NULL != child);
-		children.push_back(child);
+
+		if(std::find(children.begin(), children.end(), child) != children.end())
+		{
+			// children中已存在此对象指针
+			return;
+		}
+		else
+		{
+			children.push_back(child);
+
+			child->parent = this;
+			child->updateRelativePostion();
+			child->updateRelativeOrientation();
+			child->updateRelativeScale();
+		}
+	}
+
+	void SetParent(Object* _parent)
+	{
+		if(NULL == _parent)
+		{
+			Detach();
+		}
+		else
+		{
+			_parent->AddChild(this);
+		}
+	}
+
+	void RemoveChild(Object* child)
+	{
+		_Assert(NULL != child);
+		_Assert(std::find(children.begin(), children.end(), child) != children.end());
+
+		if(std::find(children.begin(), children.end(), child) == children.end())
+		{
+			return;
+		}
+		else 
+		{			
+			child->Detach();
+		}
+	}
+
+	void Detach()
+	{
+		if(NULL == parent)
+		{
+			return;
+		}
+		else
+		{
+			parent->children.remove(this);
+			parent = NULL;
+
+			relativePosition = worldPosition;
+			relativeOrientation = worldOrientation;
+			relativeScale = worldScale;
+		}
 	}
 
 	void LookAt(Vector3 lookAtPos);
@@ -100,8 +170,11 @@ private:
 
 	void updateRelativePostion();
 	void updateRelativeOrientation();
+	void updateRelativeScale();
 
 	void updateLocalAxis();
+
+	void updateChildrenLocation();		// 父对象方位变化后, 更新子对象方位
 
 	void rotate(Quaternion worldRotation);
 	void rotateLocal(Quaternion localRotation);

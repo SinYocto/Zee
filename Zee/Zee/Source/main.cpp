@@ -36,6 +36,7 @@ Cube* cubeMesh = NULL;
 Material* mtlBump = NULL;
 
 // model
+SubModel* parentNode;
 SubModel* cubeRO;
 
 void SetupGUIStyle();
@@ -93,21 +94,17 @@ int main()
 		mtlBump->shader->SetSpecShiness(0.4f);
 
 		// model
-		SubModel* parentNode = new SubModel(NULL, cubeMesh, mtlBump);
-		//parentNode->SetWorldPosition(2.0f, 0, 0);
-		//parentNode->SetWorldOrientation(0, PI/4, 0);
+		parentNode = new SubModel(NULL, cubeMesh, mtlBump);
 		parentNode->TranslateLocal(2.0f, 0, 0);
-		parentNode->RotateLocal(0, PI/4, 0);
 
+		/*cubeRO = new SubModel(parentNode, cubeMesh, mtlBump);
+		cubeRO->RotateLocal(-PI/4, 0, 0);*/
+		cubeRO = new SubModel(NULL, cubeMesh, mtlBump);
+		cubeRO->SetParent(parentNode);
 
-		cubeRO = new SubModel(parentNode, cubeMesh, mtlBump);
-		cubeRO->RotateLocal(0, PI/4, 0);
-		cubeRO->TranslateLocal(0, 0, -4.0f);
-		//cubeRO->RotateLocal(PI/4, 0, 0);
-		//cubeRO->Rotate(PI/2, 0, 0);
-		//cubeRO->SetRelativePosition(-2.0f, 0, 0);
-		//cubeRO->SetWorldOrientation(0, PI/4, 0);
-		//cubeRO->SetWorldPosition(4.0f, 0, 0);
+		parentNode->Rotate(0, PI, 0);
+		cubeRO->TranslateLocal(4.0f, 0, 0);
+
 
         // start loop
 		Time::Start();
@@ -276,9 +273,12 @@ void AppDestroy()
 {
 	delete leftAlignStyle;
 	delete camera;
-	delete cubeMesh;
-	delete mtlBump;
+
+	cubeMesh->Drop();
+	mtlBump->Drop();
+
 	delete cubeRO;
+	delete parentNode;
 }
 
 void OnLostDevice()

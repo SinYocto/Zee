@@ -2,13 +2,14 @@
 #define MATERIAL_H
 
 #include"D3DUtility.h"
+#include "IReferenceCounted.h"
 #include "Shader.h"
 
 #define MAX_MATERIAL_TEXTURE_LAYERS 4
 
 class Object;
 
-class Material
+class Material : public IReferenceCounted
 {
 public:
 	Material()
