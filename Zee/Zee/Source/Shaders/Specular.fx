@@ -43,7 +43,9 @@ void SpecularVS(float3 Pos : POSITION0,
 	oNormal = (mul(float4(Normal, 0), matWorld)).xyz;
 }
 
-float4 SpecularPS(float2 Tex : TEXCOORD0, float3 Normal : TEXCOORD1, float3 posW : TEXCOORD2) : COLOR0
+float4 SpecularPS(float2 Tex : TEXCOORD0, 
+				  float3 Normal : TEXCOORD1, 
+				  float3 posW : TEXCOORD2) : COLOR0
 {
 	float4 totalDiffuse = float4(0, 0, 0, 1);
 	float4 totalSpec = float4(0, 0, 0, 1);

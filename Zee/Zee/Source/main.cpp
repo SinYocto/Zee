@@ -228,10 +228,13 @@ void SetupGUIStyle()
 
 void SetupShaders()
 {
-	DiffuseShader::CreateEffectFromFile(TEXT("./Source/Textures/Diffuse.fx"));
-	SpecularShader::CreateEffectFromFile(TEXT("./Source/Textures/Specular.fx"));
-	BumpSpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/BumpSpecular.fx"));
+	DiffuseShader::CreateEffectFromFile(TEXT("./Source/Shaders/Diffuse.fx"));
+	_Assert(NULL != DiffuseShader::effect);
 
+	SpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/Specular.fx"));
+	_Assert(NULL != SpecularShader::effect);
+
+	BumpSpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/BumpSpecular.fx"));
 	_Assert(NULL != BumpSpecularShader::effect);
 }
 

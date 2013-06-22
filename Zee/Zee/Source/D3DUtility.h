@@ -12,9 +12,26 @@
 
 #define log printf
 #define Assert(condition) \
-	if(!(condition)) { printf("assert failed! condition:\"%s\"\n", #condition); goto Exit; }
+	if(!(condition)) \
+	{ \
+		{ \
+			printf("File: %s(%d) has triggered a break point.\nAssert(%s) failed!\n", \
+				   __FILE__, __LINE__, #condition); \
+				   __asm int 3 \
+		} \
+		goto Exit; \
+	}
+
 #define _Assert(condition) \
-	if(!(condition)) { printf("assert failed! condition:\"%s\"\n", #condition); }
+	if(!(condition)) \
+	{ \
+		{ \
+		printf("File: %s(%d) has triggered a break point.\nAssert(%s) failed!\n", \
+		__FILE__, __LINE__, #condition); \
+		__asm int 3 \
+		} \
+	}
+
 
 #define SAFE_RELEASE(p)	{ if(p) { (p)->Release(); (p)=NULL; } }
 #define SAFE_DELETE(p) { if(p) { delete (p); (p) = NULL; } }
