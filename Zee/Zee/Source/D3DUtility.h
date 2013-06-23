@@ -36,6 +36,7 @@
 #define SAFE_RELEASE(p)	{ if(p) { (p)->Release(); (p)=NULL; } }
 #define SAFE_DELETE(p) { if(p) { delete (p); (p) = NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p); (p) = NULL; } }
+#define SAFE_DROP(p)	{ if(p) { (p)->Drop(); (p)=NULL; } }
 
 #define MAX_STR_LEN 256
 #define MAX_PATH_LEN 512

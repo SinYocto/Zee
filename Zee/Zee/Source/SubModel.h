@@ -1,3 +1,6 @@
+#ifndef SUBMODEL_H
+#define SUBMODEL_H
+
 #include "RenderableObject.h"
 
 class SubModel : public RenderableObject
@@ -9,3 +12,5 @@ public:
 
 	}
 };
+
+#endif

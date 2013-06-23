@@ -10,6 +10,12 @@
 // 另外还需注意, 像RotateLocal, LocalVectorToWorld, LocalToWorldMatrix这里面的local含义可能会引发歧义,
 // 其实际指的是object space, 比如RotateLocal方法指的是在自身坐标系下(object space)旋转一定角度, 而非父对象的坐标系(local space)
 
+// #Object数据成员更新
+// 要考虑两个问题, 首先自身的相对位置和绝对位置的某一个改变要更新另一个, 其次父对象位置改变要更新子对象位置
+
+// #父对象或子对象删除时的处理
+// 需要更新父对象指针, 子对象列表, 需要detach来取消相对位置的依附关系
+
 class Object
 {
 public:
@@ -34,9 +40,15 @@ public:
 	{
 		Detach();
 
-		for(std::list<Object*>::iterator iter = children.begin(); iter != children.end(); ++iter)
+		for(std::list<Object*>::iterator iter = children.begin(); iter != children.end();)
 		{
-			(*iter)->Detach();
+			// 没有直接调用children的Detach方法, 因为是边遍历边删除, 需要记录删除后的下个迭代器位置
+			(*iter)->relativePosition = (*iter)->worldPosition;
+			(*iter)->relativeOrientation = (*iter)->worldOrientation;
+			(*iter)->relativeScale = (*iter)->worldScale;
+			(*iter)->parent = NULL;
+
+			iter = children.erase(iter);
 		}
 	}
 
@@ -95,7 +107,10 @@ public:
 		}
 		else
 		{
-			parent->children.remove(this);
+			std::list<Object*>::iterator iter = std::find(parent->children.begin(), parent->children.end(), this);
+			_Assert(iter != parent->children.end());
+
+			iter = parent->children.erase(iter);
 			parent = NULL;
 
 			relativePosition = worldPosition;

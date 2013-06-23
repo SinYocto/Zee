@@ -13,6 +13,7 @@
 #include "Primitive.h"
 #include "Material.h"
 #include "SubModel.h"
+#include "Model.h"
 
 const int wndWidth = 1024;
 const int wndHeight = 600;
@@ -38,6 +39,8 @@ Material* mtlBump = NULL;
 // model
 SubModel* parentNode;
 SubModel* cubeRO;
+
+Model* cubeModel;
 
 void SetupGUIStyle();
 void SetupShaders();
@@ -99,12 +102,9 @@ int main()
 
 		/*cubeRO = new SubModel(parentNode, cubeMesh, mtlBump);
 		cubeRO->RotateLocal(-PI/4, 0, 0);*/
-		cubeRO = new SubModel(NULL, cubeMesh, mtlBump);
-		cubeRO->SetParent(parentNode);
+		cubeRO = new SubModel(parentNode, cubeMesh, mtlBump);
 
-		parentNode->Rotate(0, PI, 0);
-		cubeRO->TranslateLocal(4.0f, 0, 0);
-
+		cubeModel = new Model(NULL, cubeMesh, mtlBump);
 
         // start loop
 		Time::Start();
@@ -131,7 +131,8 @@ int main()
 					gD3DDevice->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff1e90ff, 1.0f, 0);
 					gD3DDevice->BeginScene();
 
-					cubeRO->Draw(camera);
+					//cubeRO->Draw(camera);
+					cubeModel->Draw(camera);
 
 					gGUISystem.Draw();
 
@@ -271,14 +272,16 @@ int GetFPS()
 
 void AppDestroy()
 {
-	delete leftAlignStyle;
-	delete camera;
+	SAFE_DELETE(leftAlignStyle);
+	SAFE_DELETE(camera);
 
-	cubeMesh->Drop();
-	mtlBump->Drop();
+	SAFE_DROP(cubeMesh);
+	SAFE_DROP(mtlBump);
 
-	delete cubeRO;
-	delete parentNode;
+	SAFE_DELETE(cubeRO);
+	SAFE_DELETE(parentNode);
+
+	SAFE_DELETE(cubeModel);
 }
 
 void OnLostDevice()

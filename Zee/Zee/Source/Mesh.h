@@ -7,6 +7,10 @@
 #include<map>
 #include<vector>
 
+// #资源管理
+// 设备丢失时要释放VertexBuffer, IndexBuffer, VertexDeclaration(这个不确定)资源, 恢复时重建
+// 除了上面3个, 顶点的数据也是new出来的, 需要在析构时delete
+
 enum UVMappingMode { SphereUV };
 enum MeshFileFormat { OBJ };
 
