@@ -34,7 +34,6 @@ public:
 
 	}
 
-	// TODO:Data可以作为类的一个成员,不用每次get都创建个对象
 	DirectionalLightData GetData() 
 	{ 
 		return DirectionalLightData(intensity * color, direction); 

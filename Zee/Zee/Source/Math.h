@@ -6,6 +6,9 @@
 
 #define PI 3.141592654f
 
+bool FloatEqual(const float& f1, const float& f2, const float& tolerance);
+bool FloatUnequal(const float& f1, const float& f2, const float& tolerance);
+
 class Vector3
 {
 public:
@@ -23,10 +26,10 @@ public:
 	Vector3 operator-=(const Vector3& vec); 
 	Vector3 operator*=(float val);
 
-	float Length();
+	float Length() const;
 	void Normalize();
 	Vector3 Normalized();
-	float Dot(Vector3 vec);
+	float Dot(Vector3 vec) const;
 	Vector3 Cross(Vector3 vec);
 
 public:
@@ -41,6 +44,10 @@ Vector3 operator-(const Vector3& vec);
 Vector3 operator+(const Vector3& vec1, const Vector3& vec2);
 Vector3 operator-(const Vector3& vec1, const Vector3& vec2);
 Vector3 operator*(float value, const Vector3& vec);
+
+float VectorAngle(const Vector3& vec1, const Vector3& vec2);
+
+bool Vector3Equal(const Vector3& vec1, const Vector3& vec2, const float& tolerance);
 
 class Vector2
 {

@@ -22,8 +22,7 @@ class Model : public Object
 {
 public:
 	// 此构造函数使用一个mesh和material对象来构造一个包含一个SubModel的Model对象
-	// TODO:处理mesh和material默认参数为NULL的情况
-	Model(Object* _parent, Mesh* _mesh = NULL, Material* _material = NULL)
+	Model(Object* _parent = NULL, Mesh* _mesh = NULL, Material* _material = NULL)
 	{
 		SubModel* subModel = new SubModel(this, _mesh, _material);
 		addSubModel(subModel);

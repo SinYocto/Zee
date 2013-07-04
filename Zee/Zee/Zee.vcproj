@@ -172,30 +172,6 @@
 			Name="core"
 			>
 			<File
-				RelativePath=".\Source\AmbientLight.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\AmbientLight.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Bound.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Bound.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Camera.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Camera.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\D3DUtility.cpp"
 				>
 			</File>
@@ -204,39 +180,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\DirectionalLight.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\DirectionalLight.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GUI.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GUI.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Input.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Input.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\IReferenceCounted.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\LightManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\LightManager.h"
 				>
 			</File>
 			<File
@@ -245,14 +189,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\Material.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Math.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Math.h"
 				>
 			</File>
 			<File
@@ -280,11 +216,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\PointLight.cpp"
+				RelativePath=".\Source\OBJParser.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\PointLight.h"
+				RelativePath=".\Source\OBJParser.h"
 				>
 			</File>
 			<File
@@ -313,6 +249,110 @@
 			</File>
 			<File
 				RelativePath=".\Source\SubModel.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Environment"
+			>
+			<File
+				RelativePath=".\Source\AmbientLight.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\AmbientLight.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Camera.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Camera.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\DirectionalLight.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\DirectionalLight.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\LightManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\LightManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\PointLight.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\PointLight.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="GUI"
+			>
+			<File
+				RelativePath=".\Source\GUI.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GUI.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Geometry"
+			>
+		</Filter>
+		<Filter
+			Name="Math&amp;Physics"
+			>
+			<File
+				RelativePath=".\Source\Bound.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Bound.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Math.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Math.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Input"
+			>
+			<File
+				RelativePath=".\Source\Input.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Input.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Helper"
+			>
+			<File
+				RelativePath=".\Source\File.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\File.h"
 				>
 			</File>
 			<File

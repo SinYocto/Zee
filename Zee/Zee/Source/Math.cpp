@@ -1,4 +1,23 @@
 #include"Math.h"
+#include "D3DUtility.h"
+
+
+bool FloatEqual(const float& f1, const float& f2, const float& tolerance)
+{
+	if(fabsf(f1 - f2) < tolerance)
+		return true;
+	else 
+		return false;
+}
+
+
+bool FloatUnequal(const float& f1, const float& f2, const float& tolerance)
+{
+	if(fabsf(f1 - f2) > tolerance)
+		return true;
+	else 
+		return false;
+}
 
 // Vector3
 Vector3 Vector3::Zero = Vector3(0, 0, 0);
@@ -77,7 +96,7 @@ bool Vector3::operator!=(const Vector3& vec)
 	return !(*this == vec); 
 }
 
-float Vector3::Length() 
+float Vector3::Length() const
 { 
 	return sqrt(x*x + y*y + z*z);
 }
@@ -98,7 +117,7 @@ Vector3 Vector3::Normalized()
 	return vec;
 }
 	
-float Vector3::Dot(Vector3 vec) 
+float Vector3::Dot(Vector3 vec) const
 { 
 	return x*vec.x + y*vec.y + z*vec.z; 
 }
@@ -106,6 +125,29 @@ float Vector3::Dot(Vector3 vec)
 Vector3 Vector3::Cross(Vector3 vec) 
 { 
 	return Vector3(y*vec.z - z*vec.y, z*vec.x - x*vec.z, x*vec.y - y*vec.x); 
+}
+
+float VectorAngle(const Vector3& vec1, const Vector3& vec2)
+{
+	float length1 = vec1.Length();
+	float length2 = vec2.Length();
+
+	_Assert(length1 != 0 && length2 != 0);
+	return acosf(vec1.Dot(vec2) / (length1 * length2));
+}
+
+bool Vector3Equal(const Vector3& vec1, const Vector3& vec2, const float& tolerance)
+{
+	if(FloatUnequal(vec1.x, vec2.x, tolerance))
+		return false;
+
+	if(FloatUnequal(vec1.y, vec2.y, tolerance))
+		return false;
+
+	if(FloatUnequal(vec1.z, vec2.z, tolerance))
+		return false;
+
+	return true;
 }
 
 

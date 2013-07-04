@@ -14,6 +14,8 @@
 #include "Material.h"
 #include "SubModel.h"
 #include "Model.h"
+#include "File.h"
+#include <stdio.h>
 
 const int wndWidth = 1024;
 const int wndHeight = 600;
@@ -83,6 +85,19 @@ int main()
 		LightManager::AddDirectionalLight(&dirLight1);
 		LightManager::AddPointLight(&pointLight1);
 
+		Vector3 a(0.1f, 0.002f, 0.003f);
+		Vector3 b(0.09f, 0.002f, 0.003f);
+		b += Vector3(0.01f, 0, 0);
+
+		log("a(%f, %f, %f)\n", a.x, a.y, a.z);
+		log("b(%f, %f, %f)\n", b.x, b.y, b.z);
+
+		if(a == b)
+			log("a == b\n");
+
+		if(Vector3Equal(a, b, 0.0001f))
+			log("a == b(vec3)\n");
+
 		// mesh
 		cubeMesh = new Cube();
 		cubeMesh->CalculateTBN();
@@ -105,6 +120,27 @@ int main()
 		cubeRO = new SubModel(parentNode, cubeMesh, mtlBump);
 
 		cubeModel = new Model(NULL, cubeMesh, mtlBump);
+
+		File* file = File::Open("testIO.txt", READ);
+
+		char lineContent[MAX_STR_LEN];
+
+		while(true)
+		{
+			file->ReadLine(lineContent, MAX_STR_LEN);
+
+			float x = 0;
+			float y = 0;
+			float z = 0;
+
+			sscanf (lineContent,"%*s %f %f %f", &x, &y, &z);
+			log("pos:(%f, %f, %f)\n", x, y, z);
+
+			if(file->EndOfFile())
+				break; 
+		}
+
+		file->Close();
 
         // start loop
 		Time::Start();

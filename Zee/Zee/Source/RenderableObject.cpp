@@ -5,9 +5,12 @@
 
 void RenderableObject::Draw(Camera* camera)
 {
+	if(NULL == mesh || NULL == material)
+	{
+		return;		// 允许构造RenderableObject对象时不指定mesh和material对象, 此时调用draw不做任何事
+	}
+
 	_Assert(NULL != camera);
-	_Assert(NULL != mesh);
-	_Assert(NULL != material);
 
 	if(displayMode == WireFrame)
 		gD3DDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_WIREFRAME );
