@@ -114,7 +114,22 @@ protected:
 	{
 		bool operator()(const Vector3& vec1, const Vector3& vec2)
 		{
-			return true;
+			if(vec1.x < vec2.x)
+				return true;
+
+			if(vec1.x > vec2.x)
+				return false;
+
+			if(vec1.y < vec2.y)
+				return true;
+
+			if(vec1.y > vec2.y)
+				return false;
+
+			if(vec1.z < vec2.z)
+				return true;
+
+			return false;
 		}
 	};
 	typedef std::map<Vector3, TriangleList, CompareVector> VertexTrianglesMap;
@@ -123,7 +138,22 @@ protected:
 	{
 		bool operator()(const Triangle& tri1, const Triangle& tri2)
 		{
-			return true;
+			if(tri1.vertexIndex[0] < tri2.vertexIndex[0])
+				return true;
+
+			if(tri1.vertexIndex[0] > tri2.vertexIndex[0])
+				return false;
+
+			if(tri1.vertexIndex[1] < tri2.vertexIndex[1])
+				return true;
+
+			if(tri1.vertexIndex[1] > tri2.vertexIndex[1])
+				return false;
+
+			if(tri1.vertexIndex[2] < tri2.vertexIndex[2])
+				return true;
+
+			return false;
 		}
 	};
 	typedef std::map<Triangle, int, CompareTriangle> TriangleSmoothGroupMap;

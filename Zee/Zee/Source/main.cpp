@@ -39,9 +39,6 @@ Cube* cubeMesh = NULL;
 Material* mtlBump = NULL;
 
 // model
-SubModel* parentNode;
-SubModel* cubeRO;
-
 Model* cubeModel;
 
 void SetupGUIStyle();
@@ -74,29 +71,16 @@ int main()
 		SetupShaders();
 
         // camera
-		camera = new Camera(Vector3(0, 0.0f, -10.0f), Vector3::Zero, 
+		camera = new Camera(Vector3(0, 2.0f, -4.0f), Vector3::Zero, 
 			PI/3, (float)wndWidth/(float)wndHeight, 0.1f, 1000.0f);
 
 		// lights
 		LightManager::SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
-		dirLight1.SetValue(D3DXCOLOR_RED, Vector3(1.0f, -0.5f, 1.0f), 1.0f);
+		dirLight1.SetValue(D3DXCOLOR_RED, Vector3(1.0f, -1.0f, 1.0f), 1.0f);
 		pointLight1.SetValue(D3DXCOLOR_YELLOW, Vector3(-4.0f, 0, 0), Vector3(1.0f, 0, 0), 1.0f);
 
 		LightManager::AddDirectionalLight(&dirLight1);
 		LightManager::AddPointLight(&pointLight1);
-
-		Vector3 a(0.1f, 0.002f, 0.003f);
-		Vector3 b(0.09f, 0.002f, 0.003f);
-		b += Vector3(0.01f, 0, 0);
-
-		log("a(%f, %f, %f)\n", a.x, a.y, a.z);
-		log("b(%f, %f, %f)\n", b.x, b.y, b.z);
-
-		if(a == b)
-			log("a == b\n");
-
-		if(Vector3Equal(a, b, 0.0001f))
-			log("a == b(vec3)\n");
 
 		// mesh
 		cubeMesh = new Cube();
@@ -112,13 +96,6 @@ int main()
 		mtlBump->shader->SetSpecShiness(0.4f);
 
 		// model
-		parentNode = new SubModel(NULL, cubeMesh, mtlBump);
-		parentNode->TranslateLocal(2.0f, 0, 0);
-
-		/*cubeRO = new SubModel(parentNode, cubeMesh, mtlBump);
-		cubeRO->RotateLocal(-PI/4, 0, 0);*/
-		cubeRO = new SubModel(parentNode, cubeMesh, mtlBump);
-
 		cubeModel = new Model(NULL, cubeMesh, mtlBump);
 
 		File* file = File::Open("testIO.txt", READ);
@@ -169,6 +146,7 @@ int main()
 
 					//cubeRO->Draw(camera);
 					cubeModel->Draw(camera);
+					anotherModel->Draw(camera);
 
 					gGUISystem.Draw();
 
@@ -313,9 +291,6 @@ void AppDestroy()
 
 	SAFE_DROP(cubeMesh);
 	SAFE_DROP(mtlBump);
-
-	SAFE_DELETE(cubeRO);
-	SAFE_DELETE(parentNode);
 
 	SAFE_DELETE(cubeModel);
 }

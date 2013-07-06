@@ -116,15 +116,15 @@ void Mesh::BuildGeometry(VertexType type)
 						positionData[verts[i].posIndex].z, 
 						uvData[verts[i].uvIndex].x, 
 						uvData[verts[i].uvIndex].y,
-						normalData[verts[i].normalIndex].x, 
-						normalData[verts[i].normalIndex].y,
-						normalData[verts[i].normalIndex].z,
 						tangentData[verts[i].tangentIndex].x, 
 						tangentData[verts[i].tangentIndex].y,
 						tangentData[verts[i].tangentIndex].z,
 						bitangentData[verts[i].bitangentIndex].x, 
 						bitangentData[verts[i].bitangentIndex].y,
-						bitangentData[verts[i].bitangentIndex].z);
+						bitangentData[verts[i].bitangentIndex].z,
+						normalData[verts[i].normalIndex].x, 
+						normalData[verts[i].normalIndex].y,
+						normalData[verts[i].normalIndex].z);
 
 					((VertexUVTBN*)vertexData)[i] = vert;
 				}
@@ -282,7 +282,7 @@ void Mesh::processSmoothNormal(const Vector3& curPos, const TriangleList& overAl
 			int indexInTri = 0;
 			for(int k = 0; k < 3; ++k)
 			{
-				if(positionData[verts[curTri.vertexIndex[k]].posIndex] == curPos)		// TODO:浮点精度?
+				if(Vector3Equal(positionData[verts[curTri.vertexIndex[k]].posIndex], curPos, 0.0001f))
 				{
 					vertIx = curTri.vertexIndex[k];
 					indexInTri = k;
@@ -296,7 +296,7 @@ void Mesh::processSmoothNormal(const Vector3& curPos, const TriangleList& overAl
 			}
 			else
 			{
-				if(normalData[verts[vertIx].normalIndex] != groupNormal)		// TODO:浮点精度?
+				if(Vector3Unequal(normalData[verts[vertIx].normalIndex], groupNormal, 0.01f))
 				{
 					Vert newVert = verts[vertIx];
 					newVert.normalIndex = normalData.size() - 1;
@@ -350,7 +350,7 @@ void Mesh::processSmoothTangent(const Vector3& curPos, const TriangleList& overA
 			int indexInTri = 0;
 			for(int k = 0; k < 3; ++k)
 			{
-				if(positionData[verts[curTri.vertexIndex[k]].posIndex] == curPos)		// TODO:浮点精度?
+				if(Vector3Equal(positionData[verts[curTri.vertexIndex[k]].posIndex], curPos, 0.0001f))
 				{
 					vertIx = curTri.vertexIndex[k];
 					indexInTri = k;
@@ -364,7 +364,7 @@ void Mesh::processSmoothTangent(const Vector3& curPos, const TriangleList& overA
 			}
 			else
 			{
-				if(tangentData[verts[vertIx].tangentIndex] != groupTangent)		// TODO:浮点精度?
+				if(Vector3Unequal(tangentData[verts[vertIx].tangentIndex], groupTangent, 0.01f))
 				{
 					Vert newVert = verts[vertIx];
 					newVert.tangentIndex = tangentData.size() - 1;
@@ -418,7 +418,7 @@ void Mesh::processSmoothBitangent(const Vector3& curPos, const TriangleList& ove
 			int indexInTri = 0;
 			for(int k = 0; k < 3; ++k)
 			{
-				if(positionData[verts[curTri.vertexIndex[k]].posIndex] == curPos)		// TODO:浮点精度?
+				if(Vector3Equal(positionData[verts[curTri.vertexIndex[k]].posIndex], curPos, 0.0001f))
 				{
 					vertIx = curTri.vertexIndex[k];
 					indexInTri = k;
@@ -432,7 +432,7 @@ void Mesh::processSmoothBitangent(const Vector3& curPos, const TriangleList& ove
 			}
 			else
 			{
-				if(bitangentData[verts[vertIx].bitangentIndex] != groupBitangent)		// TODO:浮点精度?
+				if(Vector3Unequal(bitangentData[verts[vertIx].bitangentIndex], groupBitangent, 0.01f))
 				{
 					Vert newVert = verts[vertIx];
 					newVert.bitangentIndex = bitangentData.size() - 1;
@@ -463,7 +463,7 @@ void Mesh::calculateTBN(bool calculateTangent, bool calculateBitangent)
 
 		for(int i = 0; i < 3; ++i)
 		{
-			Vector3 curPos = positionData[curTri.vertexIndex[i]];	// each vertPos of curTri
+			Vector3 curPos = positionData[verts[curTri.vertexIndex[i]].posIndex];	// each vertPos of curTri
 
 			VertexTrianglesMap::iterator iter = vertexTrianglesMap.find(curPos);
 			if(iter != vertexTrianglesMap.end())
@@ -531,7 +531,11 @@ void Mesh::buildNormalSmoothGroup(Vector3 curPos, const TriangleList& overAllTri
 	else
 	{
 		triSmoothGroupMap[curTri] = triSmoothGroups.size();
-		triSmoothGroups.back().push_back(curTri);
+
+		TriangleList newSmoothGroup;
+		newSmoothGroup.push_back(curTri);
+
+		triSmoothGroups.push_back(newSmoothGroup);
 	}
 
 	if(neighbourTri0 != NULL)
@@ -571,7 +575,11 @@ void Mesh::buildTangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTr
 	else
 	{
 		triSmoothGroupMap[curTri] = triSmoothGroups.size();
-		triSmoothGroups.back().push_back(curTri);
+
+		TriangleList newSmoothGroup;
+		newSmoothGroup.push_back(curTri);
+
+		triSmoothGroups.push_back(newSmoothGroup);
 	}
 
 	if(neighbourTri0 != NULL)
@@ -611,7 +619,11 @@ void Mesh::buildBitangentSmoothGroup(Vector3 curPos, const TriangleList& overAll
 	else
 	{
 		triSmoothGroupMap[curTri] = triSmoothGroups.size();
-		triSmoothGroups.back().push_back(curTri);
+
+		TriangleList newSmoothGroup;
+		newSmoothGroup.push_back(curTri);
+
+		triSmoothGroups.push_back(newSmoothGroup);
 	}
 
 	buildBitangentSmoothGroup(curPos, overAllTriGroup, *neighbourTri0, triSmoothGroupMap, triSmoothGroups);
@@ -630,6 +642,11 @@ void Mesh::findNeighbourTriangles(const TriangleList& triGroup, const Triangle& 
 	for(size_t i = 0; i < triGroup.size(); ++i)
 	{
 		const Triangle& tri = triGroup[i];
+
+		if(tri.vertexIndex[0] == curTri.vertexIndex[0] &&
+			tri.vertexIndex[1] == curTri.vertexIndex[1] &&
+			tri.vertexIndex[2] == curTri.vertexIndex[2])		// 排除自己
+			continue;
 		
 		if(hasSharedEdge(curTri, tri))
 		{
@@ -637,6 +654,8 @@ void Mesh::findNeighbourTriangles(const TriangleList& triGroup, const Triangle& 
 				*neighbour0 = &tri;
 			else
 				*neighbour1 = &tri;
+
+			numNeighboursFound++;
 		}
 	}
 }
@@ -650,7 +669,7 @@ bool Mesh::hasSharedEdge(const Triangle& triangle0, const Triangle& triangle1)
 		for(int j = 0; j < 3; ++j)
 		{
 			Vector3 tri1Pos = positionData[verts[triangle1.vertexIndex[j]].posIndex];
-			if(tri1Pos == tri0Pos)		// TODO:浮点数的精度?
+			if(Vector3Equal(tri1Pos, tri0Pos, 0.0001f))
 			{
 				++numSharedVerts;
 			}
@@ -743,9 +762,9 @@ void Mesh::calculateTriangleTangent(const Triangle& triangle, Vector3* tangent)
 	Vector3 p0p1 = pos1 - pos0;
 	Vector3 p0p2 = pos2 - pos0;
 
-	Vector2 uv0 = uvData[verts[triangle.vertexIndex[0]].posIndex];
-	Vector2 uv1 = uvData[verts[triangle.vertexIndex[1]].posIndex];
-	Vector2 uv2 = uvData[verts[triangle.vertexIndex[2]].posIndex];
+	Vector2 uv0 = uvData[verts[triangle.vertexIndex[0]].uvIndex];
+	Vector2 uv1 = uvData[verts[triangle.vertexIndex[1]].uvIndex];
+	Vector2 uv2 = uvData[verts[triangle.vertexIndex[2]].uvIndex];
 
 	float s1 = uv1.x - uv0.x;
 	float t1 = uv1.y - uv0.y;
@@ -778,9 +797,9 @@ void Mesh::calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangen
 	Vector3 p0p1 = pos1 - pos0;
 	Vector3 p0p2 = pos2 - pos0;
 
-	Vector2 uv0 = uvData[verts[triangle.vertexIndex[0]].posIndex];
-	Vector2 uv1 = uvData[verts[triangle.vertexIndex[1]].posIndex];
-	Vector2 uv2 = uvData[verts[triangle.vertexIndex[2]].posIndex];
+	Vector2 uv0 = uvData[verts[triangle.vertexIndex[0]].uvIndex];
+	Vector2 uv1 = uvData[verts[triangle.vertexIndex[1]].uvIndex];
+	Vector2 uv2 = uvData[verts[triangle.vertexIndex[2]].uvIndex];
 
 	float s1 = uv1.x - uv0.x;
 	float t1 = uv1.y - uv0.y;

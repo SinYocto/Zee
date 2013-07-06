@@ -80,7 +80,7 @@ float4 BumpSpecularPS(float2 Tex : TEXCOORD0,
 	Normal = 2*tex2D(NormalS, Tex) - 1.0f;
 	Normal = mul(Normal, TBN);
 	Normal = normalize(Normal);
-	
+
 	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
 	{
 		float3 lightDir = normalize(-directionalLights[i].dir);

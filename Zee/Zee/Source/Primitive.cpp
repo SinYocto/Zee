@@ -67,20 +67,23 @@ void Cube::constructGeometryData()
 	triangles[0] = Triangle(0, 1, 2);
 	triangles[1] = Triangle(2, 1, 3);
 
-	triangles[2] = Triangle(5, 4, 7);
-	triangles[3] = Triangle(7, 4, 6);
+	triangles[2] = Triangle(4, 5, 6);
+	triangles[3] = Triangle(6, 5, 7);
 
-	triangles[4] = Triangle(0, 2, 4);
-	triangles[5] = Triangle(4, 2, 6);
+	triangles[4] = Triangle(8, 9, 10);
+	triangles[5] = Triangle(10, 9, 11);
 
-	triangles[6] = Triangle(3, 1, 7);
-	triangles[7] = Triangle(7, 1, 5);
+	triangles[6] = Triangle(12, 13, 14);
+	triangles[7] = Triangle(14, 13, 15);
 
-	triangles[8] = Triangle(2, 3, 6);
-	triangles[9] = Triangle(6, 3, 7);
+	triangles[8] = Triangle(16, 17, 18);
+	triangles[9] = Triangle(18, 17, 19);
 
-	triangles[10] = Triangle(1, 0, 5);
-	triangles[11] = Triangle(5, 0, 4);
+	triangles[10] = Triangle(20, 21, 22);
+	triangles[11] = Triangle(22, 21, 23);
+
+	for(int i = 0; i < 12; ++i)
+		triangleList.push_back(triangles[i]);
 }
 
 void Cylinder::constructGeometryData()

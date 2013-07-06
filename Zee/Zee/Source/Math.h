@@ -48,6 +48,7 @@ Vector3 operator*(float value, const Vector3& vec);
 float VectorAngle(const Vector3& vec1, const Vector3& vec2);
 
 bool Vector3Equal(const Vector3& vec1, const Vector3& vec2, const float& tolerance);
+bool Vector3Unequal(const Vector3& vec1, const Vector3& vec2, const float& tolerance);
 
 class Vector2
 {

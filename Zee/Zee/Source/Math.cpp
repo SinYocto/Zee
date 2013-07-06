@@ -4,7 +4,7 @@
 
 bool FloatEqual(const float& f1, const float& f2, const float& tolerance)
 {
-	if(fabsf(f1 - f2) < tolerance)
+	if(fabsf(f1 - f2) < fabsf(tolerance))
 		return true;
 	else 
 		return false;
@@ -13,10 +13,7 @@ bool FloatEqual(const float& f1, const float& f2, const float& tolerance)
 
 bool FloatUnequal(const float& f1, const float& f2, const float& tolerance)
 {
-	if(fabsf(f1 - f2) > tolerance)
-		return true;
-	else 
-		return false;
+	return !FloatEqual(f1, f2, tolerance);
 }
 
 // Vector3
@@ -148,6 +145,11 @@ bool Vector3Equal(const Vector3& vec1, const Vector3& vec2, const float& toleran
 		return false;
 
 	return true;
+}
+
+bool Vector3Unequal(const Vector3& vec1, const Vector3& vec2, const float& tolerance)
+{
+	return !Vector3Equal(vec1, vec2, tolerance);
 }
 
 
