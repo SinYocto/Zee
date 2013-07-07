@@ -26,12 +26,12 @@ enum MeshFileFormat { OBJ };
 class Mesh : public IReferenceCounted
 {
 public:
-	Mesh()
+	Mesh(const char* _name)
 		:vertexBuffer(NULL)
 		,indexBuffer(NULL)
 		,vertexDecl(NULL)
 	{
-
+		strcpy_s(name, _countof(name), _name);
 	}
 
 	~Mesh()
@@ -64,6 +64,9 @@ public:
 
 	void SetVertexDeclaration();
 	void SetVertexStream();
+
+	char* GetName();
+	void SetID(DWORD _id);
 
 	void Draw();
 
@@ -200,6 +203,9 @@ protected:
 
 	std::vector<Vert> verts;
 	TriangleList triangleList;
+
+	DWORD id;
+	char name[MAX_STR_LEN];
 
 private:
 	IDirect3DVertexBuffer9* vertexBuffer;

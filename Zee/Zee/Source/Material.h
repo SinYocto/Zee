@@ -12,7 +12,7 @@ class Object;
 class Material : public IReferenceCounted
 {
 public:
-	Material()
+	Material(const char* _name)
 		:shader(NULL)
 		,diffuseColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
 		,specularColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
@@ -23,6 +23,8 @@ public:
 		,offsetU(0)
 		,offsetV(0)
 	{
+		strcpy_s(name, _countof(name), _name);
+
 		for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
 		{
 			textureLayer[layerIx] = NULL;
@@ -64,10 +66,16 @@ public:
 
 	void Render(Object* object, Mesh* mesh, Camera* camera);
 
+	char* GetName();
+	void SetID(DWORD _id);
+
 public:
 	IShader* shader;
 
 private:
+	DWORD id;
+	char name[MAX_STR_LEN];
+
 	D3DXCOLOR diffuseColor;
 	D3DXCOLOR specularColor;
 	float gloss;

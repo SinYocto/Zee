@@ -960,3 +960,13 @@ void Mesh::CalculateTBN()
 {
 	calculateTBN(true, true);
 }
+
+char* Mesh::GetName()
+{
+	return name;
+}
+
+void Mesh::SetID( DWORD _id )
+{
+	id = _id;
+}

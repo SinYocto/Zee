@@ -16,6 +16,8 @@
 #include "Model.h"
 #include "File.h"
 #include <stdio.h>
+#include "MeshManager.h"
+#include "MaterialManager.h"
 
 const int wndWidth = 1024;
 const int wndHeight = 600;
@@ -33,10 +35,10 @@ PointLight pointLight1;
 PointLight pointLight2;
 
 // mesh
-Cube* cubeMesh = NULL;
+//Cube* cubeMesh = NULL;
 
 // material
-Material* mtlBump = NULL;
+//Material* mtlBump = NULL;
 
 // model
 Model* cubeModel;
@@ -83,20 +85,24 @@ int main()
 		LightManager::AddPointLight(&pointLight1);
 
 		// mesh
-		cubeMesh = new Cube();
-		cubeMesh->CalculateTBN();
-		cubeMesh->BuildGeometry(XYZ_UV_TBN);
+		Cube* cube1 = new Cube("cube1");
+		MeshManager::AddMesh(cube1);
+
+		cube1->CalculateTBN();
+		cube1->BuildGeometry(XYZ_UV_TBN);
 
 		// material
-		mtlBump = new Material();
-		mtlBump->SetShader(BumpSpecular);
+		Material* mtl1 = new Material("mtl1");
+		MaterialManager::AddMaterial(mtl1);
 
-		mtlBump->shader->SetColorTex(TEXT("./Assets/Textures/6133.jpg"));
-		mtlBump->shader->SetNormalTex(TEXT("./Assets/Textures/6133Normal.jpg"));
-		mtlBump->shader->SetSpecShiness(0.4f);
+		mtl1->SetShader(BumpSpecular);
+
+		mtl1->shader->SetColorTex(TEXT("./Assets/Textures/6133.jpg"));
+		mtl1->shader->SetNormalTex(TEXT("./Assets/Textures/6133Normal.jpg"));
+		mtl1->shader->SetSpecShiness(0.4f);
 
 		// model
-		cubeModel = new Model(NULL, cubeMesh, mtlBump);
+		cubeModel = new Model(NULL, cube1, mtl1);
 
 		File* file = File::Open("testIO.txt", READ);
 
@@ -144,9 +150,7 @@ int main()
 					gD3DDevice->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff1e90ff, 1.0f, 0);
 					gD3DDevice->BeginScene();
 
-					//cubeRO->Draw(camera);
 					cubeModel->Draw(camera);
-					anotherModel->Draw(camera);
 
 					gGUISystem.Draw();
 
@@ -289,8 +293,8 @@ void AppDestroy()
 	SAFE_DELETE(leftAlignStyle);
 	SAFE_DELETE(camera);
 
-	SAFE_DROP(cubeMesh);
-	SAFE_DROP(mtlBump);
+	MeshManager::DeleteAll();
+	MaterialManager::DeleteAll();
 
 	SAFE_DELETE(cubeModel);
 }
@@ -306,7 +310,7 @@ void OnLostDevice()
 	SpecularShader::OnLostDevice();
 	BumpSpecularShader::OnLostDevice();
 
-	cubeMesh->OnLostDevice();
+	MeshManager::OnLostDevice();
 }
 
 void OnResetDevice()
@@ -323,5 +327,5 @@ void OnResetDevice()
 	SpecularShader::OnResetDevice();
 	BumpSpecularShader::OnResetDevice();
 
-	cubeMesh->OnResetDevice();
+	MeshManager::OnResetDevice();
 }

@@ -192,11 +192,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\MaterialManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\MaterialManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Mesh.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Source\Mesh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\MeshManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\MeshManager.h"
 				>
 			</File>
 			<File

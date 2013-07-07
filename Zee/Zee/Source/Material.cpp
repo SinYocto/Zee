@@ -113,3 +113,13 @@ void Material::Render(Object* object, Mesh* mesh, Camera* camera)
 
 	shader->Render(object, mesh, camera);
 }
+
+char* Material::GetName()
+{
+	return name;
+}
+
+void Material::SetID(DWORD _id)
+{
+	id = _id;
+}
