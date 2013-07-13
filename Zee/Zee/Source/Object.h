@@ -1,6 +1,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include "Utility.h"
 #include "D3DUtility.h"
 #include"Math.h"
 #include <list>

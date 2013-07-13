@@ -49,6 +49,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				CallingConvention="0"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -377,6 +378,26 @@
 			</File>
 			<File
 				RelativePath=".\Source\Time.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Utility.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\YFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\YFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\YString.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\YString.h"
 				>
 			</File>
 		</Filter>

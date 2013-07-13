@@ -1,6 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "Utility.h"
 #include "D3DUtility.h"
 #include "IReferenceCounted.h"
 #include "Bound.h"
@@ -168,7 +169,7 @@ private:
 	void createVertexDeclaration();
 	//void calculateBoundingBox();
 
-	void calculateTBN(bool calculateTangent, bool calculateBitangent);
+	void calculateTBN(bool calculateNormal, bool calculateTangent, bool calculateBitangent);
 
 	void processSmoothNormal(const Vector3& curPos, const TriangleList& overAllTriGroup);
 	void processSmoothTangent(const Vector3& curPos, const TriangleList& overAllTriGroup);
@@ -198,7 +199,7 @@ protected:
 	std::vector<Vector3> positionData;
 	std::vector<Vector2> uvData;
 	std::vector<Vector3> normalData;
-	std::vector<Vector3> tangentData;
+	std::vector<Vector3> tangentData; 
 	std::vector<Vector3> bitangentData;
 
 	std::vector<Vert> verts;

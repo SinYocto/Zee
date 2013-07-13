@@ -1,4 +1,5 @@
 #include "D3DUtility.h"
+#include "Utility.h"
 #include "Input.h"
 
 HWND gHWnd = NULL;
@@ -71,7 +72,7 @@ bool CreateD3DDevice(HWND hWnd, int bufferWidth, int bufferHeight, _D3DMULTISAMP
 		HRESULT hr = (*ppD3D)->GetAdapterIdentifier(D3DADAPTER_DEFAULT, 0, &adapterIdentifier);
 		Assert(SUCCEEDED(hr));
 
-		log("graphics card:%s\n", adapterIdentifier.Description);
+		Log("graphics card:%s\n", adapterIdentifier.Description);
 
 		// device capacity
 		D3DCAPS9 d3dcaps;

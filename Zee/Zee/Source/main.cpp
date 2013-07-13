@@ -14,10 +14,13 @@
 #include "Material.h"
 #include "SubModel.h"
 #include "Model.h"
-#include "File.h"
+//#include "File.h"
 #include <stdio.h>
 #include "MeshManager.h"
 #include "MaterialManager.h"
+#include "OBJParser.h"
+#include "YString.h"
+#include "YFile.h"
 
 const int wndWidth = 1024;
 const int wndHeight = 600;
@@ -104,26 +107,60 @@ int main()
 		// model
 		cubeModel = new Model(NULL, cube1, mtl1);
 
-		File* file = File::Open("testIO.txt", READ);
+		char str1[MAX_STR_LEN];
+		char str2[MAX_STR_LEN];
+		YString::Empty(str1);
+		YString::Empty(str2);
+
+		YString::Copy(str1, _countof(str1), "  yaoo xin");
+		YString::Copy(str2, _countof(str2), "YaoXin");
+
+		bool strictEqual = YString::Compare(str1, str2) == 0 ? true : false;
+		bool equal = YString::Compare(str1, str2, true) == 0 ? true : false;
+
+		char str3[MAX_STR_LEN];
+		YString::Empty(str3);
+
+		YString::Scan(str1, "%s", str3);
+		sscanf(str1, "%s", str3);
+		YString::GetSpecifier(str3, _countof(str3), str1);
+
+		YFile* file = YFile::Open("testIO.txt", YFile::READ);
 
 		char lineContent[MAX_STR_LEN];
+		YString::Empty(lineContent);
 
-		while(true)
+		while(file->ReadLine(lineContent, _countof(lineContent)) != NULL)
 		{
-			file->ReadLine(lineContent, MAX_STR_LEN);
-
 			float x = 0;
 			float y = 0;
 			float z = 0;
 
-			sscanf (lineContent,"%*s %f %f %f", &x, &y, &z);
-			log("pos:(%f, %f, %f)\n", x, y, z);
-
-			if(file->EndOfFile())
-				break; 
+			YString::Scan(lineContent, "%*s %f %f %f", &x, &y, &z);
+			Log("pos:(%f, %f, %f)\n", x, y, z);
 		}
 
 		file->Close();
+
+		file = YFile::Open("testIO1.txt", YFile::READ);
+
+		//char lineContent[MAX_STR_LEN];
+		//YString::Empty(lineContent);
+		std::vector<std::string> contents1;
+		std::vector<std::string> contents2;
+		file->ReadBlock(&contents1, "newmtl", "illum");
+		file->ReadBlock(&contents2, "newmtl", "Tf");
+		file->Close();
+
+		for(size_t i = 0; i < contents1.size(); ++i)
+		{
+			Log("%s", contents1[i].c_str());
+		}
+
+		for(size_t i = 0; i < contents2.size(); ++i)
+		{
+			Log("%s", contents2[i].c_str());
+		}
 
         // start loop
 		Time::Start();

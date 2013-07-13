@@ -444,15 +444,19 @@ void Mesh::processSmoothBitangent(const Vector3& curPos, const TriangleList& ove
 	}
 }
 
-void Mesh::calculateTBN(bool calculateTangent, bool calculateBitangent)
+void Mesh::calculateTBN(bool calculateNormal, bool calculateTangent, bool calculateBitangent)
 {
-	normalData.clear();
+	if(calculateNormal)
+		normalData.clear();
 
 	if(calculateTangent)
 		tangentData.clear();
 
 	if(calculateBitangent)
 		bitangentData.clear();
+
+	if(!calculateNormal && !calculateTangent && !calculateBitangent)
+		return;
 
 	VertexTrianglesMap vertexTrianglesMap;
 
@@ -486,7 +490,8 @@ void Mesh::calculateTBN(bool calculateTangent, bool calculateBitangent)
 
 		TriangleList& overAllTriGroup = iter->second;
 
-		processSmoothNormal(curPos, overAllTriGroup);
+		if(calculateNormal)
+			processSmoothNormal(curPos, overAllTriGroup);
 
 		if(calculateTangent)
 			processSmoothTangent(curPos, overAllTriGroup);
@@ -498,7 +503,7 @@ void Mesh::calculateTBN(bool calculateTangent, bool calculateBitangent)
 
 void Mesh::CalculateNormals()
 {
-	calculateTBN(false, false);
+	calculateTBN(true, false, false);
 }
 
 
@@ -874,7 +879,7 @@ void Mesh::calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangen
 //	std::fstream fin(filename.c_str());
 //
 //	if(!fin)
-//		log("load file \"%s\" failed!\n", filename.c_str());
+//		Log("load file \"%s\" failed!\n", filename.c_str());
 //
 //	switch(format)
 //	{
@@ -958,7 +963,7 @@ void Mesh::calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangen
 
 void Mesh::CalculateTBN()
 {
-	calculateTBN(true, true);
+	calculateTBN(true, true, true);
 }
 
 char* Mesh::GetName()

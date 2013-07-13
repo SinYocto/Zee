@@ -10,37 +10,6 @@
 
 #include "Math.h"
 
-#define log printf
-#define Assert(condition) \
-	if(!(condition)) \
-	{ \
-		{ \
-			printf("File: %s(%d) has triggered a break point.\nAssert(%s) failed!\n", \
-				   __FILE__, __LINE__, #condition); \
-				   __asm int 3 \
-		} \
-		goto Exit; \
-	}
-
-#define _Assert(condition) \
-	if(!(condition)) \
-	{ \
-		{ \
-		printf("File: %s(%d) has triggered a break point.\nAssert(%s) failed!\n", \
-		__FILE__, __LINE__, #condition); \
-		__asm int 3 \
-		} \
-	}
-
-
-#define SAFE_RELEASE(p)	{ if(p) { (p)->Release(); (p)=NULL; } }
-#define SAFE_DELETE(p) { if(p) { delete (p); (p) = NULL; } }
-#define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p); (p) = NULL; } }
-#define SAFE_DROP(p)	{ if(p) { (p)->Drop(); (p)=NULL; } }
-
-#define MAX_STR_LEN 256
-#define MAX_PATH_LEN 512
-
 #define WHITE 0xffffffff
 #define BLACK 0xff000000
 
