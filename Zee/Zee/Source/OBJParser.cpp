@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <set>
+#include "Time.h"
 
 DWORD OBJParser::dataContentType = 0;
 
@@ -35,32 +36,54 @@ bool OBJParser::Parse(const wchar_t* filePath, Model** result)
 {
 	bool isSucceed = false;
 
-	Assert(NULL != filePath);
-	Assert(NULL != result);
-	Assert(*result == NULL);
-
-	clear();
-
-	YFile* file = YFile::Open(filePath, YFile::READ);
-	Assert(NULL != file);
-
-	wchar_t lineContent[MAX_STR_LEN];
-	while(file->ReadLine(lineContent, MAX_STR_LEN) != NULL)
-		parseLine(file, lineContent);
-
-	file->Close();
-
-	// 为获取得到的mesh数据计算tbn并创建vb,ib
-	for(size_t i = 0; i < meshList.size(); ++i)
 	{
-		Mesh* mesh = meshList[i];
+		Assert(NULL != filePath);
+		Assert(NULL != result);
+		Assert(*result == NULL);
 
-		mesh->CalculateTBN();
-		mesh->BuildGeometry(XYZ_UV_TBN);
+		Timer timer;
+		timer.Reset();
+
+		Log(L"start parsing OBJ file(%s)...\n", filePath);
+
+		clear();
+
+		YFile* file = YFile::Open(filePath, YFile::READ);
+		Assert(NULL != file);
+
+		wchar_t lineContent[MAX_STR_LEN];
+		while(file->ReadLine(lineContent, MAX_STR_LEN) != NULL)
+			parseLine(file, lineContent);
+
+		file->Close();
+
+		Log(L"finish parsing OBJ file(%s). time used(%f)\n", filePath, timer.GetElapsedTime());
+
+		timer.Reset();
+		Log(L"start building result model geometry...\n");
+
+		// 为获取得到的mesh数据计算tbn并创建vb,ib
+		for(size_t i = 0; i < meshList.size(); ++i)
+		{
+			Mesh* mesh = meshList[i];
+
+			if(((dataContentType & UV_DATA) == 0))
+			{
+				mesh->CalculateNormals();
+				mesh->BuildGeometry(XYZ_N);
+			}
+			else
+			{
+				mesh->CalculateTBN();
+				mesh->BuildGeometry(XYZ_UV_TBN);
+			}
+		}
+
+		Log(L"finish building result model geometry. time used(%f)\n", timer.GetElapsedTime());
+
+		*result = resultModel;
+		clear();
 	}
-
-	*result = resultModel;
-	clear();
 
 	isSucceed = true;
 Exit:
@@ -176,7 +199,109 @@ Exit:
 void OBJParser::parseTrianglesBlockLinePos(const wchar_t* lineContent, Mesh** curMesh, std::map<int, int>& posIndexMap,
 										   std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap)
 {
-	_Assert(false);
+	Assert(NULL != lineContent);
+
+	{
+		OBJ_SPECIFIER specifier = OBJ_OTEHR;
+		getOBJSpecifier(lineContent, &specifier);
+
+		switch(specifier)
+		{
+		case MESH_MTL:
+			{
+				Material* material = NULL;
+				{
+					wchar_t mtlName[MAX_STR_LEN];
+					YString::Scan(lineContent, L"%*s %s", mtlName);
+
+					getMaterial(mtlName, &material);
+					Assert(NULL != material);
+				}
+
+				// 为使用mtlName材质的triangleList创建一个mesh, 此mtl和mesh共同构成一个subModel
+				SubModel* subModel = NULL;
+				{
+					Assert((*curMesh) == NULL);
+					(*curMesh) = new Mesh(L"mesh");				// TODO:给个按序号增加的默认名?
+					MeshManager::AddMesh((*curMesh));
+
+					meshList.push_back((*curMesh));
+
+					if(resultModel == NULL)
+						resultModel = new Model();
+					Assert(NULL != resultModel);
+
+					subModel = new SubModel(NULL, (*curMesh), material);
+					resultModel->AddSubModel(subModel);
+				}
+
+				break;
+			}
+		case FACE:
+			{
+				int posIndex[3] = { -1, -1, -1 };
+
+				YString::Scan(lineContent, L"%*c %d %d %d", 
+					&posIndex[0], &posIndex[1], &posIndex[2]);
+
+				Mesh::Triangle tri;
+				for(int i = 0; i < 3; ++i)
+				{			
+					// OBJ文件是从1开始的, 减1变成从0开始
+					Assert((posIndex[i] -= 1) >= 0);
+
+					int curMeshPosIndex = -1;
+					int curVertIndex = -1;
+
+					bool posIndexExist = posIndexMap.find(posIndex[i]) != posIndexMap.end();
+
+					if(posIndexExist)
+					{
+						curMeshPosIndex = posIndexMap[posIndex[i]];
+					}
+					else
+					{
+						curMeshPosIndex = (*curMesh)->positionData.size();
+						(*curMesh)->positionData.push_back(positionData[posIndex[i]]);
+						posIndexMap[posIndex[i]] = curMeshPosIndex;
+					}
+
+					// 查找tri的vert是否是已经加入到verts中的重复vert
+					bool isVertExist = false;
+					for(size_t k = 0; k < (*curMesh)->verts.size(); ++k)
+					{
+						Mesh::Vert& vert = (*curMesh)->verts[k];
+						if(vert.posIndex == curMeshPosIndex)
+						{
+							isVertExist = true;
+							curVertIndex = k;
+							break;
+						}
+					}
+
+					if(!isVertExist)
+					{
+						curVertIndex = (*curMesh)->verts.size();
+						Mesh::Vert vert(curMeshPosIndex);
+						(*curMesh)->verts.push_back(vert);
+					}
+
+					tri.vertexIndex[i] = curVertIndex;
+				}
+
+				(*curMesh)->triangleList.push_back(tri);
+
+				break;
+			}
+		case OBJ_OTEHR:
+			{
+				break;
+			}
+		}
+	}
+
+Exit:
+	return;
 }
 
 void OBJParser::parseTrianglesBlockLinePosNormal(const wchar_t* lineContent, Mesh** curMesh, std::map<int, int>& posIndexMap,
@@ -232,12 +357,16 @@ void OBJParser::parseTrianglesBlockLinePosUV(const wchar_t* lineContent, Mesh** 
 				int uvIndex[3] = { -1, -1, -1 };
 
 				YString::Scan(lineContent, L"%*c %d/%d %d/%d %d/%d", 
-					posIndex[0], uvIndex[0], posIndex[1], 
-					uvIndex[1], posIndex[2], uvIndex[2]);
+					&posIndex[0], &uvIndex[0], &posIndex[1], 
+					&uvIndex[1], &posIndex[2], &uvIndex[2]);
 
 				Mesh::Triangle tri;
 				for(int i = 0; i < 3; ++i)
 				{			
+					// OBJ文件是从1开始的, 减1变成从0开始
+					Assert((posIndex[i] -= 1) >= 0);
+					Assert((uvIndex[i] -= 1) >= 0);
+
 					int curMeshPosIndex = -1;
 					int curMeshUVIndex = -1;
 					int curVertIndex = -1;
@@ -486,12 +615,13 @@ void OBJParser::parseMtlBlock(const std::vector<std::wstring>& blockContent)
 		material->shader->SetNormalTex(materialContent.bumpTexFilePath);
 	}
 
+	material->shader->SetAmbientColor(materialContent.ambientColor);
 	material->shader->SetDiffuseColor(materialContent.diffuseColor);
 	material->shader->SetSpecularColor(materialContent.specColor);
 	material->shader->SetSpecGloss(materialContent.gloss); 
 
-	_Assert(!YString::isEmpty(materialContent.diffuseTexFilePath));		// TODO:考虑没有diffuse贴图的情况
-	material->shader->SetColorTex(materialContent.diffuseTexFilePath);
+	if(!YString::isEmpty(materialContent.diffuseTexFilePath))		// TODO:考虑没有diffuse贴图的情况
+		material->shader->SetColorTex(materialContent.diffuseTexFilePath);
 
 	materialList.push_back(material);
 }

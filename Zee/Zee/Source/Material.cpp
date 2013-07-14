@@ -48,6 +48,16 @@ void Material::SetShader(ShadingMethod shadingMethod)
 	_Assert(NULL != shader);
 }
 
+void Material::SetAmbientColor(D3DXCOLOR color)
+{
+	ambientColor = color;
+}
+
+D3DXCOLOR Material::GetAmbientColor()
+{
+	return ambientColor;
+}
+
 void Material::SetDiffuseColor(D3DXCOLOR color)
 {
 	diffuseColor = color;

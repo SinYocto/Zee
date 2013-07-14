@@ -16,6 +16,7 @@ class Material : public IReferenceCounted
 public:
 	Material(const wchar_t* _name)
 		:shader(NULL)
+		,ambientColor(D3DXCOLOR(0, 0, 0, 1))
 		,diffuseColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
 		,specularColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
 		,shiness(1.0f)
@@ -48,6 +49,9 @@ public:
 	void SetTexture(int layerIx, wchar_t* texFileName);	// TODO: 改为使用texture,而不是直接从文件创建texture
 	IDirect3DTexture9* GetTexture(int layerIx);
 
+	void SetAmbientColor(D3DXCOLOR color);
+	D3DXCOLOR GetAmbientColor();
+
 	void SetDiffuseColor(D3DXCOLOR color);
 	D3DXCOLOR GetDiffuseColor();
 
@@ -78,6 +82,7 @@ private:
 	DWORD id;
 	wchar_t name[MAX_STR_LEN];
 
+	D3DXCOLOR ambientColor;
 	D3DXCOLOR diffuseColor;
 	D3DXCOLOR specularColor;
 	float gloss;

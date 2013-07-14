@@ -22,6 +22,11 @@ public:
 
 	}
 
+	virtual void SetAmbientColor(D3DXCOLOR color)
+	{
+
+	}
+
 	virtual void SetDiffuseColor(D3DXCOLOR color)
 	{
 
@@ -80,6 +85,8 @@ public:
 	}
 
 	void SetColorTex(wchar_t* texFileName);
+
+	void SetAmbientColor(D3DXCOLOR color); 
 	void SetDiffuseColor(D3DXCOLOR color);
 
 	void SetUVTiles(float _tilesU, float _tilesV);
@@ -120,6 +127,7 @@ public:
 
 	void SetColorTex(wchar_t* texFileName);
 
+	void SetAmbientColor(D3DXCOLOR color);
 	void SetDiffuseColor(D3DXCOLOR color);
 	void SetSpecularColor(D3DXCOLOR color);
 
@@ -165,6 +173,7 @@ public:
 	void SetColorTex(wchar_t* texFileName);
 	void SetNormalTex(wchar_t* texFileName);
 
+	void SetAmbientColor(D3DXCOLOR color);
 	void SetDiffuseColor(D3DXCOLOR color);
 	void SetSpecularColor(D3DXCOLOR color);
 

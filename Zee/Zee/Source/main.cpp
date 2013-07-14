@@ -45,7 +45,9 @@ PointLight pointLight2;
 //Material* mtlBump = NULL;
 
 // model
-Model* cubeModel;
+Model* cubeModel = NULL;
+Model* model2 = NULL;
+Model* model3 = NULL;
 
 void SetupGUIStyle();
 void SetupShaders();
@@ -80,12 +82,13 @@ int main()
 
         // camera
 		camera = new Camera(Vector3(0, 2.0f, -4.0f), Vector3::Zero, 
-			PI/3, (float)wndWidth/(float)wndHeight, 0.1f, 1000.0f);
+			PI/3, (float)wndWidth/(float)wndHeight, 0.1f, 100000.0f);
 
 		// lights
+
 		LightManager::SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
 		dirLight1.SetValue(D3DXCOLOR_RED, Vector3(1.0f, -1.0f, 1.0f), 1.0f);
-		pointLight1.SetValue(D3DXCOLOR_YELLOW, Vector3(-4.0f, 0, 0), Vector3(1.0f, 0, 0), 1.0f);
+		pointLight1.SetValue(D3DXCOLOR_YELLOW, Vector3(-4.0f, 200.0f, 0), Vector3(1.0f, 0, 0), 1.0f);
 
 		LightManager::AddDirectionalLight(&dirLight1);
 		LightManager::AddPointLight(&pointLight1);
@@ -109,7 +112,9 @@ int main()
 
 		// model
 		//cubeModel = new Model(NULL, cube1, mtl1);
-		OBJParser::Parse(L"lance.obj", &cubeModel);
+		//OBJParser::Parse(L"Assets/Models/room_p2.obj", &model2);
+		OBJParser::Parse(L"Assets/Models/teapot.obj", &cubeModel);
+		//OBJParser::Parse(L"Assets/Models/room_p3.obj", &model3);
 
         // start loop
 		Time::Start();
@@ -137,6 +142,8 @@ int main()
 					gD3DDevice->BeginScene();
 
 					cubeModel->Draw(camera);
+					//model2->Draw(camera);
+					//model3->Draw(camera);
 
 					gGUISystem.Draw();
 
@@ -172,7 +179,7 @@ Exit:
 void ApplyFPCameraControllor(Camera* pCamera, float deltaTime)
 {
 	Vector3 moveVector;
-	float moveSpeed = 2.0f;
+	float moveSpeed = 200.0f;
 	float rotateSpeed = 2.0f;
 
 	if(Input::GetKey(DIK_LSHIFT))
@@ -283,6 +290,8 @@ void AppDestroy()
 	MaterialManager::DeleteAll();
 
 	SAFE_DELETE(cubeModel);
+	SAFE_DELETE(model2);
+	SAFE_DELETE(model3);
 }
 
 void OnLostDevice()

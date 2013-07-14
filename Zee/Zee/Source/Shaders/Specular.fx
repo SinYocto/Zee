@@ -7,7 +7,9 @@ float4x4 matWVP;
 float4x4 matWorld;
 float4x4 matUVTransform;
 
+bool useColorTex;
 texture colorTex;
+float4 mtlAmbient;
 float4 mtlDiffuse;
 float4 mtlSpec;
 float gloss;
@@ -85,8 +87,12 @@ float4 SpecularPS(float2 Tex : TEXCOORD0,
 		totalDiffuse += attenuation * diffuse * pointLights[i].color;
 		totalSpec += attenuation * spec * pointLights[i].color;
 	}
+
+	float4 texColor = float4(1, 1, 1, 1);
+	if(useColorTex)
+		texColor = tex2D(ColorS, Tex);
 	
-	float4 color = (ambientLight.color + mtlDiffuse * totalDiffuse) * tex2D(ColorS, Tex) + mtlSpec * totalSpec;
+	float4 color = (mtlAmbient * ambientLight.color + mtlDiffuse * totalDiffuse) * texColor + mtlSpec * totalSpec;
 	return color;
 }
 

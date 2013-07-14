@@ -5,8 +5,11 @@
 float4x4 matWVP;
 float4x4 matWorld;
 float4x4 matUVTransform;
-texture colorTex;
+float4 mtlAmbient;
 float4 mtlDiffuse;
+
+bool useColorTex;
+texture colorTex;
 
 AmbientLight ambientLight;
 DirectionalLight directionalLights[MAX_NUM_DIRECTIONAL_LIGHTS];
@@ -61,8 +64,12 @@ float4 DiffusePS(float2 Tex : TEXCOORD0,
 		float attenuation = 1 / (pointLights[i].atten.x + pointLights[i].atten.y * distance + pointLights[i].atten.z * distance * distance);
 		totalDiffuse += attenuation * diffuse * pointLights[i].color;
 	}
-	
-	color = (ambientLight.color + mtlDiffuse * totalDiffuse) * tex2D(ColorS, Tex);
+
+	float4 texColor = float4(1, 1, 1, 1);
+	if(useColorTex)
+		texColor = tex2D(ColorS, Tex);
+
+	color = (mtlAmbient * ambientLight.color + mtlDiffuse * totalDiffuse) * texColor;
 	return color;
 }
 

@@ -16,6 +16,11 @@ void DiffuseShader::SetColorTex(wchar_t* texFileName)
 	material->SetTexture(0, texFileName);
 }
 
+void DiffuseShader::SetAmbientColor(D3DXCOLOR color)
+{
+	material->SetAmbientColor(color);
+}
+
 void DiffuseShader::SetDiffuseColor(D3DXCOLOR color)
 {
 	material->SetDiffuseColor(color);
@@ -50,8 +55,17 @@ void DiffuseShader::Render(Object* object, Mesh* mesh, Camera* camera)
 		0, sizeof(LightManager::directionalLightsData));
 	DiffuseShader::effect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
 
-	DiffuseShader::effect->SetTexture("colorTex", material->GetTexture(0));
+	if(NULL == material->GetTexture(0))
+	{
+		DiffuseShader::effect->SetBool("useColorTex", false);
+	}
+	else
+	{
+		DiffuseShader::effect->SetBool("useColorTex", true);	
+		DiffuseShader::effect->SetTexture("colorTex", material->GetTexture(0));
+	}
 
+	DiffuseShader::effect->SetRawValue("mtlAmbient", &(material->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
 	DiffuseShader::effect->SetRawValue("mtlDiffuse", &(material->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
 
 	DiffuseShader::effect->Begin(0, 0);
@@ -70,6 +84,12 @@ void SpecularShader::SetColorTex(wchar_t* texFileName)
 {
 	material->SetTexture(0, texFileName);
 }
+
+void SpecularShader::SetAmbientColor(D3DXCOLOR color)
+{
+	material->SetAmbientColor(color);
+}
+
 
 void SpecularShader::SetDiffuseColor(D3DXCOLOR color)
 {
@@ -121,8 +141,17 @@ void SpecularShader::Render(Object* object, Mesh* mesh, Camera* camera)
 	SpecularShader::effect->SetRawValue("directionalLights", LightManager::directionalLightsData, 0, sizeof(LightManager::directionalLightsData));
 	SpecularShader::effect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
 
-	SpecularShader::effect->SetTexture("colorTex", material->GetTexture(0));
+	if(NULL == material->GetTexture(0))
+	{
+		SpecularShader::effect->SetBool("useColorTex", false);
+	}
+	else
+	{
+		SpecularShader::effect->SetBool("useColorTex", true);	
+		SpecularShader::effect->SetTexture("colorTex", material->GetTexture(0));
+	}
 
+	SpecularShader::effect->SetRawValue("mtlAmbient", &(material->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
 	SpecularShader::effect->SetRawValue("mtlDiffuse", &(material->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
 	SpecularShader::effect->SetRawValue("mtlSpec", &(material->GetFinalSpecularColor()), 0, sizeof(D3DXCOLOR));
 	SpecularShader::effect->SetFloat("gloss", material->GetSpecGloss());
@@ -147,6 +176,11 @@ void BumpSpecularShader::SetColorTex(wchar_t* texFileName)
 void BumpSpecularShader::SetNormalTex(wchar_t* texFileName)
 {
 	material->SetTexture(1, texFileName);
+}
+
+void BumpSpecularShader::SetAmbientColor(D3DXCOLOR color)
+{
+	material->SetAmbientColor(color);
 }
 
 void BumpSpecularShader::SetDiffuseColor(D3DXCOLOR color)
@@ -202,6 +236,7 @@ void BumpSpecularShader::Render(Object* object, Mesh* mesh, Camera* camera)
 	BumpSpecularShader::effect->SetTexture("colorTex", material->GetTexture(0));
 	BumpSpecularShader::effect->SetTexture("normalTex", material->GetTexture(1));
 
+	BumpSpecularShader::effect->SetRawValue("mtlAmbient", &(material->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
 	BumpSpecularShader::effect->SetRawValue("mtlDiffuse", &(material->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
 	BumpSpecularShader::effect->SetRawValue("mtlSpec", &(material->GetFinalSpecularColor()), 0, sizeof(D3DXCOLOR));
 	BumpSpecularShader::effect->SetFloat("gloss", material->GetSpecGloss());

@@ -610,6 +610,8 @@ void Mesh::buildTangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTr
 void Mesh::buildBitangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
 								   TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriangleList>& triSmoothGroups)
 {
+	_Assert(triSmoothGroupMap.find(curTri) != triSmoothGroupMap.end());
+
 	if(triSmoothGroupMap[curTri] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
 		return;
 
@@ -643,8 +645,11 @@ void Mesh::buildBitangentSmoothGroup(Vector3 curPos, const TriangleList& overAll
 		triSmoothGroups.push_back(newSmoothGroup);
 	}
 
-	buildBitangentSmoothGroup(curPos, overAllTriGroup, *neighbourTri0, triSmoothGroupMap, triSmoothGroups);
-	buildBitangentSmoothGroup(curPos, overAllTriGroup, *neighbourTri1, triSmoothGroupMap, triSmoothGroups);
+	if(neighbourTri0)
+		buildBitangentSmoothGroup(curPos, overAllTriGroup, *neighbourTri0, triSmoothGroupMap, triSmoothGroups);
+
+	if(neighbourTri1)
+		buildBitangentSmoothGroup(curPos, overAllTriGroup, *neighbourTri1, triSmoothGroupMap, triSmoothGroups);
 }
 
 void Mesh::findNeighbourTriangles(const TriangleList& triGroup, const Triangle& curTri, const Triangle** neighbour0, const Triangle** neighbour1)
