@@ -114,7 +114,7 @@ void Material::Render(Object* object, Mesh* mesh, Camera* camera)
 	shader->Render(object, mesh, camera);
 }
 
-char* Material::GetName()
+wchar_t* Material::GetName()
 {
 	return name;
 }

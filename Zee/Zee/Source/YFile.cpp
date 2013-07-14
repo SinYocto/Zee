@@ -2,7 +2,7 @@
 #include "Utility.h"
 #include "YString.h"
 
-YFile* YFile::Open(const char* filePath, OPEN_MODE mode)
+YFile* YFile::Open(const wchar_t* filePath, OPEN_MODE mode)
 {
 	bool isSucceed = false;
 
@@ -11,9 +11,9 @@ YFile* YFile::Open(const char* filePath, OPEN_MODE mode)
 	Assert(NULL != file);
 
 	if(mode == READ)
-		fopen_s(&file->pFile, filePath, "r");
+		_wfopen_s(&file->pFile, filePath, L"r");
 	else
-		fopen_s(&file->pFile, filePath, "w");
+		_wfopen_s(&file->pFile, filePath, L"w");
 
 	Assert(NULL != file->pFile);
 
@@ -42,19 +42,21 @@ Exit:
 	return isSucceed;
 }
 
-char* YFile::ReadLine(char* lineContent, int maxLineSize)
+wchar_t* YFile::ReadLine(wchar_t* lineContent, int maxLineSize)
 {
-	return fgets(lineContent, maxLineSize, pFile);
+	return fgetws(lineContent, maxLineSize, pFile);
 }
 
 // 读取由beginSpecifier和endSpecifier界定的字符串段落的每一行到blockContent中
 // endSpecifier为NULL时, 则读取两个beginSpecifier之间的字符串段落
-bool YFile::ReadBlock(std::vector<std::string>* blockContent, const char* beginSpecifier, const char* endSpecifier /*= NULL*/)
+int YFile::ReadBlock(std::vector<std::wstring>* blockContent, const wchar_t* beginSpecifier, const wchar_t* endSpecifier /*= NULL*/)
 {
 	bool isSucceed = false;
 
 	Assert(NULL != blockContent);
 	Assert(NULL != beginSpecifier);
+
+	blockContent->clear();
 
 	bool putbackOneLine = false;
 	if(endSpecifier == NULL)
@@ -65,22 +67,24 @@ bool YFile::ReadBlock(std::vector<std::string>* blockContent, const char* beginS
 
 	bool blockStart = false;
 
-	fpos_t lastLinePos = 0;
-	fgetpos(pFile, &lastLinePos);
+	long lastLinePos = ftell(pFile);
 
-	char lineContent[MAX_STR_LEN];
+	if(lastLinePos == 1534493)
+		fseek(pFile, 1534460, SEEK_SET);
+
+	wchar_t lineContent[MAX_STR_LEN];
 	YString::Empty(lineContent);
 
 	while(ReadLine(lineContent, _countof(lineContent)) != NULL)
 	{
-		char specifier[MAX_STR_LEN];
+		wchar_t specifier[MAX_STR_LEN];
 		YString::Empty(specifier);
-		YString::Scan(lineContent, "%s", specifier);
+		YString::Scan(lineContent, L"%s", specifier);
 
 		if(blockStart && YString::Compare(specifier, endSpecifier) == 0)
 		{
 			if(putbackOneLine)
-				fsetpos(pFile, &lastLinePos);
+				fseek(pFile, lastLinePos, SEEK_SET);
 			else
 				blockContent->push_back(lineContent);
 
@@ -93,11 +97,14 @@ bool YFile::ReadBlock(std::vector<std::string>* blockContent, const char* beginS
 		if(blockStart)
 		{
 			blockContent->push_back(lineContent);
-			fgetpos(pFile, &lastLinePos);
+			lastLinePos = ftell(pFile);
 		}
 	}
 
 	isSucceed = true;
 Exit:
-	return isSucceed;
+	if(isSucceed)
+		return (int)(blockContent->size());
+	else
+		return -1;
 }

@@ -6,6 +6,7 @@
 #include "IReferenceCounted.h"
 #include "Bound.h"
 #include "Math.h"
+#include "YString.h"
 #include <map>
 #include <vector>
 
@@ -27,12 +28,12 @@ enum MeshFileFormat { OBJ };
 class Mesh : public IReferenceCounted
 {
 public:
-	Mesh(const char* _name)
+	Mesh(const wchar_t* _name)
 		:vertexBuffer(NULL)
 		,indexBuffer(NULL)
 		,vertexDecl(NULL)
 	{
-		strcpy_s(name, _countof(name), _name);
+		YString::Copy(name, _countof(name), _name);
 	}
 
 	~Mesh()
@@ -66,7 +67,7 @@ public:
 	void SetVertexDeclaration();
 	void SetVertexStream();
 
-	char* GetName();
+	wchar_t* GetName();
 	void SetID(DWORD _id);
 
 	void Draw();
@@ -74,13 +75,7 @@ public:
 protected:
 	virtual void constructGeometryData() {}
 
-protected:
-	enum
-	{
-		INVALID_INDEX = 0xffffffff,
-		NO_GROUP = 0xffffffff,
-	};
-
+public:
 	struct Vert			// Vert结构保存的是各个数据项的在相应data中的索引
 	{
 		Vert(int _posIndex = INVALID_INDEX, int _uvIndex = INVALID_INDEX, int _normalIndex = INVALID_INDEX, 
@@ -113,6 +108,13 @@ protected:
 		int vertexIndex[3];
 	};
 	typedef std::vector<Triangle> TriangleList;
+
+protected:
+	enum
+	{
+		INVALID_INDEX = 0xffffffff,
+		NO_GROUP = 0xffffffff,
+	};
 
 	struct CompareVector
 	{
@@ -195,7 +197,8 @@ private:
 	void calculateTriangleTangent(const Triangle& triangle, Vector3* tangent);
 	void calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangent);
 
-protected:
+public:
+	// TODO:OBJParser要更改这些数据, 暂时设为public
 	std::vector<Vector3> positionData;
 	std::vector<Vector2> uvData;
 	std::vector<Vector3> normalData;
@@ -205,8 +208,9 @@ protected:
 	std::vector<Vert> verts;
 	TriangleList triangleList;
 
+protected:
 	DWORD id;
-	char name[MAX_STR_LEN];
+	wchar_t name[MAX_STR_LEN];
 
 private:
 	IDirect3DVertexBuffer9* vertexBuffer;

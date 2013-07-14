@@ -16,7 +16,7 @@ class Camera;
 class RenderableObject : public Object
 {
 public:
-	RenderableObject(Object* _parent = NULL, Mesh* _mesh = NULL, Material* _material = NULL)
+	RenderableObject(Object* _parent, Mesh* _mesh, Material* _material)
 		:Object(_parent)
 		,mesh(_mesh)
 		,material(_material)

@@ -455,6 +455,18 @@ void Mesh::calculateTBN(bool calculateNormal, bool calculateTangent, bool calcul
 	if(calculateBitangent)
 		bitangentData.clear();
 
+	for(size_t i = 0; i < verts.size(); ++i)
+	{
+		if(calculateNormal)
+			verts[i].normalIndex = INVALID_INDEX;
+
+		if(calculateTangent)
+			verts[i].tangentIndex = INVALID_INDEX;
+
+		if(calculateBitangent)
+			verts[i].bitangentIndex = INVALID_INDEX;
+	}
+
 	if(!calculateNormal && !calculateTangent && !calculateBitangent)
 		return;
 
@@ -966,7 +978,7 @@ void Mesh::CalculateTBN()
 	calculateTBN(true, true, true);
 }
 
-char* Mesh::GetName()
+wchar_t* Mesh::GetName()
 {
 	return name;
 }

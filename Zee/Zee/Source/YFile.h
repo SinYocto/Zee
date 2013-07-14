@@ -20,17 +20,17 @@ public:
 
 	}
 
-	static YFile* Open(const char* filePath, OPEN_MODE mode);
+	static YFile* Open(const wchar_t* filePath, OPEN_MODE mode);
 
-	char* ReadLine(char* lineContent, int maxLineSize);
-	bool ReadBlock(std::vector<std::string>* blockContent, const char* beginSpecifier, const char* endSpecifier = NULL);
+	wchar_t* ReadLine(wchar_t* lineContent, int maxLineSize);
+	int ReadBlock(std::vector<std::wstring>* blockContent, const wchar_t* beginSpecifier, const wchar_t* endSpecifier = NULL);
 
 	bool Close();
 
 private:
 	bool reachEnd();
 
-private:
+public:
 	FILE* pFile;
 };
 

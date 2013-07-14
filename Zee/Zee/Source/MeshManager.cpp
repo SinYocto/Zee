@@ -22,7 +22,7 @@ void MeshManager::DeleteAll()
 	resourceList.clear();
 }
 
-void MeshManager::GetMesh(const char* name, Mesh** mesh)
+void MeshManager::GetMesh(const wchar_t* name, Mesh** mesh)
 {
 	_Assert(NULL != mesh);
 
@@ -30,7 +30,7 @@ void MeshManager::GetMesh(const char* name, Mesh** mesh)
 	for(std::list<Mesh*>::iterator iter = resourceList.begin(); iter != resourceList.end(); ++iter)
 	{
 		Mesh* curMesh = *iter;
-		if(strcmp(curMesh->GetName(), name) == 0)
+		if(YString::Compare(curMesh->GetName(), name) == 0)
 		{
 			*mesh = curMesh;
 			break;

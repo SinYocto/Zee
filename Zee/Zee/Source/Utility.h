@@ -7,7 +7,7 @@
 	if(!(condition)) \
 	{ \
 		{ \
-		printf("File: %s(%d) has triggered a break point.\nAssert(%s) failed!\n", \
+		wprintf(L"File: %S(%d) has triggered a break point.\nAssert(%S) failed!\n", \
 		__FILE__, __LINE__, #condition); \
 		__asm int 3 \
 		} \
@@ -18,13 +18,13 @@
 	if(!(condition)) \
 	{ \
 		{ \
-		printf("File: %s(%d) has triggered a break point.\nAssert(%s) failed!\n", \
+		wprintf(L"File: %S(%d) has triggered a break point.\nAssert(%S) failed!\n", \
 		__FILE__, __LINE__, #condition); \
 		__asm int 3 \
 		} \
 	}
 
-#define Log printf
+#define Log wprintf
 
 #define SAFE_RELEASE(p)	{ if(p) { (p)->Release(); (p)=NULL; } }
 #define SAFE_DELETE(p) { if(p) { delete (p); (p) = NULL; } }

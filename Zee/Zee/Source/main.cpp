@@ -21,6 +21,7 @@
 #include "OBJParser.h"
 #include "YString.h"
 #include "YFile.h"
+#include <Locale.h>
 
 const int wndWidth = 1024;
 const int wndHeight = 600;
@@ -63,8 +64,10 @@ int main()
 {
 	int retCode = 1;
 	{
+		_wsetlocale(LC_ALL, L"chs");
+
         // create window
-		gHWnd = RegisterAndCreateWindow(TEXT("Demos"), TEXT("Demos_Frame"), wndWidth, wndHeight, WndProc);
+		gHWnd = RegisterAndCreateWindow(L"Demos", L"Demos_Frame", wndWidth, wndHeight, WndProc);
 		Assert(NULL != gHWnd);
 
         // create d3ddevice
@@ -88,79 +91,25 @@ int main()
 		LightManager::AddPointLight(&pointLight1);
 
 		// mesh
-		Cube* cube1 = new Cube("cube1");
+		Cube* cube1 = new Cube(L"cube1");
 		MeshManager::AddMesh(cube1);
 
 		cube1->CalculateTBN();
 		cube1->BuildGeometry(XYZ_UV_TBN);
 
 		// material
-		Material* mtl1 = new Material("mtl1");
+		Material* mtl1 = new Material(L"mtl1");
 		MaterialManager::AddMaterial(mtl1);
 
 		mtl1->SetShader(BumpSpecular);
 
-		mtl1->shader->SetColorTex(TEXT("./Assets/Textures/6133.jpg"));
-		mtl1->shader->SetNormalTex(TEXT("./Assets/Textures/6133Normal.jpg"));
+		mtl1->shader->SetColorTex(L"./Assets/Textures/6133.jpg");
+		mtl1->shader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
 		mtl1->shader->SetSpecShiness(0.4f);
 
 		// model
-		cubeModel = new Model(NULL, cube1, mtl1);
-
-		char str1[MAX_STR_LEN];
-		char str2[MAX_STR_LEN];
-		YString::Empty(str1);
-		YString::Empty(str2);
-
-		YString::Copy(str1, _countof(str1), "  yaoo xin");
-		YString::Copy(str2, _countof(str2), "YaoXin");
-
-		bool strictEqual = YString::Compare(str1, str2) == 0 ? true : false;
-		bool equal = YString::Compare(str1, str2, true) == 0 ? true : false;
-
-		char str3[MAX_STR_LEN];
-		YString::Empty(str3);
-
-		YString::Scan(str1, "%s", str3);
-		sscanf(str1, "%s", str3);
-		YString::GetSpecifier(str3, _countof(str3), str1);
-
-		YFile* file = YFile::Open("testIO.txt", YFile::READ);
-
-		char lineContent[MAX_STR_LEN];
-		YString::Empty(lineContent);
-
-		while(file->ReadLine(lineContent, _countof(lineContent)) != NULL)
-		{
-			float x = 0;
-			float y = 0;
-			float z = 0;
-
-			YString::Scan(lineContent, "%*s %f %f %f", &x, &y, &z);
-			Log("pos:(%f, %f, %f)\n", x, y, z);
-		}
-
-		file->Close();
-
-		file = YFile::Open("testIO1.txt", YFile::READ);
-
-		//char lineContent[MAX_STR_LEN];
-		//YString::Empty(lineContent);
-		std::vector<std::string> contents1;
-		std::vector<std::string> contents2;
-		file->ReadBlock(&contents1, "newmtl", "illum");
-		file->ReadBlock(&contents2, "newmtl", "Tf");
-		file->Close();
-
-		for(size_t i = 0; i < contents1.size(); ++i)
-		{
-			Log("%s", contents1[i].c_str());
-		}
-
-		for(size_t i = 0; i < contents2.size(); ++i)
-		{
-			Log("%s", contents2[i].c_str());
-		}
+		//cubeModel = new Model(NULL, cube1, mtl1);
+		OBJParser::Parse(L"lance.obj", &cubeModel);
 
         // start loop
 		Time::Start();

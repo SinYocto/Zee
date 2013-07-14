@@ -15,13 +15,14 @@ void MaterialManager::DeleteAll()
 {
 	for(std::list<Material*>::iterator iter = resourceList.begin(); iter != resourceList.end(); ++iter)
 	{
-		SAFE_DROP(*iter);
+		SAFE_DROP(*iter);		// 这里使用了drop方法而不是delete, 当有Model持有material对象时, 虽然material对象不在MeshManager中管理了
+								// 但Model中仍能正常持有 
 	}
 
 	resourceList.clear();
 }
 
-void MaterialManager::GetMaterial(const char* name, Material** material)
+void MaterialManager::GetMaterial(const wchar_t* name, Material** material)
 {
 	_Assert(NULL != material);
 
@@ -29,7 +30,7 @@ void MaterialManager::GetMaterial(const char* name, Material** material)
 	for(std::list<Material*>::iterator iter = resourceList.begin(); iter != resourceList.end(); ++iter)
 	{
 		Material* curMaterial = *iter;
-		if(strcmp(curMaterial->GetName(), name) == 0)
+		if(YString::Compare(curMaterial->GetName(), name) == 0)
 		{
 			*material = curMaterial;
 			break;

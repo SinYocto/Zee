@@ -7,7 +7,7 @@
 class Cube : public Mesh
 {
 public:
-	Cube(const char* _name)
+	Cube(const wchar_t* _name)
 		:Mesh(_name)
 	{
 		constructGeometryData();

@@ -1,7 +1,7 @@
 #include "Model.h"
 #include "Camera.h"
 
-void Model::LoadModelDataFromFile( char* filename, ModelFileFormat format )
+void Model::LoadModelDataFromFile(wchar_t* filename, ModelFileFormat format)
 {
 
 }

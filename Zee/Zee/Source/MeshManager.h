@@ -9,7 +9,7 @@ class MeshManager
 public:
 	static void AddMesh(Mesh* mesh);
 	static void DeleteAll();
-	static void GetMesh(const char* name, Mesh** mesh);
+	static void GetMesh(const wchar_t* name, Mesh** mesh);
 
 	static void OnLostDevice();
 	static void OnResetDevice();
