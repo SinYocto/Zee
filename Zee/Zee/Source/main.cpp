@@ -111,9 +111,11 @@ int main()
 		mtl1->shader->SetSpecShiness(0.4f);
 
 		// model
+
 		//cubeModel = new Model(NULL, cube1, mtl1);
+		//OBJParser::Parse(L"Assets/Models/teapot.obj", &cubeModel);
+		OBJParser::Parse(L"Assets/Models/room_p2.obj", &cubeModel);
 		//OBJParser::Parse(L"Assets/Models/room_p2.obj", &model2);
-		OBJParser::Parse(L"Assets/Models/teapot.obj", &cubeModel);
 		//OBJParser::Parse(L"Assets/Models/room_p3.obj", &model3);
 
         // start loop

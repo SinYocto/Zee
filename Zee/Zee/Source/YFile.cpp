@@ -44,6 +44,7 @@ Exit:
 
 wchar_t* YFile::ReadLine(wchar_t* lineContent, int maxLineSize)
 {
+	// TEST:每行读取读一个共13793行的文件, 花了83ms
 	return fgetws(lineContent, maxLineSize, pFile);
 }
 

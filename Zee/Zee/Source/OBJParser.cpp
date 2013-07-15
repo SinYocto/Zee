@@ -41,10 +41,11 @@ bool OBJParser::Parse(const wchar_t* filePath, Model** result)
 		Assert(NULL != result);
 		Assert(*result == NULL);
 
-		Timer timer;
-		timer.Reset();
+		//Timer timer;
+		//timer.Reset();
 
-		Log(L"start parsing OBJ file(%s)...\n", filePath);
+		//Log(L"start parsing OBJ file(%s)...\n", filePath);
+		PerformanceTimer::Begin(L"parsing OBJ file");
 
 		clear();
 
@@ -57,10 +58,9 @@ bool OBJParser::Parse(const wchar_t* filePath, Model** result)
 
 		file->Close();
 
-		Log(L"finish parsing OBJ file(%s). time used(%f)\n", filePath, timer.GetElapsedTime());
+		PerformanceTimer::End();
 
-		timer.Reset();
-		Log(L"start building result model geometry...\n");
+		PerformanceTimer::Begin(L"building result model geometry");
 
 		// 为获取得到的mesh数据计算tbn并创建vb,ib
 		for(size_t i = 0; i < meshList.size(); ++i)
@@ -79,7 +79,8 @@ bool OBJParser::Parse(const wchar_t* filePath, Model** result)
 			}
 		}
 
-		Log(L"finish building result model geometry. time used(%f)\n", timer.GetElapsedTime());
+		PerformanceTimer::End();
+		//Log(L"finish building result model geometry. time used(%f)\n", timer.GetElapsedTime());
 
 		*result = resultModel;
 		clear();
@@ -201,6 +202,9 @@ void OBJParser::parseTrianglesBlockLinePos(const wchar_t* lineContent, Mesh** cu
 {
 	Assert(NULL != lineContent);
 
+	// <DEBUG>
+	static float vertFindTime = 0;
+
 	{
 		OBJ_SPECIFIER specifier = OBJ_OTEHR;
 		getOBJSpecifier(lineContent, &specifier);
@@ -266,9 +270,13 @@ void OBJParser::parseTrianglesBlockLinePos(const wchar_t* lineContent, Mesh** cu
 						posIndexMap[posIndex[i]] = curMeshPosIndex;
 					}
 
+					// <DEBUG>
+					Timer timer;
+					timer.Reset();
+
 					// 查找tri的vert是否是已经加入到verts中的重复vert
 					bool isVertExist = false;
-					for(size_t k = 0; k < (*curMesh)->verts.size(); ++k)
+					for(int k = (*curMesh)->verts.size() - 1; k >= 0; --k)		// 反向查找快很多, teapot.obj此查找操作总耗时从9.51s变为1.35s
 					{
 						Mesh::Vert& vert = (*curMesh)->verts[k];
 						if(vert.posIndex == curMeshPosIndex)
@@ -277,6 +285,13 @@ void OBJParser::parseTrianglesBlockLinePos(const wchar_t* lineContent, Mesh** cu
 							curVertIndex = k;
 							break;
 						}
+					}
+
+					// <DEBUG>
+					vertFindTime += timer.GetElapsedTime();
+					if(posIndex[0] == 4105 && posIndex[1] == 4657 && posIndex[2] == 4656)
+					{
+						vertFindTime += timer.GetElapsedTime();
 					}
 
 					if(!isVertExist)

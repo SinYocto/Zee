@@ -2,7 +2,9 @@
 #define TIME_H
 
 #include "Utility.h"
-#include<windows.h>
+#include "YString.h"
+#include <windows.h>
+#include <vector>
 
 class Timer
 {
@@ -42,6 +44,31 @@ private:
 private:
 	LONGLONG ticksPerSecond;
 	LONGLONG startTick;
+};
+
+class PerformanceTimer
+{
+private:
+	struct Performance
+	{
+		Performance(const wchar_t* descStr)
+			:timeUsed(0)
+		{
+			YString::Copy(desc, _countof(desc), descStr);
+		}
+
+		wchar_t desc[MAX_STR_LEN];
+		float timeUsed;
+	};
+
+public:
+	static void Begin(const wchar_t* desc);
+	static void End();
+
+private:
+	static Timer timer;
+	static std::vector<Performance> performanceList;
+	static int curPerformanceIndex;
 };
 
 class Time
