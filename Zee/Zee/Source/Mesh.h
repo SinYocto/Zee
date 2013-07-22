@@ -112,13 +112,13 @@ public:
 protected:
 	enum
 	{
-		INVALID_INDEX = 0xffffffff,
-		NO_GROUP = 0xffffffff,
+		INVALID_INDEX = -1,
+		NO_GROUP = -1,
 	};
 
 	struct CompareVector
 	{
-		bool operator()(const Vector3& vec1, const Vector3& vec2)
+		bool operator()(const Vector3& vec1, const Vector3& vec2) const
 		{
 			if(vec1.x < vec2.x)
 				return true;
@@ -142,7 +142,7 @@ protected:
 
 	struct CompareTriangle
 	{
-		bool operator()(const Triangle& tri1, const Triangle& tri2)
+		bool operator()(const Triangle& tri1, const Triangle& tri2) const
 		{
 			if(tri1.vertexIndex[0] < tri2.vertexIndex[0])
 				return true;

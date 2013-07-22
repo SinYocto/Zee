@@ -64,3 +64,13 @@ void PerformanceTimer::End()
 
 	curPerformanceIndex--;
 }
+
+//void PerformanceTimer::BeginObserveFunc(const wchar_t* funcName)
+//{
+//	
+//}
+//
+//void PerformanceTimer::EndObserveFunc()
+//{
+//
+//}

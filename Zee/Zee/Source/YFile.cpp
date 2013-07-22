@@ -50,7 +50,8 @@ wchar_t* YFile::ReadLine(wchar_t* lineContent, int maxLineSize)
 
 // 读取由beginSpecifier和endSpecifier界定的字符串段落的每一行到blockContent中
 // endSpecifier为NULL时, 则读取两个beginSpecifier之间的字符串段落
-int YFile::ReadBlock(std::vector<std::wstring>* blockContent, const wchar_t* beginSpecifier, const wchar_t* endSpecifier /*= NULL*/)
+int YFile::ReadBlock(std::vector<std::wstring>* blockContent, const wchar_t* beginSpecifier, 
+					 const wchar_t* endSpecifier /*= NULL*/, const wchar_t* firstLineContent /*= NULL*/)
 {
 	bool isSucceed = false;
 
@@ -68,10 +69,19 @@ int YFile::ReadBlock(std::vector<std::wstring>* blockContent, const wchar_t* beg
 
 	bool blockStart = false;
 
-	long lastLinePos = ftell(pFile);
+	if(firstLineContent != NULL)
+	{
+		blockStart = true;
 
-	if(lastLinePos == 1534493)
-		fseek(pFile, 1534460, SEEK_SET);
+		wchar_t specifier[MAX_STR_LEN];
+		YString::GetSpecifier(specifier, _countof(specifier), firstLineContent);
+
+		Assert(YString::Compare(specifier, beginSpecifier) == 0);
+
+		blockContent->push_back(firstLineContent);
+	}
+
+	long lastLinePos = ftell(pFile);
 
 	wchar_t lineContent[MAX_STR_LEN];
 	YString::Empty(lineContent);
@@ -98,7 +108,7 @@ int YFile::ReadBlock(std::vector<std::wstring>* blockContent, const wchar_t* beg
 		if(blockStart)
 		{
 			blockContent->push_back(lineContent);
-			lastLinePos = ftell(pFile);
+			lastLinePos = ftell(pFile);				// OPTIMISE:ftell很耗时
 		}
 	}
 

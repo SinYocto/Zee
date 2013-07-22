@@ -49,6 +49,20 @@ private:
 class PerformanceTimer
 {
 private:
+	//struct FuncPerformance
+	//{
+	//	FuncPerformance(const wchar_t* _funcName)
+	//		:runTime(0)
+	//	{
+	//		YString::Copy(funcName, _countof(funcName), _funcName);
+	//	}
+
+	//	wchar_t funcName[MAX_STR_LEN];
+	//	float runTime;
+
+	//	Timer timer;
+	//};
+
 	struct Performance
 	{
 		Performance(const wchar_t* descStr)
@@ -59,11 +73,16 @@ private:
 
 		wchar_t desc[MAX_STR_LEN];
 		float timeUsed;
+
+		//std::vector<FuncPerformance> funcPerformanceList;
 	};
 
 public:
 	static void Begin(const wchar_t* desc);
 	static void End();
+
+	//static void BeginObserveFunc(const wchar_t* funcName);
+	//static void EndObserveFunc();
 
 private:
 	static Timer timer;

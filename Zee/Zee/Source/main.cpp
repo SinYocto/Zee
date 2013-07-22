@@ -111,16 +111,17 @@ int main()
 		mtl1->shader->SetSpecShiness(0.4f);
 
 		// model
-
 		//cubeModel = new Model(NULL, cube1, mtl1);
 		//OBJParser::Parse(L"Assets/Models/teapot.obj", &cubeModel);
-		OBJParser::Parse(L"Assets/Models/room_p2.obj", &cubeModel);
-		//OBJParser::Parse(L"Assets/Models/room_p2.obj", &model2);
-		//OBJParser::Parse(L"Assets/Models/room_p3.obj", &model3);
+		OBJParser::Parse(L"Assets/Models/room_p1.obj", &cubeModel);
+		OBJParser::Parse(L"Assets/Models/room_p2.obj", &model2);
+		OBJParser::Parse(L"Assets/Models/room_p3.obj", &model3);
+
 
         // start loop
 		Time::Start();
 		while(run())
+		//while(false)
 		{
 			switch(gD3DDevice->TestCooperativeLevel())
 			{
@@ -144,8 +145,8 @@ int main()
 					gD3DDevice->BeginScene();
 
 					cubeModel->Draw(camera);
-					//model2->Draw(camera);
-					//model3->Draw(camera);
+					model2->Draw(camera);
+					model3->Draw(camera);
 
 					gGUISystem.Draw();
 
@@ -239,13 +240,13 @@ void SetupGUIStyle()
 
 void SetupShaders()
 {
-	DiffuseShader::CreateEffectFromFile(TEXT("./Source/Shaders/Diffuse.fx"));
+	DiffuseShader::CreateEffectFromFile(TEXT("./Source/Shaders/Diffuse.fx"));	// time used: 124ms
 	_Assert(NULL != DiffuseShader::effect);
 
-	SpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/Specular.fx"));
+	SpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/Specular.fx"));		// time used: 230ms
 	_Assert(NULL != SpecularShader::effect);
 
-	BumpSpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/BumpSpecular.fx"));
+	BumpSpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/BumpSpecular.fx"));		// time used: 248ms
 	_Assert(NULL != BumpSpecularShader::effect);
 }
 

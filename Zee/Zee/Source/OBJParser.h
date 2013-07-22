@@ -1,5 +1,3 @@
-#if 1
-
 #ifndef OBJPARSER_H
 #define OBJPARSER_H
 
@@ -82,18 +80,9 @@ public:
 private:
 	static void clear();
 	static void parseLine(YFile* file, const wchar_t* lineContent);
+
 	static void parseTrianglesBlock(const std::vector<std::wstring>& blockContent);
-
-	static void parseTrianglesBlockLinePos(const wchar_t* lineContent, Mesh** curMesh, std::map<int, int>& posIndexMap,
-		std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap);
-
-	static void parseTrianglesBlockLinePosNormal(const wchar_t* lineContent, Mesh** curMesh, std::map<int, int>& posIndexMap,
-		std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap);
-
-	static void parseTrianglesBlockLinePosUV(const wchar_t* lineContent, Mesh** curMesh, std::map<int, int>& posIndexMap,
-		std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap);
-
-	static void parseTrianglesBlockLinePosUVNormal(const wchar_t* lineContent, Mesh** curMesh, std::map<int, int>& posIndexMap,
+	static void parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMesh, std::map<int, int>& posIndexMap,
 		std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap);
 
 	static void parseMtl(const wchar_t* mtlFilePath);
@@ -121,7 +110,5 @@ private:
 
 };
 
-
-#endif
 
 #endif

@@ -68,6 +68,7 @@
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
+				Profile="false"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -118,6 +119,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -136,7 +139,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib winmm.lib dxguid.lib dsound.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -364,14 +369,6 @@
 		<Filter
 			Name="Helper"
 			>
-			<File
-				RelativePath=".\Source\File.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\File.h"
-				>
-			</File>
 			<File
 				RelativePath=".\Source\Time.cpp"
 				>

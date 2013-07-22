@@ -23,7 +23,8 @@ public:
 	static YFile* Open(const wchar_t* filePath, OPEN_MODE mode);
 
 	wchar_t* ReadLine(wchar_t* lineContent, int maxLineSize);
-	int ReadBlock(std::vector<std::wstring>* blockContent, const wchar_t* beginSpecifier, const wchar_t* endSpecifier = NULL);
+	int ReadBlock(std::vector<std::wstring>* blockContent, const wchar_t* beginSpecifier, 
+		const wchar_t* endSpecifier = NULL, const wchar_t* firstLineContent = NULL);
 
 	bool Close();
 

@@ -685,12 +685,13 @@ void Mesh::findNeighbourTriangles(const TriangleList& triGroup, const Triangle& 
 bool Mesh::hasSharedEdge(const Triangle& triangle0, const Triangle& triangle1)
 {
 	int numSharedVerts = 0;
+
 	for(int i = 0; i < 3; ++i)
 	{
-		Vector3 tri0Pos = positionData[verts[triangle0.vertexIndex[i]].posIndex];
+		Vector3& tri0Pos = positionData[verts[triangle0.vertexIndex[i]].posIndex];
 		for(int j = 0; j < 3; ++j)
 		{
-			Vector3 tri1Pos = positionData[verts[triangle1.vertexIndex[j]].posIndex];
+			Vector3& tri1Pos = positionData[verts[triangle1.vertexIndex[j]].posIndex];
 			if(Vector3Equal(tri1Pos, tri0Pos, 0.0001f))
 			{
 				++numSharedVerts;

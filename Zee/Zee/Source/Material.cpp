@@ -1,6 +1,6 @@
 #include"Material.h"
 
-void Material::SetTexture(int layerIx, wchar_t* texFileName)
+void Material::SetTexture(int layerIx, wchar_t* texFileName)	// TODO:不应该直接从文件中CreateTexture再Set, 增加TextureManager类
 {
 	if(layerIx < 0 || layerIx >= MAX_MATERIAL_TEXTURE_LAYERS)
 		return;
@@ -8,7 +8,7 @@ void Material::SetTexture(int layerIx, wchar_t* texFileName)
 	if(textureLayer[layerIx])
 		SAFE_RELEASE(textureLayer[layerIx]);
 
-	D3DXCreateTextureFromFile(gD3DDevice, texFileName, &textureLayer[layerIx]);
+	D3DXCreateTextureFromFile(gD3DDevice, texFileName, &textureLayer[layerIx]);		
 }
 
 IDirect3DTexture9* Material::GetTexture(int layerIx)
