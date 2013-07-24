@@ -2,6 +2,8 @@
 #define UTILITY_H
 
 #include <stdio.h>
+#include <vector>
+#include <list>
 
 #define Assert(condition) \
 	if(!(condition)) \

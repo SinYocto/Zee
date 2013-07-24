@@ -21,6 +21,7 @@
 #include "OBJParser.h"
 #include "YString.h"
 #include "YFile.h"
+#include "DebugDrawer.h"
 #include <Locale.h>
 
 const int wndWidth = 1024;
@@ -113,9 +114,15 @@ int main()
 		// model
 		//cubeModel = new Model(NULL, cube1, mtl1);
 		//OBJParser::Parse(L"Assets/Models/teapot.obj", &cubeModel);
-		OBJParser::Parse(L"Assets/Models/room_p1.obj", &cubeModel);
-		OBJParser::Parse(L"Assets/Models/room_p2.obj", &model2);
-		OBJParser::Parse(L"Assets/Models/room_p3.obj", &model3);
+		OBJParser::Parse(L"Assets/Models/knife.obj", &cubeModel);
+		//OBJParser::Parse(L"Assets/Models/room_p2.obj", &model2);
+		//OBJParser::Parse(L"Assets/Models/room_p3.obj", &model3);
+
+		// line test
+		std::vector<Vector3> points;
+		points.push_back(Vector3(0, 0, 0));
+		points.push_back(Vector3(4, 0, 0));
+		points.push_back(Vector3(4, 4, 0));
 
 
         // start loop
@@ -144,9 +151,12 @@ int main()
 					gD3DDevice->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff1e90ff, 1.0f, 0);
 					gD3DDevice->BeginScene();
 
+					DebugDrawer::DrawLine(points, 0xffff0000, camera);
+					DebugDrawer::DrawCircle(Vector3(4, 4, 0), Vector3(1, 1, 1), 1, 0xffff0000, camera);
+
 					cubeModel->Draw(camera);
-					model2->Draw(camera);
-					model3->Draw(camera);
+					//model2->Draw(camera);
+					//model3->Draw(camera);
 
 					gGUISystem.Draw();
 
@@ -182,7 +192,7 @@ Exit:
 void ApplyFPCameraControllor(Camera* pCamera, float deltaTime)
 {
 	Vector3 moveVector;
-	float moveSpeed = 200.0f;
+	float moveSpeed = 2.0f;
 	float rotateSpeed = 2.0f;
 
 	if(Input::GetKey(DIK_LSHIFT))

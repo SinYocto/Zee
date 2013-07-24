@@ -108,7 +108,7 @@ void Vector3::Normalize()
 	}
 }
 
-Vector3 Vector3::Normalized()
+Vector3 Vector3::Normalized() const
 {
 	Vector3 vec = *this;
 	vec.Normalize();
@@ -120,7 +120,7 @@ float Vector3::Dot(Vector3 vec) const
 	return x*vec.x + y*vec.y + z*vec.z; 
 }
 	
-Vector3 Vector3::Cross(Vector3 vec) 
+Vector3 Vector3::Cross(Vector3 vec) const
 { 
 	return Vector3(y*vec.z - z*vec.y, z*vec.x - x*vec.z, x*vec.y - y*vec.x); 
 }
@@ -320,6 +320,48 @@ D3DXMATRIX Quaternion::Matrix()
 Quaternion Quaternion::Difference(Quaternion quat)
 {
 	return quat * (*this).Conjugate();
+}
+
+void Quaternion::Normalize()
+{
+	float length = sqrt(w*w + x*x + y*y + z*z);
+	if(FloatUnequal(length, 0, 0.00001f))
+	{
+		w /= length;
+		x /= length;
+		y /= length;
+		z /= length;
+	}
+}
+
+Quaternion Quaternion::VectorRotation(Vector3 vec1, Vector3 vec2)
+{
+	vec1.Normalize();
+	vec2.Normalize();
+
+	float dot = vec1.Dot(vec2);
+
+	if(FloatEqual(dot, 1, 0.0001f))
+	{
+		return Quaternion(1, 0, 0, 0);
+	}
+
+	if(FloatEqual(dot, -1, 0.0001f))
+	{
+		return Quaternion(0, 0, 1, 0);
+	}
+
+	Vector3 axis = vec1.Cross(vec2);
+
+	Quaternion rotation;
+	rotation.x = axis.x;
+	rotation.y = axis.y;
+	rotation.z = axis.z;
+	rotation.w = 1 + dot;
+
+	rotation.Normalize();
+
+	return rotation;
 }
 
 Rect::Rect()

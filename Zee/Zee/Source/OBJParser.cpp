@@ -242,47 +242,54 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMe
 			}
 		case FACE:
 			{
-				int posIndex[3] = { -1, -1, -1 };
-				int uvIndex[3] = { -1, -1, -1 };
-				int normalIndex[3] = { -1, -1, -1 };
+				int posIndex[4] = { -1, -1, -1, -1 };
+				int uvIndex[4] = { -1, -1, -1, -1 };
+				int normalIndex[4] = { -1, -1, -1, -1 };
 
 				if(((dataContentType & UV_DATA) == 0) && ((dataContentType & NORMAL_DATA) == 0))
 				{
-					YString::Scan(lineContent, L"%*c %d %d %d", 
-						&posIndex[0], &posIndex[1], &posIndex[2]);
+					YString::Scan(lineContent, L"%*c %d %d %d %d", 
+						&posIndex[0], &posIndex[1], &posIndex[2], &posIndex[3]);
 				}
 				else if(((dataContentType & UV_DATA) == 0) && ((dataContentType & NORMAL_DATA) != 0))
 				{
-					YString::Scan(lineContent, L"%*c %d//%d %d//%d %d//%d",
+					YString::Scan(lineContent, L"%*c %d//%d %d//%d %d//%d %d//%d",
 						&posIndex[0], &normalIndex[0],
 						&posIndex[1], &normalIndex[1],
-						&posIndex[2], &normalIndex[2]);
+						&posIndex[2], &normalIndex[2],
+						&posIndex[3], &normalIndex[3]);
 				}
 				else if(((dataContentType & UV_DATA) != 0) && ((dataContentType & NORMAL_DATA) == 0))
 				{
-					YString::Scan(lineContent, L"%*c %d/%d %d/%d %d/%d", 
+					YString::Scan(lineContent, L"%*c %d/%d %d/%d %d/%d %d/%d", 
 						&posIndex[0], &uvIndex[0], 
 						&posIndex[1], &uvIndex[1], 
-						&posIndex[2], &uvIndex[2]);
+						&posIndex[2], &uvIndex[2], 
+						&posIndex[3], &uvIndex[3]);
 				}
 				else if(((dataContentType & UV_DATA) != 0) && ((dataContentType & NORMAL_DATA) != 0))
 				{
-					YString::Scan(lineContent, L"%*c %d/%d/%d %d/%d/%d %d/%d/%d",		// TODO:face可能是三角面, 也可能是四边面
+					YString::Scan(lineContent, L"%*c %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",		// TODO:face可能是三角面, 也可能是四边面
 						&posIndex[0], &uvIndex[0], &normalIndex[0], 
 						&posIndex[1], &uvIndex[1], &normalIndex[1], 
-						&posIndex[2], &uvIndex[2], &normalIndex[2]);
+						&posIndex[2], &uvIndex[2], &normalIndex[2], 
+						&posIndex[3], &uvIndex[3], &normalIndex[3]);
 				}
 
-				Mesh::Triangle tri;
-				for(int i = 0; i < 3; ++i)
+				int vertIndex[4] = { -1, -1, -1, -1 };
+				for(int i = 0; i < 4; ++i)
 				{			
+					if(i == 3 && posIndex[i] == -1)		// 三角面
+						break;
+
 					// OBJ文件是从1开始的, 减1变成从0开始
 					Assert((posIndex[i] -= 1) >= 0);
 
 					int curMeshPosIndex = -1;
 					int curMeshUVIndex = -1;
 					int curMeshNormalIndex = -1;
-					int curVertIndex = -1;
+					//int curVertIndex = -1;
+					int& curVertIndex = vertIndex[i];
 
 					bool posIndexExist = posIndexMap.find(posIndex[i]) != posIndexMap.end();
 
@@ -360,11 +367,22 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMe
 						Mesh::Vert vert(curMeshPosIndex, curMeshUVIndex, curMeshNormalIndex);
 						(*curMesh)->verts.push_back(vert);
 					}
-
-					tri.vertexIndex[i] = curVertIndex;
 				}
 
-				(*curMesh)->triangleList.push_back(tri);
+				Mesh::Triangle tri1;
+				tri1.vertexIndex[0] = vertIndex[0];
+				tri1.vertexIndex[1] = vertIndex[1];
+				tri1.vertexIndex[2] = vertIndex[2];
+				(*curMesh)->triangleList.push_back(tri1);
+
+				if(vertIndex[3] != -1)
+				{
+					Mesh::Triangle tri2;
+					tri2.vertexIndex[0] = vertIndex[0];
+					tri2.vertexIndex[1] = vertIndex[2];
+					tri2.vertexIndex[2] = vertIndex[3];
+					(*curMesh)->triangleList.push_back(tri2);
+				}
 
 				break;
 			}

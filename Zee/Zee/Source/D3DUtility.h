@@ -242,6 +242,26 @@ struct VertexXYZRHWUV
     static const DWORD FVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
 };
 
+struct VertexXYZD
+{
+	VertexXYZD(float _x = 0, float _y = 0, float _z = 0, D3DCOLOR _color = 0)
+		:x(_x)
+		,y(_y)
+		,z(_z)
+		,color(_color)
+	{
+
+	}
+
+	float x;
+	float y;
+	float z;
+
+	D3DCOLOR color;
+
+	static const DWORD FVF = D3DFVF_XYZ | D3DFVF_DIFFUSE;
+};
+
 struct VertexXYZRHWD
 {
 	VertexXYZRHWD(float _x = 0, float _y = 0, float _z = 0, float _rhw = 0, D3DCOLOR _color = 0)
@@ -264,7 +284,7 @@ struct VertexXYZRHWD
 	static const DWORD FVF = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
 };
 
-enum VertexType { XYZ, XYZ_UV, XYZ_N, XYZ_UV_N, XYZ_UV_TBN, XYZRHW_UV, XYZRHW_D };
+enum VertexType { XYZ, XYZ_UV, XYZ_N, XYZ_UV_N, XYZ_UV_TBN, XYZRHW_UV, XYZ_D, XYZRHW_D };
 
 HWND RegisterAndCreateWindow(LPCWSTR wndClassName, LPCWSTR wndName, int wndWidth, int wndHeight, WNDPROC WndProc);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);

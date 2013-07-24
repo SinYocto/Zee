@@ -28,9 +28,9 @@ public:
 
 	float Length() const;
 	void Normalize();
-	Vector3 Normalized();
+	Vector3 Normalized() const;
 	float Dot(Vector3 vec) const;
-	Vector3 Cross(Vector3 vec);
+	Vector3 Cross(Vector3 vec) const;
 
 public:
 	float x;
@@ -112,8 +112,12 @@ public:
 
 	Quaternion Difference(Quaternion quat);
 
+	void Normalize();
+
 	Vector3 EulerAngle();
 	D3DXMATRIX Matrix();
+
+	static Quaternion VectorRotation(Vector3 vec1, Vector3 vec2);
 
 public:
 	float w;

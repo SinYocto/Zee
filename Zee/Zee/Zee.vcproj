@@ -186,6 +186,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\DebugDrawer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\DebugDrawer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\IReferenceCounted.h"
 				>
 			</File>
