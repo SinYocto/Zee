@@ -4,7 +4,7 @@
 #include "Utility.h"
 
 /* 引用计数基类, 需要使用引用计数来管理资源释放的类可以继承此类
- * 目前使用的有Mesh类和Material类
+ * 目前使用的有Geometry类和Material类
  * 每被引用一次调用Grab方法, 释放引用调用Drop方法
  */
 

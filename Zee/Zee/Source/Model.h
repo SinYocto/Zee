@@ -1,15 +1,15 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "SubModel.h"
+#include "Mesh.h"
 #include <list>
 
 // #设计
-// 每个Model对象包含一个SubModel列表, 同时Model和SubModel都是Object对象, 在Object层级上每个SubModel都是Model的子对象
-// 增加一个SubModel要加入到SubModel列表还要在Object层级设置为Model的子对象
+// 每个Model对象包含一个mesh列表, 同时Model和mesh都是Object对象, 在Object层级上每个mesh都是Model的子对象
+// 增加一个mesh要加入到mesh列表还要在Object层级设置为Model的子对象
 
 // #资源管理
-// Model会new出若干SubModel对象, 析构时调用SubModel的delete即可
+// Model会new出若干mesh对象, 析构时调用mesh的delete即可
 
 enum ModelFileFormat
 {
@@ -21,38 +21,38 @@ class Camera;
 class Model : public Object
 {
 public:
-	// 此构造函数使用一个mesh和material对象来构造一个包含一个SubModel的Model对象
 	Model()
 	{
 
 	}
 
-	Model(Object* _parent, Mesh* _mesh, Material* _material)
+	// 此构造函数使用一个geo和material对象来构造一个包含一个SubMesh的Model对象
+	Model(Object* _parent, Geometry* _geo, Material* _material)
 	{
-		SubModel* subModel = new SubModel(this, _mesh, _material);
-		AddSubModel(subModel);
+		Mesh* mesh = new Mesh(this, _geo, _material);
+		AddSubMesh(mesh);
 	}
 
 	~Model()
 	{
-		for(std::list<SubModel*>::iterator iter = subModels.begin(); iter != subModels.end(); ++iter)
+		for(std::list<Mesh*>::iterator iter = subMeshes.begin(); iter != subMeshes.end(); ++iter)
 		{
 			SAFE_DELETE(*iter);
 		}
 	}
-	void AddSubModel(SubModel* subModel)
+	void AddSubMesh(Mesh* mesh)
 	{
-		_Assert(NULL != subModel);
+		_Assert(NULL != mesh);
 
-		if(std::find(subModels.begin(), subModels.end(), subModel) != subModels.end())
+		if(std::find(subMeshes.begin(), subMeshes.end(), mesh) != subMeshes.end())
 		{
-			// subModels中已存在此对象指针
+			// subMeshes中已存在此对象指针
 			return;
 		}
 		else
 		{
-			subModel->SetParent(this);
-			subModels.push_back(subModel);
+			mesh->SetParent(this);
+			subMeshes.push_back(mesh);
 		}
 	}
 
@@ -63,7 +63,7 @@ public:
 
 
 private:
-	std::list<SubModel*> subModels;
+	std::list<Mesh*> subMeshes;
 };
 
 

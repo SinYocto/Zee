@@ -12,11 +12,10 @@
 #include "RenderableObject.h"
 #include "Primitive.h"
 #include "Material.h"
-#include "SubModel.h"
+#include "Mesh.h"
 #include "Model.h"
-//#include "File.h"
 #include <stdio.h>
-#include "MeshManager.h"
+#include "GeometryManager.h"
 #include "MaterialManager.h"
 #include "OBJParser.h"
 #include "YString.h"
@@ -39,7 +38,7 @@ DirectionalLight dirLight2;
 PointLight pointLight1;
 PointLight pointLight2;
 
-// mesh
+// geo
 //Cube* cubeMesh = NULL;
 
 // material
@@ -94,9 +93,9 @@ int main()
 		LightManager::AddDirectionalLight(&dirLight1);
 		LightManager::AddPointLight(&pointLight1);
 
-		// mesh
+		// geo
 		Cube* cube1 = new Cube(L"cube1");
-		MeshManager::AddMesh(cube1);
+		GeometryManager::AddGeometry(cube1);
 
 		cube1->CalculateTBN();
 		cube1->BuildGeometry(XYZ_UV_TBN);
@@ -153,6 +152,7 @@ int main()
 
 					DebugDrawer::DrawLine(points, 0xffff0000, camera);
 					DebugDrawer::DrawCircle(Vector3(4, 4, 0), Vector3(1, 1, 1), 1, 0xffff0000, camera);
+					DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, 1), 1, 0xffff0000, camera);
 
 					cubeModel->Draw(camera);
 					//model2->Draw(camera);
@@ -299,7 +299,7 @@ void AppDestroy()
 	SAFE_DELETE(leftAlignStyle);
 	SAFE_DELETE(camera);
 
-	MeshManager::DeleteAll();
+	GeometryManager::DeleteAll();
 	MaterialManager::DeleteAll();
 
 	SAFE_DELETE(cubeModel);
@@ -318,7 +318,7 @@ void OnLostDevice()
 	SpecularShader::OnLostDevice();
 	BumpSpecularShader::OnLostDevice();
 
-	MeshManager::OnLostDevice();
+	GeometryManager::OnLostDevice();
 }
 
 void OnResetDevice()
@@ -335,5 +335,5 @@ void OnResetDevice()
 	SpecularShader::OnResetDevice();
 	BumpSpecularShader::OnResetDevice();
 
-	MeshManager::OnResetDevice();
+	GeometryManager::OnResetDevice();
 }

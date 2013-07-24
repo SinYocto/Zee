@@ -8,7 +8,7 @@ enum ShadingMethod { Diffuse, Specular, BumpSpecular };
 class Material;
 class Camera;
 class Object;
-class Mesh;
+class Geometry;
 
 interface IShader
 {
@@ -54,7 +54,7 @@ public:
 
 	}
 
-	virtual void Render(Object* object, Mesh* mesh, Camera* camera)
+	virtual void Render(Object* object, Geometry* geo, Camera* camera)
 	{
 
 	}
@@ -92,7 +92,7 @@ public:
 	void SetUVTiles(float _tilesU, float _tilesV);
 	void SetUVOffset(float _offsetU, float _offsetV);
 
-	void Render(Object* object, Mesh* mesh, Camera* camera);
+	void Render(Object* object, Geometry* geo, Camera* camera);
 
 private:
 	Material* material;
@@ -137,7 +137,7 @@ public:
 	void SetUVTiles(float _tilesU, float _tilesV);
 	void SetUVOffset(float _offsetU, float _offsetV);
 
-	void Render(Object* object, Mesh* mesh, Camera* camera);
+	void Render(Object* object, Geometry* geo, Camera* camera);
 
 private:
 	Material* material;
@@ -183,7 +183,7 @@ public:
 	void SetUVTiles(float _tilesU, float _tilesV);
 	void SetUVOffset(float _offsetU, float _offsetV);
 
-	void Render(Object* object, Mesh* mesh, Camera* camera);
+	void Render(Object* object, Geometry* geo, Camera* camera);
 
 private:
 	Material* material;

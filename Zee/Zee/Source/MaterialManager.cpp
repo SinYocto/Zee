@@ -15,7 +15,7 @@ void MaterialManager::DeleteAll()
 {
 	for(std::list<Material*>::iterator iter = resourceList.begin(); iter != resourceList.end(); ++iter)
 	{
-		SAFE_DROP(*iter);		// 这里使用了drop方法而不是delete, 当有Model持有material对象时, 虽然material对象不在MeshManager中管理了
+		SAFE_DROP(*iter);		// 这里使用了drop方法而不是delete, 当有Model持有material对象时, 虽然material对象不在GeometryManager中管理了
 								// 但Model中仍能正常持有 
 	}
 

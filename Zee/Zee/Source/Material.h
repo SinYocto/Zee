@@ -70,7 +70,7 @@ public:
 
 	D3DXMATRIX UVTransformMatrix();
 
-	void Render(Object* object, Mesh* mesh, Camera* camera);
+	void Render(Object* object, Geometry* geo, Camera* camera);
 
 	wchar_t* GetName();
 	void SetID(DWORD _id);

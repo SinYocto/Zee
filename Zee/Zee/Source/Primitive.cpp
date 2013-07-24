@@ -28,42 +28,42 @@ void Cube::constructGeometryData()
 		uvData.push_back(uv[i]);
 
 	// verts
-	Mesh::Vert meshVerts[24];
-	meshVerts[0] = Vert(0, 0);
-	meshVerts[1] = Vert(1, 1);
-	meshVerts[2] = Vert(2, 2);
-	meshVerts[3] = Vert(3, 3);
+	Geometry::Vert geoVerts[24];
+	geoVerts[0] = Vert(0, 0);
+	geoVerts[1] = Vert(1, 1);
+	geoVerts[2] = Vert(2, 2);
+	geoVerts[3] = Vert(3, 3);
 
-	meshVerts[4] = Vert(5, 0);
-	meshVerts[5] = Vert(4, 1);
-	meshVerts[6] = Vert(7, 2);
-	meshVerts[7] = Vert(6, 3);
+	geoVerts[4] = Vert(5, 0);
+	geoVerts[5] = Vert(4, 1);
+	geoVerts[6] = Vert(7, 2);
+	geoVerts[7] = Vert(6, 3);
 
-	meshVerts[8] = Vert(2, 0);
-	meshVerts[9] = Vert(3, 1);
-	meshVerts[10] = Vert(6, 2);
-	meshVerts[11] = Vert(7, 3);
+	geoVerts[8] = Vert(2, 0);
+	geoVerts[9] = Vert(3, 1);
+	geoVerts[10] = Vert(6, 2);
+	geoVerts[11] = Vert(7, 3);
 
-	meshVerts[12] = Vert(1, 0);
-	meshVerts[13] = Vert(0, 1);
-	meshVerts[14] = Vert(5, 2);
-	meshVerts[15] = Vert(4, 3);
+	geoVerts[12] = Vert(1, 0);
+	geoVerts[13] = Vert(0, 1);
+	geoVerts[14] = Vert(5, 2);
+	geoVerts[15] = Vert(4, 3);
 
-	meshVerts[16] = Vert(0, 0);
-	meshVerts[17] = Vert(2, 1);
-	meshVerts[18] = Vert(4, 2);
-	meshVerts[19] = Vert(6, 3);
+	geoVerts[16] = Vert(0, 0);
+	geoVerts[17] = Vert(2, 1);
+	geoVerts[18] = Vert(4, 2);
+	geoVerts[19] = Vert(6, 3);
 
-	meshVerts[20] = Vert(3, 0);
-	meshVerts[21] = Vert(1, 1);
-	meshVerts[22] = Vert(7, 2);
-	meshVerts[23] = Vert(5, 3);
+	geoVerts[20] = Vert(3, 0);
+	geoVerts[21] = Vert(1, 1);
+	geoVerts[22] = Vert(7, 2);
+	geoVerts[23] = Vert(5, 3);
 
 	for(int i = 0; i < 24; ++i)
-		verts.push_back(meshVerts[i]);
+		verts.push_back(geoVerts[i]);
 
 	// triangles
-	Mesh::Triangle triangles[12];
+	Geometry::Triangle triangles[12];
 	triangles[0] = Triangle(0, 1, 2);
 	triangles[1] = Triangle(2, 1, 3);
 

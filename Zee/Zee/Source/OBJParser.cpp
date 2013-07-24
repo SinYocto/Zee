@@ -1,7 +1,7 @@
 #include "OBJParser.h"
 #include "Model.h"
 #include "YFile.h"
-#include "MeshManager.h"
+#include "GeometryManager.h"
 #include "MaterialManager.h"
 #include <stdio.h>
 #include <string.h>
@@ -14,7 +14,7 @@ std::vector<Vector3> OBJParser::positionData;
 std::vector<Vector2> OBJParser::uvData;
 std::vector<Vector3> OBJParser::normalData;
 
-std::vector<Mesh*> OBJParser::meshList;
+std::vector<Geometry*> OBJParser::geoList;
 std::vector<Material*> OBJParser::materialList;
 
 Model* OBJParser::resultModel = NULL;
@@ -25,7 +25,7 @@ void OBJParser::clear()
 	uvData.clear();
 	normalData.clear();
 
-	meshList.clear();
+	geoList.clear();
 	materialList.clear();
 	resultModel = NULL;
 }
@@ -56,20 +56,20 @@ bool OBJParser::Parse(const wchar_t* filePath, Model** result)
 
 		PerformanceTimer::Begin(L"building result model geometry");
 
-		// 为获取得到的mesh数据计算tbn并创建vb,ib
-		for(size_t i = 0; i < meshList.size(); ++i)
+		// 为获取得到的geo数据计算tbn并创建vb,ib
+		for(size_t i = 0; i < geoList.size(); ++i)
 		{
-			Mesh* mesh = meshList[i];
+			Geometry* geo = geoList[i];
 
 			if(((dataContentType & UV_DATA) == 0))
 			{
-				mesh->CalculateNormals();
-				mesh->BuildGeometry(XYZ_N);
+				geo->CalculateNormals();
+				geo->BuildGeometry(XYZ_N);
 			}
 			else
 			{
-				mesh->CalculateTBN();
-				mesh->BuildGeometry(XYZ_UV_TBN);
+				geo->CalculateTBN();
+				geo->BuildGeometry(XYZ_UV_TBN);
 			}
 		}
 
@@ -161,38 +161,17 @@ Exit:
 
 void OBJParser::parseTrianglesBlock(const std::vector<std::wstring>& blockContent)
 {
-	Mesh* mesh = NULL;
+	Geometry* geo = NULL;
 
 	std::map<int, int> posIndexMap;
 	std::map<int, int> uvIndexMap;
 	std::map<int, int> normalIndexMap;
 
-	//typedef void (*ParseFunc)(const wchar_t*, Mesh**, std::map<int, int>&, std::map<int, int>&, std::map<int, int>&);
-	//ParseFunc parseFunc = NULL;
-
 	Assert((dataContentType & POS_DATA) != 0);
 
-	//if(((dataContentType & UV_DATA) == 0) && ((dataContentType & NORMAL_DATA) == 0))
-	//{
-	//	parseFunc = parseTrianglesBlockLinePos;
-	//}
-	//else if(((dataContentType & UV_DATA) == 0) && ((dataContentType & NORMAL_DATA) != 0))
-	//{
-	//	parseFunc = parseTrianglesBlockLinePosNormal;
-	//}
-	//else if(((dataContentType & UV_DATA) != 0) && ((dataContentType & NORMAL_DATA) == 0))
-	//{
-	//	parseFunc = parseTrianglesBlockLinePosUV;
-	//}
-	//else if(((dataContentType & UV_DATA) != 0) && ((dataContentType & NORMAL_DATA) != 0))
-	//{
-	//	parseFunc = parseTrianglesBlockLinePosUVNormal;
-	//}
-
-	//Assert(NULL != parseFunc);
 	for(size_t i = 0; i < blockContent.size(); ++i)
 	{
-		parseTrianglesBlockLine(blockContent[i].c_str(), &mesh, posIndexMap, uvIndexMap, normalIndexMap);
+		parseTrianglesBlockLine(blockContent[i].c_str(), &geo, posIndexMap, uvIndexMap, normalIndexMap);
 	}
 
 Exit:
@@ -200,7 +179,7 @@ Exit:
 }
 
 
-void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMesh, std::map<int, int>& posIndexMap,
+void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** curGeo, std::map<int, int>& posIndexMap,
 								std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap)
 {
 	Assert(NULL != lineContent);
@@ -221,21 +200,21 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMe
 					Assert(NULL != material);
 				}
 
-				// 为使用mtlName材质的triangleList创建一个mesh, 此mtl和mesh共同构成一个subModel
-				SubModel* subModel = NULL;
+				// 为使用mtlName材质的triangleList创建一个geo, 此mtl和geo共同构成一个subMesh
+				Mesh* subMesh = NULL;
 				{
-					Assert((*curMesh) == NULL);
-					(*curMesh) = new Mesh(L"mesh");				// TODO:给个按序号增加的默认名?
-					MeshManager::AddMesh((*curMesh));
+					Assert((*curGeo) == NULL);
+					(*curGeo) = new Geometry(L"geo");				// TODO:给个按序号增加的默认名?
+					GeometryManager::AddGeometry((*curGeo));
 
-					meshList.push_back((*curMesh));
+					geoList.push_back((*curGeo));
 
 					if(resultModel == NULL)
 						resultModel = new Model();
 					Assert(NULL != resultModel);
 
-					subModel = new SubModel(NULL, (*curMesh), material);
-					resultModel->AddSubModel(subModel);
+					subMesh = new Mesh(NULL, (*curGeo), material);
+					resultModel->AddSubMesh(subMesh);
 				}
 
 				break;
@@ -285,9 +264,9 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMe
 					// OBJ文件是从1开始的, 减1变成从0开始
 					Assert((posIndex[i] -= 1) >= 0);
 
-					int curMeshPosIndex = -1;
-					int curMeshUVIndex = -1;
-					int curMeshNormalIndex = -1;
+					int curGeoPosIndex = -1;
+					int curGeoUVIndex = -1;
+					int curGeoNormalIndex = -1;
 					//int curVertIndex = -1;
 					int& curVertIndex = vertIndex[i];
 
@@ -295,13 +274,13 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMe
 
 					if(posIndexExist)
 					{
-						curMeshPosIndex = posIndexMap[posIndex[i]];
+						curGeoPosIndex = posIndexMap[posIndex[i]];
 					}
 					else
 					{
-						curMeshPosIndex = (*curMesh)->positionData.size();
-						(*curMesh)->positionData.push_back(positionData[posIndex[i]]);
-						posIndexMap[posIndex[i]] = curMeshPosIndex;
+						curGeoPosIndex = (*curGeo)->positionData.size();
+						(*curGeo)->positionData.push_back(positionData[posIndex[i]]);
+						posIndexMap[posIndex[i]] = curGeoPosIndex;
 					}
 
 					if((dataContentType & UV_DATA) != 0)
@@ -312,13 +291,13 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMe
 
 						if(uvIndexExist)
 						{
-							curMeshUVIndex = uvIndexMap[uvIndex[i]];
+							curGeoUVIndex = uvIndexMap[uvIndex[i]];
 						}
 						else
 						{
-							curMeshUVIndex = (*curMesh)->uvData.size();
-							(*curMesh)->uvData.push_back(uvData[uvIndex[i]]);
-							uvIndexMap[uvIndex[i]] = curMeshUVIndex;
+							curGeoUVIndex = (*curGeo)->uvData.size();
+							(*curGeo)->uvData.push_back(uvData[uvIndex[i]]);
+							uvIndexMap[uvIndex[i]] = curGeoUVIndex;
 						}
 					}
 
@@ -330,29 +309,29 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMe
 
 						if(normalIndexExist)
 						{
-							curMeshNormalIndex = normalIndexMap[normalIndex[i]];
+							curGeoNormalIndex = normalIndexMap[normalIndex[i]];
 						}
 						else
 						{
-							curMeshNormalIndex = (*curMesh)->normalData.size();
-							(*curMesh)->normalData.push_back(normalData[normalIndex[i]]);
-							normalIndexMap[normalIndex[i]] = curMeshNormalIndex;
+							curGeoNormalIndex = (*curGeo)->normalData.size();
+							(*curGeo)->normalData.push_back(normalData[normalIndex[i]]);
+							normalIndexMap[normalIndex[i]] = curGeoNormalIndex;
 						}
 					}
 
 					// 查找tri的vert是否是已经加入到verts中的重复vert
 					bool isVertExist = false;
-					for(size_t k = 0; k < (*curMesh)->verts.size(); ++k)
+					for(size_t k = 0; k < (*curGeo)->verts.size(); ++k)
 					{
-						Mesh::Vert& vert = (*curMesh)->verts[k];
+						Geometry::Vert& vert = (*curGeo)->verts[k];
 
-						if(vert.posIndex != curMeshPosIndex)
+						if(vert.posIndex != curGeoPosIndex)
 							continue;
 
-						if((dataContentType & UV_DATA) != 0 && vert.uvIndex != curMeshUVIndex)
+						if((dataContentType & UV_DATA) != 0 && vert.uvIndex != curGeoUVIndex)
 							continue;
 
-						if((dataContentType & NORMAL_DATA) != 0 && vert.normalIndex != curMeshNormalIndex)
+						if((dataContentType & NORMAL_DATA) != 0 && vert.normalIndex != curGeoNormalIndex)
 							continue;
 
 						isVertExist = true;
@@ -362,26 +341,26 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMe
 
 					if(!isVertExist)
 					{
-						curVertIndex = (*curMesh)->verts.size();
+						curVertIndex = (*curGeo)->verts.size();
 
-						Mesh::Vert vert(curMeshPosIndex, curMeshUVIndex, curMeshNormalIndex);
-						(*curMesh)->verts.push_back(vert);
+						Geometry::Vert vert(curGeoPosIndex, curGeoUVIndex, curGeoNormalIndex);
+						(*curGeo)->verts.push_back(vert);
 					}
 				}
 
-				Mesh::Triangle tri1;
+				Geometry::Triangle tri1;
 				tri1.vertexIndex[0] = vertIndex[0];
 				tri1.vertexIndex[1] = vertIndex[1];
 				tri1.vertexIndex[2] = vertIndex[2];
-				(*curMesh)->triangleList.push_back(tri1);
+				(*curGeo)->triangleList.push_back(tri1);
 
 				if(vertIndex[3] != -1)
 				{
-					Mesh::Triangle tri2;
+					Geometry::Triangle tri2;
 					tri2.vertexIndex[0] = vertIndex[0];
 					tri2.vertexIndex[1] = vertIndex[2];
 					tri2.vertexIndex[2] = vertIndex[3];
-					(*curMesh)->triangleList.push_back(tri2);
+					(*curGeo)->triangleList.push_back(tri2);
 				}
 
 				break;

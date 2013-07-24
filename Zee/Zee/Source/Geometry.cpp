@@ -1,13 +1,13 @@
-#include "Mesh.h"
+#include "Geometry.h"
 #include <fstream>
 #include <map>
 
-void Mesh::createVertexBuffer(void* vertexData)
+void Geometry::createVertexBuffer(void* vertexData)
 {
 	CreateVB(gD3DDevice, &vertexBuffer, vertexData, verts.size(), vertexType);
 }
 
-void Mesh::createIndexBuffer()
+void Geometry::createIndexBuffer()
 {
 	int numIndices = 3 * triangleList.size();
 
@@ -23,7 +23,7 @@ void Mesh::createIndexBuffer()
 }
 
 // BuildGeometry之前先要获取相应VertexType所需的顶点数据
-void Mesh::BuildGeometry(VertexType type)
+void Geometry::BuildGeometry(VertexType type)
 {
 	vertexType = type;
 
@@ -145,7 +145,7 @@ void Mesh::BuildGeometry(VertexType type)
 	}
 }
 
-void Mesh::createVertexDeclaration()
+void Geometry::createVertexDeclaration()
 {
 	switch(vertexType)
 	{
@@ -225,23 +225,23 @@ void Mesh::createVertexDeclaration()
 	}
 }
 
-void Mesh::SetVertexDeclaration()
+void Geometry::SetVertexDeclaration()
 {
 	gD3DDevice->SetVertexDeclaration(vertexDecl);
 }
 
-void Mesh::Draw()
+void Geometry::Draw()
 {
 	gD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, verts.size(), 0, triangleList.size());
 }
 
-void Mesh::SetVertexStream()
+void Geometry::SetVertexStream()
 {	
 	gD3DDevice->SetStreamSource(0, vertexBuffer, 0, SizeofVertex(vertexType));
 	gD3DDevice->SetIndices(indexBuffer);
 }
 
-void Mesh::processSmoothNormal(const Vector3& curPos, const TriangleList& overAllTriGroup)
+void Geometry::processSmoothNormal(const Vector3& curPos, const TriangleList& overAllTriGroup)
 {
 	TriangleSmoothGroupMap triangleSmoothGroupMap;		// 三角面属于哪个smoothgroup
 	for(size_t i = 0; i < overAllTriGroup.size(); ++i)
@@ -309,7 +309,7 @@ void Mesh::processSmoothNormal(const Vector3& curPos, const TriangleList& overAl
 }
 
 
-void Mesh::processSmoothTangent(const Vector3& curPos, const TriangleList& overAllTriGroup)
+void Geometry::processSmoothTangent(const Vector3& curPos, const TriangleList& overAllTriGroup)
 {
 	TriangleSmoothGroupMap triangleSmoothGroupMap;		// 三角面属于哪个smoothgroup
 	for(size_t i = 0; i < overAllTriGroup.size(); ++i)
@@ -377,7 +377,7 @@ void Mesh::processSmoothTangent(const Vector3& curPos, const TriangleList& overA
 }
 
 
-void Mesh::processSmoothBitangent(const Vector3& curPos, const TriangleList& overAllTriGroup)
+void Geometry::processSmoothBitangent(const Vector3& curPos, const TriangleList& overAllTriGroup)
 {
 	TriangleSmoothGroupMap triangleSmoothGroupMap;		// 三角面属于哪个smoothgroup
 	for(size_t i = 0; i < overAllTriGroup.size(); ++i)
@@ -444,7 +444,7 @@ void Mesh::processSmoothBitangent(const Vector3& curPos, const TriangleList& ove
 	}
 }
 
-void Mesh::calculateTBN(bool calculateNormal, bool calculateTangent, bool calculateBitangent)
+void Geometry::calculateTBN(bool calculateNormal, bool calculateTangent, bool calculateBitangent)
 {
 	if(calculateNormal)
 		normalData.clear();
@@ -513,13 +513,13 @@ void Mesh::calculateTBN(bool calculateNormal, bool calculateTangent, bool calcul
 	}
 }
 
-void Mesh::CalculateNormals()
+void Geometry::CalculateNormals()
 {
 	calculateTBN(true, false, false);
 }
 
 
-void Mesh::buildNormalSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
+void Geometry::buildNormalSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
 							TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriangleList>& triSmoothGroups)
 {
 	if(triSmoothGroupMap[curTri] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
@@ -563,7 +563,7 @@ void Mesh::buildNormalSmoothGroup(Vector3 curPos, const TriangleList& overAllTri
 }
 
 
-void Mesh::buildTangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
+void Geometry::buildTangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
 								  TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriangleList>& triSmoothGroups)
 {
 	if(triSmoothGroupMap[curTri] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
@@ -607,7 +607,7 @@ void Mesh::buildTangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTr
 }
 
 
-void Mesh::buildBitangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
+void Geometry::buildBitangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
 								   TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriangleList>& triSmoothGroups)
 {
 	_Assert(triSmoothGroupMap.find(curTri) != triSmoothGroupMap.end());
@@ -652,7 +652,7 @@ void Mesh::buildBitangentSmoothGroup(Vector3 curPos, const TriangleList& overAll
 		buildBitangentSmoothGroup(curPos, overAllTriGroup, *neighbourTri1, triSmoothGroupMap, triSmoothGroups);
 }
 
-void Mesh::findNeighbourTriangles(const TriangleList& triGroup, const Triangle& curTri, const Triangle** neighbour0, const Triangle** neighbour1)
+void Geometry::findNeighbourTriangles(const TriangleList& triGroup, const Triangle& curTri, const Triangle** neighbour0, const Triangle** neighbour1)
 {
 	_Assert(NULL != neighbour0);
 	_Assert(NULL != neighbour1);
@@ -682,7 +682,7 @@ void Mesh::findNeighbourTriangles(const TriangleList& triGroup, const Triangle& 
 	}
 }
 
-bool Mesh::hasSharedEdge(const Triangle& triangle0, const Triangle& triangle1)
+bool Geometry::hasSharedEdge(const Triangle& triangle0, const Triangle& triangle1)
 {
 	int numSharedVerts = 0;
 
@@ -705,7 +705,7 @@ bool Mesh::hasSharedEdge(const Triangle& triangle0, const Triangle& triangle1)
 		return false;
 }
 
-bool Mesh::canSmoothNormal(const Triangle& triangle0, const Triangle& triangle1, float minCreaseAngle)
+bool Geometry::canSmoothNormal(const Triangle& triangle0, const Triangle& triangle1, float minCreaseAngle)
 {
 	Vector3 triNormal0;
 	Vector3 triNormal1;
@@ -724,7 +724,7 @@ bool Mesh::canSmoothNormal(const Triangle& triangle0, const Triangle& triangle1,
 		return false;
 }
 
-bool Mesh::canSmoothTangent(const Triangle& triangle0, const Triangle& triangle1, float minCreaseAngle)
+bool Geometry::canSmoothTangent(const Triangle& triangle0, const Triangle& triangle1, float minCreaseAngle)
 {
 	Vector3 triTangent0;
 	Vector3 triTangent1;
@@ -743,7 +743,7 @@ bool Mesh::canSmoothTangent(const Triangle& triangle0, const Triangle& triangle1
 		return false;
 }
 
-bool Mesh::canSmoothBitangent(const Triangle& triangle0, const Triangle& triangle1, float minCreaseAngle)
+bool Geometry::canSmoothBitangent(const Triangle& triangle0, const Triangle& triangle1, float minCreaseAngle)
 {
 	Vector3 triBitangent0;
 	Vector3 triBitangent1;
@@ -762,7 +762,7 @@ bool Mesh::canSmoothBitangent(const Triangle& triangle0, const Triangle& triangl
 		return false;
 }
 
-void Mesh::calculateTriangleNormal(const Triangle& triangle, Vector3* normal)
+void Geometry::calculateTriangleNormal(const Triangle& triangle, Vector3* normal)
 {
 	Vector3 pos0 = positionData[verts[triangle.vertexIndex[0]].posIndex];
 	Vector3 pos1 = positionData[verts[triangle.vertexIndex[1]].posIndex];
@@ -776,7 +776,7 @@ void Mesh::calculateTriangleNormal(const Triangle& triangle, Vector3* normal)
 	normal->Normalize();
 }
 
-void Mesh::calculateTriangleTangent(const Triangle& triangle, Vector3* tangent)
+void Geometry::calculateTriangleTangent(const Triangle& triangle, Vector3* tangent)
 {
 	Vector3 pos0 = positionData[verts[triangle.vertexIndex[0]].posIndex];
 	Vector3 pos1 = positionData[verts[triangle.vertexIndex[1]].posIndex];
@@ -811,7 +811,7 @@ void Mesh::calculateTriangleTangent(const Triangle& triangle, Vector3* tangent)
 	*tangent = tmp * (*tangent);
 }
 
-void Mesh::calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangent)
+void Geometry::calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangent)
 {
 	Vector3 pos0 = positionData[verts[triangle.vertexIndex[0]].posIndex];
 	Vector3 pos1 = positionData[verts[triangle.vertexIndex[1]].posIndex];
@@ -979,17 +979,17 @@ void Mesh::calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangen
 //	}
 //}
 
-void Mesh::CalculateTBN()
+void Geometry::CalculateTBN()
 {
 	calculateTBN(true, true, true);
 }
 
-wchar_t* Mesh::GetName()
+wchar_t* Geometry::GetName()
 {
 	return name;
 }
 
-void Mesh::SetID( DWORD _id )
+void Geometry::SetID( DWORD _id )
 {
 	id = _id;
 }

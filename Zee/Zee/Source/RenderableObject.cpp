@@ -5,9 +5,9 @@
 
 void RenderableObject::Draw(Camera* camera)
 {
-	if(NULL == mesh || NULL == material)
+	if(NULL == geo || NULL == material)
 	{
-		return;		// 允许构造RenderableObject对象时不指定mesh和material对象, 此时调用draw不做任何事
+		return;		// 允许构造RenderableObject对象时不指定geo和material对象, 此时调用draw不做任何事
 	}
 
 	_Assert(NULL != camera);
@@ -15,7 +15,7 @@ void RenderableObject::Draw(Camera* camera)
 	if(displayMode == WireFrame)
 		gD3DDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_WIREFRAME );
 
-	material->Render(this, mesh, camera);
+	material->Render(this, geo, camera);
 
 	if(displayMode == WireFrame)
 		gD3DDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_SOLID );

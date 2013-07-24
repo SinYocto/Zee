@@ -2,7 +2,7 @@
 #include "Material.h"
 #include "Camera.h"
 #include "Object.h"
-#include "Mesh.h"
+#include "Geometry.h"
 #include "AmbientLight.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
@@ -36,13 +36,13 @@ void DiffuseShader::SetUVOffset(float _offsetU, float _offsetV)
 	material->SetUVOffset(_offsetU, _offsetV);
 }
 
-void DiffuseShader::Render(Object* object, Mesh* mesh, Camera* camera)
+void DiffuseShader::Render(Object* object, Geometry* geo, Camera* camera)
 {
-	_Assert(NULL != mesh);
+	_Assert(NULL != geo);
 	_Assert(NULL != camera);
 
-	mesh->SetVertexStream();
-	mesh->SetVertexDeclaration();
+	geo->SetVertexStream();
+	geo->SetVertexDeclaration();
 
 	DiffuseShader::effect->SetTechnique("Diffuse");
 
@@ -71,7 +71,7 @@ void DiffuseShader::Render(Object* object, Mesh* mesh, Camera* camera)
 	DiffuseShader::effect->Begin(0, 0);
 	DiffuseShader::effect->BeginPass(0);
 
-	mesh->Draw();
+	geo->Draw();
 
 	DiffuseShader::effect->EndPass();
 	DiffuseShader::effect->End();
@@ -121,13 +121,13 @@ void SpecularShader::SetUVOffset(float _offsetU, float _offsetV)
 	material->SetUVOffset(_offsetU, _offsetV);
 }
 
-void SpecularShader::Render(Object* object, Mesh* mesh, Camera* camera)
+void SpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 {
-	_Assert(NULL != mesh);
+	_Assert(NULL != geo);
 	_Assert(NULL != camera);
 
-	mesh->SetVertexStream();
-	mesh->SetVertexDeclaration();
+	geo->SetVertexStream();
+	geo->SetVertexDeclaration();
 
 	SpecularShader::effect->SetTechnique("Specular");
 
@@ -159,7 +159,7 @@ void SpecularShader::Render(Object* object, Mesh* mesh, Camera* camera)
 	SpecularShader::effect->Begin(0, 0);
 	SpecularShader::effect->BeginPass(0);
 
-	mesh->Draw();
+	geo->Draw();
 
 	SpecularShader::effect->EndPass();
 	SpecularShader::effect->End();
@@ -213,13 +213,13 @@ void BumpSpecularShader::SetUVOffset(float _offsetU, float _offsetV)
 	material->SetUVOffset(_offsetU, _offsetV);
 }
 
-void BumpSpecularShader::Render(Object* object, Mesh* mesh, Camera* camera)
+void BumpSpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 {
-	_Assert(NULL != mesh);
+	_Assert(NULL != geo);
 	_Assert(NULL != camera);
 
-	mesh->SetVertexStream();
-	mesh->SetVertexDeclaration();
+	geo->SetVertexStream();
+	geo->SetVertexDeclaration();
 
 	BumpSpecularShader::effect->SetTechnique("BumpSpecular");
 
@@ -244,7 +244,7 @@ void BumpSpecularShader::Render(Object* object, Mesh* mesh, Camera* camera)
 	BumpSpecularShader::effect->Begin(0, 0);
 	BumpSpecularShader::effect->BeginPass(0);
 
-	mesh->Draw();
+	geo->Draw();
 
 	BumpSpecularShader::effect->EndPass();
 	BumpSpecularShader::effect->End();

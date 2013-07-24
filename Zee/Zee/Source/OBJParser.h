@@ -2,7 +2,7 @@
 #define OBJPARSER_H
 
 #include "Math.h"
-#include "Mesh.h"
+#include "Geometry.h"
 #include "Material.h"
 #include "YString.h"
 #include "YFile.h"
@@ -82,7 +82,7 @@ private:
 	static void parseLine(YFile* file, const wchar_t* lineContent);
 
 	static void parseTrianglesBlock(const std::vector<std::wstring>& blockContent);
-	static void parseTrianglesBlockLine(const wchar_t* lineContent, Mesh** curMesh, std::map<int, int>& posIndexMap,
+	static void parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** curGeo, std::map<int, int>& posIndexMap,
 		std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap);
 
 	static void parseMtl(const wchar_t* mtlFilePath);
@@ -103,7 +103,7 @@ private:
 	static std::vector<Vector2> uvData;
 	static std::vector<Vector3> normalData;
 
-	static std::vector<Mesh*> meshList;
+	static std::vector<Geometry*> geoList;
 	static std::vector<Material*> materialList;
 
 	static Model* resultModel;

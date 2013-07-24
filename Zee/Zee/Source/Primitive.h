@@ -1,14 +1,14 @@
 #ifndef PRIMITIVE_H
 #define PRIMITIVE_H
 
-#include"Mesh.h"
+#include"Geometry.h"
 #include"Math.h"
 
-class Cube : public Mesh
+class Cube : public Geometry
 {
 public:
 	Cube(const wchar_t* _name)
-		:Mesh(_name)
+		:Geometry(_name)
 	{
 		constructGeometryData();
 	}

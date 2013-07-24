@@ -75,3 +75,39 @@ bool DebugDrawer::DrawCircle(const Vector3& center, const Vector3& normal, float
 Exit:
 	return isSucceed;
 }
+
+bool DebugDrawer::DrawSquare( const Vector3& center, const Vector3& normal, float size, D3DCOLOR color, Camera* camera )
+{
+	bool isSucceed = false;
+
+	{
+		Assert(NULL != camera);
+
+		std::vector<Vector3> points;
+		points.push_back(Vector3(-size / 2, 0, -size / 2));
+		points.push_back(Vector3( size / 2, 0, -size / 2));
+		points.push_back(Vector3( size / 2, 0,  size / 2));
+		points.push_back(Vector3(-size / 2, 0,  size / 2));
+		points.push_back(Vector3(-size / 2, 0, -size / 2));
+
+		Vector3 normalizedN = normal.Normalized();
+		if(FloatUnequal(fabsf(normalizedN.Dot(Vector3(0, 1, 0))), 1, 0.0001f))
+		{
+			Quaternion rotation = Quaternion::VectorRotation(Vector3(0, 1, 0), normalizedN);
+
+			for(size_t i = 0; i < points.size(); ++i)
+			{
+				Vector3& point = points[i];
+				point = point * rotation;
+
+				point += center;
+			}
+		}
+
+		Assert(DrawLine(points, color, camera));
+	}
+
+	isSucceed = true;
+Exit:
+	return isSucceed;
+}
