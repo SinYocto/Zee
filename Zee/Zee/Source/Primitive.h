@@ -17,32 +17,30 @@ private:
 	virtual void constructGeometryData();
 };
 
-//class Cylinder : public Mesh
-//{
-//public:
-//	Cylinder(float _topRadius, float _bottomRadius, float _height, int _segmentsW, int _segmentsH, D3DXCOLOR _color)
-//		:topRadius(_topRadius)
-//		,bottomRadius(_bottomRadius)
-//		,height(_height)
-//		,segmentsW(_segmentsW)
-//		,segmentsH(_segmentsH)
-//		,color(_color)
-//	{
-//		constructGeometryData();
-//	}
-//
-//private:
-//	virtual void constructGeometryData();
-//
-//private:
-//	float topRadius;
-//	float bottomRadius;
-//	float height;
-//	int segmentsW;
-//	int segmentsH;
-//
-//	D3DXCOLOR color;
-//};
+class Cylinder : public Geometry
+{
+public:
+	Cylinder(const wchar_t* _name, float _topRadius, float _bottomRadius, float _height, int _segmentsW, int _segmentsH)
+		:Geometry(_name)
+		,topRadius(_topRadius)
+		,bottomRadius(_bottomRadius)
+		,height(_height)
+		,segmentsW(_segmentsW)
+		,segmentsH(_segmentsH)
+	{
+		constructGeometryData();
+	}
+
+private:
+	virtual void constructGeometryData();
+
+private:
+	float topRadius;
+	float bottomRadius;
+	float height;
+	int segmentsW;
+	int segmentsH;
+};
 //
 //class Sphere : public Mesh
 //{

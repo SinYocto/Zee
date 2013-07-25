@@ -86,90 +86,81 @@ void Cube::constructGeometryData()
 		triangleList.push_back(triangles[i]);
 }
 
-//void Cylinder::constructGeometryData()
-//{
-//	//// 顶圆面和底圆面顶点数为segmentW + 2（不能实现中心点的不同uv坐标）
-//	//// 柱面顶点数为(segmentW + 1) * (segmentH + 1)
-//
-//	//numVertices = (segmentsW + 1)*(segmentsH + 1) + 2*(segmentsW + 2);
-//	//numTriangles = 2*segmentsW + 2*segmentsW*segmentsH;
-//
-//	//Vector3 *pos = new Vector3[numVertices];
-//	//DWORD* indices = new DWORD[3*numTriangles];
-//
-//	//// 顶圆面
-//	//pos[0] = Vector3(0, height, 0);
-//	//float deltaTheta = 2*PI / segmentsW;
-//	//for(int i = 0; i < segmentsW + 1; ++i)
-//	//{
-//	//	float x = topRadius * cos(i*deltaTheta);
-//	//	float z = topRadius * sin(i*deltaTheta);
-//
-//	//	pos[i+1] = Vector3(x, height, z);
-//	//}
-//
-//	//for(int i = 0; i < segmentsW; ++i)
-//	//{
-//	//	indices[3*i + 0] = i + 1;
-//	//	indices[3*i + 1] = 0;
-//	//	indices[3*i + 2] = i + 2;
-//	//}
-//
-//	//// 底圆面
-//	//pos[segmentsW + 2] = Vector3(0, 0, 0);
-//	//for(int i = 0; i < segmentsW + 1; ++i)
-//	//{
-//	//	float x = bottomRadius * cos(i*deltaTheta);
-//	//	float z = bottomRadius * sin(i*deltaTheta);
-//
-//	//	pos[i + 1 + (segmentsW + 2)] = Vector3(x, 0, z);
-//	//}
-//
-//	//for(int i = 0; i < segmentsW; ++i)
-//	//{
-//	//	indices[3*i + 3*segmentsW + 0] = i + (segmentsW + 2) + 2;
-//	//	indices[3*i + 3*segmentsW + 1] = segmentsW + 2;
-//	//	indices[3*i + 3*segmentsW + 2] = i + (segmentsW + 2) + 1;
-//	//}
-//
-//	//// 柱面
-//	//float heightDelta = height / segmentsH;
-//	//float radiusDelta = (topRadius - bottomRadius) / segmentsH;
-//	//for(int i = 0; i <= segmentsH; ++i)
-//	//{
-//	//	float circleHeight = i * heightDelta;
-//	//	float circleRadius = bottomRadius + i*radiusDelta;
-//	//	for(int j = 0; j <= segmentsW; ++j)
-//	//	{
-//	//		float x = circleRadius * cos(j*deltaTheta);
-//	//		float z = circleRadius * sin(j*deltaTheta);
-//
-//	//		pos[i*(segmentsW+1) + 2*(segmentsW+2) + j] = Vector3(x, circleHeight, z);
-//	//	}
-//	//}
-//
-//	//for(int i = 0; i < segmentsH; ++i)
-//	//{
-//	//	for(int j = 0; j < segmentsW; ++j)
-//	//	{
-//	//		indices[2*3*segmentsW + 6*(segmentsW*i + j) + 0] = i*(segmentsW+1) + 2*(segmentsW+2) + j;
-//	//		indices[2*3*segmentsW + 6*(segmentsW*i + j) + 1] = (i+1)*(segmentsW+1) + 2*(segmentsW+2) + j;
-//	//		indices[2*3*segmentsW + 6*(segmentsW*i + j) + 2] = (i+1)*(segmentsW+1) + 2*(segmentsW+2) + j+1;
-//
-//	//		indices[2*3*segmentsW + 6*(segmentsW*i + j) + 3] = i*(segmentsW+1) + 2*(segmentsW+2) + j;
-//	//		indices[2*3*segmentsW + 6*(segmentsW*i + j) + 4] = (i+1)*(segmentsW+1) + 2*(segmentsW+2) + j+1;
-//	//		indices[2*3*segmentsW + 6*(segmentsW*i + j) + 5] = i*(segmentsW+1) + 2*(segmentsW+2) + j+1;
-//	//	}
-//	//}
-//
-//	//positionData = pos;
-//	//indexData = indices;
-//
-//	//normalData = new Vector3[numVertices];
-//	//tangentData = new Vector3[numVertices];
-//	//bitangentData = new Vector3[numVertices];
-//
-//}
+void Cylinder::constructGeometryData()
+{
+	int numVerts = segmentsW * (segmentsH + 1) + 2;
+
+	// positionData
+	positionData.push_back(Vector3::Zero);
+	positionData.push_back(Vector3(0, height, 0));
+
+	float heightDelta = height / segmentsH;
+	float radiusDelta = (topRadius - bottomRadius) / segmentsH;
+	float deltaTheta = 2*PI / segmentsW;
+
+	for(int i = 0; i <= segmentsH; ++i)
+	{
+		float circleHeight = i * heightDelta;
+		float circleRadius = bottomRadius + i*radiusDelta;
+		for(int j = 0; j < segmentsW; ++j)
+		{
+			float x = circleRadius * cos(j*deltaTheta);
+			float z = circleRadius * sin(j*deltaTheta);
+
+			positionData.push_back(Vector3(x, circleHeight, z));
+		}
+	}
+
+	// verts
+	for(size_t i = 0; i < positionData.size(); ++i)
+	{
+		Geometry::Vert vert(i);
+		verts.push_back(vert);
+	}
+
+	// triangles
+	for(int i = 0; i < segmentsW; ++i)		// 底圆面
+	{
+		// 顶点索引为2 ~ sw+1
+		Geometry::Triangle triangle(0, 2+i, 2 + (i + 1) % segmentsW);
+		triangleList.push_back(triangle);
+	}
+
+	for(int i = 0; i < segmentsW; ++i)		// 顶圆面
+	{
+		// 顶点索引为sw*sh + 2 ~ sw*(sh + 1) + 1
+		Geometry::Triangle triangle(1, segmentsW*segmentsH + 2 + (i + 1) % segmentsW, segmentsW*segmentsH + 2 + i);
+		triangleList.push_back(triangle);
+	}
+
+	for(int i = 0; i < segmentsH; ++i)		// 柱面
+	{
+		for(int j = 0; j < segmentsW; ++j)		
+		{
+			Geometry::Triangle tri1;
+			Geometry::Triangle tri2;
+
+			tri1.vertexIndex[0] = segmentsW * i + j + 2;
+			tri1.vertexIndex[1] = segmentsW * (i + 1) + j + 2;
+			tri1.vertexIndex[2] = segmentsW * i + (j + 1)%segmentsW + 2;
+
+			tri2.vertexIndex[0] = segmentsW * (i + 1) + j + 2;
+			tri2.vertexIndex[1] = segmentsW * (i + 1) + (j + 1)%segmentsW + 2;
+			tri2.vertexIndex[2] = segmentsW * i + (j + 1)%segmentsW + 2;
+
+			_Assert(tri1.vertexIndex[0] < segmentsW * (segmentsH + 1) + 2);
+			_Assert(tri1.vertexIndex[1] < segmentsW * (segmentsH + 1) + 2);
+			_Assert(tri1.vertexIndex[2] < segmentsW * (segmentsH + 1) + 2);
+
+			_Assert(tri2.vertexIndex[0] < segmentsW * (segmentsH + 1) + 2);
+			_Assert(tri2.vertexIndex[1] < segmentsW * (segmentsH + 1) + 2);
+			_Assert(tri2.vertexIndex[2] < segmentsW * (segmentsH + 1) + 2);
+
+			triangleList.push_back(tri1);
+			triangleList.push_back(tri2);
+		}
+	}
+}
 //
 //void Sphere::constructGeometryData()
 //{

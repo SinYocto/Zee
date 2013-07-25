@@ -8,6 +8,7 @@
 
 bool FloatEqual(const float& f1, const float& f2, const float& tolerance);
 bool FloatUnequal(const float& f1, const float& f2, const float& tolerance);
+void Clamp(float& val, const float min, const float max);
 
 class Vector3
 {

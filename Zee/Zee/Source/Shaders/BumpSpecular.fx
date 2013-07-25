@@ -1,4 +1,4 @@
-// Specular.fx
+// BumpSpecular.fx
 // using NormalMap
 
 #include"LightsDefine.fx"

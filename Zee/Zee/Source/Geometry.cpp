@@ -274,6 +274,7 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriangleList& ov
 
 		normalData.push_back(groupNormal);		// normal加入到normaldata数据中
 
+		bool isNewVertAdded = false;			// 同一个smoothgroup最多增加一个顶点即可
 		for(size_t triIx = 0; triIx < curGroup.size(); ++triIx)
 		{
 			Triangle& curTri = curGroup[triIx];
@@ -296,12 +297,15 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriangleList& ov
 			}
 			else
 			{
-				if(Vector3Unequal(normalData[verts[vertIx].normalIndex], groupNormal, 0.01f))
+				if(!isNewVertAdded && Vector3Unequal(normalData[verts[vertIx].normalIndex], groupNormal, 0.01f))
 				{
 					Vert newVert = verts[vertIx];
 					newVert.normalIndex = normalData.size() - 1;
 
+					verts.push_back(newVert);
 					curTri.vertexIndex[indexInTri] = verts.size() - 1;
+
+					isNewVertAdded = true;
 				}
 			}
 		}
@@ -342,6 +346,7 @@ void Geometry::processSmoothTangent(const Vector3& curPos, const TriangleList& o
 
 		tangentData.push_back(groupTangent);		// normal加入到normaldata数据中
 
+		bool isNewVertAdded = false;
 		for(size_t triIx = 0; triIx < curGroup.size(); ++triIx)
 		{
 			Triangle& curTri = curGroup[triIx];
@@ -364,12 +369,15 @@ void Geometry::processSmoothTangent(const Vector3& curPos, const TriangleList& o
 			}
 			else
 			{
-				if(Vector3Unequal(tangentData[verts[vertIx].tangentIndex], groupTangent, 0.01f))
+				if(!isNewVertAdded && Vector3Unequal(tangentData[verts[vertIx].tangentIndex], groupTangent, 0.01f))
 				{
 					Vert newVert = verts[vertIx];
 					newVert.tangentIndex = tangentData.size() - 1;
 
+					verts.push_back(newVert);
 					curTri.vertexIndex[indexInTri] = verts.size() - 1;
+
+					isNewVertAdded = true;
 				}
 			}
 		}
@@ -393,6 +401,7 @@ void Geometry::processSmoothBitangent(const Vector3& curPos, const TriangleList&
 		buildBitangentSmoothGroup(curPos, overAllTriGroup, curTri, triangleSmoothGroupMap, triSmoothGroups);
 	}
 
+	bool isNewVertAdded = false;
 	for(size_t i = 0; i < triSmoothGroups.size(); ++i)		// 对于每个smoothgroup, 计算normal并更新顶点数据
 	{
 		TriangleList& curGroup = triSmoothGroups[i];
@@ -432,12 +441,15 @@ void Geometry::processSmoothBitangent(const Vector3& curPos, const TriangleList&
 			}
 			else
 			{
-				if(Vector3Unequal(bitangentData[verts[vertIx].bitangentIndex], groupBitangent, 0.01f))
+				if(!isNewVertAdded && Vector3Unequal(bitangentData[verts[vertIx].bitangentIndex], groupBitangent, 0.01f))
 				{
 					Vert newVert = verts[vertIx];
 					newVert.bitangentIndex = bitangentData.size() - 1;
 
+					verts.push_back(newVert);
 					curTri.vertexIndex[indexInTri] = verts.size() - 1;
+
+					isNewVertAdded = true;
 				}
 			}
 		}

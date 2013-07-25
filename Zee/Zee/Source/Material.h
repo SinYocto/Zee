@@ -16,7 +16,7 @@ class Material : public IReferenceCounted
 public:
 	Material(const wchar_t* _name)
 		:shader(NULL)
-		,ambientColor(D3DXCOLOR(0, 0, 0, 1))
+		,ambientColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
 		,diffuseColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
 		,specularColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
 		,shiness(1.0f)

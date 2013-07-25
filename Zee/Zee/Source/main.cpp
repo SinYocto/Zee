@@ -88,7 +88,8 @@ int main()
 
 		LightManager::SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
 		dirLight1.SetValue(D3DXCOLOR_RED, Vector3(1.0f, -1.0f, 1.0f), 1.0f);
-		pointLight1.SetValue(D3DXCOLOR_YELLOW, Vector3(-4.0f, 200.0f, 0), Vector3(1.0f, 0, 0), 1.0f);
+		pointLight1.SetValue(D3DXCOLOR_YELLOW, Vector3(-4.0f, 0, 0), Vector3(1.0f, 0, 0), 1.0f);
+		pointLight1.Enable(false);
 
 		LightManager::AddDirectionalLight(&dirLight1);
 		LightManager::AddPointLight(&pointLight1);
@@ -97,23 +98,34 @@ int main()
 		Cube* cube1 = new Cube(L"cube1");
 		GeometryManager::AddGeometry(cube1);
 
-		cube1->CalculateTBN();
-		cube1->BuildGeometry(XYZ_UV_TBN);
+		//cube1->CalculateTBN();
+		//cube1->BuildGeometry(XYZ_UV_TBN);
+
+		Cylinder* cylinder1 = new Cylinder(L"cylinder1", 0.5f, 0.5f, 2, 4, 1);
+		GeometryManager::AddGeometry(cylinder1);
+
+		cylinder1->CalculateNormals();
+		cylinder1->BuildGeometry(XYZ_N);
 
 		// material
 		Material* mtl1 = new Material(L"mtl1");
 		MaterialManager::AddMaterial(mtl1);
 
 		mtl1->SetShader(BumpSpecular);
-
 		mtl1->shader->SetColorTex(L"./Assets/Textures/6133.jpg");
 		mtl1->shader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
 		mtl1->shader->SetSpecShiness(0.4f);
 
+		Material* mtl2 = new Material(L"mtl2");
+		MaterialManager::AddMaterial(mtl2);
+
+		mtl2->SetShader(Diffuse);
+		//mtl2->shader->SetColorTex(L"./Assets/Textures/6133.jpg");
+
 		// model
-		//cubeModel = new Model(NULL, cube1, mtl1);
+		cubeModel = new Model(NULL, cylinder1, mtl2);
 		//OBJParser::Parse(L"Assets/Models/teapot.obj", &cubeModel);
-		OBJParser::Parse(L"Assets/Models/knife.obj", &cubeModel);
+		//OBJParser::Parse(L"Assets/Models/knife.obj", &cubeModel);
 		//OBJParser::Parse(L"Assets/Models/room_p2.obj", &model2);
 		//OBJParser::Parse(L"Assets/Models/room_p3.obj", &model3);
 

@@ -17,6 +17,15 @@ bool FloatUnequal(const float& f1, const float& f2, const float& tolerance)
 	return !FloatEqual(f1, f2, tolerance);
 }
 
+void Clamp(float& val, const float min, const float max)
+{
+	if(val - max > FLT_MIN)
+		val = max;
+
+	if(min - val > FLT_MIN)
+		val = min;
+}
+
 // Vector3
 Vector3 Vector3::Zero = Vector3(0, 0, 0);
 
@@ -131,7 +140,11 @@ float VectorAngle(const Vector3& vec1, const Vector3& vec2)
 	float length2 = vec2.Length();
 
 	_Assert(length1 != 0 && length2 != 0);
-	return acosf(vec1.Dot(vec2) / (length1 * length2));
+
+	float val = vec1.Dot(vec2) / (length1 * length2);
+	Clamp(val, -1.0f, 1.0f);		// 若范围在-1 ~ 1外, acosf返回的是INFINITE
+
+	return acosf(val);
 }
 
 bool Vector3Equal(const Vector3& vec1, const Vector3& vec2, const float& tolerance)
