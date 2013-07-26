@@ -101,7 +101,7 @@ int main()
 		//cube1->CalculateTBN();
 		//cube1->BuildGeometry(XYZ_UV_TBN);
 
-		Cylinder* cylinder1 = new Cylinder(L"cylinder1", 0.5f, 0.5f, 2, 4, 1);
+		Cylinder* cylinder1 = new Cylinder(L"cylinder1", 0, 0.5f, 2.0f);
 		GeometryManager::AddGeometry(cylinder1);
 
 		cylinder1->CalculateNormals();

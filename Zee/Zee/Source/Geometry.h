@@ -138,31 +138,11 @@ protected:
 			return false;
 		}
 	};
-	typedef std::map<Vector3, TriangleList, CompareVector> VertexTrianglesMap;
+	
+	typedef std::map<Vector3, std::vector<int>, CompareVector> VertexTrianglesMap;		// vertPos -> triListByID
 
-	struct CompareTriangle
-	{
-		bool operator()(const Triangle& tri1, const Triangle& tri2) const
-		{
-			if(tri1.vertexIndex[0] < tri2.vertexIndex[0])
-				return true;
-
-			if(tri1.vertexIndex[0] > tri2.vertexIndex[0])
-				return false;
-
-			if(tri1.vertexIndex[1] < tri2.vertexIndex[1])
-				return true;
-
-			if(tri1.vertexIndex[1] > tri2.vertexIndex[1])
-				return false;
-
-			if(tri1.vertexIndex[2] < tri2.vertexIndex[2])
-				return true;
-
-			return false;
-		}
-	};
-	typedef std::map<Triangle, int, CompareTriangle> TriangleSmoothGroupMap;
+	typedef std::map<int, int> TriangleSmoothGroupMap;		// triID -> sgID
+	typedef std::vector<int> TriIDList;
 
 private:
 	//void OBJParseLine(char *line, std::vector<Vector3> &filePosData, std::vector<DWORD> &fileIndexData);
@@ -173,20 +153,20 @@ private:
 
 	void calculateTBN(bool calculateNormal, bool calculateTangent, bool calculateBitangent);
 
-	void processSmoothNormal(const Vector3& curPos, const TriangleList& overAllTriGroup);
-	void processSmoothTangent(const Vector3& curPos, const TriangleList& overAllTriGroup);
-	void processSmoothBitangent(const Vector3& curPos, const TriangleList& overAllTriGroup);
+	void processSmoothNormal(const Vector3& curPos, const TriIDList& overAllTriGroup);
+	void processSmoothTangent(const Vector3& curPos, const TriIDList& overAllTriGroup);
+	void processSmoothBitangent(const Vector3& curPos, const TriIDList& overAllTriGroup);
 
-	void buildNormalSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
-		TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriangleList>& triSmoothGroups);
+	void buildNormalSmoothGroup(Vector3 curPos, const TriIDList& overAllTriGroup, int curTriID, 
+		TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriIDList>& triSmoothGroups);
 
-	void buildTangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
-		TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriangleList>& triSmoothGroups);
+	void buildTangentSmoothGroup(Vector3 curPos, const TriIDList& overAllTriGroup, int curTriID, 
+		TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriIDList>& triSmoothGroups);
 
-	void buildBitangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
-		TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriangleList>& triSmoothGroups);
+	void buildBitangentSmoothGroup(Vector3 curPos, const TriIDList& overAllTriGroup, int curTriID, 
+		TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriIDList>& triSmoothGroups);
 
-	void findNeighbourTriangles(const TriangleList& triGroup, const Triangle& curTri, const Triangle** neighbour0, const Triangle** neighbour1);
+	void findNeighbourTriangles(const TriIDList& triGroup, int curTriID, int* neighb0ID, int* neighb1ID);
 	bool hasSharedEdge(const Triangle& triangle0, const Triangle& triangle1);
 
 	bool canSmoothNormal(const Triangle& triangle0, const Triangle& triangle1, float minCreaseAngle);

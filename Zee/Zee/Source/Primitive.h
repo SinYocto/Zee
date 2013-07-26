@@ -20,7 +20,7 @@ private:
 class Cylinder : public Geometry
 {
 public:
-	Cylinder(const wchar_t* _name, float _topRadius, float _bottomRadius, float _height, int _segmentsW, int _segmentsH)
+	Cylinder(const wchar_t* _name, float _topRadius, float _bottomRadius, float _height, int _segmentsW = 32, int _segmentsH = 4)
 		:Geometry(_name)
 		,topRadius(_topRadius)
 		,bottomRadius(_bottomRadius)

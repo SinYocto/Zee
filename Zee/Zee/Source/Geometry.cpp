@@ -241,7 +241,7 @@ void Geometry::SetVertexStream()
 	gD3DDevice->SetIndices(indexBuffer);
 }
 
-void Geometry::processSmoothNormal(const Vector3& curPos, const TriangleList& overAllTriGroup)
+void Geometry::processSmoothNormal(const Vector3& curPos, const TriIDList& overAllTriGroup)
 {
 	TriangleSmoothGroupMap triangleSmoothGroupMap;		// 三角面属于哪个smoothgroup
 	for(size_t i = 0; i < overAllTriGroup.size(); ++i)
@@ -249,23 +249,25 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriangleList& ov
 		triangleSmoothGroupMap[overAllTriGroup[i]] = NO_GROUP;
 	}
 
-	std::vector<TriangleList> triSmoothGroups;		// 包含这个顶点的面可分为几个smoothgroup
+	std::vector<TriIDList> triSmoothGroups;		// 包含这个顶点的面可分为几个smoothgroup
 
 	for(size_t i = 0; i < overAllTriGroup.size(); ++i)
 	{
-		const Triangle& curTri = overAllTriGroup[i];
-		buildNormalSmoothGroup(curPos, overAllTriGroup, curTri, triangleSmoothGroupMap, triSmoothGroups);
+		int curTriID = overAllTriGroup[i];
+		buildNormalSmoothGroup(curPos, overAllTriGroup, curTriID, triangleSmoothGroupMap, triSmoothGroups);
 	}
 
 	for(size_t i = 0; i < triSmoothGroups.size(); ++i)		// 对于每个smoothgroup, 计算normal并更新顶点数据
 	{
-		TriangleList& curGroup = triSmoothGroups[i];
+		TriIDList& curGroup = triSmoothGroups[i];
 
 		Vector3 groupNormal = Vector3::Zero;
-		for(size_t triIx = 0; triIx < curGroup.size(); ++triIx)
+		for(size_t k = 0; k < curGroup.size(); ++k)
 		{
+			const Triangle& tri = triangleList[curGroup[k]];
+
 			Vector3 triNormal;
-			calculateTriangleNormal(curGroup[triIx], &triNormal);
+			calculateTriangleNormal(tri, &triNormal);
 
 			groupNormal += triNormal;		// TODO:面积加成 
 		}
@@ -274,10 +276,10 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriangleList& ov
 
 		normalData.push_back(groupNormal);		// normal加入到normaldata数据中
 
-		bool isNewVertAdded = false;			// 同一个smoothgroup最多增加一个顶点即可
-		for(size_t triIx = 0; triIx < curGroup.size(); ++triIx)
+		int newVertIndex = INVALID_INDEX;
+		for(size_t i = 0; i < curGroup.size(); ++i)
 		{
-			Triangle& curTri = curGroup[triIx];
+			Triangle& curTri = triangleList[curGroup[i]];
 
 			int vertIx = INVALID_INDEX;		// smoothgroup共位置的顶点在当前三角面中是哪个顶点
 			int indexInTri = 0;
@@ -297,15 +299,22 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriangleList& ov
 			}
 			else
 			{
-				if(!isNewVertAdded && Vector3Unequal(normalData[verts[vertIx].normalIndex], groupNormal, 0.01f))
+				if(Vector3Unequal(normalData[verts[vertIx].normalIndex], groupNormal, 0.01f))
 				{
-					Vert newVert = verts[vertIx];
-					newVert.normalIndex = normalData.size() - 1;
+					if(newVertIndex != INVALID_INDEX)
+					{
+						curTri.vertexIndex[indexInTri] = newVertIndex;
+					}
+					else
+					{
+						Vert newVert = verts[vertIx];
+						newVert.normalIndex = normalData.size() - 1;
 
-					verts.push_back(newVert);
-					curTri.vertexIndex[indexInTri] = verts.size() - 1;
+						verts.push_back(newVert);
+						curTri.vertexIndex[indexInTri] = verts.size() - 1;
 
-					isNewVertAdded = true;
+						newVertIndex = verts.size() - 1;
+					}
 				}
 			}
 		}
@@ -313,7 +322,7 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriangleList& ov
 }
 
 
-void Geometry::processSmoothTangent(const Vector3& curPos, const TriangleList& overAllTriGroup)
+void Geometry::processSmoothTangent(const Vector3& curPos, const TriIDList& overAllTriGroup)
 {
 	TriangleSmoothGroupMap triangleSmoothGroupMap;		// 三角面属于哪个smoothgroup
 	for(size_t i = 0; i < overAllTriGroup.size(); ++i)
@@ -321,23 +330,25 @@ void Geometry::processSmoothTangent(const Vector3& curPos, const TriangleList& o
 		triangleSmoothGroupMap[overAllTriGroup[i]] = NO_GROUP;
 	}
 
-	std::vector<TriangleList> triSmoothGroups;		// 包含这个顶点的面可分为几个smoothgroup
+	std::vector<TriIDList> triSmoothGroups;		// 包含这个顶点的面可分为几个smoothgroup
 
 	for(size_t i = 0; i < overAllTriGroup.size(); ++i)
 	{
-		const Triangle& curTri = overAllTriGroup[i];
-		buildTangentSmoothGroup(curPos, overAllTriGroup, curTri, triangleSmoothGroupMap, triSmoothGroups);
+		int curTriID = overAllTriGroup[i];
+		buildTangentSmoothGroup(curPos, overAllTriGroup, curTriID, triangleSmoothGroupMap, triSmoothGroups);
 	}
 
 	for(size_t i = 0; i < triSmoothGroups.size(); ++i)		// 对于每个smoothgroup, 计算normal并更新顶点数据
 	{
-		TriangleList& curGroup = triSmoothGroups[i];
+		TriIDList& curGroup = triSmoothGroups[i];
 
 		Vector3 groupTangent = Vector3::Zero;
-		for(size_t triIx = 0; triIx < curGroup.size(); ++triIx)
+		for(size_t k = 0; k < curGroup.size(); ++k)
 		{
+			const Triangle& tri = triangleList[curGroup[k]];
+
 			Vector3 triTangent;
-			calculateTriangleTangent(curGroup[triIx], &triTangent);
+			calculateTriangleTangent(tri, &triTangent);
 
 			groupTangent += triTangent;		// TODO:面积加成 
 		}
@@ -346,10 +357,10 @@ void Geometry::processSmoothTangent(const Vector3& curPos, const TriangleList& o
 
 		tangentData.push_back(groupTangent);		// normal加入到normaldata数据中
 
-		bool isNewVertAdded = false;
+		int newVertIndex = INVALID_INDEX;
 		for(size_t triIx = 0; triIx < curGroup.size(); ++triIx)
 		{
-			Triangle& curTri = curGroup[triIx];
+			Triangle& curTri = triangleList[curGroup[triIx]];
 
 			int vertIx = INVALID_INDEX;		// smoothgroup共位置的顶点在当前三角面中是哪个顶点
 			int indexInTri = 0;
@@ -369,15 +380,22 @@ void Geometry::processSmoothTangent(const Vector3& curPos, const TriangleList& o
 			}
 			else
 			{
-				if(!isNewVertAdded && Vector3Unequal(tangentData[verts[vertIx].tangentIndex], groupTangent, 0.01f))
+				if(Vector3Unequal(tangentData[verts[vertIx].tangentIndex], groupTangent, 0.01f))
 				{
-					Vert newVert = verts[vertIx];
-					newVert.tangentIndex = tangentData.size() - 1;
+					if(newVertIndex != INVALID_INDEX)
+					{
+						curTri.vertexIndex[indexInTri] = newVertIndex;
+					}
+					else
+					{
+						Vert newVert = verts[vertIx];
+						newVert.tangentIndex = tangentData.size() - 1;
 
-					verts.push_back(newVert);
-					curTri.vertexIndex[indexInTri] = verts.size() - 1;
+						verts.push_back(newVert);
+						curTri.vertexIndex[indexInTri] = verts.size() - 1;
 
-					isNewVertAdded = true;
+						newVertIndex = verts.size() - 1;
+					}
 				}
 			}
 		}
@@ -385,7 +403,7 @@ void Geometry::processSmoothTangent(const Vector3& curPos, const TriangleList& o
 }
 
 
-void Geometry::processSmoothBitangent(const Vector3& curPos, const TriangleList& overAllTriGroup)
+void Geometry::processSmoothBitangent(const Vector3& curPos, const TriIDList& overAllTriGroup)
 {
 	TriangleSmoothGroupMap triangleSmoothGroupMap;		// 三角面属于哪个smoothgroup
 	for(size_t i = 0; i < overAllTriGroup.size(); ++i)
@@ -393,24 +411,26 @@ void Geometry::processSmoothBitangent(const Vector3& curPos, const TriangleList&
 		triangleSmoothGroupMap[overAllTriGroup[i]] = NO_GROUP;
 	}
 
-	std::vector<TriangleList> triSmoothGroups;		// 包含这个顶点的面可分为几个smoothgroup
+	std::vector<TriIDList> triSmoothGroups;		// 包含这个顶点的面可分为几个smoothgroup
 
 	for(size_t i = 0; i < overAllTriGroup.size(); ++i)
 	{
-		const Triangle& curTri = overAllTriGroup[i];
-		buildBitangentSmoothGroup(curPos, overAllTriGroup, curTri, triangleSmoothGroupMap, triSmoothGroups);
+		int curTriID = overAllTriGroup[i];
+		buildBitangentSmoothGroup(curPos, overAllTriGroup, curTriID, triangleSmoothGroupMap, triSmoothGroups);
 	}
 
-	bool isNewVertAdded = false;
+	int newVertIndex = INVALID_INDEX;
 	for(size_t i = 0; i < triSmoothGroups.size(); ++i)		// 对于每个smoothgroup, 计算normal并更新顶点数据
 	{
-		TriangleList& curGroup = triSmoothGroups[i];
+		TriIDList& curGroup = triSmoothGroups[i];
 
 		Vector3 groupBitangent = Vector3::Zero;
-		for(size_t triIx = 0; triIx < curGroup.size(); ++triIx)
+		for(size_t k = 0; k < curGroup.size(); ++k)
 		{
+			const Triangle& tri = triangleList[curGroup[k]];
+
 			Vector3 triBitangent;
-			calculateTriangleBitanget(curGroup[triIx], &triBitangent);
+			calculateTriangleBitanget(tri, &triBitangent);
 
 			groupBitangent += triBitangent;		// TODO:面积加成 
 		}
@@ -421,7 +441,7 @@ void Geometry::processSmoothBitangent(const Vector3& curPos, const TriangleList&
 
 		for(size_t triIx = 0; triIx < curGroup.size(); ++triIx)
 		{
-			Triangle& curTri = curGroup[triIx];
+			Triangle& curTri = triangleList[curGroup[triIx]];
 
 			int vertIx = INVALID_INDEX;		// smoothgroup共位置的顶点在当前三角面中是哪个顶点
 			int indexInTri = 0;
@@ -441,15 +461,22 @@ void Geometry::processSmoothBitangent(const Vector3& curPos, const TriangleList&
 			}
 			else
 			{
-				if(!isNewVertAdded && Vector3Unequal(bitangentData[verts[vertIx].bitangentIndex], groupBitangent, 0.01f))
+				if(Vector3Unequal(bitangentData[verts[vertIx].bitangentIndex], groupBitangent, 0.01f))
 				{
-					Vert newVert = verts[vertIx];
-					newVert.bitangentIndex = bitangentData.size() - 1;
+					if(newVertIndex != INVALID_INDEX)
+					{
+						curTri.vertexIndex[indexInTri] = newVertIndex;
+					}
+					else
+					{
+						Vert newVert = verts[vertIx];
+						newVert.bitangentIndex = bitangentData.size() - 1;
 
-					verts.push_back(newVert);
-					curTri.vertexIndex[indexInTri] = verts.size() - 1;
+						verts.push_back(newVert);
+						curTri.vertexIndex[indexInTri] = verts.size() - 1;
 
-					isNewVertAdded = true;
+						newVertIndex = verts.size() - 1;
+					}
 				}
 			}
 		}
@@ -487,7 +514,8 @@ void Geometry::calculateTBN(bool calculateNormal, bool calculateTangent, bool ca
 	// get vertexTrianglesMap
 	for(size_t triIndex = 0; triIndex < triangleList.size(); ++triIndex)
 	{
-		Triangle& curTri = triangleList[triIndex];		// each triangle
+		int curTriID = triIndex;
+		Triangle& curTri = triangleList[curTriID];		// each triangle
 
 		for(int i = 0; i < 3; ++i)
 		{
@@ -496,12 +524,12 @@ void Geometry::calculateTBN(bool calculateNormal, bool calculateTangent, bool ca
 			VertexTrianglesMap::iterator iter = vertexTrianglesMap.find(curPos);
 			if(iter != vertexTrianglesMap.end())
 			{
-				iter->second.push_back(curTri);
+				iter->second.push_back(curTriID);
 			}
 			else
 			{
-				TriangleList triList;
-				triList.push_back(curTri);
+				TriIDList triList;
+				triList.push_back(curTriID);
 
 				vertexTrianglesMap[curPos] = triList;
 			}
@@ -512,7 +540,7 @@ void Geometry::calculateTBN(bool calculateNormal, bool calculateTangent, bool ca
 	{
 		Vector3 curPos = iter->first;		// for each unique position
 
-		TriangleList& overAllTriGroup = iter->second;
+		TriIDList overAllTriGroup = iter->second;
 
 		if(calculateNormal)
 			processSmoothNormal(curPos, overAllTriGroup);
@@ -531,151 +559,187 @@ void Geometry::CalculateNormals()
 }
 
 
-void Geometry::buildNormalSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
-							TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriangleList>& triSmoothGroups)
+void Geometry::buildNormalSmoothGroup(Vector3 curPos, const TriIDList& overAllTriGroup, int curTriID, 
+							TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriIDList>& triSmoothGroups)
 {
-	if(triSmoothGroupMap[curTri] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
+	if(triSmoothGroupMap[curTriID] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
 		return;
 
-	const Triangle* neighbourTri0;
-	const Triangle* neighbourTri1;
+	const Triangle& curTri = triangleList[curTriID];
 
-	findNeighbourTriangles(overAllTriGroup, curTri, &neighbourTri0, &neighbourTri1);
+	int neighb0ID = -1;
+	int neighb1ID = -1;
+
+	Triangle* neighb0 = NULL;
+	Triangle* neighb1 = NULL;
+
+	findNeighbourTriangles(overAllTriGroup, curTriID, &neighb0ID, &neighb1ID);
+
+	if(neighb0ID != -1)
+		neighb0 = &(triangleList[neighb0ID]);
+
+	if(neighb1ID != -1)
+		neighb1 = &(triangleList[neighb1ID]);
 
 	const float minCreaseAngle = PI / 3.0f;
-	if(neighbourTri0 != NULL &&
-		canSmoothNormal(curTri, *neighbourTri0, minCreaseAngle) && triSmoothGroupMap[*neighbourTri0] != NO_GROUP)
+	if(neighb0 != NULL &&
+		canSmoothNormal(curTri, *neighb0, minCreaseAngle) && triSmoothGroupMap[neighb0ID] != NO_GROUP)
 	{
-		triSmoothGroupMap[curTri] = triSmoothGroupMap[*neighbourTri0];
-		triSmoothGroups[triSmoothGroupMap[curTri]].push_back(curTri);
+		triSmoothGroupMap[curTriID] = triSmoothGroupMap[neighb0ID];
+		triSmoothGroups[triSmoothGroupMap[curTriID]].push_back(curTriID);
 		return;
 	}
-	else if(neighbourTri1 != NULL &&
-		canSmoothNormal(curTri, *neighbourTri1, minCreaseAngle) && triSmoothGroupMap[*neighbourTri1] != NO_GROUP)
+	else if(neighb1 != NULL &&
+		canSmoothNormal(curTri, *neighb1, minCreaseAngle) && triSmoothGroupMap[neighb1ID] != NO_GROUP)
 	{
-		triSmoothGroupMap[curTri] = triSmoothGroupMap[*neighbourTri1];
-		triSmoothGroups[triSmoothGroupMap[curTri]].push_back(curTri);
+		triSmoothGroupMap[curTriID] = triSmoothGroupMap[neighb1ID];
+		triSmoothGroups[triSmoothGroupMap[curTriID]].push_back(curTriID);
 		return;
 	}
 	else
 	{
-		triSmoothGroupMap[curTri] = triSmoothGroups.size();
+		triSmoothGroupMap[curTriID] = triSmoothGroups.size();
 
-		TriangleList newSmoothGroup;
-		newSmoothGroup.push_back(curTri);
+		TriIDList newSmoothGroup;
+		newSmoothGroup.push_back(curTriID);
 
 		triSmoothGroups.push_back(newSmoothGroup);
 	}
 
-	if(neighbourTri0 != NULL)
-		buildNormalSmoothGroup(curPos, overAllTriGroup, *neighbourTri0, triSmoothGroupMap, triSmoothGroups);
+	if(neighb0 != NULL)
+		buildNormalSmoothGroup(curPos, overAllTriGroup, neighb0ID, triSmoothGroupMap, triSmoothGroups);
 
-	if(neighbourTri1 != NULL)
-		buildNormalSmoothGroup(curPos, overAllTriGroup, *neighbourTri1, triSmoothGroupMap, triSmoothGroups);
+	if(neighb1 != NULL)
+		buildNormalSmoothGroup(curPos, overAllTriGroup, neighb1ID, triSmoothGroupMap, triSmoothGroups);
 }
 
 
-void Geometry::buildTangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
-								  TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriangleList>& triSmoothGroups)
+void Geometry::buildTangentSmoothGroup(Vector3 curPos, const TriIDList& overAllTriGroup, int curTriID, 
+									   TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriIDList>& triSmoothGroups)
 {
-	if(triSmoothGroupMap[curTri] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
+	if(triSmoothGroupMap[curTriID] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
 		return;
 
-	const Triangle* neighbourTri0;
-	const Triangle* neighbourTri1;
+	const Triangle& curTri = triangleList[curTriID];
 
-	findNeighbourTriangles(overAllTriGroup, curTri, &neighbourTri0, &neighbourTri1);
+	int neighb0ID = -1;
+	int neighb1ID = -1;
+
+	Triangle* neighb0 = NULL;
+	Triangle* neighb1 = NULL;
+
+	findNeighbourTriangles(overAllTriGroup, curTriID, &neighb0ID, &neighb1ID);
+
+	if(neighb0ID != -1)
+		neighb0 = &(triangleList[neighb0ID]);
+
+	if(neighb1ID != -1)
+		neighb1 = &(triangleList[neighb1ID]);
+
 
 	const float minCreaseAngle = PI / 3.0f;
-	if(neighbourTri0 != NULL &&
-		canSmoothTangent(curTri, *neighbourTri0, minCreaseAngle) && triSmoothGroupMap[*neighbourTri0] != NO_GROUP)
+	if(neighb0 != NULL &&
+		canSmoothTangent(curTri, *neighb0, minCreaseAngle) && triSmoothGroupMap[neighb0ID] != NO_GROUP)
 	{
-		triSmoothGroupMap[curTri] = triSmoothGroupMap[*neighbourTri0];
-		triSmoothGroups[triSmoothGroupMap[curTri]].push_back(curTri);
+		triSmoothGroupMap[curTriID] = triSmoothGroupMap[neighb0ID];
+		triSmoothGroups[triSmoothGroupMap[curTriID]].push_back(curTriID);
 		return;
 	}
-	else if(neighbourTri1 != NULL &&
-		canSmoothTangent(curTri, *neighbourTri1, minCreaseAngle) && triSmoothGroupMap[*neighbourTri1] != NO_GROUP)
+	else if(neighb1 != NULL &&
+		canSmoothTangent(curTri, *neighb1, minCreaseAngle) && triSmoothGroupMap[neighb1ID] != NO_GROUP)
 	{
-		triSmoothGroupMap[curTri] = triSmoothGroupMap[*neighbourTri1];
-		triSmoothGroups[triSmoothGroupMap[curTri]].push_back(curTri);
+		triSmoothGroupMap[curTriID] = triSmoothGroupMap[neighb1ID];
+		triSmoothGroups[triSmoothGroupMap[curTriID]].push_back(curTriID);
 		return;
 	}
 	else
 	{
-		triSmoothGroupMap[curTri] = triSmoothGroups.size();
+		triSmoothGroupMap[curTriID] = triSmoothGroups.size();
 
-		TriangleList newSmoothGroup;
-		newSmoothGroup.push_back(curTri);
+		TriIDList newSmoothGroup;
+		newSmoothGroup.push_back(curTriID);
 
 		triSmoothGroups.push_back(newSmoothGroup);
 	}
 
-	if(neighbourTri0 != NULL)
-		buildTangentSmoothGroup(curPos, overAllTriGroup, *neighbourTri0, triSmoothGroupMap, triSmoothGroups);
+	if(neighb0 != NULL)
+		buildTangentSmoothGroup(curPos, overAllTriGroup, neighb0ID, triSmoothGroupMap, triSmoothGroups);
 
-	if(neighbourTri1 != NULL)
-		buildTangentSmoothGroup(curPos, overAllTriGroup, *neighbourTri1, triSmoothGroupMap, triSmoothGroups);
+	if(neighb1 != NULL)
+		buildTangentSmoothGroup(curPos, overAllTriGroup, neighb1ID, triSmoothGroupMap, triSmoothGroups);
 }
 
 
-void Geometry::buildBitangentSmoothGroup(Vector3 curPos, const TriangleList& overAllTriGroup, const Triangle& curTri, 
-								   TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriangleList>& triSmoothGroups)
+void Geometry::buildBitangentSmoothGroup(Vector3 curPos, const TriIDList& overAllTriGroup, int curTriID, 
+										 TriangleSmoothGroupMap& triSmoothGroupMap, std::vector<TriIDList>& triSmoothGroups)
 {
-	_Assert(triSmoothGroupMap.find(curTri) != triSmoothGroupMap.end());
-
-	if(triSmoothGroupMap[curTri] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
+	if(triSmoothGroupMap[curTriID] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
 		return;
 
-	const Triangle* neighbourTri0;
-	const Triangle* neighbourTri1;
+	const Triangle& curTri = triangleList[curTriID];
 
-	findNeighbourTriangles(overAllTriGroup, curTri, &neighbourTri0, &neighbourTri1);
+	int neighb0ID = -1;
+	int neighb1ID = -1;
+
+	Triangle* neighb0 = NULL;
+	Triangle* neighb1 = NULL;
+
+	findNeighbourTriangles(overAllTriGroup, curTriID, &neighb0ID, &neighb1ID);
+
+	if(neighb0ID != -1)
+		neighb0 = &(triangleList[neighb0ID]);
+
+	if(neighb1ID != -1)
+		neighb1 = &(triangleList[neighb1ID]);
+
 
 	const float minCreaseAngle = PI / 3.0f;
-	if(neighbourTri0 != NULL &&
-		canSmoothBitangent(curTri, *neighbourTri0, minCreaseAngle) && triSmoothGroupMap[*neighbourTri0] != NO_GROUP)
+	if(neighb0 != NULL &&
+		canSmoothBitangent(curTri, *neighb0, minCreaseAngle) && triSmoothGroupMap[neighb0ID] != NO_GROUP)
 	{
-		triSmoothGroupMap[curTri] = triSmoothGroupMap[*neighbourTri0];
-		triSmoothGroups[triSmoothGroupMap[curTri]].push_back(curTri);
+		triSmoothGroupMap[curTriID] = triSmoothGroupMap[neighb0ID];
+		triSmoothGroups[triSmoothGroupMap[curTriID]].push_back(curTriID);
 		return;
 	}
-	else if(neighbourTri1 != NULL &&
-		canSmoothBitangent(curTri, *neighbourTri1, minCreaseAngle) && triSmoothGroupMap[*neighbourTri1] != NO_GROUP)
+	else if(neighb1 != NULL &&
+		canSmoothBitangent(curTri, *neighb1, minCreaseAngle) && triSmoothGroupMap[neighb1ID] != NO_GROUP)
 	{
-		triSmoothGroupMap[curTri] = triSmoothGroupMap[*neighbourTri1];
-		triSmoothGroups[triSmoothGroupMap[curTri]].push_back(curTri);
+		triSmoothGroupMap[curTriID] = triSmoothGroupMap[neighb1ID];
+		triSmoothGroups[triSmoothGroupMap[curTriID]].push_back(curTriID);
 		return;
 	}
 	else
 	{
-		triSmoothGroupMap[curTri] = triSmoothGroups.size();
+		triSmoothGroupMap[curTriID] = triSmoothGroups.size();
 
-		TriangleList newSmoothGroup;
-		newSmoothGroup.push_back(curTri);
+		TriIDList newSmoothGroup;
+		newSmoothGroup.push_back(curTriID);
 
 		triSmoothGroups.push_back(newSmoothGroup);
 	}
 
-	if(neighbourTri0)
-		buildBitangentSmoothGroup(curPos, overAllTriGroup, *neighbourTri0, triSmoothGroupMap, triSmoothGroups);
+	if(neighb0 != NULL)
+		buildBitangentSmoothGroup(curPos, overAllTriGroup, neighb0ID, triSmoothGroupMap, triSmoothGroups);
 
-	if(neighbourTri1)
-		buildBitangentSmoothGroup(curPos, overAllTriGroup, *neighbourTri1, triSmoothGroupMap, triSmoothGroups);
+	if(neighb1 != NULL)
+		buildBitangentSmoothGroup(curPos, overAllTriGroup, neighb1ID, triSmoothGroupMap, triSmoothGroups);
 }
 
-void Geometry::findNeighbourTriangles(const TriangleList& triGroup, const Triangle& curTri, const Triangle** neighbour0, const Triangle** neighbour1)
+void Geometry::findNeighbourTriangles(const TriIDList& triGroup, int curTriID, int* neighb0ID, int* neighb1ID)
 {
-	_Assert(NULL != neighbour0);
-	_Assert(NULL != neighbour1);
+	_Assert(NULL != neighb0ID);
+	_Assert(NULL != neighb1ID);
+
+	const Triangle& curTri = triangleList[curTriID];
 
 	int numNeighboursFound = 0;
-	*neighbour0 = NULL;
-	*neighbour1 = NULL;
+	*neighb0ID = -1;
+	*neighb1ID = -1;
 
 	for(size_t i = 0; i < triGroup.size(); ++i)
 	{
-		const Triangle& tri = triGroup[i];
+		int triID = triGroup[i];
+		const Triangle& tri = triangleList[triID];
 
 		if(tri.vertexIndex[0] == curTri.vertexIndex[0] &&
 			tri.vertexIndex[1] == curTri.vertexIndex[1] &&
@@ -685,9 +749,9 @@ void Geometry::findNeighbourTriangles(const TriangleList& triGroup, const Triang
 		if(hasSharedEdge(curTri, tri))
 		{
 			if(numNeighboursFound == 0)
-				*neighbour0 = &tri;
+				*neighb0ID = triID;
 			else
-				*neighbour1 = &tri;
+				*neighb1ID = triID;
 
 			numNeighboursFound++;
 		}
