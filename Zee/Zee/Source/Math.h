@@ -21,8 +21,32 @@ public:
 
 	}
 
+	struct Comparer
+	{
+		bool operator()(const Vector3& vec1, const Vector3& vec2) const
+		{
+			if(vec1.x < vec2.x)
+				return true;
+
+			if(vec1.x > vec2.x)
+				return false;
+
+			if(vec1.y < vec2.y)
+				return true;
+
+			if(vec1.y > vec2.y)
+				return false;
+
+			if(vec1.z < vec2.z)
+				return true;
+
+			return false;
+		}
+	};
+
 	bool operator==(const Vector3& vec); 
 	bool operator!=(const Vector3& vec);
+	bool operator<(const Vector3& vec);
 	Vector3 operator+=(const Vector3& vec); 
 	Vector3 operator-=(const Vector3& vec); 
 	Vector3 operator*=(float val);

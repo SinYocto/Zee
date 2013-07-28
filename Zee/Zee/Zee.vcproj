@@ -186,47 +186,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\DebugDrawer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\DebugDrawer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Geometry.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Geometry.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GeometryManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GeometryManager.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\IReferenceCounted.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Material.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Material.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\MaterialManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\MaterialManager.h"
 				>
 			</File>
 			<File
@@ -258,14 +218,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Primitive.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Primitive.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\RenderableObject.cpp"
 				>
 			</File>
@@ -274,13 +226,77 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Shader.cpp"
+				RelativePath=".\Source\SceneManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Shader.h"
+				RelativePath=".\Source\SceneManager.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Source\SceneNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\SceneNode.h"
+				>
+			</File>
+			<Filter
+				Name="Geometry"
+				>
+				<File
+					RelativePath=".\Source\Geometry.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Geometry.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GeometryManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GeometryManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Primitive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Primitive.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Material&amp;Shading"
+				>
+				<File
+					RelativePath=".\Source\Material.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Material.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\MaterialManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\MaterialManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Shader.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Shader.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Environment"
@@ -339,10 +355,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Geometry"
-			>
-		</Filter>
-		<Filter
 			Name="Math&amp;Physics"
 			>
 			<File
@@ -375,7 +387,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Helper"
+			Name="UtilityHelper"
 			>
 			<File
 				RelativePath=".\Source\Time.cpp"
@@ -403,6 +415,18 @@
 			</File>
 			<File
 				RelativePath=".\Source\YString.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="DebugHelper"
+			>
+			<File
+				RelativePath=".\Source\DebugDrawer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\DebugDrawer.h"
 				>
 			</File>
 		</Filter>

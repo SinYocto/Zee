@@ -12,8 +12,8 @@ public:
 	static void GetMaterial(const wchar_t* name, Material** material);
 
 private:
-	static std::list<Material*> resourceList;
-	static DWORD curIDIndex; 
+	static std::list<Material*> mResourceList;
+	static DWORD mCurID;
 };
 
 

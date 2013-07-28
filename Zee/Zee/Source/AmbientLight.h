@@ -6,38 +6,38 @@
 
 class AmbientLight{
 public:
-	AmbientLight(D3DXCOLOR _color = D3DXCOLOR_WHITE, float _intensity = 0)
-		:color(_color)
-		,intensity(_intensity)
+	AmbientLight(D3DXCOLOR color = D3DXCOLOR_WHITE, float intensity = 0)
+		:mColor(color)
+		,mIntensity(intensity)
 	{
 
 	}
 
-	void SetValue(D3DXCOLOR _color, float _intensity)
+	void SetValue(D3DXCOLOR color, float intensity)
 	{
-		color = _color;
-		intensity = _intensity;
+		mColor = color;
+		mIntensity = intensity;
 	}
 
-	void SetColor(D3DXCOLOR _color)
+	void SetColor(D3DXCOLOR color)
 	{
-		color = _color;
+		mColor = color;
 	}
 
-	void SetIntisity(float _intensity)
+	void SetIntisity(float intensity)
 	{
-		intensity = _intensity;
+		mIntensity = intensity;
 	}
 
 	D3DXCOLOR FinalColor()
 	{
-		return intensity * color;
+		return mIntensity * mColor;
 	}
 
 
 private:
-	D3DXCOLOR color;
-	float intensity;
+	D3DXCOLOR mColor;
+	float mIntensity;
 };
 
 #endif

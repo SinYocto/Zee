@@ -15,8 +15,8 @@ public:
 	static void OnResetDevice();
 
 private:
-	static std::list<Geometry*> resourceList;
-	static DWORD curIDIndex;
+	static std::list<Geometry*> mResourceList;
+	static DWORD mCurID;
 };
 
 

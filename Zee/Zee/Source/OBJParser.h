@@ -98,15 +98,15 @@ private:
 
 private:
 	// 解析过程中存的数据和状态
-	static DWORD dataContentType;
-	static std::vector<Vector3> positionData;
+	static DWORD mDataContentType;
+	static std::vector<Vector3> mPosData;
 	static std::vector<Vector2> uvData;
 	static std::vector<Vector3> normalData;
 
-	static std::vector<Geometry*> geoList;
-	static std::vector<Material*> materialList;
+	static std::vector<Geometry*> mGeoList;
+	static std::vector<Material*> mMtlList;
 
-	static Model* resultModel;
+	static Model* mResultModel;
 
 };
 

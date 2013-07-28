@@ -112,9 +112,9 @@ int main()
 		MaterialManager::AddMaterial(mtl1);
 
 		mtl1->SetShader(BumpSpecular);
-		mtl1->shader->SetColorTex(L"./Assets/Textures/6133.jpg");
-		mtl1->shader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
-		mtl1->shader->SetSpecShiness(0.4f);
+		mtl1->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
+		mtl1->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
+		mtl1->mShader->SetSpecShiness(0.4f);
 
 		Material* mtl2 = new Material(L"mtl2");
 		MaterialManager::AddMaterial(mtl2);
@@ -263,13 +263,13 @@ void SetupGUIStyle()
 void SetupShaders()
 {
 	DiffuseShader::CreateEffectFromFile(TEXT("./Source/Shaders/Diffuse.fx"));	// time used: 124ms
-	_Assert(NULL != DiffuseShader::effect);
+	_Assert(NULL != DiffuseShader::mEffect);
 
 	SpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/Specular.fx"));		// time used: 230ms
-	_Assert(NULL != SpecularShader::effect);
+	_Assert(NULL != SpecularShader::mEffect);
 
 	BumpSpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/BumpSpecular.fx"));		// time used: 248ms
-	_Assert(NULL != BumpSpecularShader::effect);
+	_Assert(NULL != BumpSpecularShader::mEffect);
 }
 
 void GUIUpdate()

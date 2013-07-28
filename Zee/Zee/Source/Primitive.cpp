@@ -15,7 +15,7 @@ void Cube::constructGeometryData()
 	pos[7] = Vector3( 1.0f, -1.0f, -1.0f);
 
 	for(int i = 0; i < 8; ++i)
-		positionData.push_back(pos[i]);
+		mPositionData.push_back(pos[i]);
 
 	// uvData
 	Vector2 uv[4];
@@ -25,7 +25,7 @@ void Cube::constructGeometryData()
 	uv[3] = Vector2(1, 1);
 
 	for(int i = 0; i < 4; ++i)
-		uvData.push_back(uv[i]);
+		mUVData.push_back(uv[i]);
 
 	// verts
 	Geometry::Vert geoVerts[24];
@@ -60,7 +60,7 @@ void Cube::constructGeometryData()
 	geoVerts[23] = Vert(5, 3);
 
 	for(int i = 0; i < 24; ++i)
-		verts.push_back(geoVerts[i]);
+		mVerts.push_back(geoVerts[i]);
 
 	// triangles
 	Geometry::Triangle triangles[12];
@@ -83,7 +83,7 @@ void Cube::constructGeometryData()
 	triangles[11] = Triangle(22, 21, 23);
 
 	for(int i = 0; i < 12; ++i)
-		triangleList.push_back(triangles[i]);
+		mTriangles.push_back(triangles[i]);
 }
 
 void Cylinder::constructGeometryData()
@@ -91,8 +91,8 @@ void Cylinder::constructGeometryData()
 	int numVerts = segmentsW * (segmentsH + 1) + 2;
 
 	// positionData
-	positionData.push_back(Vector3::Zero);
-	positionData.push_back(Vector3(0, height, 0));
+	mPositionData.push_back(Vector3::Zero);
+	mPositionData.push_back(Vector3(0, height, 0));
 
 	float heightDelta = height / segmentsH;
 	float radiusDelta = (topRadius - bottomRadius) / segmentsH;
@@ -107,15 +107,15 @@ void Cylinder::constructGeometryData()
 			float x = circleRadius * cos(j*deltaTheta);
 			float z = circleRadius * sin(j*deltaTheta);
 
-			positionData.push_back(Vector3(x, circleHeight, z));
+			mPositionData.push_back(Vector3(x, circleHeight, z));
 		}
 	}
 
 	// verts
-	for(size_t i = 0; i < positionData.size(); ++i)
+	for(size_t i = 0; i < mPositionData.size(); ++i)
 	{
 		Geometry::Vert vert(i);
-		verts.push_back(vert);
+		mVerts.push_back(vert);
 	}
 
 	// triangles
@@ -123,14 +123,14 @@ void Cylinder::constructGeometryData()
 	{
 		// 顶点索引为2 ~ sw+1
 		Geometry::Triangle triangle(0, 2+i, 2 + (i + 1) % segmentsW);
-		triangleList.push_back(triangle);
+		mTriangles.push_back(triangle);
 	}
 
 	for(int i = 0; i < segmentsW; ++i)		// 顶圆面
 	{
 		// 顶点索引为sw*sh + 2 ~ sw*(sh + 1) + 1
 		Geometry::Triangle triangle(1, segmentsW*segmentsH + 2 + (i + 1) % segmentsW, segmentsW*segmentsH + 2 + i);
-		triangleList.push_back(triangle);
+		mTriangles.push_back(triangle);
 	}
 
 	for(int i = 0; i < segmentsH; ++i)		// 柱面
@@ -156,8 +156,8 @@ void Cylinder::constructGeometryData()
 			_Assert(tri2.vertexIndex[1] < segmentsW * (segmentsH + 1) + 2);
 			_Assert(tri2.vertexIndex[2] < segmentsW * (segmentsH + 1) + 2);
 
-			triangleList.push_back(tri1);
-			triangleList.push_back(tri2);
+			mTriangles.push_back(tri1);
+			mTriangles.push_back(tri2);
 		}
 	}
 }

@@ -16,36 +16,36 @@ class Camera;
 class RenderableObject : public Object
 {
 public:
-	RenderableObject(Object* _parent, Geometry* _geo, Material* _material)
-		:Object(_parent)
-		,geo(_geo)
-		,material(_material)
-		,displayMode(Textured)
+	RenderableObject(Object* parent, Geometry* geo, Material* material)
+		:Object(parent)
+		,mGeo(geo)
+		,mMaterial(material)
+		,mDisplayMode(Textured)
 	{
-		if(NULL != geo)
+		if(NULL != mGeo)
 		{
-			geo->Grab();
+			mGeo->Grab();
 		}
 
-		if(NULL != material)
+		if(NULL != mMaterial)
 		{
-			material->Grab();
+			mMaterial->Grab();
 		}
 	}
 
 	~RenderableObject()
 	{
-		SAFE_DROP(geo);
-		SAFE_DROP(material);
+		SAFE_DROP(mGeo);
+		SAFE_DROP(mMaterial);
 	}
 
 	void Draw(Camera* camera);
 
 protected:
-	Geometry* geo;
-	Material* material; 
+	Geometry* mGeo;
+	Material* mMaterial; 
 
-	DisplayMode displayMode;
+	DisplayMode mDisplayMode;
 };
 
 #endif

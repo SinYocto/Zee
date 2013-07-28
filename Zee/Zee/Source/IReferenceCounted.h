@@ -13,7 +13,7 @@ class IReferenceCounted
 {
 public:
 	IReferenceCounted()
-		:referenceCounter(1)
+		:mRefCounts(1)
 	{
 
 	}
@@ -26,21 +26,21 @@ public:
 
 	void Grab()
 	{
-		++referenceCounter;
+		++mRefCounts;
 	}
 
 	void Drop()
 	{
-		_Assert(referenceCounter > 0);
+		_Assert(mRefCounts > 0);
 
-		if(--referenceCounter == 0)
+		if(--mRefCounts == 0)
 		{
 			delete this;		// QUESTION:如果对象不是new出来的呢?
 		}
 	}
 
 public:
-	int referenceCounter;
+	int mRefCounts;
 };
 
 #endif

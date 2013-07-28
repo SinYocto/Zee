@@ -137,7 +137,7 @@ bool run()
 void CreateVB(IDirect3DDevice9* d3dDevice,IDirect3DVertexBuffer9** vb, void* vertexData, int numVertices, VertexType vertexType)
 {
 	int sizeofVertex;
-	DWORD vertexFVF;
+	DWORD vertexFVF = D3DFVF_XYZ;
 	switch(vertexType)
 	{
 		case XYZ:

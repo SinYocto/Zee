@@ -4,35 +4,38 @@
 
 void Geometry::createVertexBuffer(void* vertexData)
 {
-	CreateVB(gD3DDevice, &vertexBuffer, vertexData, verts.size(), vertexType);
+	CreateVB(gD3DDevice, &mVertexBuffer, vertexData, mVerts.size(), mVertexType);
 }
 
 void Geometry::createIndexBuffer()
 {
-	int numIndices = 3 * triangleList.size();
+	int numIndices = 3 * mTriangles.size();
 
 	DWORD* indexData = new DWORD[numIndices];
-	for(size_t triIndex = 0; triIndex < triangleList.size(); ++triIndex)
+	for(size_t triIndex = 0; triIndex < mTriangles.size(); ++triIndex)
 	{
-		indexData[3*triIndex + 0] = triangleList[triIndex].vertexIndex[0];
-		indexData[3*triIndex + 1] = triangleList[triIndex].vertexIndex[1];
-		indexData[3*triIndex + 2] = triangleList[triIndex].vertexIndex[2];
+		indexData[3*triIndex + 0] = mTriangles[triIndex].vertexIndex[0];
+		indexData[3*triIndex + 1] = mTriangles[triIndex].vertexIndex[1];
+		indexData[3*triIndex + 2] = mTriangles[triIndex].vertexIndex[2];
 	}
 
-	CreateIB(gD3DDevice, &indexBuffer, indexData, numIndices);
+	CreateIB(gD3DDevice, &mIndexBuffer, indexData, numIndices);
 }
 
 // BuildGeometry之前先要获取相应VertexType所需的顶点数据
 void Geometry::BuildGeometry(VertexType type)
 {
-	vertexType = type;
+	if(type == VERTEX_TYPE_INVALID)
+		return;
+
+	mVertexType = type;
 
 	void* vertexData = NULL;
 	bool needToDeleteVertexData = false;
 
-	int numVertices = (int)verts.size();
+	int numVertices = (int)mVerts.size();
 
-	switch(vertexType)
+	switch(mVertexType)
 	{
 		case XYZ:
 			{
@@ -41,9 +44,9 @@ void Geometry::BuildGeometry(VertexType type)
 
 				for(int i = 0; i < numVertices; ++i)
 				{
-					Vertex vert = Vertex(positionData[verts[i].posIndex].x, 
-						positionData[verts[i].posIndex].y, 
-						positionData[verts[i].posIndex].z);
+					Vertex vert = Vertex(mPositionData[mVerts[i].posIndex].x, 
+						mPositionData[mVerts[i].posIndex].y, 
+						mPositionData[mVerts[i].posIndex].z);
 
 					((Vertex*)vertexData)[i] = vert;
 				}
@@ -56,11 +59,11 @@ void Geometry::BuildGeometry(VertexType type)
 
 				for(int i = 0; i < numVertices; ++i)
 				{
-					VertexUV vert = VertexUV(positionData[verts[i].posIndex].x, 
-						positionData[verts[i].posIndex].y, 
-						positionData[verts[i].posIndex].z, 
-						uvData[verts[i].uvIndex].x, 
-						uvData[verts[i].uvIndex].y);
+					VertexUV vert = VertexUV(mPositionData[mVerts[i].posIndex].x, 
+						mPositionData[mVerts[i].posIndex].y, 
+						mPositionData[mVerts[i].posIndex].z, 
+						mUVData[mVerts[i].uvIndex].x, 
+						mUVData[mVerts[i].uvIndex].y);
 
 					((VertexUV*)vertexData)[i] = vert;
 				}
@@ -73,12 +76,12 @@ void Geometry::BuildGeometry(VertexType type)
 
 				for(int i = 0; i < numVertices; ++i)
 				{
-					VertexN vert = VertexN(positionData[verts[i].posIndex].x, 
-						positionData[verts[i].posIndex].y, 
-						positionData[verts[i].posIndex].z, 
-						normalData[verts[i].normalIndex].x, 
-						normalData[verts[i].normalIndex].y,
-						normalData[verts[i].normalIndex].z);
+					VertexN vert = VertexN(mPositionData[mVerts[i].posIndex].x, 
+						mPositionData[mVerts[i].posIndex].y, 
+						mPositionData[mVerts[i].posIndex].z, 
+						mNormalData[mVerts[i].normalIndex].x, 
+						mNormalData[mVerts[i].normalIndex].y,
+						mNormalData[mVerts[i].normalIndex].z);
 
 					((VertexN*)vertexData)[i] = vert;
 				}
@@ -91,14 +94,14 @@ void Geometry::BuildGeometry(VertexType type)
 
 				for(int i = 0; i < numVertices; ++i)
 				{
-					VertexUVN vert = VertexUVN(positionData[verts[i].posIndex].x, 
-						positionData[verts[i].posIndex].y, 
-						positionData[verts[i].posIndex].z, 
-						uvData[verts[i].uvIndex].x, 
-						uvData[verts[i].uvIndex].y,
-						normalData[verts[i].normalIndex].x, 
-						normalData[verts[i].normalIndex].y,
-						normalData[verts[i].normalIndex].z);
+					VertexUVN vert = VertexUVN(mPositionData[mVerts[i].posIndex].x, 
+						mPositionData[mVerts[i].posIndex].y, 
+						mPositionData[mVerts[i].posIndex].z, 
+						mUVData[mVerts[i].uvIndex].x, 
+						mUVData[mVerts[i].uvIndex].y,
+						mNormalData[mVerts[i].normalIndex].x, 
+						mNormalData[mVerts[i].normalIndex].y,
+						mNormalData[mVerts[i].normalIndex].z);
 
 					((VertexUVN*)vertexData)[i] = vert;
 				}
@@ -111,25 +114,27 @@ void Geometry::BuildGeometry(VertexType type)
 
 				for(int i = 0; i < numVertices; ++i)
 				{
-					VertexUVTBN vert = VertexUVTBN(positionData[verts[i].posIndex].x, 
-						positionData[verts[i].posIndex].y, 
-						positionData[verts[i].posIndex].z, 
-						uvData[verts[i].uvIndex].x, 
-						uvData[verts[i].uvIndex].y,
-						tangentData[verts[i].tangentIndex].x, 
-						tangentData[verts[i].tangentIndex].y,
-						tangentData[verts[i].tangentIndex].z,
-						bitangentData[verts[i].bitangentIndex].x, 
-						bitangentData[verts[i].bitangentIndex].y,
-						bitangentData[verts[i].bitangentIndex].z,
-						normalData[verts[i].normalIndex].x, 
-						normalData[verts[i].normalIndex].y,
-						normalData[verts[i].normalIndex].z);
+					VertexUVTBN vert = VertexUVTBN(mPositionData[mVerts[i].posIndex].x, 
+						mPositionData[mVerts[i].posIndex].y, 
+						mPositionData[mVerts[i].posIndex].z, 
+						mUVData[mVerts[i].uvIndex].x, 
+						mUVData[mVerts[i].uvIndex].y,
+						mTangentData[mVerts[i].tangentIndex].x, 
+						mTangentData[mVerts[i].tangentIndex].y,
+						mTangentData[mVerts[i].tangentIndex].z,
+						mBitangentData[mVerts[i].bitangentIndex].x, 
+						mBitangentData[mVerts[i].bitangentIndex].y,
+						mBitangentData[mVerts[i].bitangentIndex].z,
+						mNormalData[mVerts[i].normalIndex].x, 
+						mNormalData[mVerts[i].normalIndex].y,
+						mNormalData[mVerts[i].normalIndex].z);
 
 					((VertexUVTBN*)vertexData)[i] = vert;
 				}
 				break;
 			}
+		default:
+			_Assert(false);
 	}
 
 	createVertexBuffer(vertexData);
@@ -147,7 +152,7 @@ void Geometry::BuildGeometry(VertexType type)
 
 void Geometry::createVertexDeclaration()
 {
-	switch(vertexType)
+	switch(mVertexType)
 	{
 	case XYZ:
 		{
@@ -156,10 +161,10 @@ void Geometry::createVertexDeclaration()
 				D3DDECL_END()
 			};
 
-			if(vertexDecl)
-				SAFE_RELEASE(vertexDecl);
+			if(mVertexDecl)
+				SAFE_RELEASE(mVertexDecl);
 
-			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &vertexDecl);
+			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_UV:
@@ -170,10 +175,10 @@ void Geometry::createVertexDeclaration()
 				D3DDECL_END()
 			};
 
-			if(vertexDecl)
-				SAFE_RELEASE(vertexDecl);
+			if(mVertexDecl)
+				SAFE_RELEASE(mVertexDecl);
 
-			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &vertexDecl);
+			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_N:
@@ -184,10 +189,10 @@ void Geometry::createVertexDeclaration()
 				D3DDECL_END()
 			};
 
-			if(vertexDecl)
-				SAFE_RELEASE(vertexDecl);
+			if(mVertexDecl)
+				SAFE_RELEASE(mVertexDecl);
 
-			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &vertexDecl);
+			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_UV_N:
@@ -199,10 +204,10 @@ void Geometry::createVertexDeclaration()
 				D3DDECL_END()
 			};
 
-			if(vertexDecl)
-				SAFE_RELEASE(vertexDecl);
+			if(mVertexDecl)
+				SAFE_RELEASE(mVertexDecl);
 
-			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &vertexDecl);
+			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_UV_TBN:
@@ -216,10 +221,10 @@ void Geometry::createVertexDeclaration()
 				D3DDECL_END()
 			};
 
-			if(vertexDecl)
-				SAFE_RELEASE(vertexDecl);
+			if(mVertexDecl)
+				SAFE_RELEASE(mVertexDecl);
 
-			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &vertexDecl);
+			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	}
@@ -227,18 +232,18 @@ void Geometry::createVertexDeclaration()
 
 void Geometry::SetVertexDeclaration()
 {
-	gD3DDevice->SetVertexDeclaration(vertexDecl);
+	gD3DDevice->SetVertexDeclaration(mVertexDecl);
 }
 
 void Geometry::Draw()
 {
-	gD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, verts.size(), 0, triangleList.size());
+	gD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, mVerts.size(), 0, mTriangles.size());
 }
 
 void Geometry::SetVertexStream()
 {	
-	gD3DDevice->SetStreamSource(0, vertexBuffer, 0, SizeofVertex(vertexType));
-	gD3DDevice->SetIndices(indexBuffer);
+	gD3DDevice->SetStreamSource(0, mVertexBuffer, 0, SizeofVertex(mVertexType));
+	gD3DDevice->SetIndices(mIndexBuffer);
 }
 
 void Geometry::processSmoothNormal(const Vector3& curPos, const TriIDList& overAllTriGroup)
@@ -264,7 +269,7 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriIDList& overA
 		Vector3 groupNormal = Vector3::Zero;
 		for(size_t k = 0; k < curGroup.size(); ++k)
 		{
-			const Triangle& tri = triangleList[curGroup[k]];
+			const Triangle& tri = mTriangles[curGroup[k]];
 
 			Vector3 triNormal;
 			calculateTriangleNormal(tri, &triNormal);
@@ -274,18 +279,18 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriIDList& overA
 
 		groupNormal.Normalize();
 
-		normalData.push_back(groupNormal);		// normal加入到normaldata数据中
+		mNormalData.push_back(groupNormal);		// normal加入到normaldata数据中
 
 		int newVertIndex = INVALID_INDEX;
 		for(size_t i = 0; i < curGroup.size(); ++i)
 		{
-			Triangle& curTri = triangleList[curGroup[i]];
+			Triangle& curTri = mTriangles[curGroup[i]];
 
 			int vertIx = INVALID_INDEX;		// smoothgroup共位置的顶点在当前三角面中是哪个顶点
 			int indexInTri = 0;
 			for(int k = 0; k < 3; ++k)
 			{
-				if(Vector3Equal(positionData[verts[curTri.vertexIndex[k]].posIndex], curPos, 0.0001f))
+				if(Vector3Equal(mPositionData[mVerts[curTri.vertexIndex[k]].posIndex], curPos, 0.0001f))
 				{
 					vertIx = curTri.vertexIndex[k];
 					indexInTri = k;
@@ -293,13 +298,13 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriIDList& overA
 				}
 			}
 
-			if(verts[vertIx].normalIndex == INVALID_INDEX)
+			if(mVerts[vertIx].normalIndex == INVALID_INDEX)
 			{
-				verts[vertIx].normalIndex = normalData.size() - 1;
+				mVerts[vertIx].normalIndex = mNormalData.size() - 1;
 			}
 			else
 			{
-				if(Vector3Unequal(normalData[verts[vertIx].normalIndex], groupNormal, 0.01f))
+				if(Vector3Unequal(mNormalData[mVerts[vertIx].normalIndex], groupNormal, 0.01f))
 				{
 					if(newVertIndex != INVALID_INDEX)
 					{
@@ -307,13 +312,13 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriIDList& overA
 					}
 					else
 					{
-						Vert newVert = verts[vertIx];
-						newVert.normalIndex = normalData.size() - 1;
+						Vert newVert = mVerts[vertIx];
+						newVert.normalIndex = mNormalData.size() - 1;
 
-						verts.push_back(newVert);
-						curTri.vertexIndex[indexInTri] = verts.size() - 1;
+						mVerts.push_back(newVert);
+						curTri.vertexIndex[indexInTri] = mVerts.size() - 1;
 
-						newVertIndex = verts.size() - 1;
+						newVertIndex = mVerts.size() - 1;
 					}
 				}
 			}
@@ -345,7 +350,7 @@ void Geometry::processSmoothTangent(const Vector3& curPos, const TriIDList& over
 		Vector3 groupTangent = Vector3::Zero;
 		for(size_t k = 0; k < curGroup.size(); ++k)
 		{
-			const Triangle& tri = triangleList[curGroup[k]];
+			const Triangle& tri = mTriangles[curGroup[k]];
 
 			Vector3 triTangent;
 			calculateTriangleTangent(tri, &triTangent);
@@ -355,18 +360,18 @@ void Geometry::processSmoothTangent(const Vector3& curPos, const TriIDList& over
 
 		groupTangent.Normalize();
 
-		tangentData.push_back(groupTangent);		// normal加入到normaldata数据中
+		mTangentData.push_back(groupTangent);		// normal加入到normaldata数据中
 
 		int newVertIndex = INVALID_INDEX;
 		for(size_t triIx = 0; triIx < curGroup.size(); ++triIx)
 		{
-			Triangle& curTri = triangleList[curGroup[triIx]];
+			Triangle& curTri = mTriangles[curGroup[triIx]];
 
 			int vertIx = INVALID_INDEX;		// smoothgroup共位置的顶点在当前三角面中是哪个顶点
 			int indexInTri = 0;
 			for(int k = 0; k < 3; ++k)
 			{
-				if(Vector3Equal(positionData[verts[curTri.vertexIndex[k]].posIndex], curPos, 0.0001f))
+				if(Vector3Equal(mPositionData[mVerts[curTri.vertexIndex[k]].posIndex], curPos, 0.0001f))
 				{
 					vertIx = curTri.vertexIndex[k];
 					indexInTri = k;
@@ -374,13 +379,13 @@ void Geometry::processSmoothTangent(const Vector3& curPos, const TriIDList& over
 				}
 			}
 
-			if(verts[vertIx].tangentIndex == INVALID_INDEX)
+			if(mVerts[vertIx].tangentIndex == INVALID_INDEX)
 			{
-				verts[vertIx].tangentIndex = tangentData.size() - 1;
+				mVerts[vertIx].tangentIndex = mTangentData.size() - 1;
 			}
 			else
 			{
-				if(Vector3Unequal(tangentData[verts[vertIx].tangentIndex], groupTangent, 0.01f))
+				if(Vector3Unequal(mTangentData[mVerts[vertIx].tangentIndex], groupTangent, 0.01f))
 				{
 					if(newVertIndex != INVALID_INDEX)
 					{
@@ -388,13 +393,13 @@ void Geometry::processSmoothTangent(const Vector3& curPos, const TriIDList& over
 					}
 					else
 					{
-						Vert newVert = verts[vertIx];
-						newVert.tangentIndex = tangentData.size() - 1;
+						Vert newVert = mVerts[vertIx];
+						newVert.tangentIndex = mTangentData.size() - 1;
 
-						verts.push_back(newVert);
-						curTri.vertexIndex[indexInTri] = verts.size() - 1;
+						mVerts.push_back(newVert);
+						curTri.vertexIndex[indexInTri] = mVerts.size() - 1;
 
-						newVertIndex = verts.size() - 1;
+						newVertIndex = mVerts.size() - 1;
 					}
 				}
 			}
@@ -427,7 +432,7 @@ void Geometry::processSmoothBitangent(const Vector3& curPos, const TriIDList& ov
 		Vector3 groupBitangent = Vector3::Zero;
 		for(size_t k = 0; k < curGroup.size(); ++k)
 		{
-			const Triangle& tri = triangleList[curGroup[k]];
+			const Triangle& tri = mTriangles[curGroup[k]];
 
 			Vector3 triBitangent;
 			calculateTriangleBitanget(tri, &triBitangent);
@@ -437,17 +442,17 @@ void Geometry::processSmoothBitangent(const Vector3& curPos, const TriIDList& ov
 
 		groupBitangent.Normalize();
 
-		bitangentData.push_back(groupBitangent);		// normal加入到normaldata数据中
+		mBitangentData.push_back(groupBitangent);		// normal加入到normaldata数据中
 
 		for(size_t triIx = 0; triIx < curGroup.size(); ++triIx)
 		{
-			Triangle& curTri = triangleList[curGroup[triIx]];
+			Triangle& curTri = mTriangles[curGroup[triIx]];
 
 			int vertIx = INVALID_INDEX;		// smoothgroup共位置的顶点在当前三角面中是哪个顶点
 			int indexInTri = 0;
 			for(int k = 0; k < 3; ++k)
 			{
-				if(Vector3Equal(positionData[verts[curTri.vertexIndex[k]].posIndex], curPos, 0.0001f))
+				if(Vector3Equal(mPositionData[mVerts[curTri.vertexIndex[k]].posIndex], curPos, 0.0001f))
 				{
 					vertIx = curTri.vertexIndex[k];
 					indexInTri = k;
@@ -455,13 +460,13 @@ void Geometry::processSmoothBitangent(const Vector3& curPos, const TriIDList& ov
 				}
 			}
 
-			if(verts[vertIx].bitangentIndex == INVALID_INDEX)
+			if(mVerts[vertIx].bitangentIndex == INVALID_INDEX)
 			{
-				verts[vertIx].bitangentIndex = bitangentData.size() - 1;
+				mVerts[vertIx].bitangentIndex = mBitangentData.size() - 1;
 			}
 			else
 			{
-				if(Vector3Unequal(bitangentData[verts[vertIx].bitangentIndex], groupBitangent, 0.01f))
+				if(Vector3Unequal(mBitangentData[mVerts[vertIx].bitangentIndex], groupBitangent, 0.01f))
 				{
 					if(newVertIndex != INVALID_INDEX)
 					{
@@ -469,13 +474,13 @@ void Geometry::processSmoothBitangent(const Vector3& curPos, const TriIDList& ov
 					}
 					else
 					{
-						Vert newVert = verts[vertIx];
-						newVert.bitangentIndex = bitangentData.size() - 1;
+						Vert newVert = mVerts[vertIx];
+						newVert.bitangentIndex = mBitangentData.size() - 1;
 
-						verts.push_back(newVert);
-						curTri.vertexIndex[indexInTri] = verts.size() - 1;
+						mVerts.push_back(newVert);
+						curTri.vertexIndex[indexInTri] = mVerts.size() - 1;
 
-						newVertIndex = verts.size() - 1;
+						newVertIndex = mVerts.size() - 1;
 					}
 				}
 			}
@@ -486,24 +491,24 @@ void Geometry::processSmoothBitangent(const Vector3& curPos, const TriIDList& ov
 void Geometry::calculateTBN(bool calculateNormal, bool calculateTangent, bool calculateBitangent)
 {
 	if(calculateNormal)
-		normalData.clear();
+		mNormalData.clear();
 
 	if(calculateTangent)
-		tangentData.clear();
+		mTangentData.clear();
 
 	if(calculateBitangent)
-		bitangentData.clear();
+		mBitangentData.clear();
 
-	for(size_t i = 0; i < verts.size(); ++i)
+	for(size_t i = 0; i < mVerts.size(); ++i)
 	{
 		if(calculateNormal)
-			verts[i].normalIndex = INVALID_INDEX;
+			mVerts[i].normalIndex = INVALID_INDEX;
 
 		if(calculateTangent)
-			verts[i].tangentIndex = INVALID_INDEX;
+			mVerts[i].tangentIndex = INVALID_INDEX;
 
 		if(calculateBitangent)
-			verts[i].bitangentIndex = INVALID_INDEX;
+			mVerts[i].bitangentIndex = INVALID_INDEX;
 	}
 
 	if(!calculateNormal && !calculateTangent && !calculateBitangent)
@@ -512,14 +517,14 @@ void Geometry::calculateTBN(bool calculateNormal, bool calculateTangent, bool ca
 	VertexTrianglesMap vertexTrianglesMap;
 
 	// get vertexTrianglesMap
-	for(size_t triIndex = 0; triIndex < triangleList.size(); ++triIndex)
+	for(size_t triIndex = 0; triIndex < mTriangles.size(); ++triIndex)
 	{
 		int curTriID = triIndex;
-		Triangle& curTri = triangleList[curTriID];		// each triangle
+		Triangle& curTri = mTriangles[curTriID];		// each triangle
 
 		for(int i = 0; i < 3; ++i)
 		{
-			Vector3 curPos = positionData[verts[curTri.vertexIndex[i]].posIndex];	// each vertPos of curTri
+			Vector3 curPos = mPositionData[mVerts[curTri.vertexIndex[i]].posIndex];	// each vertPos of curTri
 
 			VertexTrianglesMap::iterator iter = vertexTrianglesMap.find(curPos);
 			if(iter != vertexTrianglesMap.end())
@@ -565,7 +570,7 @@ void Geometry::buildNormalSmoothGroup(Vector3 curPos, const TriIDList& overAllTr
 	if(triSmoothGroupMap[curTriID] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
 		return;
 
-	const Triangle& curTri = triangleList[curTriID];
+	const Triangle& curTri = mTriangles[curTriID];
 
 	int neighb0ID = -1;
 	int neighb1ID = -1;
@@ -576,10 +581,10 @@ void Geometry::buildNormalSmoothGroup(Vector3 curPos, const TriIDList& overAllTr
 	findNeighbourTriangles(overAllTriGroup, curTriID, &neighb0ID, &neighb1ID);
 
 	if(neighb0ID != -1)
-		neighb0 = &(triangleList[neighb0ID]);
+		neighb0 = &(mTriangles[neighb0ID]);
 
 	if(neighb1ID != -1)
-		neighb1 = &(triangleList[neighb1ID]);
+		neighb1 = &(mTriangles[neighb1ID]);
 
 	const float minCreaseAngle = PI / 3.0f;
 	if(neighb0 != NULL &&
@@ -620,7 +625,7 @@ void Geometry::buildTangentSmoothGroup(Vector3 curPos, const TriIDList& overAllT
 	if(triSmoothGroupMap[curTriID] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
 		return;
 
-	const Triangle& curTri = triangleList[curTriID];
+	const Triangle& curTri = mTriangles[curTriID];
 
 	int neighb0ID = -1;
 	int neighb1ID = -1;
@@ -631,10 +636,10 @@ void Geometry::buildTangentSmoothGroup(Vector3 curPos, const TriIDList& overAllT
 	findNeighbourTriangles(overAllTriGroup, curTriID, &neighb0ID, &neighb1ID);
 
 	if(neighb0ID != -1)
-		neighb0 = &(triangleList[neighb0ID]);
+		neighb0 = &(mTriangles[neighb0ID]);
 
 	if(neighb1ID != -1)
-		neighb1 = &(triangleList[neighb1ID]);
+		neighb1 = &(mTriangles[neighb1ID]);
 
 
 	const float minCreaseAngle = PI / 3.0f;
@@ -676,7 +681,7 @@ void Geometry::buildBitangentSmoothGroup(Vector3 curPos, const TriIDList& overAl
 	if(triSmoothGroupMap[curTriID] != NO_GROUP)		// 已处理(分配好smoothgroup)的直接返回
 		return;
 
-	const Triangle& curTri = triangleList[curTriID];
+	const Triangle& curTri = mTriangles[curTriID];
 
 	int neighb0ID = -1;
 	int neighb1ID = -1;
@@ -687,10 +692,10 @@ void Geometry::buildBitangentSmoothGroup(Vector3 curPos, const TriIDList& overAl
 	findNeighbourTriangles(overAllTriGroup, curTriID, &neighb0ID, &neighb1ID);
 
 	if(neighb0ID != -1)
-		neighb0 = &(triangleList[neighb0ID]);
+		neighb0 = &(mTriangles[neighb0ID]);
 
 	if(neighb1ID != -1)
-		neighb1 = &(triangleList[neighb1ID]);
+		neighb1 = &(mTriangles[neighb1ID]);
 
 
 	const float minCreaseAngle = PI / 3.0f;
@@ -730,7 +735,7 @@ void Geometry::findNeighbourTriangles(const TriIDList& triGroup, int curTriID, i
 	_Assert(NULL != neighb0ID);
 	_Assert(NULL != neighb1ID);
 
-	const Triangle& curTri = triangleList[curTriID];
+	const Triangle& curTri = mTriangles[curTriID];
 
 	int numNeighboursFound = 0;
 	*neighb0ID = -1;
@@ -739,7 +744,7 @@ void Geometry::findNeighbourTriangles(const TriIDList& triGroup, int curTriID, i
 	for(size_t i = 0; i < triGroup.size(); ++i)
 	{
 		int triID = triGroup[i];
-		const Triangle& tri = triangleList[triID];
+		const Triangle& tri = mTriangles[triID];
 
 		if(tri.vertexIndex[0] == curTri.vertexIndex[0] &&
 			tri.vertexIndex[1] == curTri.vertexIndex[1] &&
@@ -764,10 +769,10 @@ bool Geometry::hasSharedEdge(const Triangle& triangle0, const Triangle& triangle
 
 	for(int i = 0; i < 3; ++i)
 	{
-		Vector3& tri0Pos = positionData[verts[triangle0.vertexIndex[i]].posIndex];
+		Vector3& tri0Pos = mPositionData[mVerts[triangle0.vertexIndex[i]].posIndex];
 		for(int j = 0; j < 3; ++j)
 		{
-			Vector3& tri1Pos = positionData[verts[triangle1.vertexIndex[j]].posIndex];
+			Vector3& tri1Pos = mPositionData[mVerts[triangle1.vertexIndex[j]].posIndex];
 			if(Vector3Equal(tri1Pos, tri0Pos, 0.0001f))
 			{
 				++numSharedVerts;
@@ -840,9 +845,9 @@ bool Geometry::canSmoothBitangent(const Triangle& triangle0, const Triangle& tri
 
 void Geometry::calculateTriangleNormal(const Triangle& triangle, Vector3* normal)
 {
-	Vector3 pos0 = positionData[verts[triangle.vertexIndex[0]].posIndex];
-	Vector3 pos1 = positionData[verts[triangle.vertexIndex[1]].posIndex];
-	Vector3 pos2 = positionData[verts[triangle.vertexIndex[2]].posIndex];
+	Vector3 pos0 = mPositionData[mVerts[triangle.vertexIndex[0]].posIndex];
+	Vector3 pos1 = mPositionData[mVerts[triangle.vertexIndex[1]].posIndex];
+	Vector3 pos2 = mPositionData[mVerts[triangle.vertexIndex[2]].posIndex];
 
 	Vector3 p0p1 = pos1 - pos0;
 	Vector3 p0p2 = pos2 - pos0;
@@ -854,16 +859,16 @@ void Geometry::calculateTriangleNormal(const Triangle& triangle, Vector3* normal
 
 void Geometry::calculateTriangleTangent(const Triangle& triangle, Vector3* tangent)
 {
-	Vector3 pos0 = positionData[verts[triangle.vertexIndex[0]].posIndex];
-	Vector3 pos1 = positionData[verts[triangle.vertexIndex[1]].posIndex];
-	Vector3 pos2 = positionData[verts[triangle.vertexIndex[2]].posIndex];
+	Vector3 pos0 = mPositionData[mVerts[triangle.vertexIndex[0]].posIndex];
+	Vector3 pos1 = mPositionData[mVerts[triangle.vertexIndex[1]].posIndex];
+	Vector3 pos2 = mPositionData[mVerts[triangle.vertexIndex[2]].posIndex];
 
 	Vector3 p0p1 = pos1 - pos0;
 	Vector3 p0p2 = pos2 - pos0;
 
-	Vector2 uv0 = uvData[verts[triangle.vertexIndex[0]].uvIndex];
-	Vector2 uv1 = uvData[verts[triangle.vertexIndex[1]].uvIndex];
-	Vector2 uv2 = uvData[verts[triangle.vertexIndex[2]].uvIndex];
+	Vector2 uv0 = mUVData[mVerts[triangle.vertexIndex[0]].uvIndex];
+	Vector2 uv1 = mUVData[mVerts[triangle.vertexIndex[1]].uvIndex];
+	Vector2 uv2 = mUVData[mVerts[triangle.vertexIndex[2]].uvIndex];
 
 	float s1 = uv1.x - uv0.x;
 	float t1 = uv1.y - uv0.y;
@@ -889,16 +894,16 @@ void Geometry::calculateTriangleTangent(const Triangle& triangle, Vector3* tange
 
 void Geometry::calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangent)
 {
-	Vector3 pos0 = positionData[verts[triangle.vertexIndex[0]].posIndex];
-	Vector3 pos1 = positionData[verts[triangle.vertexIndex[1]].posIndex];
-	Vector3 pos2 = positionData[verts[triangle.vertexIndex[2]].posIndex];
+	Vector3 pos0 = mPositionData[mVerts[triangle.vertexIndex[0]].posIndex];
+	Vector3 pos1 = mPositionData[mVerts[triangle.vertexIndex[1]].posIndex];
+	Vector3 pos2 = mPositionData[mVerts[triangle.vertexIndex[2]].posIndex];
 
 	Vector3 p0p1 = pos1 - pos0;
 	Vector3 p0p2 = pos2 - pos0;
 
-	Vector2 uv0 = uvData[verts[triangle.vertexIndex[0]].uvIndex];
-	Vector2 uv1 = uvData[verts[triangle.vertexIndex[1]].uvIndex];
-	Vector2 uv2 = uvData[verts[triangle.vertexIndex[2]].uvIndex];
+	Vector2 uv0 = mUVData[mVerts[triangle.vertexIndex[0]].uvIndex];
+	Vector2 uv1 = mUVData[mVerts[triangle.vertexIndex[1]].uvIndex];
+	Vector2 uv2 = mUVData[mVerts[triangle.vertexIndex[2]].uvIndex];
 
 	float s1 = uv1.x - uv0.x;
 	float t1 = uv1.y - uv0.y;
@@ -1014,46 +1019,6 @@ void Geometry::calculateTriangleBitanget(const Triangle& triangle, Vector3* bita
 //	}
 //}
 //
-//
-//void Mesh::OBJParseLine(char *line, std::vector<Vector3> &filePosData, std::vector<DWORD> &fileIndexData)
-//{
-//
-//	char *lineWordPtr;
-//	lineWordPtr = strtok_s(line, " ", NULL);
-//	if(!lineWordPtr)
-//		return;
-//
-//	switch(lineWordPtr[0])
-//	{
-//	case '#':
-//		return;
-//		break;
-//	case 'v':
-//		{
-//			Vector3 pos;
-//
-//			lineWordPtr = strtok_s(NULL, " ", NULL);
-//			pos.x = (float)atof(lineWordPtr);
-//			lineWordPtr = strtok_s(NULL, " ", NULL);
-//			pos.y = (float)atof(lineWordPtr);
-//			lineWordPtr = strtok_s(NULL, " ", NULL);
-//			pos.z = (float)atof(lineWordPtr);
-//
-//			filePosData.push_back(pos);
-//			break;
-//		}
-//	case 'f':
-//		{
-//			lineWordPtr = strtok_s(NULL, " ", NULL);
-//			fileIndexData.push_back(atoi(lineWordPtr) - 1);
-//			lineWordPtr = strtok_s(NULL, " ", NULL);
-//			fileIndexData.push_back(atoi(lineWordPtr) - 1);
-//			lineWordPtr = strtok_s(NULL, " ", NULL);
-//			fileIndexData.push_back(atoi(lineWordPtr) - 1);
-//			break;
-//		}
-//	}
-//}
 
 void Geometry::CalculateTBN()
 {
@@ -1062,10 +1027,10 @@ void Geometry::CalculateTBN()
 
 wchar_t* Geometry::GetName()
 {
-	return name;
+	return mName;
 }
 
 void Geometry::SetID( DWORD _id )
 {
-	id = _id;
+	mID = _id;
 }

@@ -34,11 +34,11 @@ bool DirectionalLight::IsEnabled()
 	return isEnabled;
 }
 
-void DirectionalLight::SetValue(D3DXCOLOR _color, Vector3 _dir, float _intensity)
+void DirectionalLight::SetValue(D3DXCOLOR color, Vector3 dir, float intensity)
 {
-	color = _color;
-	direction = _dir;
-	intensity = _intensity;
+	mColor = color;
+	mDirection = dir;
+	mIntensity = intensity;
 
 	LightManager::isDirectionalLightsDirty = true;
 }

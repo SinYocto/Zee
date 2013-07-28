@@ -24,11 +24,11 @@ struct DirectionalLightData
 class DirectionalLight
 {
 public:
-	DirectionalLight(D3DXCOLOR _color = D3DXCOLOR_WHITE, Vector3 _dir = Vector3(1.0f, -1.0f, 1.0f), 
-		float _intensity = 1.0f)
-		:color(_color)
-		,direction(_dir)
-		,intensity(_intensity)
+	DirectionalLight(D3DXCOLOR color = D3DXCOLOR_WHITE, Vector3 dir = Vector3(1.0f, -1.0f, 1.0f), 
+		float intensity = 1.0f)
+		:mColor(color)
+		,mDirection(dir)
+		,mIntensity(intensity)
 		,isEnabled(true)
 	{
 
@@ -36,18 +36,18 @@ public:
 
 	DirectionalLightData GetData() 
 	{ 
-		return DirectionalLightData(intensity * color, direction); 
+		return DirectionalLightData(mIntensity * mColor, mDirection); 
 	}
 
-	void SetValue(D3DXCOLOR _color, Vector3 _dir, float _intensity);
+	void SetValue(D3DXCOLOR color, Vector3 dir, float intensity);
 
 	void Enable(bool enable);
 	bool IsEnabled();
 
 private:
-	D3DXCOLOR color;
-	Vector3 direction;
-	float intensity;
+	D3DXCOLOR mColor;
+	Vector3 mDirection;
+	float mIntensity;
 
 	bool isEnabled;
 };

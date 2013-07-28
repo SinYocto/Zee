@@ -29,31 +29,31 @@ struct PointLightData
 class PointLight
 {
 public:
-	PointLight(D3DXCOLOR _color = D3DXCOLOR_WHITE, Vector3 _pos = Vector3(0, 0, 0), 
-		Vector3 _attenuation = Vector3(1.0f, 0, 0), float _intensity = 1.0f)
-		:color(_color)
-		,position(_pos)
-		,attenuation(_attenuation)
-		,intensity(_intensity)
-		,isEnabled(true){}
+	PointLight(D3DXCOLOR color = D3DXCOLOR_WHITE, Vector3 pos = Vector3(0, 0, 0), 
+		Vector3 attenuation = Vector3(1.0f, 0, 0), float intensity = 1.0f)
+		:mColor(color)
+		,mPosition(pos)
+		,mAttenuation(attenuation)
+		,mIntensity(intensity)
+		,mIsEnabled(true){}
 
 	PointLightData GetData() 
 	{ 
-		return PointLightData(intensity * color, position, attenuation); 
+		return PointLightData(mIntensity * mColor, mPosition, mAttenuation); 
 	}
 
-	void SetValue(D3DXCOLOR _color, Vector3 _pos, Vector3 _attenuation, float _intensity);
+	void SetValue(D3DXCOLOR color, Vector3 pos, Vector3 attenuation, float intensity);
 
 	void Enable(bool enable);
 	bool IsEnabled();
 
 private:
-	D3DXCOLOR color;
-	Vector3 position;
-	Vector3 attenuation;
-	float intensity;
+	D3DXCOLOR mColor;
+	Vector3 mPosition;
+	Vector3 mAttenuation;
+	float mIntensity;
 
-	bool isEnabled;
+	bool mIsEnabled;
 }; 
 
 #endif

@@ -36,20 +36,20 @@ public:
 
 	}
 
-	virtual void SetSpecShiness(float _shiness)
+	virtual void SetSpecShiness(float shiness)
 	{
 
 	}
-	virtual void SetSpecGloss(float _gloss)
+	virtual void SetSpecGloss(float gloss)
 	{
 
 	}
 
-	virtual void SetUVTiles(float _tilesU, float _tilesV)
+	virtual void SetUVTiles(float tilesU, float tilesV)
 	{
 
 	}
-	virtual void SetUVOffset(float _offsetU, float _offsetV)
+	virtual void SetUVOffset(float offsetU, float offsetV)
 	{
 
 	}
@@ -63,25 +63,25 @@ public:
 class DiffuseShader : public IShader
 {
 public:
-	DiffuseShader(Material* _material)
-		:material(_material)
+	DiffuseShader(Material* material)
+		:mMaterial(material)
 	{
 
 	}
 
 	static void OnLostDevice()
 	{
-		effect->OnLostDevice();
+		mEffect->OnLostDevice();
 	}
 
 	static void OnResetDevice()
 	{
-		effect->OnResetDevice();
+		mEffect->OnResetDevice();
 	}
 
 	static void CreateEffectFromFile(wchar_t* FXFileName)
 	{
-		D3DXCreateEffectFromFile(gD3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &effect, NULL);
+		D3DXCreateEffectFromFile(gD3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -89,40 +89,40 @@ public:
 	void SetAmbientColor(D3DXCOLOR color); 
 	void SetDiffuseColor(D3DXCOLOR color);
 
-	void SetUVTiles(float _tilesU, float _tilesV);
-	void SetUVOffset(float _offsetU, float _offsetV);
+	void SetUVTiles(float tilesU, float tilesV);
+	void SetUVOffset(float offsetU, float offsetV);
 
 	void Render(Object* object, Geometry* geo, Camera* camera);
 
 private:
-	Material* material;
+	Material* mMaterial;
 
 public:
-	static LPD3DXEFFECT effect;
+	static LPD3DXEFFECT mEffect;
 };
 
 class SpecularShader : public IShader
 {
 public:
 	SpecularShader(Material* _material)
-		:material(_material)
+		:mMaterial(_material)
 	{
 
 	}
 
 	static void OnLostDevice()
 	{
-		effect->OnLostDevice();
+		mEffect->OnLostDevice();
 	}
 
 	static void OnResetDevice()
 	{
-		effect->OnResetDevice();
+		mEffect->OnResetDevice();
 	}
 
 	static void CreateEffectFromFile(wchar_t* FXFileName)
 	{
-		D3DXCreateEffectFromFile(gD3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &effect, NULL);
+		D3DXCreateEffectFromFile(gD3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -131,43 +131,43 @@ public:
 	void SetDiffuseColor(D3DXCOLOR color);
 	void SetSpecularColor(D3DXCOLOR color);
 
-	void SetSpecShiness(float _shiness);
-	void SetSpecGloss(float _gloss);
+	void SetSpecShiness(float shiness);
+	void SetSpecGloss(float gloss);
 
-	void SetUVTiles(float _tilesU, float _tilesV);
-	void SetUVOffset(float _offsetU, float _offsetV);
+	void SetUVTiles(float tilesU, float tilesV);
+	void SetUVOffset(float offsetU, float offsetV);
 
 	void Render(Object* object, Geometry* geo, Camera* camera);
 
 private:
-	Material* material;
+	Material* mMaterial;
 
 public:
-	static LPD3DXEFFECT effect;
+	static LPD3DXEFFECT mEffect;
 };
 
 class BumpSpecularShader : public IShader
 {
 public:
-	BumpSpecularShader(Material* _material)
-		:material(_material)
+	BumpSpecularShader(Material* material)
+		:mMaterial(material)
 	{
 
 	}
 
 	static void OnLostDevice()
 	{
-		effect->OnLostDevice();
+		mEffect->OnLostDevice();
 	}
 
 	static void OnResetDevice()
 	{
-		effect->OnResetDevice();
+		mEffect->OnResetDevice();
 	}
 
 	static void CreateEffectFromFile(wchar_t* FXFileName)
 	{
-		D3DXCreateEffectFromFile(gD3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &effect, NULL);
+		D3DXCreateEffectFromFile(gD3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -177,19 +177,19 @@ public:
 	void SetDiffuseColor(D3DXCOLOR color);
 	void SetSpecularColor(D3DXCOLOR color);
 
-	void SetSpecShiness(float _shiness);
-	void SetSpecGloss(float _gloss);
+	void SetSpecShiness(float shiness);
+	void SetSpecGloss(float gloss);
 
-	void SetUVTiles(float _tilesU, float _tilesV);
-	void SetUVOffset(float _offsetU, float _offsetV);
+	void SetUVTiles(float tilesU, float tilesV);
+	void SetUVOffset(float offsetU, float offsetV);
 
 	void Render(Object* object, Geometry* geo, Camera* camera);
 
 private:
-	Material* material;
+	Material* mMaterial;
 
 public:
-	static LPD3DXEFFECT effect;
+	static LPD3DXEFFECT mEffect;
 };
 
 #endif

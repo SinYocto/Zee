@@ -5,10 +5,10 @@ void Material::SetTexture(int layerIx, wchar_t* texFileName)	// TODO:≤ª”¶∏√÷±Ω”¥
 	if(layerIx < 0 || layerIx >= MAX_MATERIAL_TEXTURE_LAYERS)
 		return;
 
-	if(textureLayer[layerIx])
-		SAFE_RELEASE(textureLayer[layerIx]);
+	if(mTextureLayer[layerIx])
+		SAFE_RELEASE(mTextureLayer[layerIx]);
 
-	D3DXCreateTextureFromFile(gD3DDevice, texFileName, &textureLayer[layerIx]);		
+	D3DXCreateTextureFromFile(gD3DDevice, texFileName, &mTextureLayer[layerIx]);		
 }
 
 IDirect3DTexture9* Material::GetTexture(int layerIx)
@@ -16,120 +16,120 @@ IDirect3DTexture9* Material::GetTexture(int layerIx)
 	if(layerIx < 0 || layerIx >= MAX_MATERIAL_TEXTURE_LAYERS)
 		return NULL;
 
-	return textureLayer[layerIx];
+	return mTextureLayer[layerIx];
 }
 
 D3DXMATRIX Material::UVTransformMatrix()
 {
 	D3DXMATRIX matScale, matTrans;
-	D3DXMatrixScaling(&matScale, tilesU, tilesV, 1.0f);
-	D3DXMatrixTranslation(&matTrans, offsetU, offsetV, 0);
+	D3DXMatrixScaling(&matScale, mTilesU, mTilesV, 1.0f);
+	D3DXMatrixTranslation(&matTrans, mOffsetU, mOffsetV, 0);
 
 	return matScale * matTrans;
 }
 
 void Material::SetShader(ShadingMethod shadingMethod)
 {
-	SAFE_DELETE(shader);
+	SAFE_DELETE(mShader);
 
 	switch(shadingMethod)
 	{
 	case Diffuse:
-		shader = new DiffuseShader(this);
+		mShader = new DiffuseShader(this);
 		break;
 	case Specular:
-		shader = new SpecularShader(this);
+		mShader = new SpecularShader(this);
 		break;;
 	case BumpSpecular:
-		shader = new BumpSpecularShader(this);
+		mShader = new BumpSpecularShader(this);
 		break;
 	}
 
-	_Assert(NULL != shader);
+	_Assert(NULL != mShader);
 }
 
 void Material::SetAmbientColor(D3DXCOLOR color)
 {
-	ambientColor = color;
+	mAmbientColor = color;
 }
 
 D3DXCOLOR Material::GetAmbientColor()
 {
-	return ambientColor;
+	return mAmbientColor;
 }
 
 void Material::SetDiffuseColor(D3DXCOLOR color)
 {
-	diffuseColor = color;
+	mDiffuseColor = color;
 }
 
 D3DXCOLOR Material::GetDiffuseColor()
 {
-	return diffuseColor;
+	return mDiffuseColor;
 }
 
 void Material::SetSpecularColor(D3DXCOLOR color)
 {
-	specularColor = color;
+	mSpecularColor = color;
 }
 
 D3DXCOLOR Material::GetSpecularColor()
 {
-	return specularColor;
+	return mSpecularColor;
 }
 
 D3DXCOLOR Material::GetFinalSpecularColor()
 {
-	return shiness * specularColor;
+	return mShiness * mSpecularColor;
 }
 
-void Material::SetSpecShiness(float _shiness)
+void Material::SetSpecShiness(float shiness)
 {
-	shiness = _shiness;
+	mShiness = shiness;
 }
 
 float Material::GetSpecShiness()
 {
-	return shiness;
+	return mShiness;
 }
 
-void Material::SetSpecGloss(float _gloss)
+void Material::SetSpecGloss(float gloss)
 {
-	gloss = _gloss;
+	mGloss = gloss;
 }
 
 float Material::GetSpecGloss()
 {
-	return gloss;
+	return mGloss;
 }
 
-void Material::SetUVTiles(float _tilesU, float _tilesV)
+void Material::SetUVTiles(float tilesU, float tilesV)
 {
-	tilesU = _tilesU;
-	tilesV = _tilesV;
+	mTilesU = tilesU;
+	mTilesV = tilesV;
 }
 
-void Material::SetUVOffset(float _offsetU, float _offsetV)
+void Material::SetUVOffset(float offsetU, float offsetV)
 {
-	offsetU = _offsetU;
-	offsetV = _offsetV;
+	mOffsetU = offsetU;
+	mOffsetV = offsetV;
 }
 
 void Material::Render(Object* object, Geometry* geo, Camera* camera)
 {
-	_Assert(NULL != shader);
+	_Assert(NULL != mShader);
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
 
-	shader->Render(object, geo, camera);
+	mShader->Render(object, geo, camera);
 }
 
 wchar_t* Material::GetName()
 {
-	return name;
+	return mName;
 }
 
-void Material::SetID(DWORD _id)
+void Material::SetID(DWORD id)
 {
-	id = _id;
+	mID = id;
 }

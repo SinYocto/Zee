@@ -9,31 +9,31 @@
 #include "LightManager.h"
 
 // DiffuseShader
-LPD3DXEFFECT DiffuseShader::effect = NULL;
+LPD3DXEFFECT DiffuseShader::mEffect = NULL;
 
 void DiffuseShader::SetColorTex(wchar_t* texFileName)
 {
-	material->SetTexture(0, texFileName);
+	mMaterial->SetTexture(0, texFileName);
 }
 
 void DiffuseShader::SetAmbientColor(D3DXCOLOR color)
 {
-	material->SetAmbientColor(color);
+	mMaterial->SetAmbientColor(color);
 }
 
 void DiffuseShader::SetDiffuseColor(D3DXCOLOR color)
 {
-	material->SetDiffuseColor(color);
+	mMaterial->SetDiffuseColor(color);
 }
 
-void DiffuseShader::SetUVTiles(float _tilesU, float _tilesV)
+void DiffuseShader::SetUVTiles(float tilesU, float tilesV)
 {
-	material->SetUVTiles(_tilesU, _tilesV);
+	mMaterial->SetUVTiles(tilesU, tilesV);
 }
 
-void DiffuseShader::SetUVOffset(float _offsetU, float _offsetV)
+void DiffuseShader::SetUVOffset(float offsetU, float offsetV)
 {
-	material->SetUVOffset(_offsetU, _offsetV);
+	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
 void DiffuseShader::Render(Object* object, Geometry* geo, Camera* camera)
@@ -44,81 +44,81 @@ void DiffuseShader::Render(Object* object, Geometry* geo, Camera* camera)
 	geo->SetVertexStream();
 	geo->SetVertexDeclaration();
 
-	DiffuseShader::effect->SetTechnique("Diffuse");
+	DiffuseShader::mEffect->SetTechnique("Diffuse");
 
-	DiffuseShader::effect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
-	DiffuseShader::effect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
-	DiffuseShader::effect->SetMatrix("matUVTransform", &(material->UVTransformMatrix()));
+	DiffuseShader::mEffect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
+	DiffuseShader::mEffect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
+	DiffuseShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
 
-	DiffuseShader::effect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
-	DiffuseShader::effect->SetRawValue("directionalLights", LightManager::directionalLightsData, 
+	DiffuseShader::mEffect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
+	DiffuseShader::mEffect->SetRawValue("directionalLights", LightManager::directionalLightsData, 
 		0, sizeof(LightManager::directionalLightsData));
-	DiffuseShader::effect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
+	DiffuseShader::mEffect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
 
-	if(NULL == material->GetTexture(0))
+	if(NULL == mMaterial->GetTexture(0))
 	{
-		DiffuseShader::effect->SetBool("useColorTex", false);
+		DiffuseShader::mEffect->SetBool("useColorTex", false);
 	}
 	else
 	{
-		DiffuseShader::effect->SetBool("useColorTex", true);	
-		DiffuseShader::effect->SetTexture("colorTex", material->GetTexture(0));
+		DiffuseShader::mEffect->SetBool("useColorTex", true);	
+		DiffuseShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
 	}
 
-	DiffuseShader::effect->SetRawValue("mtlAmbient", &(material->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
-	DiffuseShader::effect->SetRawValue("mtlDiffuse", &(material->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
+	DiffuseShader::mEffect->SetRawValue("mtlAmbient", &(mMaterial->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
+	DiffuseShader::mEffect->SetRawValue("mtlDiffuse", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
 
-	DiffuseShader::effect->Begin(0, 0);
-	DiffuseShader::effect->BeginPass(0);
+	DiffuseShader::mEffect->Begin(0, 0);
+	DiffuseShader::mEffect->BeginPass(0);
 
 	geo->Draw();
 
-	DiffuseShader::effect->EndPass();
-	DiffuseShader::effect->End();
+	DiffuseShader::mEffect->EndPass();
+	DiffuseShader::mEffect->End();
 }
 
 // SpecularShader
-LPD3DXEFFECT SpecularShader::effect = NULL;
+LPD3DXEFFECT SpecularShader::mEffect = NULL;
 
 void SpecularShader::SetColorTex(wchar_t* texFileName)
 {
-	material->SetTexture(0, texFileName);
+	mMaterial->SetTexture(0, texFileName);
 }
 
 void SpecularShader::SetAmbientColor(D3DXCOLOR color)
 {
-	material->SetAmbientColor(color);
+	mMaterial->SetAmbientColor(color);
 }
 
 
 void SpecularShader::SetDiffuseColor(D3DXCOLOR color)
 {
-	material->SetDiffuseColor(color);
+	mMaterial->SetDiffuseColor(color);
 }
 
 void SpecularShader::SetSpecularColor(D3DXCOLOR color)
 {
-	material->SetSpecularColor(color);
+	mMaterial->SetSpecularColor(color);
 }
 
 void SpecularShader::SetSpecShiness(float _shiness)
 {
-	material->SetSpecShiness(_shiness);
+	mMaterial->SetSpecShiness(_shiness);
 }
 
 void SpecularShader::SetSpecGloss(float _gloss)
 {
-	material->SetSpecGloss(_gloss);
+	mMaterial->SetSpecGloss(_gloss);
 }
 
-void SpecularShader::SetUVTiles(float _tilesU, float _tilesV)
+void SpecularShader::SetUVTiles(float tilesU, float tilesV)
 {
-	material->SetUVTiles(_tilesU, _tilesV);
+	mMaterial->SetUVTiles(tilesU, tilesV);
 }
 
-void SpecularShader::SetUVOffset(float _offsetU, float _offsetV)
+void SpecularShader::SetUVOffset(float offsetU, float offsetV)
 {
-	material->SetUVOffset(_offsetU, _offsetV);
+	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
 void SpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
@@ -129,88 +129,88 @@ void SpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 	geo->SetVertexStream();
 	geo->SetVertexDeclaration();
 
-	SpecularShader::effect->SetTechnique("Specular");
+	SpecularShader::mEffect->SetTechnique("Specular");
 
-	SpecularShader::effect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
-	SpecularShader::effect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
-	SpecularShader::effect->SetMatrix("matUVTransform", &(material->UVTransformMatrix()));
+	SpecularShader::mEffect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
+	SpecularShader::mEffect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
+	SpecularShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
 
-	SpecularShader::effect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));
+	SpecularShader::mEffect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));
 
-	SpecularShader::effect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
-	SpecularShader::effect->SetRawValue("directionalLights", LightManager::directionalLightsData, 0, sizeof(LightManager::directionalLightsData));
-	SpecularShader::effect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
+	SpecularShader::mEffect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
+	SpecularShader::mEffect->SetRawValue("directionalLights", LightManager::directionalLightsData, 0, sizeof(LightManager::directionalLightsData));
+	SpecularShader::mEffect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
 
-	if(NULL == material->GetTexture(0))
+	if(NULL == mMaterial->GetTexture(0))
 	{
-		SpecularShader::effect->SetBool("useColorTex", false);
+		SpecularShader::mEffect->SetBool("useColorTex", false);
 	}
 	else
 	{
-		SpecularShader::effect->SetBool("useColorTex", true);	
-		SpecularShader::effect->SetTexture("colorTex", material->GetTexture(0));
+		SpecularShader::mEffect->SetBool("useColorTex", true);	
+		SpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
 	}
 
-	SpecularShader::effect->SetRawValue("mtlAmbient", &(material->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
-	SpecularShader::effect->SetRawValue("mtlDiffuse", &(material->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
-	SpecularShader::effect->SetRawValue("mtlSpec", &(material->GetFinalSpecularColor()), 0, sizeof(D3DXCOLOR));
-	SpecularShader::effect->SetFloat("gloss", material->GetSpecGloss());
+	SpecularShader::mEffect->SetRawValue("mtlAmbient", &(mMaterial->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
+	SpecularShader::mEffect->SetRawValue("mtlDiffuse", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
+	SpecularShader::mEffect->SetRawValue("mtlSpec", &(mMaterial->GetFinalSpecularColor()), 0, sizeof(D3DXCOLOR));
+	SpecularShader::mEffect->SetFloat("gloss", mMaterial->GetSpecGloss());
 
-	SpecularShader::effect->Begin(0, 0);
-	SpecularShader::effect->BeginPass(0);
+	SpecularShader::mEffect->Begin(0, 0);
+	SpecularShader::mEffect->BeginPass(0);
 
 	geo->Draw();
 
-	SpecularShader::effect->EndPass();
-	SpecularShader::effect->End();
+	SpecularShader::mEffect->EndPass();
+	SpecularShader::mEffect->End();
 }
 
 // BumpSpecularShader
-LPD3DXEFFECT BumpSpecularShader::effect = NULL;
+LPD3DXEFFECT BumpSpecularShader::mEffect = NULL;
 
 void BumpSpecularShader::SetColorTex(wchar_t* texFileName)
 {
-	material->SetTexture(0, texFileName);
+	mMaterial->SetTexture(0, texFileName);
 }
 
 void BumpSpecularShader::SetNormalTex(wchar_t* texFileName)
 {
-	material->SetTexture(1, texFileName);
+	mMaterial->SetTexture(1, texFileName);
 }
 
 void BumpSpecularShader::SetAmbientColor(D3DXCOLOR color)
 {
-	material->SetAmbientColor(color);
+	mMaterial->SetAmbientColor(color);
 }
 
 void BumpSpecularShader::SetDiffuseColor(D3DXCOLOR color)
 {
-	material->SetDiffuseColor(color);
+	mMaterial->SetDiffuseColor(color);
 }
 
 void BumpSpecularShader::SetSpecularColor(D3DXCOLOR color)
 {
-	material->SetSpecularColor(color);
+	mMaterial->SetSpecularColor(color);
 }
 
-void BumpSpecularShader::SetSpecShiness(float _shiness)
+void BumpSpecularShader::SetSpecShiness(float shiness)
 {
-	material->SetSpecShiness(_shiness);
+	mMaterial->SetSpecShiness(shiness);
 }
 
-void BumpSpecularShader::SetSpecGloss(float _gloss)
+void BumpSpecularShader::SetSpecGloss(float gloss)
 {
-	material->SetSpecGloss(_gloss);
+	mMaterial->SetSpecGloss(gloss);
 }
 
-void BumpSpecularShader::SetUVTiles(float _tilesU, float _tilesV)
+void BumpSpecularShader::SetUVTiles(float tilesU, float tilesV)
 {
-	material->SetUVTiles(_tilesU, _tilesV);
+	mMaterial->SetUVTiles(tilesU, tilesV);
 }
 
-void BumpSpecularShader::SetUVOffset(float _offsetU, float _offsetV)
+void BumpSpecularShader::SetUVOffset(float offsetU, float offsetV)
 {
-	material->SetUVOffset(_offsetU, _offsetV);
+	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
 void BumpSpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
@@ -221,31 +221,31 @@ void BumpSpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 	geo->SetVertexStream();
 	geo->SetVertexDeclaration();
 
-	BumpSpecularShader::effect->SetTechnique("BumpSpecular");
+	BumpSpecularShader::mEffect->SetTechnique("BumpSpecular");
 
-	BumpSpecularShader::effect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
-	BumpSpecularShader::effect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
-	BumpSpecularShader::effect->SetMatrix("matUVTransform", &(material->UVTransformMatrix()));
+	BumpSpecularShader::mEffect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
+	BumpSpecularShader::mEffect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
+	BumpSpecularShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
 
-	BumpSpecularShader::effect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));
+	BumpSpecularShader::mEffect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));
 
-	BumpSpecularShader::effect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
-	BumpSpecularShader::effect->SetRawValue("directionalLights", LightManager::directionalLightsData, 0, sizeof(LightManager::directionalLightsData));
-	BumpSpecularShader::effect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
+	BumpSpecularShader::mEffect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
+	BumpSpecularShader::mEffect->SetRawValue("directionalLights", LightManager::directionalLightsData, 0, sizeof(LightManager::directionalLightsData));
+	BumpSpecularShader::mEffect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
 
-	BumpSpecularShader::effect->SetTexture("colorTex", material->GetTexture(0));
-	BumpSpecularShader::effect->SetTexture("normalTex", material->GetTexture(1));
+	BumpSpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
+	BumpSpecularShader::mEffect->SetTexture("normalTex", mMaterial->GetTexture(1));
 
-	BumpSpecularShader::effect->SetRawValue("mtlAmbient", &(material->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
-	BumpSpecularShader::effect->SetRawValue("mtlDiffuse", &(material->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
-	BumpSpecularShader::effect->SetRawValue("mtlSpec", &(material->GetFinalSpecularColor()), 0, sizeof(D3DXCOLOR));
-	BumpSpecularShader::effect->SetFloat("gloss", material->GetSpecGloss());
+	BumpSpecularShader::mEffect->SetRawValue("mtlAmbient", &(mMaterial->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
+	BumpSpecularShader::mEffect->SetRawValue("mtlDiffuse", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
+	BumpSpecularShader::mEffect->SetRawValue("mtlSpec", &(mMaterial->GetFinalSpecularColor()), 0, sizeof(D3DXCOLOR));
+	BumpSpecularShader::mEffect->SetFloat("gloss", mMaterial->GetSpecGloss());
 
-	BumpSpecularShader::effect->Begin(0, 0);
-	BumpSpecularShader::effect->BeginPass(0);
+	BumpSpecularShader::mEffect->Begin(0, 0);
+	BumpSpecularShader::mEffect->BeginPass(0);
 
 	geo->Draw();
 
-	BumpSpecularShader::effect->EndPass();
-	BumpSpecularShader::effect->End();
+	BumpSpecularShader::mEffect->EndPass();
+	BumpSpecularShader::mEffect->End();
 }

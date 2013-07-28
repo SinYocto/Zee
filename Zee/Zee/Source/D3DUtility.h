@@ -284,7 +284,7 @@ struct VertexXYZRHWD
 	static const DWORD FVF = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
 };
 
-enum VertexType { XYZ, XYZ_UV, XYZ_N, XYZ_UV_N, XYZ_UV_TBN, XYZRHW_UV, XYZ_D, XYZRHW_D };
+enum VertexType { VERTEX_TYPE_INVALID, XYZ, XYZ_UV, XYZ_N, XYZ_UV_N, XYZ_UV_TBN, XYZRHW_UV, XYZ_D, XYZRHW_D };
 
 HWND RegisterAndCreateWindow(LPCWSTR wndClassName, LPCWSTR wndName, int wndWidth, int wndHeight, WNDPROC WndProc);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);

@@ -3,7 +3,7 @@
 
 void PointLight::Enable(bool enable)
 {
-	if(enable == isEnabled)
+	if(enable == mIsEnabled)
 	{
 		return;
 	}
@@ -13,7 +13,7 @@ void PointLight::Enable(bool enable)
 		{
 			if(LightManager::numActivePointLights < MAX_NUM_POINT_LIGHTS)
 			{
-				isEnabled = true;
+				mIsEnabled = true;
 				LightManager::numActivePointLights++;
 
 				LightManager::isPointLightsDirty = true;
@@ -21,7 +21,7 @@ void PointLight::Enable(bool enable)
 		}
 		else
 		{
-			isEnabled = false;
+			mIsEnabled = false;
 			LightManager::numActivePointLights--;
 
 			LightManager::isPointLightsDirty = true;
@@ -31,15 +31,15 @@ void PointLight::Enable(bool enable)
 
 bool PointLight::IsEnabled()
 {
-	return isEnabled;
+	return mIsEnabled;
 }
 
-void PointLight::SetValue(D3DXCOLOR _color, Vector3 _pos, Vector3 _attenuation, float _intensity)
+void PointLight::SetValue(D3DXCOLOR color, Vector3 pos, Vector3 attenuation, float intensity)
 {
-	color = _color;
-	position = _pos;
-	attenuation = _attenuation;
-	intensity = _intensity;
+	mColor = color;
+	mPosition = pos;
+	mAttenuation = attenuation;
+	mIntensity = intensity;
 
 	LightManager::isPointLightsDirty = true;
 }

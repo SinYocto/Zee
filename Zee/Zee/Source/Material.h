@@ -14,23 +14,23 @@ class Object;
 class Material : public IReferenceCounted
 {
 public:
-	Material(const wchar_t* _name)
-		:shader(NULL)
-		,ambientColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
-		,diffuseColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
-		,specularColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))
-		,shiness(1.0f)
-		,gloss(50.0f)
-		,tilesU(1.0f)
-		,tilesV(1.0f)
-		,offsetU(0)
-		,offsetV(0)
+	Material(const wchar_t* name)
+		:mShader(NULL)
+		,mAmbientColor(D3DXCOLOR_WHITE)
+		,mDiffuseColor(D3DXCOLOR_WHITE)
+		,mSpecularColor(D3DXCOLOR_WHITE)
+		,mShiness(1.0f)
+		,mGloss(50.0f)
+		,mTilesU(1.0f)
+		,mTilesV(1.0f)
+		,mOffsetU(0)
+		,mOffsetV(0)
 	{
-		YString::Copy(name, _countof(name), _name);
+		YString::Copy(mName, _countof(mName), name);
 
 		for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
 		{
-			textureLayer[layerIx] = NULL;
+			mTextureLayer[layerIx] = NULL;
 		}
 	}
 
@@ -38,31 +38,31 @@ public:
 	{
 		for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
 		{
-			SAFE_RELEASE(textureLayer[layerIx]);
+			SAFE_RELEASE(mTextureLayer[layerIx]);
 		}
 
-		SAFE_DELETE(shader);
+		SAFE_DELETE(mShader);
 	}
 
-	void SetShader(ShadingMethod shadingMethod);
+	wchar_t* GetName();
+	void SetID(DWORD id);
 
+	void SetShader(ShadingMethod shadingMethod);
 	void SetTexture(int layerIx, wchar_t* texFileName);	// TODO: 改为使用texture,而不是直接从文件创建texture
-	IDirect3DTexture9* GetTexture(int layerIx);
 
 	void SetAmbientColor(D3DXCOLOR color);
-	D3DXCOLOR GetAmbientColor();
-
 	void SetDiffuseColor(D3DXCOLOR color);
-	D3DXCOLOR GetDiffuseColor();
-
 	void SetSpecularColor(D3DXCOLOR color);
+	void SetSpecShiness(float shiness);
+	void SetSpecGloss(float gloss);
+
+	IDirect3DTexture9* GetTexture(int layerIx);
+
+	D3DXCOLOR GetAmbientColor();
+	D3DXCOLOR GetDiffuseColor();
 	D3DXCOLOR GetSpecularColor();
 	D3DXCOLOR GetFinalSpecularColor();
-
-	void SetSpecShiness(float _shiness);
 	float GetSpecShiness();
-
-	void SetSpecGloss(float _gloss);
 	float GetSpecGloss();
 
 	void SetUVTiles(float _tilesU, float _tilesV);
@@ -72,32 +72,29 @@ public:
 
 	void Render(Object* object, Geometry* geo, Camera* camera);
 
-	wchar_t* GetName();
-	void SetID(DWORD _id);
-
 public:
-	IShader* shader;
+	IShader* mShader;
 
 private:
-	DWORD id;
-	wchar_t name[MAX_STR_LEN];
+	DWORD mID;
+	wchar_t mName[MAX_STR_LEN];
 
-	D3DXCOLOR ambientColor;
-	D3DXCOLOR diffuseColor;
-	D3DXCOLOR specularColor;
-	float gloss;
-	float shiness;
+	D3DXCOLOR mAmbientColor;
+	D3DXCOLOR mDiffuseColor;
+	D3DXCOLOR mSpecularColor;
+	float mGloss;
+	float mShiness;
 	
-	float tilesU;
-	float tilesV;
+	float mTilesU;
+	float mTilesV;
 
-	float offsetU;
-	float offsetV;
+	float mOffsetU;
+	float mOffsetV;
 
-	Vector4 paramsVec1;
-	Vector4 paramsVec2;
+	Vector4 mParamsVec1;
+	Vector4 mParamsVec2;
 	
-	IDirect3DTexture9* textureLayer[MAX_MATERIAL_TEXTURE_LAYERS];
+	IDirect3DTexture9* mTextureLayer[MAX_MATERIAL_TEXTURE_LAYERS];
 };
 
 #endif

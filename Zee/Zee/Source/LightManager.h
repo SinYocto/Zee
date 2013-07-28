@@ -24,8 +24,8 @@ public:
 	static PointLightData pointLightsData[MAX_NUM_POINT_LIGHTS];
 
 private:
-	static AmbientLight ambientLight;
+	static AmbientLight mAmbientLight;
 
-	static std::list<DirectionalLight*> directionalLights;
-	static std::list<PointLight*> pointLights;
+	static std::list<DirectionalLight*> mDirectionalLights;
+	static std::list<PointLight*> mPointLights;
 };

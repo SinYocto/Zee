@@ -9,29 +9,29 @@ class Camera:public Object
 {
 public:
 	Camera(const Vector3 pos = Vector3(0, 0, -200), const Vector3 target = Vector3::Zero, 
-		float fov = PI/2, float asp = 1.0f, float nZ = 1.0f, float fZ = 1000.0f)
+		float fov = PI/2, float aspect = 1.0f, float nZ = 1.0f, float fZ = 1000.0f)
 		:Object(NULL, pos)
-		,FOV(fov)
-		,aspect(asp)
-		,nearZ(nZ)
-		,farZ(fZ)
+		,mFOV(fov)
+		,mAspect(aspect)
+		,mNearZ(nZ)
+		,mFarZ(fZ)
 	{
 		LookAt(target);
 		recalculateCameraMatrix();
 		extractFrustumPlanes();
 
-		isTranformDirty = false;
-		isParametersDirty = false;
+		mIsTranformDirty = false;
+		mIsParametersDirty = false;
 	}
 
 	D3DXMATRIX ViewMatrix() const 
 	{ 
-		return matView;
+		return mMatView;
 	}
 
 	D3DXMATRIX ProjMatrix() const
 	{
-		return matProj;
+		return mMatProj;
 	}
 
 	bool IsVisible(BoundingBox boundingBox);
@@ -39,24 +39,24 @@ public:
 
 	void SetTransformDirty(bool isDirty)
 	{
-		isTranformDirty = isDirty;
+		mIsTranformDirty = isDirty;
 	}
 
 	void SetParametersDirty(bool isDirty)
 	{
-		isParametersDirty = isDirty;
+		mIsParametersDirty = isDirty;
 	}
 
 	void Update()
 	{
-		if(isParametersDirty)
+		if(mIsParametersDirty)
 		{
 			recalculateProjMatrix();
 
 			SetParametersDirty(false);
 		}
 
-		if(isTranformDirty)
+		if(mIsTranformDirty)
 		{
 			recalculateViewMatrix();
 			extractFrustumPlanes();
@@ -72,18 +72,18 @@ private:
 	void extractFrustumPlanes();
 
 private:
-	float FOV;
-	float aspect;
-	float nearZ;
-	float farZ;
+	float mFOV;
+	float mAspect;
+	float mNearZ;
+	float mFarZ;
 
-	D3DXPLANE frustumPlanes[6];
+	D3DXPLANE mFrustumPlanes[6];
 
-	D3DXMATRIX matProj;
-	D3DXMATRIX matView;
+	D3DXMATRIX mMatProj;
+	D3DXMATRIX mMatView;
 
-	bool isTranformDirty;
-	bool isParametersDirty;
+	bool mIsTranformDirty;
+	bool mIsParametersDirty;
 };
 
 

@@ -27,15 +27,15 @@ public:
 	}
 
 	// 此构造函数使用一个geo和material对象来构造一个包含一个SubMesh的Model对象
-	Model(Object* _parent, Geometry* _geo, Material* _material)
+	Model(Object* parent, Geometry* geo, Material* material)
 	{
-		Mesh* mesh = new Mesh(this, _geo, _material);
+		Mesh* mesh = new Mesh(this, geo, material);
 		AddSubMesh(mesh);
 	}
 
 	~Model()
 	{
-		for(std::list<Mesh*>::iterator iter = subMeshes.begin(); iter != subMeshes.end(); ++iter)
+		for(std::list<Mesh*>::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter)
 		{
 			SAFE_DELETE(*iter);
 		}
@@ -44,7 +44,7 @@ public:
 	{
 		_Assert(NULL != mesh);
 
-		if(std::find(subMeshes.begin(), subMeshes.end(), mesh) != subMeshes.end())
+		if(std::find(mSubMeshes.begin(), mSubMeshes.end(), mesh) != mSubMeshes.end())
 		{
 			// subMeshes中已存在此对象指针
 			return;
@@ -52,7 +52,7 @@ public:
 		else
 		{
 			mesh->SetParent(this);
-			subMeshes.push_back(mesh);
+			mSubMeshes.push_back(mesh);
 		}
 	}
 
@@ -63,7 +63,7 @@ public:
 
 
 private:
-	std::list<Mesh*> subMeshes;
+	std::list<Mesh*> mSubMeshes;
 };
 
 

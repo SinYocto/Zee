@@ -28,54 +28,6 @@ enum MeshFileFormat { OBJ };
 class Geometry : public IReferenceCounted
 {
 public:
-	Geometry(const wchar_t* _name)
-		:vertexBuffer(NULL)
-		,indexBuffer(NULL)
-		,vertexDecl(NULL)
-	{
-		YString::Copy(name, _countof(name), _name);
-	}
-
-	~Geometry()
-	{
-		SAFE_RELEASE(vertexBuffer);
-		SAFE_RELEASE(indexBuffer);
-		SAFE_RELEASE(vertexDecl);
-	}
-
-	void OnLostDevice()
-	{
-		SAFE_RELEASE(vertexBuffer);
-		SAFE_RELEASE(indexBuffer);
-		SAFE_RELEASE(vertexDecl);
-	}
-
-	void OnResetDevice()
-	{
-		BuildGeometry(vertexType);
-	}
-
-//	void LoadDataFromFile(std::string filename, MeshFileFormat format);
-
-	void BuildGeometry(VertexType type);
-
-	void CalculateTBN();
-	void CalculateNormals();
-
-//	void CalculateUVs(UVMappingMode uvMode);
-
-	void SetVertexDeclaration();
-	void SetVertexStream();
-
-	wchar_t* GetName();
-	void SetID(DWORD _id);
-
-	void Draw();
-
-protected:
-	virtual void constructGeometryData() {}
-
-public:
 	struct Vert			// Vert结构保存的是各个数据项的在相应data中的索引
 	{
 		Vert(int _posIndex = INVALID_INDEX, int _uvIndex = INVALID_INDEX, int _normalIndex = INVALID_INDEX, 
@@ -109,47 +61,68 @@ public:
 	};
 	typedef std::vector<Triangle> TriangleList;
 
-protected:
+private:
 	enum
 	{
 		INVALID_INDEX = -1,
 		NO_GROUP = -1,
 	};
 
-	struct CompareVector
-	{
-		bool operator()(const Vector3& vec1, const Vector3& vec2) const
-		{
-			if(vec1.x < vec2.x)
-				return true;
-
-			if(vec1.x > vec2.x)
-				return false;
-
-			if(vec1.y < vec2.y)
-				return true;
-
-			if(vec1.y > vec2.y)
-				return false;
-
-			if(vec1.z < vec2.z)
-				return true;
-
-			return false;
-		}
-	};
-	
-	typedef std::map<Vector3, std::vector<int>, CompareVector> VertexTrianglesMap;		// vertPos -> triListByID
+	typedef std::map<Vector3, std::vector<int>, Vector3::Comparer> VertexTrianglesMap;		// vertPos -> triListByID
 
 	typedef std::map<int, int> TriangleSmoothGroupMap;		// triID -> sgID
 	typedef std::vector<int> TriIDList;
 
+public:
+	Geometry(const wchar_t* name)
+		:mVertexBuffer(NULL)
+		,mIndexBuffer(NULL)
+		,mVertexDecl(NULL)
+		,mVertexType(VERTEX_TYPE_INVALID)
+	{
+		YString::Copy(mName, _countof(mName), name);
+	}
+
+	~Geometry()
+	{
+		SAFE_RELEASE(mVertexBuffer);
+		SAFE_RELEASE(mIndexBuffer);
+		SAFE_RELEASE(mVertexDecl);
+	}
+
+	void OnLostDevice()
+	{
+		SAFE_RELEASE(mVertexBuffer);
+		SAFE_RELEASE(mIndexBuffer);
+		SAFE_RELEASE(mVertexDecl);
+	}
+
+	void OnResetDevice()
+	{
+		BuildGeometry(mVertexType);
+	}
+
+	wchar_t* GetName();
+	void SetID(DWORD _id);
+
+	void CalculateTBN();
+	void CalculateNormals();
+//	void CalculateUVs(UVMappingMode uvMode);
+
+	void BuildGeometry(VertexType type);
+
+	void SetVertexDeclaration();
+	void SetVertexStream();
+
+	void Draw();
+
+protected:
+	virtual void constructGeometryData() {}
+
 private:
-	//void OBJParseLine(char *line, std::vector<Vector3> &filePosData, std::vector<DWORD> &fileIndexData);
 	void createVertexBuffer(void* vertexData);
 	void createIndexBuffer();
 	void createVertexDeclaration();
-	//void calculateBoundingBox();
 
 	void calculateTBN(bool calculateNormal, bool calculateTangent, bool calculateBitangent);
 
@@ -177,29 +150,31 @@ private:
 	void calculateTriangleTangent(const Triangle& triangle, Vector3* tangent);
 	void calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangent);
 
+	//void calculateBoundingBox();
+
 public:
 	// TODO:OBJParser要更改这些数据, 暂时设为public
-	std::vector<Vector3> positionData;
-	std::vector<Vector2> uvData;
-	std::vector<Vector3> normalData;
-	std::vector<Vector3> tangentData; 
-	std::vector<Vector3> bitangentData;
+	std::vector<Vector3> mPositionData;
+	std::vector<Vector2> mUVData;
+	std::vector<Vector3> mNormalData;
+	std::vector<Vector3> mTangentData; 
+	std::vector<Vector3> mBitangentData;
 
-	std::vector<Vert> verts;
-	TriangleList triangleList;
+	std::vector<Vert> mVerts;
+	TriangleList mTriangles;
 
 protected:
-	DWORD id;
-	wchar_t name[MAX_STR_LEN];
+	DWORD mID;
+	wchar_t mName[MAX_STR_LEN];
 
 private:
-	IDirect3DVertexBuffer9* vertexBuffer;
-	IDirect3DIndexBuffer9*  indexBuffer;
+	IDirect3DVertexBuffer9* mVertexBuffer;
+	IDirect3DIndexBuffer9*  mIndexBuffer;
 
-	VertexType vertexType;
-	IDirect3DVertexDeclaration9 *vertexDecl;
+	VertexType mVertexType;
+	IDirect3DVertexDeclaration9 *mVertexDecl;
 
-	BoundingBox boundingBox;
+	BoundingBox mBoundingBox;
 };
 
 

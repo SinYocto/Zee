@@ -3,9 +3,9 @@
 int LightManager::numActiveDirectionalLights = 0;
 int LightManager::numActivePointLights = 0;
 
-AmbientLight LightManager::ambientLight;
-std::list<DirectionalLight*> LightManager::directionalLights;
-std::list<PointLight*> LightManager::pointLights;
+AmbientLight LightManager::mAmbientLight;
+std::list<DirectionalLight*> LightManager::mDirectionalLights;
+std::list<PointLight*> LightManager::mPointLights;
 
 DirectionalLightData LightManager::directionalLightsData[MAX_NUM_DIRECTIONAL_LIGHTS];
 PointLightData LightManager::pointLightsData[MAX_NUM_POINT_LIGHTS];
@@ -16,7 +16,7 @@ bool LightManager::isPointLightsDirty = true;
 
 void LightManager::AddDirectionalLight(DirectionalLight* light)
 {
-	directionalLights.push_back(light);
+	mDirectionalLights.push_back(light);
 
 	if(light->IsEnabled())
 	{
@@ -29,7 +29,7 @@ void LightManager::AddDirectionalLight(DirectionalLight* light)
 
 void LightManager::AddPointLight(PointLight* light)
 {
-	pointLights.push_back(light);
+	mPointLights.push_back(light);
 
 	if(light->IsEnabled())
 	{
@@ -50,7 +50,7 @@ void LightManager::Update()
 		}
 
 		int ix = 0;
-		for(std::list<DirectionalLight*>::iterator iter = directionalLights.begin(); iter != directionalLights.end(); ++iter)
+		for(std::list<DirectionalLight*>::iterator iter = mDirectionalLights.begin(); iter != mDirectionalLights.end(); ++iter)
 		{
 			if((*iter)->IsEnabled())
 			{
@@ -70,7 +70,7 @@ void LightManager::Update()
 		}
 
 		int ix = 0;
-		for(std::list<PointLight*>::iterator iter = pointLights.begin(); iter != pointLights.end(); ++iter)
+		for(std::list<PointLight*>::iterator iter = mPointLights.begin(); iter != mPointLights.end(); ++iter)
 		{
 			if((*iter)->IsEnabled())
 			{
@@ -85,10 +85,10 @@ void LightManager::Update()
 
 void LightManager::SetAmbientLight(D3DXCOLOR _color, float _intensity)
 {
-	ambientLight.SetValue(_color, _intensity);
+	mAmbientLight.SetValue(_color, _intensity);
 }
 
 D3DXCOLOR LightManager::GetFinalAmbientColor()
 {
-	return ambientLight.FinalColor();
+	return mAmbientLight.FinalColor();
 }

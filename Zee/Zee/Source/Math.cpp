@@ -103,6 +103,26 @@ bool Vector3::operator!=(const Vector3& vec)
 	return !(*this == vec); 
 }
 
+bool Vector3::operator<(const Vector3& vec)
+{
+	if(x < vec.x)
+		return true;
+
+	if(x > vec.x)
+		return false;
+
+	if(y < vec.y)
+		return true;
+
+	if(y > vec.y)
+		return false;
+
+	if(z < vec.z)
+		return true;
+
+	return false;
+}
+
 float Vector3::Length() const
 { 
 	return sqrt(x*x + y*y + z*z);
