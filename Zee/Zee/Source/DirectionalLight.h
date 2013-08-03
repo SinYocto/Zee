@@ -2,7 +2,6 @@
 #define DIRECTIONALLIGHT_H
 
 #include "D3DUtility.h"
-#include"Math.h"
 
 #define MAX_NUM_DIRECTIONAL_LIGHTS 2
 
@@ -29,7 +28,7 @@ public:
 		:mColor(color)
 		,mDirection(dir)
 		,mIntensity(intensity)
-		,isEnabled(true)
+		,mIsEnabled(true)
 	{
 
 	}
@@ -49,7 +48,7 @@ private:
 	Vector3 mDirection;
 	float mIntensity;
 
-	bool isEnabled;
+	bool mIsEnabled;
 };
 
 #endif

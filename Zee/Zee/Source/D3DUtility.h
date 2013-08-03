@@ -1,17 +1,11 @@
 #ifndef D3DUTILITY_H
 #define D3DUTILITY_H
 
-#include <stdio.h>
-#include <assert.h>
-#include <Windows.h>
-
 #include"d3d9.h"
 #include"d3dx9.h"
 
+#include "Common.h"
 #include "Math.h"
-
-#define WHITE 0xffffffff
-#define BLACK 0xff000000
 
 #define D3DXCOLOR_WHITE D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)
 #define D3DXCOLOR_BLACK D3DXCOLOR(0, 0, 0, 1.0f)
@@ -284,7 +278,18 @@ struct VertexXYZRHWD
 	static const DWORD FVF = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
 };
 
-enum VertexType { VERTEX_TYPE_INVALID, XYZ, XYZ_UV, XYZ_N, XYZ_UV_N, XYZ_UV_TBN, XYZRHW_UV, XYZ_D, XYZRHW_D };
+enum VertexType 
+{ 
+	VERTEX_TYPE_INVALID, 
+	XYZ, 
+	XYZ_UV, 
+	XYZ_N, 
+	XYZ_UV_N, 
+	XYZ_UV_TBN, 
+	XYZRHW_UV, 
+	XYZ_D, 
+	XYZRHW_D 
+};
 
 HWND RegisterAndCreateWindow(LPCWSTR wndClassName, LPCWSTR wndName, int wndWidth, int wndHeight, WNDPROC WndProc);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);

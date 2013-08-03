@@ -3,7 +3,7 @@
 
 void DirectionalLight::Enable(bool enable)
 {
-	if(enable == isEnabled)
+	if(enable == mIsEnabled)
 	{
 		return;
 	}
@@ -13,7 +13,7 @@ void DirectionalLight::Enable(bool enable)
 		{
 			if(LightManager::numActiveDirectionalLights < MAX_NUM_DIRECTIONAL_LIGHTS)
 			{
-				isEnabled = true;
+				mIsEnabled = true;
 				LightManager::numActiveDirectionalLights++;
 
 				LightManager::isDirectionalLightsDirty = true;
@@ -21,7 +21,7 @@ void DirectionalLight::Enable(bool enable)
 		}
 		else
 		{
-			isEnabled = false;
+			mIsEnabled = false;
 			LightManager::numActiveDirectionalLights--;
 
 			LightManager::isDirectionalLightsDirty = true;
@@ -31,7 +31,7 @@ void DirectionalLight::Enable(bool enable)
 
 bool DirectionalLight::IsEnabled()
 {
-	return isEnabled;
+	return mIsEnabled;
 }
 
 void DirectionalLight::SetValue(D3DXCOLOR color, Vector3 dir, float intensity)

@@ -3,7 +3,12 @@
 
 #include"D3DUtility.h"
 
-enum ShadingMethod { Diffuse, Specular, BumpSpecular };
+enum ShadingMethod 
+{ 
+	Diffuse, 
+	Specular, 
+	BumpSpecular 
+};
 
 class Material;
 class Camera;

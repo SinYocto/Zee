@@ -2,7 +2,6 @@
 #define PRIMITIVE_H
 
 #include"Geometry.h"
-#include"Math.h"
 
 class Cube : public Geometry
 {

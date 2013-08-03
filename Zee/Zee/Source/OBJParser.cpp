@@ -1,12 +1,8 @@
 #include "OBJParser.h"
 #include "Model.h"
-#include "YFile.h"
 #include "GeometryManager.h"
 #include "MaterialManager.h"
-#include <stdio.h>
-#include <string.h>
-#include <set>
-#include "Time.h"
+#include "SceneManager.h"
 
 DWORD OBJParser::mDataContentType = 0;
 
@@ -210,10 +206,10 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 					mGeoList.push_back((*curGeo));
 
 					if(mResultModel == NULL)
-						mResultModel = new Model();
+						mResultModel = new Model(L"model", SceneManager::root);
 					Assert(NULL != mResultModel);
 
-					subMesh = new Mesh(NULL, (*curGeo), material);
+					subMesh = new Mesh(L"mesh", SceneManager::root, (*curGeo), material);
 					mResultModel->AddSubMesh(subMesh);
 				}
 

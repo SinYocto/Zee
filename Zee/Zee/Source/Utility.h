@@ -4,6 +4,12 @@
 #include <stdio.h>
 #include <vector>
 #include <list>
+#include <map>
+#include <algorithm>
+#include <string.h>
+#include <malloc.h>
+#include <assert.h>
+#include <Windows.h>
 
 #define Assert(condition) \
 	if(!(condition)) \

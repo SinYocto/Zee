@@ -2,7 +2,6 @@
 #define AMBIENTLIGHT_H
 
 #include "D3DUtility.h"
-#include"Math.h"
 
 class AmbientLight{
 public:

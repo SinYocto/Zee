@@ -1,11 +1,9 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "Utility.h"
-#include"D3DUtility.h"
+#include "D3DUtility.h"
 #include "IReferenceCounted.h"
 #include "Shader.h"
-#include "YString.h"
 
 #define MAX_MATERIAL_TEXTURE_LAYERS 4
 

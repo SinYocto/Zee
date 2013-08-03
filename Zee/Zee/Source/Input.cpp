@@ -1,7 +1,6 @@
 #include"Input.h"
-#include "Utility.h"
+#include "Common.h"
 #include"D3DUtility.h"
-#include<stdio.h>
 
 IDirectInputDevice8* Input::DIDKeyboard;
 IDirectInputDevice8* Input::DIDMouse;

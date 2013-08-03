@@ -2,7 +2,6 @@
 #define CAMERA_H
 
 #include"Object.h"
-#include"Math.h"
 #include"Bound.h"
 
 class Camera:public Object
@@ -64,6 +63,7 @@ public:
 			SetTransformDirty(false);
 		}
 	}
+
 private:
 	void recalculateCameraMatrix();
 	void recalculateViewMatrix();

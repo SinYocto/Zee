@@ -1,6 +1,5 @@
-#include"GUI.h"
+#include "GUI.h"
 #include "Input.h"
-#include <Windows.h>
 
 LabelStyle gDefaultLabelStyle(TEXT("Consolas"), 7, 15, 100, 0xffe3b706, DT_CENTER | DT_VCENTER);
 ButtonStyle gDefaultButtonStyle(TEXT("./Assets/Textures/GUI/buttonNormal3.tga"), TEXT("./Assets/Textures/GUI/buttonHover3.tga"), TEXT("./Assets/Textures/GUI/buttonActive3.tga"));

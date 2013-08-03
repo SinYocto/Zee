@@ -1,11 +1,8 @@
 #include "Shader.h"
 #include "Material.h"
+#include "Geometry.h"
 #include "Camera.h"
 #include "Object.h"
-#include "Geometry.h"
-#include "AmbientLight.h"
-#include "DirectionalLight.h"
-#include "PointLight.h"
 #include "LightManager.h"
 
 // DiffuseShader

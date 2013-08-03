@@ -1,5 +1,4 @@
 #include "D3DUtility.h"
-#include "Utility.h"
 #include "Input.h"
 
 HWND gHWnd = NULL;
@@ -15,13 +14,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break; 
+
 	case WM_ACTIVATEAPP:
 		if(Input::DIDKeyboard) 
 			Input::DIDKeyboard->Acquire();
+
 		if(Input::DIDMouse) 
 			Input::DIDMouse->Acquire();
+
 		break;
 	}
+
 	return DefWindowProc(hWnd, Msg, wParam, lParam);
 }
 
@@ -138,43 +141,47 @@ void CreateVB(IDirect3DDevice9* d3dDevice,IDirect3DVertexBuffer9** vb, void* ver
 {
 	int sizeofVertex;
 	DWORD vertexFVF = D3DFVF_XYZ;
+
 	switch(vertexType)
 	{
 		case XYZ:
 			sizeofVertex = 12;
 			vertexFVF = D3DFVF_XYZ;
 			break;
+
 		case XYZ_UV:
 			sizeofVertex = 20;
 			vertexFVF = D3DFVF_XYZ | D3DFVF_TEX1;
 			break;
+
 		case XYZ_N:
 			sizeofVertex = 24;
 			vertexFVF = D3DFVF_XYZ | D3DFVF_NORMAL;
 			break;
+
 		case XYZ_UV_N:
 			sizeofVertex = 32;
 			vertexFVF = D3DFVF_XYZ | D3DFVF_TEX1 | D3DFVF_NORMAL;
 			break;
+
 		case XYZ_UV_TBN:
 			sizeofVertex = 56;
 			vertexFVF = 0;
 			break;
+
 		case XYZRHW_UV:
 			sizeofVertex = 24;
 			vertexFVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
 			break;
+
 		case XYZRHW_D:
 			sizeofVertex = sizeof(VertexXYZRHWD);
 			vertexFVF = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
 			break;
-		default:
-			break;
 	}
 
 	void *ptr;
-	d3dDevice->CreateVertexBuffer(sizeofVertex*numVertices, 0,
-                          vertexFVF, D3DPOOL_DEFAULT, vb, 0);
+	d3dDevice->CreateVertexBuffer(sizeofVertex*numVertices, 0, vertexFVF, D3DPOOL_DEFAULT, vb, 0);
 	(*vb)->Lock(0,0, (void**)&ptr, 0);
 	memcpy(ptr, vertexData, sizeofVertex*numVertices);
 	(*vb)->Unlock();
@@ -231,7 +238,8 @@ D3DXCOLOR HSL2RGB(Vector3 hsl)
 	float s = hsl.y;
 	float l = hsl.z;
 
-	if(s == 0){
+	if(s == 0)
+	{
 		return D3DXCOLOR(l, l, l, 1.0f);
 	}
 
@@ -258,8 +266,10 @@ float Hue2RGB(float v1, float v2, float vh)
 
 	if(6.0f*vh < 1)
 		return v1 + (v2 - v1)*6.0f*vh;
+
 	if(2.0f*vh < 1)
 		return v2;
+
 	if(3.0f*vh < 2)
 		return v1 + (v2 - v1)*(2.0f/3.0f - vh)*6.0f;
 
@@ -276,11 +286,13 @@ Vector3 RGB2HSL(D3DXCOLOR rgb)
 	float delMax = vMax - vMin;
 
 	l = (vMin + vMax)/2.0f;
-	if(delMax == 0){
+	if(delMax == 0)
+	{
 		h = 0;
 		s = 0;
 	}
-	else{
+	else
+	{
 		if(l < 0.5f)
 			s = delMax / (vMax + vMin);
 		else

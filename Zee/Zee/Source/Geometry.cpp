@@ -1,6 +1,4 @@
 #include "Geometry.h"
-#include <fstream>
-#include <map>
 
 void Geometry::createVertexBuffer(void* vertexData)
 {
@@ -1030,7 +1028,7 @@ wchar_t* Geometry::GetName()
 	return mName;
 }
 
-void Geometry::SetID( DWORD _id )
+void Geometry::SetID(DWORD id)
 {
-	mID = _id;
+	mID = id;
 }

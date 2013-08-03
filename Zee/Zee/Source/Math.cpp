@@ -1,6 +1,6 @@
 #include"Math.h"
-#include "Utility.h"
-#include "D3DUtility.h"
+#include "Common.h"
+#include"d3dx9.h"
 
 
 bool FloatEqual(const float& f1, const float& f2, const float& tolerance)

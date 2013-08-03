@@ -3,8 +3,6 @@
 
 #include "Utility.h"
 #include "YString.h"
-#include <windows.h>
-#include <vector>
 
 class Timer
 {

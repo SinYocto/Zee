@@ -1,4 +1,4 @@
-#include"Material.h"
+#include "Material.h"
 
 void Material::SetTexture(int layerIx, wchar_t* texFileName)	// TODO:不应该直接从文件中CreateTexture再Set, 增加TextureManager类
 {

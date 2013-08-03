@@ -2,7 +2,6 @@
 #define POINTLIGHT_H
 
 #include "D3DUtility.h"
-#include"Math.h"
 
 #define MAX_NUM_POINT_LIGHTS 8
 

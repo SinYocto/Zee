@@ -1,7 +1,7 @@
 #ifndef IREFERENCECOUNTED_H
 #define IREFERENCECOUNTED_H
 
-#include "Utility.h"
+#include "Common.h"
 
 /* 引用计数基类, 需要使用引用计数来管理资源释放的类可以继承此类
  * 目前使用的有Geometry类和Material类

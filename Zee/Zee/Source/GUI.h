@@ -1,12 +1,8 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include "Utility.h"
-#include"D3DUtility.h"
-#include"Math.h"
-#include<vector>
-#include<list>
-#include<map>
+#include "Common.h"
+#include "D3DUtility.h"
 
 enum ButtonState { Normal, Hover, Active };
 

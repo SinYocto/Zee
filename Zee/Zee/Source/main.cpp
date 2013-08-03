@@ -1,35 +1,27 @@
 #include "D3DUtility.h"
-#include "Camera.h"
 #include "Input.h"
-#include "Time.h"
 #include "GUI.h"
-#include "Material.h"
-#include "Shader.h"
-#include "AmbientLight.h"
-#include "DirectionalLight.h"
-#include "PointLight.h"
+
+#include "Camera.h"
+
 #include "LightManager.h"
-#include "RenderableObject.h"
-#include "Primitive.h"
-#include "Material.h"
-#include "Mesh.h"
-#include "Model.h"
-#include <stdio.h>
 #include "GeometryManager.h"
 #include "MaterialManager.h"
+#include "SceneManager.h"
+
+#include "Model.h"
+#include "Primitive.h"
+#include "Material.h"
+
 #include "OBJParser.h"
-#include "YString.h"
-#include "YFile.h"
 #include "DebugDrawer.h"
+
 #include <Locale.h>
 
 const int wndWidth = 1024;
 const int wndHeight = 600;
 
 LabelStyle* leftAlignStyle;
-
-// camera
-Camera* camera = NULL;
 
 // lights
 DirectionalLight dirLight1;
@@ -38,21 +30,6 @@ DirectionalLight dirLight2;
 PointLight pointLight1;
 PointLight pointLight2;
 
-// geo
-//Cube* cubeMesh = NULL;
-
-// material
-//Material* mtlBump = NULL;
-
-// model
-Model* cubeModel = NULL;
-Model* model2 = NULL;
-Model* model3 = NULL;
-
-void SetupGUIStyle();
-void SetupShaders();
-
-void GUIUpdate();
 void ApplyFPCameraControllor(Camera* pCamera, float deltaTime);
 
 void AppDestroy();
@@ -60,9 +37,12 @@ void AppDestroy();
 void OnLostDevice();
 void OnResetDevice();
 
+void SetupGUIStyle();
+void GUIUpdate();
+
 int GetFPS();
 
-int main()
+int main(int argc, char* argv[])
 {
 	int retCode = 1;
 	{
@@ -77,15 +57,17 @@ int main()
 
         // init
 		Input::Init(GetModuleHandle(0), gHWnd);
+		MaterialManager::Init();
+		SceneManager::Init();
+		Time::Start();
+
         SetupGUIStyle();
-		SetupShaders();
 
         // camera
-		camera = new Camera(Vector3(0, 2.0f, -4.0f), Vector3::Zero, 
+		SceneManager::SetMainCamera(Vector3(0, 2.0f, -4.0f), Vector3::Zero,
 			PI/3, (float)wndWidth/(float)wndHeight, 0.1f, 100000.0f);
 
 		// lights
-
 		LightManager::SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
 		dirLight1.SetValue(D3DXCOLOR_RED, Vector3(1.0f, -1.0f, 1.0f), 1.0f);
 		pointLight1.SetValue(D3DXCOLOR_YELLOW, Vector3(-4.0f, 0, 0), Vector3(1.0f, 0, 0), 1.0f);
@@ -95,8 +77,8 @@ int main()
 		LightManager::AddPointLight(&pointLight1);
 
 		// geo
-		Cube* cube1 = new Cube(L"cube1");
-		GeometryManager::AddGeometry(cube1);
+		//Cube* cube1 = new Cube(L"cube1");
+		//GeometryManager::AddGeometry(cube1);
 
 		//cube1->CalculateTBN();
 		//cube1->BuildGeometry(XYZ_UV_TBN);
@@ -108,13 +90,13 @@ int main()
 		cylinder1->BuildGeometry(XYZ_N);
 
 		// material
-		Material* mtl1 = new Material(L"mtl1");
-		MaterialManager::AddMaterial(mtl1);
+		//Material* mtl1 = new Material(L"mtl1");
+		//MaterialManager::AddMaterial(mtl1);
 
-		mtl1->SetShader(BumpSpecular);
-		mtl1->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
-		mtl1->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
-		mtl1->mShader->SetSpecShiness(0.4f);
+		//mtl1->SetShader(BumpSpecular);
+		//mtl1->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
+		//mtl1->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
+		//mtl1->mShader->SetSpecShiness(0.4f);
 
 		Material* mtl2 = new Material(L"mtl2");
 		MaterialManager::AddMaterial(mtl2);
@@ -123,11 +105,7 @@ int main()
 		//mtl2->shader->SetColorTex(L"./Assets/Textures/6133.jpg");
 
 		// model
-		cubeModel = new Model(NULL, cylinder1, mtl2);
-		//OBJParser::Parse(L"Assets/Models/teapot.obj", &cubeModel);
-		//OBJParser::Parse(L"Assets/Models/knife.obj", &cubeModel);
-		//OBJParser::Parse(L"Assets/Models/room_p2.obj", &model2);
-		//OBJParser::Parse(L"Assets/Models/room_p3.obj", &model3);
+		Model* cubeModel = new Model(L"cubeModel", SceneManager::root, cylinder1, mtl2);
 
 		// line test
 		std::vector<Vector3> points;
@@ -137,7 +115,6 @@ int main()
 
 
         // start loop
-		Time::Start();
 		while(run())
 		//while(false)
 		{
@@ -154,21 +131,20 @@ int main()
 
 					LightManager::Update();
 
-					ApplyFPCameraControllor(camera, Time::deltaTime);
+					ApplyFPCameraControllor(SceneManager::mainCamera, Time::deltaTime);
 
-					camera->Update();
+					SceneManager::Update();
 
 					// render
 					gD3DDevice->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff1e90ff, 1.0f, 0);
 					gD3DDevice->BeginScene();
 
-					DebugDrawer::DrawLine(points, 0xffff0000, camera);
-					DebugDrawer::DrawCircle(Vector3(4, 4, 0), Vector3(1, 1, 1), 1, 0xffff0000, camera);
-					DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, 1), 1, 0xffff0000, camera);
+					DebugDrawer::DrawLine(points, 0xffff0000, SceneManager::mainCamera);
+					DebugDrawer::DrawCircle(Vector3(4, 4, 0), Vector3(1, 1, 1), 1, 0xffff0000, SceneManager::mainCamera);
+					DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, 1), 1, 0xffff0000, SceneManager::mainCamera);
 
-					cubeModel->Draw(camera);
-					//model2->Draw(camera);
-					//model3->Draw(camera);
+					//cubeModel->Draw(SceneManager::mainCamera);
+					SceneManager::DrawAll();
 
 					gGUISystem.Draw();
 
@@ -194,7 +170,6 @@ int main()
 
 	retCode = 0;
 Exit:
-	Input::Destroy();
 	AppDestroy();
 	SAFE_RELEASE(gD3DDevice);
 	SAFE_RELEASE(gD3D);
@@ -260,17 +235,17 @@ void SetupGUIStyle()
     gDefaultListBoxStyle.CreateTextures();
 }
 
-void SetupShaders()
-{
-	DiffuseShader::CreateEffectFromFile(TEXT("./Source/Shaders/Diffuse.fx"));	// time used: 124ms
-	_Assert(NULL != DiffuseShader::mEffect);
-
-	SpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/Specular.fx"));		// time used: 230ms
-	_Assert(NULL != SpecularShader::mEffect);
-
-	BumpSpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/BumpSpecular.fx"));		// time used: 248ms
-	_Assert(NULL != BumpSpecularShader::mEffect);
-}
+//void SetupShaders()
+//{
+//	DiffuseShader::CreateEffectFromFile(TEXT("./Source/Shaders/Diffuse.fx"));	// time used: 124ms
+//	_Assert(NULL != DiffuseShader::mEffect);
+//
+//	SpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/Specular.fx"));		// time used: 230ms
+//	_Assert(NULL != SpecularShader::mEffect);
+//
+//	BumpSpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/BumpSpecular.fx"));		// time used: 248ms
+//	_Assert(NULL != BumpSpecularShader::mEffect);
+//}
 
 void GUIUpdate()
 {
@@ -309,14 +284,11 @@ int GetFPS()
 void AppDestroy()
 {
 	SAFE_DELETE(leftAlignStyle);
-	SAFE_DELETE(camera);
 
+	Input::Destroy();
+	SceneManager::Destory();
 	GeometryManager::DeleteAll();
 	MaterialManager::DeleteAll();
-
-	SAFE_DELETE(cubeModel);
-	SAFE_DELETE(model2);
-	SAFE_DELETE(model3);
 }
 
 void OnLostDevice()

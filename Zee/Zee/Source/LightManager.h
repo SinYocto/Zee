@@ -1,17 +1,17 @@
+#include "AmbientLight.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
-#include "AmbientLight.h"
-#include <list>
 
 class LightManager
 {
 public:
 	static void AddDirectionalLight(DirectionalLight* light);
 	static void AddPointLight(PointLight* light);
-	static void Update();
 
 	static void SetAmbientLight(D3DXCOLOR _color, float _intensity);
 	static D3DXCOLOR GetFinalAmbientColor();
+
+	static void Update();
 
 public:
 	static int numActiveDirectionalLights;

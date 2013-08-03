@@ -2,7 +2,6 @@
 #define MODEL_H
 
 #include "Mesh.h"
-#include <list>
 
 // #设计
 // 每个Model对象包含一个mesh列表, 同时Model和mesh都是Object对象, 在Object层级上每个mesh都是Model的子对象
@@ -18,18 +17,20 @@ enum ModelFileFormat
 
 class Camera;
 
-class Model : public Object
+class Model : public SceneNode
 {
 public:
-	Model()
+	Model(const wchar_t* name, SceneNode* parent)
+		:SceneNode(name, parent)
 	{
-
+		
 	}
 
 	// 此构造函数使用一个geo和material对象来构造一个包含一个SubMesh的Model对象
-	Model(Object* parent, Geometry* geo, Material* material)
+	Model(const wchar_t* name, SceneNode* parent, Geometry* geo, Material* material)
+		:SceneNode(name, parent)
 	{
-		Mesh* mesh = new Mesh(this, geo, material);
+		Mesh* mesh = new Mesh(L"mesh", this, geo, material);
 		AddSubMesh(mesh);
 	}
 
@@ -40,6 +41,7 @@ public:
 			SAFE_DELETE(*iter);
 		}
 	}
+
 	void AddSubMesh(Mesh* mesh)
 	{
 		_Assert(NULL != mesh);
@@ -59,8 +61,6 @@ public:
 	void LoadModelDataFromFile(wchar_t* filename, ModelFileFormat format);
 
 	void Draw(Camera* camera);
-
-
 
 private:
 	std::list<Mesh*> mSubMeshes;

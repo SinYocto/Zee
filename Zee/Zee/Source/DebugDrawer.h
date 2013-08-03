@@ -1,7 +1,7 @@
 #ifndef DEBUGDRAWER_H
 #define DEBUGDRAWER_H
 
-#include "Utility.h"
+#include "Common.h"
 #include "Math.h"
 
 class Camera;

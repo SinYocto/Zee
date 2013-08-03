@@ -1,15 +1,12 @@
 #ifndef OBJPARSER_H
 #define OBJPARSER_H
 
+#include "Common.h"
 #include "Math.h"
-#include "Geometry.h"
-#include "Material.h"
-#include "YString.h"
-#include "YFile.h"
-
-#include <vector>
 
 class Model;
+class Geometry;
+class Material;
 
 class OBJParser
 {
