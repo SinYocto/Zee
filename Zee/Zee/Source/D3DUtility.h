@@ -1,9 +1,7 @@
 #ifndef D3DUTILITY_H
 #define D3DUTILITY_H
 
-#include"d3d9.h"
-#include"d3dx9.h"
-
+#include "Driver.h"
 #include "Common.h"
 #include "Math.h"
 
@@ -12,12 +10,6 @@
 #define D3DXCOLOR_RED D3DXCOLOR(1.0f, 0, 0, 1.0f)
 #define D3DXCOLOR_YELLOW D3DXCOLOR(1.0f, 1.0f, 0, 1.0f)
 #define D3DXCOLOR_BLUE D3DXCOLOR(0, 0, 1.0f, 1.0f)
-
-extern HWND gHWnd;
-extern IDirect3D9* gD3D;
-extern IDirect3DDevice9 *gD3DDevice;
-
-extern D3DPRESENT_PARAMETERS gPresentParameters;	// 设备恢复时需要使用
 
 struct Vertex
 {

@@ -29,6 +29,11 @@ void PointLight::Enable(bool enable)
 	}
 }
 
+void PointLight::SetID(DWORD id)
+{
+	mID = id;
+}
+
 bool PointLight::IsEnabled()
 {
 	return mIsEnabled;
@@ -42,4 +47,9 @@ void PointLight::SetValue(D3DXCOLOR color, Vector3 pos, Vector3 attenuation, flo
 	mIntensity = intensity;
 
 	LightManager::isPointLightsDirty = true;
+}
+
+wchar_t* PointLight::GetName()
+{
+	return mName;
 }

@@ -1,7 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include"D3DUtility.h"
+#include "D3DUtility.h"
 
 enum ShadingMethod 
 { 
@@ -86,7 +86,7 @@ public:
 
 	static void CreateEffectFromFile(wchar_t* FXFileName)
 	{
-		D3DXCreateEffectFromFile(gD3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
+		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -127,7 +127,7 @@ public:
 
 	static void CreateEffectFromFile(wchar_t* FXFileName)
 	{
-		D3DXCreateEffectFromFile(gD3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
+		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -172,7 +172,7 @@ public:
 
 	static void CreateEffectFromFile(wchar_t* FXFileName)
 	{
-		D3DXCreateEffectFromFile(gD3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
+		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
 	}
 
 	void SetColorTex(wchar_t* texFileName);

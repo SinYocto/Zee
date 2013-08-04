@@ -1,12 +1,6 @@
 #include "D3DUtility.h"
 #include "Input.h"
 
-HWND gHWnd = NULL;
-IDirect3D9* gD3D = NULL;
-IDirect3DDevice9* gD3DDevice = NULL;
-
-D3DPRESENT_PARAMETERS gPresentParameters;	// 设备恢复时需要使用
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(Msg)
@@ -99,7 +93,6 @@ bool CreateD3DDevice(HWND hWnd, int bufferWidth, int bufferHeight, _D3DMULTISAMP
 		hr = (*ppD3D)->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode);
 		Assert(SUCCEEDED(hr));
 
-		//D3DPRESENT_PARAMETERS presentParams;
 		ZeroMemory(presentParams,sizeof(*presentParams));
 
 		(*presentParams).Windowed				= true;

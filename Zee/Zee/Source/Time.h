@@ -91,36 +91,22 @@ private:
 class Time
 {
 public:
-	Time() {}
-
 	static void Start()
 	{
-		LARGE_INTEGER frequency;
-		QueryPerformanceFrequency(&frequency);
-		ticksPerSecond = frequency.QuadPart;
-
-		LARGE_INTEGER tick;
-		QueryPerformanceCounter(&tick);
-		lastTick = tick.QuadPart;
+		timer.Reset();
 	}
 
 	static void Tick()
 	{
-		LARGE_INTEGER tick;
-		QueryPerformanceCounter(&tick);
-
-		LONGLONG curTick = tick.QuadPart;
-		deltaTime = (curTick - lastTick) / (float)ticksPerSecond;
-
-		lastTick = curTick;
+		deltaTime = timer.GetElapsedTime();
+		timer.Reset();
 	}
 
 public:
 	static float deltaTime;
 
 private:
-	static LONGLONG ticksPerSecond;
-	static LONGLONG lastTick;
+	static Timer timer;
 };
 
 #endif

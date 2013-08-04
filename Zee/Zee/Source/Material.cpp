@@ -8,7 +8,7 @@ void Material::SetTexture(int layerIx, wchar_t* texFileName)	// TODO:≤ª”¶∏√÷±Ω”¥
 	if(mTextureLayer[layerIx])
 		SAFE_RELEASE(mTextureLayer[layerIx]);
 
-	D3DXCreateTextureFromFile(gD3DDevice, texFileName, &mTextureLayer[layerIx]);		
+	D3DXCreateTextureFromFile(Driver::D3DDevice, texFileName, &mTextureLayer[layerIx]);		
 }
 
 IDirect3DTexture9* Material::GetTexture(int layerIx)

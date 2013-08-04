@@ -47,6 +47,7 @@ public:
 public:
 	wchar_t text[MAX_STR_LEN];
 	Rect rect;
+	Rect screenRect;
 	LabelStyle* style; 
 };
 
@@ -98,6 +99,7 @@ private:
 public:
 	LPWSTR text;
 	Rect rect;
+	Rect screenRect;
 	ButtonStyle* buttonStyle;
 	LabelStyle* labelStyle;
 	IDirect3DVertexBuffer9 *vertexBuffer;
@@ -155,6 +157,7 @@ private:
 	void CreateVertexBuffer();
 public:
 	Rect rect;
+	Rect screenRect;
 	ToggleStyle* style;
 	IDirect3DVertexBuffer9 *vertexBuffer;
 
@@ -218,6 +221,7 @@ private:
 	void CreateVertexBuffer();
 public:
 	Rect rect;
+	Rect screenRect;
 	SliderStyle* style;
 	IDirect3DVertexBuffer9 *sliderBarVB;
 	IDirect3DVertexBuffer9 *sliderThumbVB;
@@ -320,6 +324,7 @@ public:
 	IDirect3DVertexBuffer9 *labelVB;
 	IDirect3DVertexBuffer9 *buttonVB;
 	Rect rect;
+	Rect screenRect;
 	ListBoxStyle* style;
 
 	bool isSelecting;

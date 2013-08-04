@@ -28,25 +28,34 @@ struct PointLightData
 class PointLight
 {
 public:
-	PointLight(D3DXCOLOR color = D3DXCOLOR_WHITE, Vector3 pos = Vector3(0, 0, 0), 
+	PointLight(const wchar_t* name, D3DXCOLOR color = D3DXCOLOR_WHITE, Vector3 pos = Vector3(0, 0, 0), 
 		Vector3 attenuation = Vector3(1.0f, 0, 0), float intensity = 1.0f)
 		:mColor(color)
 		,mPosition(pos)
 		,mAttenuation(attenuation)
 		,mIntensity(intensity)
-		,mIsEnabled(true){}
+		,mIsEnabled(true)
+	{
+		YString::Copy(mName, _countof(mName), name);
+	}
 
 	PointLightData GetData() 
 	{ 
 		return PointLightData(mIntensity * mColor, mPosition, mAttenuation); 
 	}
 
+	void SetID(DWORD id);
 	void SetValue(D3DXCOLOR color, Vector3 pos, Vector3 attenuation, float intensity);
+
+	wchar_t* GetName();
 
 	void Enable(bool enable);
 	bool IsEnabled();
 
 private:
+	DWORD mID;
+	wchar_t mName[MAX_STR_LEN];
+
 	D3DXCOLOR mColor;
 	Vector3 mPosition;
 	Vector3 mAttenuation;

@@ -23,14 +23,14 @@ struct DirectionalLightData
 class DirectionalLight
 {
 public:
-	DirectionalLight(D3DXCOLOR color = D3DXCOLOR_WHITE, Vector3 dir = Vector3(1.0f, -1.0f, 1.0f), 
+	DirectionalLight(const wchar_t* name, D3DXCOLOR color = D3DXCOLOR_WHITE, Vector3 dir = Vector3(1.0f, -1.0f, 1.0f), 
 		float intensity = 1.0f)
 		:mColor(color)
 		,mDirection(dir)
 		,mIntensity(intensity)
 		,mIsEnabled(true)
 	{
-
+		YString::Copy(mName, _countof(mName), name);
 	}
 
 	DirectionalLightData GetData() 
@@ -38,12 +38,18 @@ public:
 		return DirectionalLightData(mIntensity * mColor, mDirection); 
 	}
 
+	void SetID(DWORD id);
 	void SetValue(D3DXCOLOR color, Vector3 dir, float intensity);
+
+	wchar_t* GetName();
 
 	void Enable(bool enable);
 	bool IsEnabled();
 
 private:
+	DWORD mID;
+	wchar_t mName[MAX_STR_LEN];
+
 	D3DXCOLOR mColor;
 	Vector3 mDirection;
 	float mIntensity;

@@ -2,7 +2,7 @@
 
 void Geometry::createVertexBuffer(void* vertexData)
 {
-	CreateVB(gD3DDevice, &mVertexBuffer, vertexData, mVerts.size(), mVertexType);
+	CreateVB(Driver::D3DDevice, &mVertexBuffer, vertexData, mVerts.size(), mVertexType);
 }
 
 void Geometry::createIndexBuffer()
@@ -17,7 +17,7 @@ void Geometry::createIndexBuffer()
 		indexData[3*triIndex + 2] = mTriangles[triIndex].vertexIndex[2];
 	}
 
-	CreateIB(gD3DDevice, &mIndexBuffer, indexData, numIndices);
+	CreateIB(Driver::D3DDevice, &mIndexBuffer, indexData, numIndices);
 }
 
 // BuildGeometry之前先要获取相应VertexType所需的顶点数据
@@ -162,7 +162,7 @@ void Geometry::createVertexDeclaration()
 			if(mVertexDecl)
 				SAFE_RELEASE(mVertexDecl);
 
-			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
+			Driver::D3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_UV:
@@ -176,7 +176,7 @@ void Geometry::createVertexDeclaration()
 			if(mVertexDecl)
 				SAFE_RELEASE(mVertexDecl);
 
-			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
+			Driver::D3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_N:
@@ -190,7 +190,7 @@ void Geometry::createVertexDeclaration()
 			if(mVertexDecl)
 				SAFE_RELEASE(mVertexDecl);
 
-			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
+			Driver::D3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_UV_N:
@@ -205,7 +205,7 @@ void Geometry::createVertexDeclaration()
 			if(mVertexDecl)
 				SAFE_RELEASE(mVertexDecl);
 
-			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
+			Driver::D3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_UV_TBN:
@@ -222,7 +222,7 @@ void Geometry::createVertexDeclaration()
 			if(mVertexDecl)
 				SAFE_RELEASE(mVertexDecl);
 
-			gD3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
+			Driver::D3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	}
@@ -230,18 +230,18 @@ void Geometry::createVertexDeclaration()
 
 void Geometry::SetVertexDeclaration()
 {
-	gD3DDevice->SetVertexDeclaration(mVertexDecl);
+	Driver::D3DDevice->SetVertexDeclaration(mVertexDecl);
 }
 
 void Geometry::Draw()
 {
-	gD3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, mVerts.size(), 0, mTriangles.size());
+	Driver::D3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, mVerts.size(), 0, mTriangles.size());
 }
 
 void Geometry::SetVertexStream()
 {	
-	gD3DDevice->SetStreamSource(0, mVertexBuffer, 0, SizeofVertex(mVertexType));
-	gD3DDevice->SetIndices(mIndexBuffer);
+	Driver::D3DDevice->SetStreamSource(0, mVertexBuffer, 0, SizeofVertex(mVertexType));
+	Driver::D3DDevice->SetIndices(mIndexBuffer);
 }
 
 void Geometry::processSmoothNormal(const Vector3& curPos, const TriIDList& overAllTriGroup)

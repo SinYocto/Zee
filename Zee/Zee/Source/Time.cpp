@@ -1,9 +1,10 @@
 #include"Time.h"
 #include "YString.h"
 
+Timer Time::timer;
 float Time::deltaTime;		// TODO:是否一定要在外面定义?
-LONGLONG Time::ticksPerSecond;
-LONGLONG Time::lastTick;
+//LONGLONG Time::ticksPerSecond;
+//LONGLONG Time::lastTick;
 
 Timer PerformanceTimer::timer;
 std::vector<PerformanceTimer::Performance> PerformanceTimer::performanceList;

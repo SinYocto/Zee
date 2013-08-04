@@ -12,10 +12,10 @@ void Mesh::Draw(Camera* camera)
 	switch(mDisplayMode)
 	{
 	case WIRE_FRAME:
-		gD3DDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_WIREFRAME );
+		Driver::D3DDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_WIREFRAME );
 		break;
 	case SOLID:
-		gD3DDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_SOLID );
+		Driver::D3DDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_SOLID );
 		break;
 	}
 

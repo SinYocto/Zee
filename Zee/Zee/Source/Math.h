@@ -158,6 +158,8 @@ class Rect
 public:
 	Rect();
 	Rect(long _left, long _top, long width, long height);
+
+	void TransLate(int x, int y);
 public:
 	long left, top, right, bottom;
 };

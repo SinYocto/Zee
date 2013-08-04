@@ -412,3 +412,11 @@ Rect::Rect(long _left, long _top, long width, long height)
 	right = left + width;
 	bottom = top + height;
 }
+
+void Rect::TransLate(int x, int y)
+{
+	left += x;
+	right += x;
+	top += y;
+	bottom += y;
+}

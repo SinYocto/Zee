@@ -19,14 +19,14 @@ bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, C
 
 		D3DXMATRIX matWorld;
 		D3DXMatrixIdentity(&matWorld);
-		gD3DDevice->SetTransform(D3DTS_WORLD, &matWorld);
-		gD3DDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
-		gD3DDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
+		Driver::D3DDevice->SetTransform(D3DTS_WORLD, &matWorld);
+		Driver::D3DDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
+		Driver::D3DDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
 
-		gD3DDevice->SetRenderState(D3DRS_LIGHTING, false);
-		gD3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
+		Driver::D3DDevice->SetRenderState(D3DRS_LIGHTING, false);
+		Driver::D3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
 
-		gD3DDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, points.size() - 1, &verts[0], sizeof(VertexXYZD));
+		Driver::D3DDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, points.size() - 1, &verts[0], sizeof(VertexXYZD));
 	}
 
 	isSucceed = true;

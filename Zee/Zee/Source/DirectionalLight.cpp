@@ -34,6 +34,11 @@ bool DirectionalLight::IsEnabled()
 	return mIsEnabled;
 }
 
+void DirectionalLight::SetID(DWORD id)
+{
+	mID = id;
+}
+
 void DirectionalLight::SetValue(D3DXCOLOR color, Vector3 dir, float intensity)
 {
 	mColor = color;
@@ -41,4 +46,9 @@ void DirectionalLight::SetValue(D3DXCOLOR color, Vector3 dir, float intensity)
 	mIntensity = intensity;
 
 	LightManager::isDirectionalLightsDirty = true;
+}
+
+wchar_t* DirectionalLight::GetName()
+{
+	return mName;
 }
