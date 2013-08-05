@@ -1,4 +1,5 @@
 #include "Geometry.h"
+#include "Bound.h"
 
 void Geometry::createVertexBuffer(void* vertexData)
 {
@@ -140,7 +141,7 @@ void Geometry::BuildGeometry(VertexType type)
 
 	createVertexDeclaration();
 
-	//calculateBoundingBox();		// TODO: 设备恢复时要调用BuildGeometry方法, 所以其他函数尽量别放在这里面
+	calculateAABBox();		// TODO: 设备恢复时要调用BuildGeometry方法, 所以其他函数尽量别放在这里面
 
 	if(needToDeleteVertexData)
 	{
@@ -1031,4 +1032,34 @@ wchar_t* Geometry::GetName()
 void Geometry::SetID(DWORD id)
 {
 	mID = id;
+}
+
+void Geometry::calculateAABBox()
+{
+	mAABBox.mMin = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+	mAABBox.mMax = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+
+	for(size_t i = 0; i < mPositionData.size(); ++i)
+	{
+		if(mPositionData[i].x > mAABBox.mMax.x)
+			mAABBox.mMax.x = mPositionData[i].x;
+		if(mPositionData[i].x < mAABBox.mMin.x)
+			mAABBox.mMin.x = mPositionData[i].x;
+
+
+		if(mPositionData[i].y > mAABBox.mMax.y)
+			mAABBox.mMax.y = mPositionData[i].y;
+		if(mPositionData[i].y < mAABBox.mMin.y)
+			mAABBox.mMin.y = mPositionData[i].y;
+
+		if(mPositionData[i].z > mAABBox.mMax.z)
+			mAABBox.mMax.z = mPositionData[i].z;
+		if(mPositionData[i].z < mAABBox.mMin.z)
+			mAABBox.mMin.z = mPositionData[i].z;
+	}
+}
+
+AABBox Geometry::GetAABBox()
+{
+	return mAABBox;
 }

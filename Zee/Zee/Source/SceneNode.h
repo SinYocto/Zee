@@ -2,6 +2,7 @@
 #define SCENE_NODE_H
 
 #include "Object.h"
+#include "Bound.h"
 
 class Camera;
 
@@ -14,13 +15,23 @@ public:
 		SOLID
 	};
 
+	struct Attribute
+	{
+		DISPLAY_MODE displayMode;
+		bool isStatic;
+		bool drawBBox;
+	};
+
 public:
 	SceneNode(const wchar_t* name, SceneNode* parent = NULL, Vector3 position = Vector3::Zero, 
 		Quaternion orient = Quaternion(0, 0, 0))
 		:Object(parent, position, orient)
-		,mDisplayMode(SOLID)
 	{
 		YString::Copy(mName, _countof(mName), name);
+
+		mAttribute.displayMode = SOLID;
+		mAttribute.isStatic = false;
+		mAttribute.drawBBox = false;
 	}
 
 	~SceneNode()
@@ -30,6 +41,11 @@ public:
 
 	void SetID(DWORD id);
 	void Detach();
+
+	void EnableBBoxDrawer(bool enalbe);
+	void SetDisplayMode(DISPLAY_MODE displayMode);
+
+	AABBox GetAABBox();
 
 	virtual void Draw(Camera* camera)
 	{
@@ -44,7 +60,9 @@ protected:
 	DWORD mID;
 	wchar_t mName[MAX_STR_LEN];
 
-	DISPLAY_MODE mDisplayMode;
+	AABBox mAABBox;
+
+	Attribute mAttribute;
 };
 
 #endif

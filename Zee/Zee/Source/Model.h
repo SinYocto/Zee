@@ -55,6 +55,8 @@ public:
 		{
 			mesh->SetParent(this);
 			mSubMeshes.push_back(mesh);
+
+			mAABBox = AABBox::CombineBBox(mAABBox, mesh->GetAABBox());
 		}
 	}
 

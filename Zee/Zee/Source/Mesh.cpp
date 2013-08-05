@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "DebugDrawer.h"
 
 void Mesh::Draw(Camera* camera)
 {
@@ -9,15 +10,22 @@ void Mesh::Draw(Camera* camera)
 
 	_Assert(NULL != camera);
 
-	switch(mDisplayMode)
+	switch(mAttribute.displayMode)
 	{
 	case WIRE_FRAME:
-		Driver::D3DDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_WIREFRAME );
+		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 		break;
 	case SOLID:
-		Driver::D3DDevice->SetRenderState( D3DRS_FILLMODE, D3DFILL_SOLID );
+		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 		break;
 	}
 
 	mMaterial->Render(this, mGeo, camera);
+
+	Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+
+	if(mAttribute.drawBBox)
+	{
+		DebugDrawer::DrawAABBox(mAABBox, 0xffff0000, camera);
+	}
 }

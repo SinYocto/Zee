@@ -17,6 +17,7 @@ public:
 		if(NULL != mGeo)
 		{
 			mGeo->Grab();
+			mAABBox = mGeo->GetAABBox();
 		}
 
 		if(NULL != mMaterial)

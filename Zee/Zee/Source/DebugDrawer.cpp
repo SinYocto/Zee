@@ -111,3 +111,72 @@ bool DebugDrawer::DrawSquare( const Vector3& center, const Vector3& normal, floa
 Exit:
 	return isSucceed;
 }
+
+bool DebugDrawer::DrawBox(const Vector3& center, const Quaternion& rotation, const Vector3& size, D3DCOLOR color, Camera* camera)
+{
+	bool isSucceed = false;
+
+	{
+		Assert(NULL != camera);
+
+		std::vector<Vector3> points;
+		points.reserve(8);
+
+		float posX = size.x / 2;
+		float negX = - size.x / 2;
+
+		float posY = size.y / 2;
+		float negY = - size.y / 2;
+
+		float posZ = size.z / 2;
+		float negZ = - size.z / 2;
+
+		points.push_back(Vector3(negX, posY, posZ));
+		points.push_back(Vector3(posX, posY, posZ));
+		points.push_back(Vector3(negX, posY, negZ));
+		points.push_back(Vector3(posX, posY, negZ));
+
+		points.push_back(Vector3(negX, negY, posZ));
+		points.push_back(Vector3(posX, negY, posZ));
+		points.push_back(Vector3(negX, negY, negZ));
+		points.push_back(Vector3(posX, negY, negZ));
+
+		for(size_t i = 0; i < points.size(); ++i)
+		{
+			points[i] = points[i] * rotation;
+			points[i] += center;
+		}
+
+		std::vector<Vector3> pointSets;
+		pointSets.push_back(points[0]);
+		pointSets.push_back(points[1]);
+		pointSets.push_back(points[3]);
+		pointSets.push_back(points[2]);
+		pointSets.push_back(points[0]);
+		pointSets.push_back(points[4]);
+		pointSets.push_back(points[6]);
+		pointSets.push_back(points[7]);
+		pointSets.push_back(points[5]);
+		pointSets.push_back(points[4]);
+		pointSets.push_back(points[6]);
+		pointSets.push_back(points[2]);
+		pointSets.push_back(points[3]);
+		pointSets.push_back(points[7]);
+		pointSets.push_back(points[5]);
+		pointSets.push_back(points[1]);
+
+		Assert(DrawLine(pointSets, color, camera));
+	}
+
+	isSucceed = true;
+Exit:
+	return isSucceed;
+}
+
+bool DebugDrawer::DrawAABBox(const AABBox& box, D3DCOLOR color, Camera* camera)
+{
+	Vector3 center = 0.5f * (box.mMin + box.mMax);
+	Vector3 size = box.mMax - box.mMin;
+
+	return DrawBox(center, Quaternion(0, 0, 0), size, 0xffff0000, camera);
+}

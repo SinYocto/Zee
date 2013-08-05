@@ -3,6 +3,7 @@
 
 #include "D3DUtility.h"
 #include "IReferenceCounted.h"
+#include "Bound.h"
 
 // #资源管理
 // 设备丢失时要释放VertexBuffer, IndexBuffer, VertexDeclaration(这个不确定)资源, 恢复时重建
@@ -15,6 +16,8 @@
 // 现在要改为: 各个data独立, 不必保证同一下标同一顶点。对于每项顶点数据, 单独使用一个FaceIndex
 // 这样对于任意一个面, 独立使用各项数据的index来构建总的顶点数据, 优点是节省了单个data数组的空间, 
 // 但增加了最终构建的顶点数据占用的空间大小(最终构建的顶点数为3*numTrianges, 无需indexData, index为0, 1, 2, 3, 4, 5, ...)
+
+class AABBox;
 
 class Geometry : public IReferenceCounted
 {
@@ -105,6 +108,8 @@ public:
 	void SetVertexDeclaration();
 	void SetVertexStream();
 
+	AABBox GetAABBox();
+
 	void Draw();
 
 protected:
@@ -141,7 +146,7 @@ private:
 	void calculateTriangleTangent(const Triangle& triangle, Vector3* tangent);
 	void calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangent);
 
-	//void calculateBoundingBox();
+	void calculateAABBox();
 
 public:
 	// TODO:OBJParser要更改这些数据, 暂时设为public
@@ -165,7 +170,7 @@ private:
 	VertexType mVertexType;
 	IDirect3DVertexDeclaration9 *mVertexDecl;
 
-	//BoundingBox mBoundingBox;
+	AABBox mAABBox;
 };
 
 

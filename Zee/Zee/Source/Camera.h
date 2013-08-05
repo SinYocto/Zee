@@ -33,7 +33,7 @@ public:
 		return mMatProj;
 	}
 
-	bool IsVisible(BoundingBox boundingBox);
+	bool IsVisible(AABBox boundingBox);
 
 
 	void SetTransformDirty(bool isDirty)

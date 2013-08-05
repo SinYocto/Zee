@@ -101,6 +101,8 @@ int main(int argc, char* argv[])
 
 	// model
 	Model* cubeModel = new Model(L"cubeModel", SceneManager::root, cylinder1, mtl2);
+	cubeModel->EnableBBoxDrawer(true);
+	cubeModel->SetDisplayMode(SceneNode::WIRE_FRAME);
 
 	// line test
 	std::vector<Vector3> points;
@@ -135,7 +137,8 @@ int main(int argc, char* argv[])
 
 				DebugDrawer::DrawLine(points, 0xffff0000, SceneManager::mainCamera);
 				DebugDrawer::DrawCircle(Vector3(4, 4, 0), Vector3(1, 1, 1), 1, 0xffff0000, SceneManager::mainCamera);
-				DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, 1), 1, 0xffff0000, SceneManager::mainCamera);
+				DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, 1), 1, 0xffff0000, SceneManager::mainCamera); 
+				DebugDrawer::DrawBox(Vector3::Zero, Quaternion(0, 0, 0), Vector3(1,1,1), 0xffff0000, SceneManager::mainCamera);
 
 				//cubeModel->Draw(SceneManager::mainCamera);
 				SceneManager::DrawAll();
