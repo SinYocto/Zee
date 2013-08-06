@@ -46,7 +46,7 @@ public:
 		mIsParametersDirty = isDirty;
 	}
 
-	void Update()
+	void FrameUpdate()
 	{
 		if(mIsParametersDirty)
 		{

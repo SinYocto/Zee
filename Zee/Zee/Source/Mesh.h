@@ -17,7 +17,7 @@ public:
 		if(NULL != mGeo)
 		{
 			mGeo->Grab();
-			mAABBox = mGeo->GetAABBox();
+			mGeo->CalcDynamicAABBox(mWorldPos, mWorldOrient, &mAABBox);
 		}
 
 		if(NULL != mMaterial)
@@ -32,7 +32,10 @@ public:
 		SAFE_DROP(mMaterial);
 	}
 
-	void Draw(Camera* camera);
+	virtual void Draw(Camera* camera);
+
+private:
+	virtual void calCurrentAABBox();
 
 private:
 	Geometry* mGeo;

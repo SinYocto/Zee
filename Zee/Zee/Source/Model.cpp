@@ -9,13 +9,19 @@ void Model::LoadModelDataFromFile(wchar_t* filename, ModelFileFormat format)
 
 void Model::Draw(Camera* camera)
 {
-	for(std::list<Mesh*>::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter)
-	{
-		(*iter)->Draw(camera);
-	}
-
-	if(mAttribute.drawBBox)
+	if(mAttribute.drawBBox && mAABBox.isValid())
 	{
 		DebugDrawer::DrawAABBox(mAABBox, 0xffff0000, camera);
+	}
+}
+
+void Model::calCurrentAABBox()
+{
+	mAABBox = AABBox::Invalid;
+
+	for(std::list<Mesh*>::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter)
+	{
+		Mesh* mesh = *iter;
+		mAABBox = AABBox::CombineBBox(mAABBox, mesh->GetAABBox());
 	}
 }

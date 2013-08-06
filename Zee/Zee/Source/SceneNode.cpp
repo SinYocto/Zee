@@ -12,9 +12,9 @@ void SceneNode::Detach()
 	SetParent(SceneManager::root);
 }
 
-void SceneNode::EnableBBoxDrawer(bool enalbe)
+void SceneNode::SetDrawBBoxFlag(bool drawBBox)
 {
-	mAttribute.drawBBox = enalbe;
+	mAttribute.drawBBox = drawBBox;
 }
 
 AABBox SceneNode::GetAABBox()
@@ -31,6 +31,22 @@ void SceneNode::SetDisplayMode(DISPLAY_MODE displayMode)
 		// QUESTION:会不会因此反复重复设置渲染状态引起渲染效率降低?
 		SceneNode* node = static_cast<SceneNode*>(*iter);
 		node->SetDisplayMode(displayMode);
+	}
+}
+
+void SceneNode::SetStaticFlag(bool isStatic)
+{
+	mAttribute.isStatic = isStatic;
+}
+
+void SceneNode::FrameUpdate()
+{
+	calCurrentAABBox();		// TODO:当前没管sceneNode的isStatic标志, 通通都更新计算AABB
+
+	for(std::list<Object*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
+	{
+		SceneNode* node = static_cast<SceneNode*>(*iter);
+		node->FrameUpdate();
 	}
 }
 

@@ -109,6 +109,7 @@ public:
 	void SetVertexStream();
 
 	AABBox GetAABBox();
+	void CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, AABBox* box);
 
 	void Draw();
 

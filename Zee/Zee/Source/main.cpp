@@ -101,8 +101,12 @@ int main(int argc, char* argv[])
 
 	// model
 	Model* cubeModel = new Model(L"cubeModel", SceneManager::root, cylinder1, mtl2);
-	cubeModel->EnableBBoxDrawer(true);
+	cubeModel->SetDrawBBoxFlag(true);
 	cubeModel->SetDisplayMode(SceneNode::WIRE_FRAME);
+
+	Mesh* cubeMesh = new Mesh(L"cubeMesh", cubeModel, cube1, mtl2);
+	cubeMesh->Translate(2, 0, 0);
+	cubeModel->AddSubMesh(cubeMesh);
 
 	// line test
 	std::vector<Vector3> points;
@@ -129,7 +133,7 @@ int main(int argc, char* argv[])
 
 				ApplyFPCameraControllor(SceneManager::mainCamera, Time::deltaTime);
 
-				SceneManager::Update();
+				SceneManager::FrameUpdate();
 
 				// render
 				Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff1e90ff);

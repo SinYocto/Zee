@@ -1046,7 +1046,6 @@ void Geometry::calculateAABBox()
 		if(mPositionData[i].x < mAABBox.mMin.x)
 			mAABBox.mMin.x = mPositionData[i].x;
 
-
 		if(mPositionData[i].y > mAABBox.mMax.y)
 			mAABBox.mMax.y = mPositionData[i].y;
 		if(mPositionData[i].y < mAABBox.mMin.y)
@@ -1062,4 +1061,34 @@ void Geometry::calculateAABBox()
 AABBox Geometry::GetAABBox()
 {
 	return mAABBox;
+}
+
+void Geometry::CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, AABBox* box)
+{
+	_Assert(NULL != box);
+
+	box->mMin = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
+	box->mMax = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+
+	for(size_t i = 0; i < mPositionData.size(); ++i)
+	{
+		Vector3 vertPos = mPositionData[i];
+		vertPos = vertPos * orient;
+		vertPos += pos;
+
+		if(vertPos.x > box->mMax.x)
+			box->mMax.x = vertPos.x;
+		if(vertPos.x < box->mMin.x)
+			box->mMin.x = vertPos.x;
+
+		if(vertPos.y > box->mMax.y)
+			box->mMax.y = vertPos.y;
+		if(vertPos.y < box->mMin.y)
+			box->mMin.y = vertPos.y;
+
+		if(vertPos.z > box->mMax.z)
+			box->mMax.z = vertPos.z;
+		if(vertPos.z < box->mMin.z)
+			box->mMin.z = vertPos.z;
+	}
 }

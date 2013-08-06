@@ -35,11 +35,13 @@ void SceneManager::SetMainCamera( const Vector3 pos /*= Vector3(0, 0, -200)*/, c
 void SceneManager::DrawAll()
 {
 	_Assert(NULL != mainCamera);
-	root->Draw(mainCamera);
+	root->DrawAll(mainCamera);
 }
 
-void SceneManager::Update()
+void SceneManager::FrameUpdate()
 {
 	_Assert(NULL != mainCamera);
-	mainCamera->Update();
+	mainCamera->FrameUpdate();
+
+	root->FrameUpdate();
 }

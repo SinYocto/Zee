@@ -24,8 +24,14 @@ void Mesh::Draw(Camera* camera)
 
 	Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
-	if(mAttribute.drawBBox)
+	if(mAttribute.drawBBox && mAABBox.isValid())
 	{
 		DebugDrawer::DrawAABBox(mAABBox, 0xffff0000, camera);
 	}
+}
+
+void Mesh::calCurrentAABBox()
+{
+	_Assert(NULL != mGeo);
+	mGeo->CalcDynamicAABBox(mWorldPos, mWorldOrient, &mAABBox);
 }

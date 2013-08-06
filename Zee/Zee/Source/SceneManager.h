@@ -15,7 +15,7 @@ public:
 	static void Destory();
 	static void AddSceneNode(SceneNode* node, SceneNode* parent);
 
-	static void Update();
+	static void FrameUpdate();
 
 	static void DrawAll();
 

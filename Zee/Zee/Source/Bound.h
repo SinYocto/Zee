@@ -21,12 +21,15 @@ public:
 
 	Vector3 GetVertex(int ix);
 	bool isPointInside(Vector3 vert);
+	bool isValid();
 
 	static AABBox CombineBBox(const AABBox& box1, const AABBox& box2);
 
 public:
 	Vector3 mMin;
 	Vector3 mMax;
+
+	static AABBox Invalid;
 };
 
 

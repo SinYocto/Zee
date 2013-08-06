@@ -30,7 +30,7 @@ public:
 		YString::Copy(mName, _countof(mName), name);
 
 		mAttribute.displayMode = SOLID;
-		mAttribute.isStatic = false;
+		mAttribute.isStatic = true;
 		mAttribute.drawBBox = false;
 	}
 
@@ -42,18 +42,34 @@ public:
 	void SetID(DWORD id);
 	void Detach();
 
-	void EnableBBoxDrawer(bool enalbe);
+	void SetDrawBBoxFlag(bool drawBBox);
+	void SetStaticFlag(bool isStatic);
 	void SetDisplayMode(DISPLAY_MODE displayMode);
 
 	AABBox GetAABBox();
 
+	void FrameUpdate();
+
 	virtual void Draw(Camera* camera)
 	{
+		return;
+	}
+
+	void DrawAll(Camera* camera)
+	{
+		Draw(camera);
+
 		for(std::list<Object*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
 		{
 			SceneNode* node = static_cast<SceneNode*>(*iter);
-			node->Draw(camera);
+			node->DrawAll(camera);
 		}
+	}
+
+protected:
+	virtual void calCurrentAABBox()
+	{
+
 	}
 
 protected:

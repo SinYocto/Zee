@@ -1,5 +1,7 @@
 #include"Bound.h"
 
+AABBox AABBox::Invalid(Vector3(FLT_MAX, FLT_MAX, FLT_MAX), Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
+
 AABBox::AABBox(const Vector3& min /*= Vector3(FLT_MAX, FLT_MAX, FLT_MAX)*/, 
 			   const Vector3& max /*= Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX)*/)
 {
@@ -81,6 +83,20 @@ AABBox AABBox::CombineBBox(const AABBox& box1, const AABBox& box2)
 		resultBox.mMax.z = box2.mMax.z;
 
 	return resultBox;
+}
+
+bool AABBox::isValid()
+{
+	if(mMin.x >= mMax.x)
+		return false;
+
+	if(mMin.y >= mMax.y)
+		return false;
+
+	if(mMin.z >= mMax.z)
+		return false;
+
+	return true;
 }
 
 Ray::Ray(const Vector3& pos /*= Vector3::Zero*/, const Vector3& dir /*= Vector3(0, 0, 1)*/)

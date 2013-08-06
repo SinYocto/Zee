@@ -62,7 +62,10 @@ public:
 
 	void LoadModelDataFromFile(wchar_t* filename, ModelFileFormat format);
 
-	void Draw(Camera* camera);
+	virtual void Draw(Camera* camera);
+
+private:
+	virtual void calCurrentAABBox();
 
 private:
 	std::list<Mesh*> mSubMeshes;
