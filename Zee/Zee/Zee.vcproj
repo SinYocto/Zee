@@ -301,6 +301,38 @@
 					RelativePath=".\Source\Shader.h"
 					>
 				</File>
+				<Filter
+					Name="Shaders"
+					>
+					<File
+						RelativePath=".\Source\Shaders\BumpSpecular.fx"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Shaders\Diffuse.fx"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Shaders\Specular.fx"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Shaders\Utility.fx"
+						>
+					</File>
+					<Filter
+						Name="Headers"
+						>
+						<File
+							RelativePath=".\Source\Shaders\CommonEnv.h"
+							>
+						</File>
+						<File
+							RelativePath=".\Source\Shaders\LightsDefine.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

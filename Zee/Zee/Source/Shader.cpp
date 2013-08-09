@@ -6,7 +6,12 @@
 #include "LightManager.h"
 
 // DiffuseShader
+LPD3DXEFFECTPOOL UtilityShader::pool = NULL;
+LPD3DXEFFECT UtilityShader::effect = NULL;
+
 LPD3DXEFFECT DiffuseShader::mEffect = NULL;
+LPD3DXEFFECT SpecularShader::mEffect = NULL;
+LPD3DXEFFECT BumpSpecularShader::mEffect = NULL;
 
 void DiffuseShader::SetColorTex(wchar_t* texFileName)
 {
@@ -47,11 +52,6 @@ void DiffuseShader::Render(Object* object, Geometry* geo, Camera* camera)
 	DiffuseShader::mEffect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
 	DiffuseShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
 
-	DiffuseShader::mEffect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
-	DiffuseShader::mEffect->SetRawValue("directionalLights", LightManager::directionalLightsData, 
-		0, sizeof(LightManager::directionalLightsData));
-	DiffuseShader::mEffect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
-
 	if(NULL == mMaterial->GetTexture(0))
 	{
 		DiffuseShader::mEffect->SetBool("useColorTex", false);
@@ -75,8 +75,6 @@ void DiffuseShader::Render(Object* object, Geometry* geo, Camera* camera)
 }
 
 // SpecularShader
-LPD3DXEFFECT SpecularShader::mEffect = NULL;
-
 void SpecularShader::SetColorTex(wchar_t* texFileName)
 {
 	mMaterial->SetTexture(0, texFileName);
@@ -134,10 +132,6 @@ void SpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 
 	SpecularShader::mEffect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));
 
-	SpecularShader::mEffect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
-	SpecularShader::mEffect->SetRawValue("directionalLights", LightManager::directionalLightsData, 0, sizeof(LightManager::directionalLightsData));
-	SpecularShader::mEffect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
-
 	if(NULL == mMaterial->GetTexture(0))
 	{
 		SpecularShader::mEffect->SetBool("useColorTex", false);
@@ -163,8 +157,6 @@ void SpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 }
 
 // BumpSpecularShader
-LPD3DXEFFECT BumpSpecularShader::mEffect = NULL;
-
 void BumpSpecularShader::SetColorTex(wchar_t* texFileName)
 {
 	mMaterial->SetTexture(0, texFileName);
@@ -226,10 +218,6 @@ void BumpSpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 
 	BumpSpecularShader::mEffect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));
 
-	BumpSpecularShader::mEffect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
-	BumpSpecularShader::mEffect->SetRawValue("directionalLights", LightManager::directionalLightsData, 0, sizeof(LightManager::directionalLightsData));
-	BumpSpecularShader::mEffect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
-
 	BumpSpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
 	BumpSpecularShader::mEffect->SetTexture("normalTex", mMaterial->GetTexture(1));
 
@@ -245,4 +233,13 @@ void BumpSpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 
 	BumpSpecularShader::mEffect->EndPass();
 	BumpSpecularShader::mEffect->End();
+}
+
+void UtilityShader::SetupSharedParams()
+{
+	_Assert(NULL != effect);
+
+	effect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
+	effect->SetRawValue("directionalLights", LightManager::directionalLightsData, 0, sizeof(LightManager::directionalLightsData));
+	effect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
 }

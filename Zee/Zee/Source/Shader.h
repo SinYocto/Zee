@@ -15,6 +15,36 @@ class Camera;
 class Object;
 class Geometry;
 
+struct UtilityShader
+{
+	static void OnLostDevice()
+	{
+		effect->OnLostDevice();
+	}
+
+	static void OnResetDevice()
+	{
+		effect->OnResetDevice();
+	}
+
+	static void CreateEffectPool()
+	{
+		HRESULT hr = D3DXCreateEffectPool(&pool);
+		_Assert(SUCCEEDED(hr));
+	}
+
+	static void CreateEffectFromFile(wchar_t* FXFileName)
+	{
+		_Assert(NULL != pool);
+		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, pool, &effect, NULL);
+	}
+
+	static void SetupSharedParams();
+
+	static LPD3DXEFFECTPOOL pool;		// QUESTION:release?
+	static LPD3DXEFFECT effect;
+};
+
 interface IShader
 {
 public:
@@ -65,6 +95,16 @@ public:
 	}
 };
 
+class FlatShader : public IShader
+{
+
+};
+
+class ViewShader : public IShader
+{
+
+};
+
 class DiffuseShader : public IShader
 {
 public:
@@ -86,7 +126,8 @@ public:
 
 	static void CreateEffectFromFile(wchar_t* FXFileName)
 	{
-		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
+		_Assert(NULL != UtilityShader::pool);
+		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -127,7 +168,8 @@ public:
 
 	static void CreateEffectFromFile(wchar_t* FXFileName)
 	{
-		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
+		_Assert(NULL != UtilityShader::pool);
+		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -172,7 +214,8 @@ public:
 
 	static void CreateEffectFromFile(wchar_t* FXFileName)
 	{
-		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, NULL, &mEffect, NULL);
+		_Assert(NULL != UtilityShader::pool);
+		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
 	}
 
 	void SetColorTex(wchar_t* texFileName);

@@ -1,5 +1,10 @@
 #include "MaterialManager.h"
 
+Material* MaterialManager::flatMtl = NULL;
+Material* MaterialManager::viewMtl = NULL;
+Material* MaterialManager::diffMtl = NULL;
+Material* MaterialManager::specMtl = NULL;
+
 std::list<Material*> MaterialManager::resourceList;
 DWORD MaterialManager::curID = 0;
 
@@ -41,6 +46,10 @@ void MaterialManager::GetMaterial(const wchar_t* name, Material** material)
 void MaterialManager::Init()
 {
 	// QUESTION:effectÒª²»Òªrelease?
+	UtilityShader::CreateEffectPool();
+	UtilityShader::CreateEffectFromFile(TEXT("./Source/Shaders/Utility.fx"));	
+	_Assert(NULL != UtilityShader::effect);
+
 	DiffuseShader::CreateEffectFromFile(TEXT("./Source/Shaders/Diffuse.fx"));	// time used: 124ms
 	_Assert(NULL != DiffuseShader::mEffect);
 
@@ -49,4 +58,25 @@ void MaterialManager::Init()
 
 	BumpSpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/BumpSpecular.fx"));		// time used: 248ms
 	_Assert(NULL != BumpSpecularShader::mEffect);
+}
+
+void MaterialManager::OnLostDevice()
+{
+	UtilityShader::OnLostDevice();
+	DiffuseShader::OnLostDevice();
+	SpecularShader::OnLostDevice();
+	BumpSpecularShader::OnLostDevice();
+}
+
+void MaterialManager::OnResetDevice()
+{
+	UtilityShader::OnResetDevice();
+	DiffuseShader::OnResetDevice();
+	SpecularShader::OnResetDevice();
+	BumpSpecularShader::OnResetDevice();
+}
+
+void MaterialManager::FrameUpdate()
+{
+	UtilityShader::SetupSharedParams();
 }

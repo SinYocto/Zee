@@ -1,6 +1,5 @@
 // Diffuse.fx
-
-#include"LightsDefine.fx"
+#include "CommonEnv.h"
 
 float4x4 matWVP;
 float4x4 matWorld;
@@ -10,10 +9,6 @@ float4 mtlDiffuse;
 
 bool useColorTex;
 texture colorTex;
-
-AmbientLight ambientLight;
-DirectionalLight directionalLights[MAX_NUM_DIRECTIONAL_LIGHTS];
-PointLight pointLights[MAX_NUM_POINT_LIGHTS];
 
 sampler ColorS = sampler_state
 {

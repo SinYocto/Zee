@@ -8,6 +8,11 @@ class MaterialManager
 public:
 	static void Init();
 
+	static void OnLostDevice();
+	static void OnResetDevice();
+
+	static void FrameUpdate();
+
 	static void AddMaterial(Material* material);
 	static void DeleteAll();
 	static void GetMaterial(const wchar_t* name, Material** material);
@@ -15,6 +20,11 @@ public:
 private:
 	static std::list<Material*> resourceList;
 	static DWORD curID;
+
+	static Material* flatMtl;
+	static Material* viewMtl;
+	static Material* diffMtl;
+	static Material* specMtl;
 };
 
 

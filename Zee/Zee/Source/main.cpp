@@ -60,13 +60,9 @@ int main(int argc, char* argv[])
 
 	// lights
 	DirectionalLight dirLight1(L"dirLight1", D3DXCOLOR_RED, Vector3(1.0f, -1.0f, 1.0f));
-	DirectionalLight dirLight2(L"dirLight2");
-
-	PointLight pointLight1(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(-4.0f, 0, 0), Vector3(1.0f, 0, 0));
-	PointLight pointLight2(L"pointLight2");
+	PointLight pointLight1(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(0, 0, 0), Vector3(1.0f, 0, 0));
 
 	LightManager::SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
-	pointLight1.Enable(false);
 
 	LightManager::AddDirectionalLight(&dirLight1);
 	LightManager::AddPointLight(&pointLight1);
@@ -99,14 +95,22 @@ int main(int argc, char* argv[])
 	mtl2->SetShader(Diffuse);
 	//mtl2->shader->SetColorTex(L"./Assets/Textures/6133.jpg");
 
-	// model
-	Model* cubeModel = new Model(L"cubeModel", SceneManager::root, cylinder1, mtl2);
-	cubeModel->SetDrawBBoxFlag(true);
-	cubeModel->SetDisplayMode(SceneNode::WIRE_FRAME);
+	Material* mtl3 = new Material(L"mtl3");
+	MaterialManager::AddMaterial(mtl3);
 
-	Mesh* cubeMesh = new Mesh(L"cubeMesh", cubeModel, cube1, mtl2);
-	cubeMesh->Translate(2, 0, 0);
-	cubeModel->AddSubMesh(cubeMesh);
+	mtl3->SetShader(Specular);
+	mtl3->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
+	mtl3->mShader->SetSpecShiness(0.4f);
+
+	// model
+	Model* cubeModel1 = new Model(L"cubeModel1", SceneManager::root, cube1, mtl1);
+	cubeModel1->Translate(2, 0, 0);
+
+	Model* cubeModel2 = new Model(L"cubeModel2", SceneManager::root, cube1, mtl3);
+	cubeModel2->Translate(-2, 0, 0);
+
+	Model* cylinderModel = new Model(L"cylinderModel", SceneManager::root, cylinder1, mtl2);
+	cylinderModel->Translate(0, 0, 2);
 
 	// line test
 	std::vector<Vector3> points;
@@ -134,6 +138,7 @@ int main(int argc, char* argv[])
 				ApplyFPCameraControllor(SceneManager::mainCamera, Time::deltaTime);
 
 				SceneManager::FrameUpdate();
+				MaterialManager::FrameUpdate();
 
 				// render
 				Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff1e90ff);
