@@ -7,17 +7,35 @@ shared AmbientLight ambientLight;
 shared DirectionalLight directionalLights[MAX_NUM_DIRECTIONAL_LIGHTS];
 shared PointLight pointLights[MAX_NUM_POINT_LIGHTS];
 
-void CalORadianceAmbient(inout float4 oRadiance, AmbientLight ambientLight, float4 Ka)
+void CalORadianceAmbient(inout float4 oRadiance, float4 ambientRadiance, float4 Ka)
 {
-	oRadiance += Ka * ambientLight.color;
+	oRadiance += Ka * ambientRadiance;
 }
 
-void CalDirLightORadianceDiff(INOUT float4 oRadiance, DirectionalLight dirLight, float3 normal, float4 Kd)
+void CalORadianceLambert(inout float4 oRadiance, float4 lRadiance, float3 dirL, float3 normal, float4 Kd)
 {
-	float3 lightDir = normalize(-dirLight.dir);
-	float cosTheta = saturate(dot(lightDir, normal)); 
+	dirL = normalize(-dirL);
+	float cosTi = saturate(dot(dirL, normal)); 
 
-	oRadiance += Kd * dirLight.color * cosTheta;
+	oRadiance += Kd * lRadiance * cosTi;
+}
+
+void CalORadianceBlinnPhong(inout float4 oRadiance, float4 lRadiance, float3 dirL, float3 normal, 
+								  float3 dirV, float4 Kd, float4 Ks, float Ns)
+{
+	dirL = normalize(-dirL);
+	float3 halfVec = normalize(dirL + dirV);
+
+	float cosTi = saturate(dot(dirL, normal)); 
+	float cosTh = saturate(dot(halfVec, normal));
+
+	oRadiance += (Kd + Ks * pow(cosTh, Ns)) * lRadiance * cosTi;
+}
+
+float CalAttenuation(float3 posW, float3 posL, float3 attenFactor)
+{
+	float dist = length(posW - posL);
+	return 1 / (attenFactor.x + attenFactor.y * dist + attenFactor.z * dist * dist);
 }
 
 #endif

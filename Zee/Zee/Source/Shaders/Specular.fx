@@ -9,6 +9,7 @@ float4x4 matUVTransform;
 
 bool useColorTex;
 texture colorTex;
+
 float4 mtlAmbient;
 float4 mtlDiffuse;
 float4 mtlSpec;
@@ -27,69 +28,71 @@ sampler ColorS = sampler_state
     AddressV  = WRAP;
 };
 
-void SpecularVS(float3 Pos : POSITION0, 
-			float2 Tex : TEXCOORD0,
-			float3 Normal : NORMAL0,
-			out float4 oPos  : POSITION0, 
-			out float2 oTex : TEXCOORD0,
-			out float3 oNormal : TEXCOORD1,
-			out float3 oPosW : TEXCOORD2)
+struct VS_IN
 {
-	oPos = mul(float4(Pos, 1.0f), matWVP);
-	oPosW = (mul(float4(Pos, 1.0f), matWorld)).xyz;
-	oTex = (mul(float4(Tex, 0, 1.0f), matUVTransform)).xy;
-	oNormal = (mul(float4(Normal, 0), matWorld)).xyz;
+	float3 pos : POSITION0;
+	float2 tex : TEXCOORD0;
+	float3 normal : NORMAL0;
+};
+
+struct VS_OUT
+{
+	float4 pos : POSITION0;
+	float2 tex : TEXCOORD0;
+	float3 normal : TEXCOORD1;
+	float3 posW : TEXCOORD2;
+};
+
+VS_OUT SpecularVS(VS_IN vIn)
+{
+	VS_OUT vOut;
+
+	vOut.pos = mul(float4(vIn.pos, 1.0f), matWVP);
+	vOut.posW = (mul(float4(vIn.pos, 1.0f), matWorld)).xyz;
+	vOut.tex = (mul(float4(vIn.tex, 0, 1.0f), matUVTransform)).xy;
+	vOut.normal = (mul(float4(vIn.normal, 0), matWorld)).xyz;
+
+	return vOut;
 }
 
-float4 SpecularPS(float2 Tex : TEXCOORD0, 
-				  float3 Normal : TEXCOORD1, 
+float4 SpecularPS(float2 tex : TEXCOORD0, 
+				  float3 normal : TEXCOORD1, 
 				  float3 posW : TEXCOORD2) : COLOR0
 {
-	float4 totalDiffuse = float4(0, 0, 0, 1);
-	float4 totalSpec = float4(0, 0, 0, 1);
+	float4 oColor = float4(0, 0, 0, 1);
+
+	float3 dirV = normalize(eyePos - posW);
+	normal = normalize(normal);
 	
-	float3 eyeDir = normalize(eyePos - posW);
-	Normal = normalize(Normal);
-	
-	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i){
-		float3 lightDir = normalize(-directionalLights[i].dir);
-		float3 halfVec = normalize(lightDir + eyeDir);
-		
-		float diffuse = saturate(dot(lightDir, Normal)); 
-		float spec;
-		if(dot(lightDir, Normal) > 0)
-			spec = pow(saturate(dot(halfVec, Normal)), gloss);
-		else
-			spec = 0;
-		
-		totalDiffuse += diffuse * directionalLights[i].color;
-		totalSpec += spec * directionalLights[i].color;
+	float4 Ka = mtlAmbient;
+	float4 Kd = mtlDiffuse;
+	float4 Ks = mtlSpec;
+	float Ns = gloss;
+
+	if(useColorTex)
+	{
+		float4 texColor = tex2D(ColorS, tex);
+
+		Ka *= texColor;
+		Kd *= texColor;
 	}
 	
-	for(int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i){
-		float3 lightDir = normalize(pointLights[i].position - posW);
-		float3 halfVec = normalize(lightDir + eyeDir);
+	CalORadianceAmbient(oColor, ambientLight.color, Ka);
+
+	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
+	{
+		CalORadianceBlinnPhong(oColor, directionalLights[i].color, directionalLights[i].dir, normal, dirV, Kd, Ks, Ns);
+	}
+	
+	for(int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i)
+	{	
+		float3 dirL = posW - pointLights[i].position;
+		float atten = CalAttenuation(posW, pointLights[i].position, pointLights[i].atten);
 		
-		float diffuse = saturate(dot(lightDir, Normal));
-		float spec;
-		if(dot(lightDir, Normal) > 0)
-			spec = pow(saturate(dot(halfVec, Normal)), gloss);
-		else
-			spec = 0;
-			
-		float distance = length(posW - pointLights[i].position);
-		float attenuation = 1 / (pointLights[i].atten.x + pointLights[i].atten.y * distance + pointLights[i].atten.z * distance * distance);
-		
-		totalDiffuse += attenuation * diffuse * pointLights[i].color;
-		totalSpec += attenuation * spec * pointLights[i].color;
+		CalORadianceBlinnPhong(oColor, atten * pointLights[i].color, dirL, normal, dirV, Kd, Ks, Ns);
 	}
 
-	float4 texColor = float4(1, 1, 1, 1);
-	if(useColorTex)
-		texColor = tex2D(ColorS, Tex);
-	
-	float4 color = (mtlAmbient * ambientLight.color + mtlDiffuse * totalDiffuse) * texColor + mtlSpec * totalSpec;
-	return color;
+	return oColor;
 }
 
 technique Specular

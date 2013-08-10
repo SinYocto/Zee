@@ -218,7 +218,16 @@ void BumpSpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 
 	BumpSpecularShader::mEffect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));
 
-	BumpSpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
+	if(NULL == mMaterial->GetTexture(0))
+	{
+		BumpSpecularShader::mEffect->SetBool("useColorTex", false);
+	}
+	else
+	{
+		BumpSpecularShader::mEffect->SetBool("useColorTex", true);	
+		BumpSpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
+	}
+
 	BumpSpecularShader::mEffect->SetTexture("normalTex", mMaterial->GetTexture(1));
 
 	BumpSpecularShader::mEffect->SetRawValue("mtlAmbient", &(mMaterial->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
