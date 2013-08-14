@@ -102,14 +102,20 @@ int main(int argc, char* argv[])
 	mtl3->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
 	mtl3->mShader->SetSpecShiness(0.4f);
 
+	Material* mtl4 = new Material(L"mtl4");
+	MaterialManager::AddMaterial(mtl4);
+
+	mtl4->SetShader(View);
+	mtl4->SetDiffuseColor(D3DXCOLOR_RED);
+
 	// model
-	Model* cubeModel1 = new Model(L"cubeModel1", SceneManager::root, cube1, mtl1);
+	Model* cubeModel1 = new Model(L"cubeModel1", SceneManager::root, cube1, MaterialManager::diffMtl);
 	cubeModel1->Translate(2, 0, 0);
 
-	Model* cubeModel2 = new Model(L"cubeModel2", SceneManager::root, cube1, mtl3);
+	Model* cubeModel2 = new Model(L"cubeModel2", SceneManager::root, cube1, MaterialManager::flatMtl);
 	cubeModel2->Translate(-2, 0, 0);
 
-	Model* cylinderModel = new Model(L"cylinderModel", SceneManager::root, cylinder1, mtl2);
+	Model* cylinderModel = new Model(L"cylinderModel", SceneManager::root, cylinder1, mtl4);
 	cylinderModel->Translate(0, 0, 2);
 
 	// line test
@@ -291,10 +297,7 @@ void OnLostDevice()
 
 	gGUISystem.OnLostDevice();
 
-	DiffuseShader::OnLostDevice();
-	SpecularShader::OnLostDevice();
-	BumpSpecularShader::OnLostDevice();
-
+	MaterialManager::OnLostDevice();
 	GeometryManager::OnLostDevice();
 }
 
@@ -308,9 +311,6 @@ void OnResetDevice()
 
 	gGUISystem.OnResetDevice();
 
-	DiffuseShader::OnResetDevice();
-	SpecularShader::OnResetDevice();
-	BumpSpecularShader::OnResetDevice();
-
+	MaterialManager::OnResetDevice();
 	GeometryManager::OnResetDevice();
 }

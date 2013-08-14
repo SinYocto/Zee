@@ -25,6 +25,8 @@ void MaterialManager::DeleteAll()
 	}
 
 	resourceList.clear();
+
+	deleteDefaultMtls();
 }
 
 void MaterialManager::GetMaterial(const wchar_t* name, Material** material)
@@ -50,6 +52,12 @@ void MaterialManager::Init()
 	UtilityShader::CreateEffectFromFile(TEXT("./Source/Shaders/Utility.fx"));	
 	_Assert(NULL != UtilityShader::effect);
 
+	FlatShader::CreateEffectFromFile(TEXT("./Source/Shaders/Flat.fx"));	
+	_Assert(NULL != FlatShader::mEffect);
+
+	ViewShader::CreateEffectFromFile(TEXT("./Source/Shaders/View.fx"));	
+	_Assert(NULL != ViewShader::mEffect);
+
 	DiffuseShader::CreateEffectFromFile(TEXT("./Source/Shaders/Diffuse.fx"));	// time used: 124ms
 	_Assert(NULL != DiffuseShader::mEffect);
 
@@ -58,11 +66,15 @@ void MaterialManager::Init()
 
 	BumpSpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/BumpSpecular.fx"));		// time used: 248ms
 	_Assert(NULL != BumpSpecularShader::mEffect);
+
+	createDefaultMtls();
 }
 
 void MaterialManager::OnLostDevice()
 {
 	UtilityShader::OnLostDevice();
+	FlatShader::OnLostDevice();
+	ViewShader::OnLostDevice();
 	DiffuseShader::OnLostDevice();
 	SpecularShader::OnLostDevice();
 	BumpSpecularShader::OnLostDevice();
@@ -71,6 +83,8 @@ void MaterialManager::OnLostDevice()
 void MaterialManager::OnResetDevice()
 {
 	UtilityShader::OnResetDevice();
+	FlatShader::OnResetDevice();
+	ViewShader::OnResetDevice();
 	DiffuseShader::OnResetDevice();
 	SpecularShader::OnResetDevice();
 	BumpSpecularShader::OnResetDevice();
@@ -79,4 +93,31 @@ void MaterialManager::OnResetDevice()
 void MaterialManager::FrameUpdate()
 {
 	UtilityShader::SetupSharedParams();
+}
+
+void MaterialManager::createDefaultMtls()
+{
+	flatMtl = new Material(L"defaultFlatMtl");
+	flatMtl->SetShader(Flat);
+	flatMtl->SetID(curID++);
+
+	viewMtl = new Material(L"defaultViewMtl");
+	viewMtl->SetShader(View);
+	viewMtl->SetID(curID++);
+
+	diffMtl = new Material(L"defaultDiffMtl");
+	diffMtl->SetShader(Diffuse);
+	diffMtl->SetID(curID++);
+
+	specMtl = new Material(L"defaultSpecMtl");
+	specMtl->SetShader(Specular);
+	specMtl->SetID(curID++);
+}
+
+void MaterialManager::deleteDefaultMtls()
+{
+	SAFE_DROP(flatMtl);
+	SAFE_DROP(viewMtl);
+	SAFE_DROP(diffMtl);
+	SAFE_DROP(specMtl);
 }

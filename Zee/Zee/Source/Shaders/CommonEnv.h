@@ -14,7 +14,6 @@ void CalORadianceAmbient(inout float4 oRadiance, float4 ambientRadiance, float4 
 
 void CalORadianceLambert(inout float4 oRadiance, float4 lRadiance, float3 dirL, float3 normal, float4 Kd)
 {
-	dirL = normalize(-dirL);
 	float cosTi = saturate(dot(dirL, normal)); 
 
 	oRadiance += Kd * lRadiance * cosTi;
@@ -23,7 +22,6 @@ void CalORadianceLambert(inout float4 oRadiance, float4 lRadiance, float3 dirL, 
 void CalORadianceBlinnPhong(inout float4 oRadiance, float4 lRadiance, float3 dirL, float3 normal, 
 								  float3 dirV, float4 Kd, float4 Ks, float Ns)
 {
-	dirL = normalize(-dirL);
 	float3 halfVec = normalize(dirL + dirV);
 
 	float cosTi = saturate(dot(dirL, normal)); 

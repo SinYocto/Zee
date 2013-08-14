@@ -35,7 +35,7 @@ public:
 
 	DirectionalLightData GetData() 
 	{ 
-		return DirectionalLightData(mIntensity * mColor, mDirection); 
+		return DirectionalLightData(mIntensity * mColor, mDirection.Normalized()); 
 	}
 
 	void SetID(DWORD id);

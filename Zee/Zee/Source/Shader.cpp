@@ -9,10 +9,127 @@
 LPD3DXEFFECTPOOL UtilityShader::pool = NULL;
 LPD3DXEFFECT UtilityShader::effect = NULL;
 
+
+LPD3DXEFFECT FlatShader::mEffect = NULL;
+LPD3DXEFFECT ViewShader::mEffect = NULL;
 LPD3DXEFFECT DiffuseShader::mEffect = NULL;
 LPD3DXEFFECT SpecularShader::mEffect = NULL;
 LPD3DXEFFECT BumpSpecularShader::mEffect = NULL;
 
+// FlatShader
+void FlatShader::SetColorTex(wchar_t* texFileName)
+{
+	mMaterial->SetTexture(0, texFileName);
+}
+
+void FlatShader::SetDiffuseColor(D3DXCOLOR color)
+{
+	mMaterial->SetDiffuseColor(color);
+}
+
+void FlatShader::SetUVTiles(float tilesU, float tilesV)
+{
+	mMaterial->SetUVTiles(tilesU, tilesV);
+}
+
+void FlatShader::SetUVOffset(float offsetU, float offsetV)
+{
+	mMaterial->SetUVOffset(offsetU, offsetV);
+}
+
+void FlatShader::Render(Object* object, Geometry* geo, Camera* camera)
+{
+	_Assert(NULL != geo);
+	_Assert(NULL != camera);
+
+	geo->SetVertexStream();
+	geo->SetVertexDeclaration();
+
+	FlatShader::mEffect->SetTechnique("Flat");
+
+	FlatShader::mEffect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
+	FlatShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
+
+	if(NULL == mMaterial->GetTexture(0))
+	{
+		FlatShader::mEffect->SetBool("useColorTex", false);
+	}
+	else
+	{
+		FlatShader::mEffect->SetBool("useColorTex", true);	
+		FlatShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
+	}
+
+	FlatShader::mEffect->SetRawValue("mtlColor", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
+
+	FlatShader::mEffect->Begin(0, 0);
+	FlatShader::mEffect->BeginPass(0);
+
+	geo->Draw();
+
+	FlatShader::mEffect->EndPass();
+	FlatShader::mEffect->End();
+}
+
+// ViewShader
+void ViewShader::SetColorTex(wchar_t* texFileName)
+{
+	mMaterial->SetTexture(0, texFileName);
+}
+
+void ViewShader::SetDiffuseColor(D3DXCOLOR color)
+{
+	mMaterial->SetDiffuseColor(color);
+}
+
+void ViewShader::SetUVTiles(float tilesU, float tilesV)
+{
+	mMaterial->SetUVTiles(tilesU, tilesV);
+}
+
+void ViewShader::SetUVOffset(float offsetU, float offsetV)
+{
+	mMaterial->SetUVOffset(offsetU, offsetV);
+}
+
+void ViewShader::Render(Object* object, Geometry* geo, Camera* camera)
+{
+	_Assert(NULL != geo);
+	_Assert(NULL != camera);
+
+	geo->SetVertexStream();
+	geo->SetVertexDeclaration();
+
+	ViewShader::mEffect->SetTechnique("View");
+
+	ViewShader::mEffect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
+	ViewShader::mEffect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
+	ViewShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
+
+	ViewShader::mEffect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));
+
+	if(NULL == mMaterial->GetTexture(0))
+	{
+		ViewShader::mEffect->SetBool("useColorTex", false);
+	}
+	else
+	{
+		ViewShader::mEffect->SetBool("useColorTex", true);	
+		ViewShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
+	}
+
+	ViewShader::mEffect->SetRawValue("mtlColor", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
+
+	ViewShader::mEffect->Begin(0, 0);
+	ViewShader::mEffect->BeginPass(0);
+
+	geo->Draw();
+
+	ViewShader::mEffect->EndPass();
+	ViewShader::mEffect->End();
+}
+
+// DiffuseShader
 void DiffuseShader::SetColorTex(wchar_t* texFileName)
 {
 	mMaterial->SetTexture(0, texFileName);

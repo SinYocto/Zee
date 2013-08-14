@@ -18,9 +18,14 @@ public:
 	static void GetMaterial(const wchar_t* name, Material** material);
 
 private:
+	static void createDefaultMtls();
+	static void deleteDefaultMtls();
+
+private:
 	static std::list<Material*> resourceList;
 	static DWORD curID;
 
+public:
 	static Material* flatMtl;
 	static Material* viewMtl;
 	static Material* diffMtl;

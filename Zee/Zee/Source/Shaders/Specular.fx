@@ -81,12 +81,12 @@ float4 SpecularPS(float2 tex : TEXCOORD0,
 
 	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
 	{
-		CalORadianceBlinnPhong(oColor, directionalLights[i].color, directionalLights[i].dir, normal, dirV, Kd, Ks, Ns);
+		CalORadianceBlinnPhong(oColor, directionalLights[i].color, -directionalLights[i].dir, normal, dirV, Kd, Ks, Ns);
 	}
 	
 	for(int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i)
 	{	
-		float3 dirL = posW - pointLights[i].position;
+		float3 dirL = normalize(pointLights[i].position - posW);
 		float atten = CalAttenuation(posW, pointLights[i].position, pointLights[i].atten);
 		
 		CalORadianceBlinnPhong(oColor, atten * pointLights[i].color, dirL, normal, dirV, Kd, Ks, Ns);

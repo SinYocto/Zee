@@ -106,12 +106,12 @@ float4 BumpSpecularPS(VS_OUT pIn) : COLOR0
 
 	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
 	{
-		CalORadianceBlinnPhong(oColor, directionalLights[i].color, directionalLights[i].dir, normal, dirV, Kd, Ks, Ns);
+		CalORadianceBlinnPhong(oColor, directionalLights[i].color, -directionalLights[i].dir, normal, dirV, Kd, Ks, Ns);
 	}
 	
 	for(int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i)
 	{	
-		float3 dirL = pIn.posW - pointLights[i].position;
+		float3 dirL = normalize(pointLights[i].position - pIn.posW);
 		float atten = CalAttenuation(pIn.posW, pointLights[i].position, pointLights[i].atten);
 		
 		CalORadianceBlinnPhong(oColor, atten * pointLights[i].color, dirL, normal, dirV, Kd, Ks, Ns);

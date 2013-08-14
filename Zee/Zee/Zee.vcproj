@@ -313,11 +313,19 @@
 						>
 					</File>
 					<File
+						RelativePath=".\Source\Shaders\Flat.fx"
+						>
+					</File>
+					<File
 						RelativePath=".\Source\Shaders\Specular.fx"
 						>
 					</File>
 					<File
 						RelativePath=".\Source\Shaders\Utility.fx"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Shaders\View.fx"
 						>
 					</File>
 					<Filter

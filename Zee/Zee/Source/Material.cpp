@@ -34,12 +34,22 @@ void Material::SetShader(ShadingMethod shadingMethod)
 
 	switch(shadingMethod)
 	{
+	case Flat:
+		mShader = new FlatShader(this);
+		break;
+
+	case View:
+		mShader = new ViewShader(this);
+		break;
+
 	case Diffuse:
 		mShader = new DiffuseShader(this);
 		break;
+
 	case Specular:
 		mShader = new SpecularShader(this);
-		break;;
+		break;
+
 	case BumpSpecular:
 		mShader = new BumpSpecularShader(this);
 		break;

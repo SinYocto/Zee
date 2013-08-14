@@ -5,6 +5,8 @@
 
 enum ShadingMethod 
 { 
+	Flat,
+	View,
 	Diffuse, 
 	Specular, 
 	BumpSpecular 
@@ -97,11 +99,85 @@ public:
 
 class FlatShader : public IShader
 {
+public:
+	FlatShader(Material* material)
+		:mMaterial(material)
+	{
+
+	}
+
+	static void OnLostDevice()
+	{
+		mEffect->OnLostDevice();
+	}
+
+	static void OnResetDevice()
+	{
+		mEffect->OnResetDevice();
+	}
+
+	static void CreateEffectFromFile(wchar_t* FXFileName)
+	{
+		_Assert(NULL != UtilityShader::pool);
+		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+	}
+
+	void SetColorTex(wchar_t* texFileName);
+
+	void SetDiffuseColor(D3DXCOLOR color);
+
+	void SetUVTiles(float tilesU, float tilesV);
+	void SetUVOffset(float offsetU, float offsetV);
+
+	void Render(Object* object, Geometry* geo, Camera* camera);
+
+private:
+	Material* mMaterial;
+
+public:
+	static LPD3DXEFFECT mEffect;
 
 };
 
 class ViewShader : public IShader
 {
+public:
+	ViewShader(Material* _material)
+		:mMaterial(_material)
+	{
+
+	}
+
+	static void OnLostDevice()
+	{
+		mEffect->OnLostDevice();
+	}
+
+	static void OnResetDevice()
+	{
+		mEffect->OnResetDevice();
+	}
+
+	static void CreateEffectFromFile(wchar_t* FXFileName)
+	{
+		_Assert(NULL != UtilityShader::pool);
+		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+	}
+
+	void SetColorTex(wchar_t* texFileName);
+
+	void SetDiffuseColor(D3DXCOLOR color);
+
+	void SetUVTiles(float tilesU, float tilesV);
+	void SetUVOffset(float offsetU, float offsetV);
+
+	void Render(Object* object, Geometry* geo, Camera* camera);
+
+private:
+	Material* mMaterial;
+
+public:
+	static LPD3DXEFFECT mEffect;
 
 };
 

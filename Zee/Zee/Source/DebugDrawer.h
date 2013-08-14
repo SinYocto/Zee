@@ -7,6 +7,15 @@
 class Camera;
 class AABBox;
 
+class TransGizmo
+{
+public:
+	void Init();
+
+private:
+	Mesh* mCone;
+};
+
 class DebugDrawer
 {
 public:

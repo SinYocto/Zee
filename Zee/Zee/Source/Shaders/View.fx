@@ -1,15 +1,16 @@
-// Diffuse.fx
+// View.fx
 #include "CommonEnv.h"
 
 float4x4 matWVP;
 float4x4 matWorld;
 float4x4 matUVTransform;
 
-float4 mtlAmbient;
-float4 mtlDiffuse;
+float4 mtlColor;
 
 bool useColorTex;
 texture colorTex;
+
+float3 eyePos;
 
 sampler ColorS = sampler_state
 {
@@ -37,7 +38,7 @@ struct VS_OUT
 	float3 posW : TEXCOORD2;
 };
 
-VS_OUT DiffuseVS(VS_IN vIn)
+VS_OUT ViewVS(VS_IN vIn)
 {
 	VS_OUT vOut;
 
@@ -49,48 +50,32 @@ VS_OUT DiffuseVS(VS_IN vIn)
 	return vOut;
 }
 
-float4 DiffusePS(float2 tex : TEXCOORD0, 
-				 float3 normal : TEXCOORD1, 
-				 float3 posW : TEXCOORD2) : COLOR0
+float4 ViewPS(float2 tex : TEXCOORD0, 
+			  float3 normal : TEXCOORD1, 
+			  float3 posW : TEXCOORD2) : COLOR0
 {
 	float4 oColor = float4(0, 0, 0, 1);
 	
+	float3 dirV = normalize(eyePos - posW);
 	normal = normalize(normal);
 
-	float4 Ka = mtlAmbient;
-	float4 Kd = mtlDiffuse;
+	float4 Kd = mtlColor;
 
 	if(useColorTex)
 	{
-		float4 texColor = tex2D(ColorS, tex);
-
-		Ka *= texColor;
-		Kd *= texColor;
+		Kd *= tex2D(ColorS, tex);
 	}
-	
-	CalORadianceAmbient(oColor, ambientLight.color, Ka);	
 
-	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
-	{
-		CalORadianceLambert(oColor, directionalLights[i].color, -directionalLights[i].dir, normal, Kd);
-	}
-	
-	for(int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i)
-	{	
-		float3 dirL = normalize(pointLights[i].position - posW);
-		float atten = CalAttenuation(posW, pointLights[i].position, pointLights[i].atten);
-
-		CalORadianceLambert(oColor, atten * pointLights[i].color, dirL, normal, Kd);
-	}
+	CalORadianceLambert(oColor, float4(1, 1, 1, 1), dirV, normal, Kd);
 
 	return oColor;
 }
 
-technique Diffuse
+technique View
 {
 	pass P0
 	{
-		VertexShader = compile vs_3_0 DiffuseVS();
-		PixelShader = compile ps_3_0 DiffusePS();		
+		VertexShader = compile vs_3_0 ViewVS();
+		PixelShader = compile ps_3_0 ViewPS();		
 	}
 }
