@@ -133,3 +133,20 @@ void LightManager::GetPointLight(const wchar_t* name, PointLight** pointLight)
 		}
 	}
 }
+
+void LightManager::Destroy()
+{
+	for(std::list<DirectionalLight*>::iterator iter = mDirlLights.begin(); iter != mDirlLights.end(); ++iter)
+	{
+		SAFE_DELETE(*iter);
+	}
+
+	mDirlLights.clear();
+
+	for(std::list<DirectionalLight*>::iterator iter = mDirlLights.begin(); iter != mDirlLights.end(); ++iter)
+	{
+		SAFE_DELETE(*iter);
+	}
+
+	mPointLights.clear();
+}

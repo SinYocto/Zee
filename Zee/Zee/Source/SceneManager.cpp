@@ -24,9 +24,10 @@ void SceneManager::AddSceneNode(SceneNode* node, SceneNode* parent /*= root*/)
 void SceneManager::Destory()
 {
 	SAFE_DELETE(root);
+	SAFE_DELETE(mainCamera);
 }
 
-void SceneManager::SetMainCamera( const Vector3 pos /*= Vector3(0, 0, -200)*/, const Vector3 target /*= Vector3::Zero*/, 
+void SceneManager::CreateMainCamera( const Vector3 pos /*= Vector3(0, 0, -200)*/, const Vector3 target /*= Vector3::Zero*/, 
 								 float fov /*= PI/2*/, float aspect /*= 1.0f*/, float nZ /*= 1.0f*/, float fZ /*= 1000.0f*/ )
 {
 	mainCamera = new Camera(pos, target, fov, aspect, nZ, fZ);

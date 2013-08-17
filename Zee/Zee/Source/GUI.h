@@ -25,7 +25,29 @@ public:
 		font->OnResetDevice();
 	}
 
-	bool CreateFont();
+	bool CreateFont()
+	{
+		Assert(Driver::D3DDevice);
+		{
+			SAFE_RELEASE(font);
+
+			D3DXFONT_DESC fontDesc;
+			ZeroMemory(&fontDesc, sizeof(D3DXFONT_DESC));
+			wcscpy_s(fontDesc.FaceName, _countof(fontDesc.FaceName), fontName);
+			fontDesc.Height = fontHeight;
+			fontDesc.Width = fontWidth;
+			fontDesc.Weight = fontWeight;
+			fontDesc.MipLevels = D3DX_DEFAULT;
+			fontDesc.Quality = DEFAULT_QUALITY ;
+			fontDesc.OutputPrecision = OUT_OUTLINE_PRECIS;
+
+			Assert(SUCCEEDED(D3DXCreateFontIndirect(Driver::D3DDevice, &fontDesc, &font)));
+		}
+
+		return true;
+Exit:
+		return false;
+	}
 
 public:
 	ID3DXFont* font;

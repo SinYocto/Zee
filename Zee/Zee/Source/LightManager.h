@@ -16,6 +16,8 @@ public:
 
 	static void Update();
 
+	static void Destroy();
+
 public:
 	static int numActiveDirectionalLights;
 	static int numActivePointLights;

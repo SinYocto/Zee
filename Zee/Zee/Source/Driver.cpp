@@ -35,7 +35,7 @@ void Driver::CreateD3DDevice(HWND _hWnd, _D3DMULTISAMPLE_TYPE _multisampleType)
 	DWORD multisampleQuality = 0;
 
 	if(SUCCEEDED(D3D->CheckDeviceMultiSampleType(d3dcaps.AdapterOrdinal, d3dcaps.DeviceType, D3DFMT_A8B8G8R8, 
-		FALSE, _multisampleType, &multisampleQuality)))
+		FALSE, _multisampleType, &multisampleQuality)))		// TODO: Ê§°Ü
 	{
 		multiSampleType = _multisampleType;
 	}

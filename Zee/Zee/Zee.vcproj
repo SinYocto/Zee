@@ -5,7 +5,7 @@
 	Name="Zee"
 	ProjectGUID="{057A6BD7-E918-42A3-B31D-715BAB8647D6}"
 	RootNamespace="Zee"
-	Keyword="Qt4VSv1.0"
+	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -41,12 +41,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;QT_CORE_LIB;QT_GUI_LIB"
+				AdditionalIncludeDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include&quot;;&quot;D:\Program Files (x86)\wxMSW-2.8.12\include&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;__WXMSW__;__WXDEBUG__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				TreatWChar_tAsBuiltInType="false"
+				TreatWChar_tAsBuiltInType="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -63,9 +63,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib winmm.lib dxguid.lib dsound.lib QtCored4.lib QtGuid4.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib winmm.lib dxguid.lib dsound.lib wxbase28ud.lib wxmsw28ud_core.lib wxmsw28ud_xrc.lib wxbase28ud_xml.lib wxmsw28ud_adv.lib wxmsw28ud_aui.lib wxmsw28ud_html.lib rpcrt4.lib comctl32.lib advapi32.lib oleacc.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;"
+				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;;&quot;D:\Program Files (x86)\wxMSW-2.8.12\lib\vc_lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -121,8 +121,8 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include&quot;;&quot;$(QTDIR)\include\QtCore&quot;;&quot;$(QTDIR)\include\QtGui&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;QT_CORE_LIB;QT_GUI_LIB"
+				AdditionalIncludeDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib winmm.lib dxguid.lib dsound.lib QtCored4.lib QtGuid4.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib winmm.lib dxguid.lib dsound.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;"
 				GenerateDebugInformation="true"
@@ -480,34 +480,14 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\Source\main.cpp"
+			RelativePath=".\Source\ZeeApp.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\ZeeApp.h"
 			>
 		</File>
 	</Files>
 	<Globals>
-		<Global
-			Name="lupdateOnBuild"
-			Value="0"
-		/>
-		<Global
-			Name="MocDir"
-			Value=".GeneratedFiles$(ConfigurationName)"
-		/>
-		<Global
-			Name="MocOptions"
-			Value=""
-		/>
-		<Global
-			Name="QtVersion Win32"
-			Value="$(DefaultQtVersion)"
-		/>
-		<Global
-			Name="RccDir"
-			Value=".GeneratedFiles"
-		/>
-		<Global
-			Name="UicDir"
-			Value=".GeneratedFiles"
-		/>
 	</Globals>
 </VisualStudioProject>

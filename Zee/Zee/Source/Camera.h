@@ -35,6 +35,11 @@ public:
 
 	bool IsVisible(AABBox boundingBox);
 
+	void SetAspect(float aspect)
+	{
+		mAspect = aspect;
+		mIsParametersDirty = true;
+	}
 
 	void SetTransformDirty(bool isDirty)
 	{
