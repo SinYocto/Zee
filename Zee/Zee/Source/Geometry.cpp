@@ -1068,7 +1068,7 @@ void Geometry::CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, A
 	_Assert(NULL != box);
 
 	box->mMin = Vector3(FLT_MAX, FLT_MAX, FLT_MAX);
-	box->mMax = Vector3(FLT_MIN, FLT_MIN, FLT_MIN);
+	box->mMax = Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
 	for(size_t i = 0; i < mPositionData.size(); ++i)
 	{

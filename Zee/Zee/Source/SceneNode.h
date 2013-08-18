@@ -9,6 +9,13 @@ class Camera;
 class SceneNode : public Object
 {
 public:
+	enum NODE_TYPE
+	{
+		SCENE_NODE_NULL,
+		SCENE_NODE_MESH,
+		SCENE_NODE_MODEL
+	};
+
 	enum DISPLAY_MODE
 	{
 		WIRE_FRAME,
@@ -26,6 +33,7 @@ public:
 	SceneNode(const wchar_t* name, SceneNode* parent = NULL, Vector3 position = Vector3::Zero, 
 		Quaternion orient = Quaternion(0, 0, 0))
 		:Object(parent, position, orient)
+		,mType(SCENE_NODE_NULL)
 	{
 		YString::Copy(mName, _countof(mName), name);
 
@@ -48,12 +56,11 @@ public:
 
 	AABBox GetAABBox();
 
+	SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
+
 	void FrameUpdate();
 
-	virtual void Draw(Camera* camera)
-	{
-		return;
-	}
+	virtual void Draw(Camera* camera);
 
 	void DrawAll(Camera* camera)
 	{
@@ -67,10 +74,7 @@ public:
 	}
 
 protected:
-	virtual void calCurrentAABBox()
-	{
-
-	}
+	virtual void calCurrentAABBox();
 
 protected:
 	DWORD mID;
@@ -79,6 +83,8 @@ protected:
 	AABBox mAABBox;
 
 	Attribute mAttribute;
+
+	NODE_TYPE mType;
 };
 
 #endif

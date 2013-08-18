@@ -1,4 +1,5 @@
 #include"Bound.h"
+#include "Common.h"
 
 AABBox AABBox::Invalid(Vector3(FLT_MAX, FLT_MAX, FLT_MAX), Vector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
 
@@ -103,4 +104,56 @@ Ray::Ray(const Vector3& pos /*= Vector3::Zero*/, const Vector3& dir /*= Vector3(
 {
 	mPos = pos;
 	mDir = dir;
+}
+
+bool IntersectRayAABB(const Vector3& rayPos, const Vector3& rayDir, const AABBox& box, Vector3* hitPos, float* dist)
+{
+//	_Assert(NULL != hitPos);
+//	_Assert(NULL != dist);
+
+	float tMin = 0;
+	float tMax = FLT_MAX;
+
+	float rp[3] = { rayPos.x, rayPos.y, rayPos.z };
+	float rd[3] = { rayDir.x, rayDir.y, rayDir.z };
+
+	float boxMin[3] = { box.mMin.x, box.mMin.y, box.mMin.z };
+	float boxMax[3] = { box.mMax.x, box.mMax.y, box.mMax.z };
+
+	for(int i = 0; i < 3; ++i)
+	{
+		if(fabs(rd[i]) < FLT_EPSILON)
+		{
+			if(rp[i] < boxMin[i] || rp[i] > boxMax[i])
+				return false;
+		}
+		else
+		{
+			float t1 = (boxMin[i] - rp[i]) / rd[i];
+			float t2 = (boxMax[i] - rp[i]) / rd[i];
+
+			if(t1 > t2)
+				std::swap(t1, t2);
+
+			if(t1 > tMin)
+				tMin = t1;
+
+			if(t2 < tMax)
+				tMax = t2;
+
+			if(tMin > tMax)
+				return false;
+		}
+	}
+
+	Vector3 hitP = rayPos + tMin * rayDir;
+	float d = VectorLength(rayPos - hitP);
+
+	if(hitPos)
+		*hitPos = hitP;
+
+	if(dist)
+		*dist = d;
+
+	return true;
 }

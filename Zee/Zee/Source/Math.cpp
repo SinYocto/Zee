@@ -167,6 +167,11 @@ float VectorAngle(const Vector3& vec1, const Vector3& vec2)
 	return acosf(val);
 }
 
+float VectorLength(const Vector3& vec)
+{
+	return vec.Length();
+}
+
 bool Vector3Equal(const Vector3& vec1, const Vector3& vec2, const float& tolerance)
 {
 	if(FloatUnequal(vec1.x, vec2.x, tolerance))
@@ -184,6 +189,47 @@ bool Vector3Equal(const Vector3& vec1, const Vector3& vec2, const float& toleran
 bool Vector3Unequal(const Vector3& vec1, const Vector3& vec2, const float& tolerance)
 {
 	return !Vector3Equal(vec1, vec2, tolerance);
+}
+
+Vector2 operator+(const Vector2& vec1, const Vector2& vec2)
+{ 
+	Vector2 vec = vec1;
+	vec.x += vec2.x;
+	vec.y += vec2.y;
+
+	return vec;
+}
+
+Vector2 operator-(const Vector2& vec1, const Vector2& vec2)
+{ 
+	Vector2 vec = vec1;
+	vec.x -= vec2.x;
+	vec.y -= vec2.y;
+
+	return vec;
+}
+
+Vector2 operator+(const Vector2& vec)
+{
+	return vec;
+}
+
+Vector2 operator-(const Vector2& vec)
+{
+	Vector2 vecResult;
+	vecResult.x = -vec.x;
+	vecResult.y = -vec.y;
+
+	return vecResult;
+}
+
+Vector2 operator*(float value, const Vector2& vec) 
+{
+	Vector2 vecResult = vec;
+	vecResult.x *= value;
+	vecResult.y *= value;
+
+	return vecResult;
 }
 
 

@@ -46,3 +46,8 @@ void SceneManager::FrameUpdate()
 
 	root->FrameUpdate();
 }
+
+SceneNode* SceneManager::RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist)
+{
+	return root->RayIntersect(rayPos, rayDir, hitPos, dist);
+}

@@ -38,9 +38,7 @@ public:
 	void InitDriver();
 
 protected:
-	//void OnPaint(wxPaintEvent& event);
 	void OnSize(wxSizeEvent& event);
-	//void OnEraseBackground(wxEraseEvent& event);
 	void OnIdle(wxIdleEvent& event);
 
 private:

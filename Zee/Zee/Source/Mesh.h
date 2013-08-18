@@ -13,6 +13,8 @@ public:
 		,mGeo(geo)
 		,mMaterial(material)
 	{
+		mType = SCENE_NODE_MESH;
+
 		// TODO:构造函数可以暂时传geo和mtl为null,后面加上方法设置geo和material内容
 		if(NULL != mGeo)
 		{

@@ -15,6 +15,8 @@ public:
 	static void Destory();
 	static void AddSceneNode(SceneNode* node, SceneNode* parent);
 
+	static SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
+
 	static void FrameUpdate();
 
 	static void DrawAll();

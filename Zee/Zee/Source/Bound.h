@@ -32,5 +32,6 @@ public:
 	static AABBox Invalid;
 };
 
+bool IntersectRayAABB(const Vector3& rayPos, const Vector3& rayDir, const AABBox& box, Vector3* hitPos, float* dist);
 
 #endif

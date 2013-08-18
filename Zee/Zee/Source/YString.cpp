@@ -175,6 +175,21 @@ Exit:
 	return numSucceed;
 }
 
+bool YString::Format(wchar_t* str, const wchar_t* format, ...)
+{
+	Assert(NULL != str);
+	Assert(NULL != format);
+
+	va_list args;
+	va_start(args, format);
+	vswprintf(str, format, args);
+	va_end(args);
+
+	return true;
+Exit:
+	return false;
+}
+
 // HACK:http://stackoverflow.com/questions/2457331/replacement-for-vsscanf-on-msvc
 int YString::vsscanf(const char* str, const char* format, va_list argPtr)
 {

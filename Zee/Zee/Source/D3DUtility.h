@@ -3,7 +3,6 @@
 
 #include "Driver.h"
 #include "Common.h"
-#include "Math.h"
 
 #define D3DXCOLOR_WHITE D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f)
 #define D3DXCOLOR_BLACK D3DXCOLOR(0, 0, 0, 1.0f)

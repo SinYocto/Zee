@@ -99,6 +99,20 @@ void Driver::SetViewPort(int offsetX, int offsetY, int width, int height)
 	D3DDevice->SetViewport(&viewPort);
 }
 
+void Driver::GetViewPort(Vector2* vpOrigin, Vector2* vpSize)
+{
+	_Assert(NULL != vpOrigin);
+	_Assert(NULL != vpSize);
+	_Assert(NULL != D3DDevice);
+
+	D3DVIEWPORT9 vp;
+	D3DDevice->GetViewport(&vp);
+
+	*vpOrigin = Vector2((float)vp.X, (float)vp.Y);
+	*vpSize = Vector2((float)vp.Width, (float)vp.Height);
+}
+
+
 void Driver::Destory()
 {
 	SAFE_RELEASE(D3D);
@@ -125,3 +139,22 @@ HRESULT Driver::Present()
 	return D3DDevice->Present(0, 0, 0, 0);
 }
 
+void Driver::GetScreenLocation(const Vector2& screenPos, Vector2* screenLocation)
+{
+	Vector2 vpOrigin;
+	Vector2 vpSize;
+
+	GetViewPort(&vpOrigin, &vpSize);
+	_Assert(vpSize.x != 0 && vpSize.y != 0);
+
+	Vector2 vpPos = screenPos - vpOrigin;
+
+	Vector2& location = *screenLocation;
+	location.x = vpPos.x / vpSize.x;
+	location.y = vpPos.y / vpSize.y;
+
+	Clamp(location.x, 0, 1.0f);
+	Clamp(location.y, 0, 1.0f);
+
+	return;
+}

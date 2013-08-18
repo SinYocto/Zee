@@ -1,4 +1,5 @@
-#include"Camera.h"
+#include "Camera.h"
+#include "Driver.h"
 
 void Camera::recalculateViewMatrix()
 {
@@ -83,3 +84,25 @@ void Camera::recalculateCameraMatrix()
 	recalculateViewMatrix();
 	recalculateProjMatrix();
 }
+
+void Camera::GetScreenRay(const Vector2& screenPos, Vector3* rayPos, Vector3* rayDir)
+ {
+	_Assert(NULL != rayPos);
+	_Assert(NULL != rayDir);
+
+	Vector2 screenLocation;
+	Driver::GetScreenLocation(screenPos, &screenLocation);
+
+	Vector3& rp = *rayPos;
+	rp = mWorldPos;
+
+	Vector3 vp = rp + mWorldForward.Normalized();
+
+	float screenWorldHeight = 2 * tan(mFOV / 2.0f);
+	float screenWorldWidth = mAspect * screenWorldHeight;
+
+	vp += (screenLocation.x - 0.5f) * screenWorldWidth * mWorldRight.Normalized();
+	vp += -(screenLocation.y - 0.5f) * screenWorldHeight * mWorldUp.Normalized();
+
+	*rayDir = vp - rp;
+}	

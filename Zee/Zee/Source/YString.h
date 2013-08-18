@@ -27,6 +27,8 @@ public:
 	static int Scan(const char* str, const char* format, ...);
 	static int Scan(const wchar_t* str, const wchar_t* format, ...);
 
+	static bool Format(wchar_t* str, const wchar_t* format, ...);
+
 	// path
 	static bool GetCurrentDirPath(wchar_t* curDirPath, int strSize);
 	static bool GetFullPath(wchar_t* fullPath, int fullPathSize, const wchar_t* relativePath = NULL);

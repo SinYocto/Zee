@@ -23,7 +23,7 @@ public:
 	Model(const wchar_t* name, SceneNode* parent)
 		:SceneNode(name, parent)
 	{
-		
+		mType = SCENE_NODE_MODEL;
 	}
 
 	// 此构造函数使用一个geo和material对象来构造一个包含一个SubMesh的Model对象

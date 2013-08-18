@@ -28,8 +28,8 @@ enum
 IMPLEMENT_APP_CONSOLE(ZeeApp)
 
 // ------------------------------------------
-const int WND_WIDTH = 1024;
-const int WND_HEIGHT = 600;
+const int WND_WIDTH = 1280;
+const int WND_HEIGHT = 720;
 
 LabelStyle* leftAlignStyle;
 
@@ -52,7 +52,7 @@ void RenderLoop();
 bool ZeeApp::OnInit()
 {
 
-	ZeeFrame* frame = new ZeeFrame(L"Zee", wxPoint(50, 50), wxSize(WND_WIDTH, WND_HEIGHT));
+	ZeeFrame* frame = new ZeeFrame(L"Zee", wxPoint(0, 0), wxSize(WND_WIDTH, WND_HEIGHT));
 	frame->Show(true);
 	SetTopWindow(frame);
 
@@ -65,7 +65,8 @@ BEGIN_EVENT_TABLE(ZeeFrame, wxFrame)
 END_EVENT_TABLE()
 
 ZeeFrame::ZeeFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
-:wxFrame((wxFrame*)NULL, -1, title, pos, size)
+:wxFrame((wxFrame*)NULL, -1, title, pos, size, 
+		 wxMINIMIZE_BOX | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN)
 {
 	wxMenu* menuFile = new wxMenu;
 
@@ -102,8 +103,6 @@ void ZeeFrame::OnAbout(wxCommandEvent& event)
 
 BEGIN_EVENT_TABLE(D3D9Canvas, wxWindow)
 	EVT_SIZE(D3D9Canvas::OnSize)
-//	EVT_PAINT(D3D9Canvas::OnPaint)
-//	EVT_ERASE_BACKGROUND(D3D9Canvas::OnEraseBackground)
 	EVT_IDLE(D3D9Canvas::OnIdle)
 END_EVENT_TABLE()
 
@@ -123,28 +122,13 @@ void D3D9Canvas::OnIdle(wxIdleEvent& event)
 	event.RequestMore(true);
 }
 
-//void D3D9Canvas::OnPaint(wxPaintEvent& event)
-//{
-//	wxPaintDC dc(this);
-//
-//	//if(!mIsInited)
-//	//{
-//	//	InitDriver();
-//	//	mIsInited = true;
-//	//}
-//}
-
 void D3D9Canvas::OnSize(wxSizeEvent& event)
 {
+	// TODO:暂且使用固定窗口, 以后再增加拉伸窗口功能
 	wxSize vpSize = GetClientSize();
 	Driver::SetViewPort(0, 0, vpSize.x, vpSize.y);
 	SceneManager::mainCamera->SetAspect((float)vpSize.x / (float)vpSize.y);
 }
-
-//void D3D9Canvas::OnEraseBackground(wxEraseEvent& event)
-//{
-//
-//}
 
 void D3D9Canvas::InitDriver()
 {
@@ -163,7 +147,7 @@ void SetUp()
 	SetupGUIStyle();
 
 	// camera
-	SceneManager::CreateMainCamera(Vector3(0, 2.0f, -4.0f), Vector3::Zero,
+	SceneManager::CreateMainCamera(Vector3(0, 4.0f, -4.0f), Vector3::Zero,
 		PI/3, (float)Driver::viewPort.Width / (float)Driver::viewPort.Height, 0.1f, 100000.0f);
 
 	// lights
@@ -225,6 +209,7 @@ void SetUp()
 
 	Model* cylinderModel = new Model(L"cylinderModel", SceneManager::root, cylinder1, mtl4);
 	cylinderModel->Translate(0, 0, 2);
+	//cylinderModel->SetDrawBBoxFlag(true);
 
 }
 
@@ -252,12 +237,31 @@ void RenderLoop()
 			Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff1e90ff);
 			Driver::BeginScene();
 
-			//DebugDrawer::DrawLine(points, 0xffff0000, SceneManager::mainCamera);
-			DebugDrawer::DrawCircle(Vector3(4, 4, 0), Vector3(1, 1, 1), 1, 0xffff0000, SceneManager::mainCamera);
-			DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, 1), 1, 0xffff0000, SceneManager::mainCamera); 
-			DebugDrawer::DrawBox(Vector3::Zero, Quaternion(0, 0, 0), Vector3(1,1,1), 0xffff0000, SceneManager::mainCamera);
+			Vector2 screenPos(Input::cursorPos.x, Input::cursorPos.y);
 
-			//cubeModel->Draw(SceneManager::mainCamera);
+			Vector3 rayPos;
+			Vector3 rayDir;
+			SceneManager::mainCamera->GetScreenRay(screenPos, &rayPos, &rayDir);
+
+			//static std::vector<Vector3> points;
+			if(Input::GetLeftButtonUp())
+			{
+				SceneNode* hitNode = NULL;
+				hitNode = SceneManager::RayIntersect(rayPos, rayDir, NULL, NULL);
+
+				if(hitNode)
+					hitNode->SetDrawBBoxFlag(true);
+				//points.clear();
+				//points.push_back(rayPos);
+				//points.push_back(rayPos + 100.0f * rayDir.Normalized());
+			}
+
+			//SceneManager::root->SetDrawBBoxFlag(true);
+			//DebugDrawer::DrawLine(points, 0xffff0000, SceneManager::mainCamera);
+			//DebugDrawer::DrawCircle(Vector3(4, 4, 0), Vector3(1, 1, 1), 1, 0xffff0000, SceneManager::mainCamera);
+			//DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, 1), 1, 0xffff0000, SceneManager::mainCamera); 
+			//DebugDrawer::DrawBox(Vector3::Zero, Quaternion(0, 0, 0), Vector3(1,1,1), 0xffff0000, SceneManager::mainCamera);
+
 			SceneManager::DrawAll();
 
 			gGUISystem.Draw();
@@ -345,12 +349,21 @@ void GUIUpdate()
 {
 	gGUISystem.clear();
 
+	Vector2 screenPos(Input::cursorPos.x, Input::cursorPos.y);
+	Vector2 screenLocation;
+	Driver::GetScreenLocation(screenPos, &screenLocation);
+
 	wchar_t text[MAX_STR_LEN];
-	wsprintf(text, TEXT("fps:%d, %d, %d"), GetFPS(), Input::cursorPos.x, Input::cursorPos.y);
+	YString::Format(text, TEXT("fps:%d"), GetFPS());
 	gGUISystem.GUILabel(text, Rect(10, 10, 300, 25), leftAlignStyle);
 
+	YString::Format(text, L"screenPos:%d, %d(%f, %f)", Input::cursorPos.x, Input::cursorPos.y, 
+		screenLocation.x, screenLocation.y);
+	gGUISystem.GUILabel(text, Rect(10, 40, 300, 25), leftAlignStyle);
+
+
 	static bool enableDirLight1 = false;
-	enableDirLight1 = gGUISystem.GUIToggle(Rect(10, 50, 20, 20), enableDirLight1);
+	enableDirLight1 = gGUISystem.GUIToggle(Rect(10, 150, 20, 20), enableDirLight1);
 
 	DirectionalLight* dirLight1 = NULL;
 	LightManager::GetDirLight(L"dirLight1", &dirLight1);

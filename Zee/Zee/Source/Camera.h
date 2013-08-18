@@ -1,10 +1,10 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include"Object.h"
-#include"Bound.h"
+#include "Object.h"
+#include "Bound.h"
 
-class Camera:public Object
+class Camera : public Object
 {
 public:
 	Camera(const Vector3 pos = Vector3(0, 0, -200), const Vector3 target = Vector3::Zero, 
@@ -68,6 +68,8 @@ public:
 			SetTransformDirty(false);
 		}
 	}
+
+	void GetScreenRay(const Vector2& screenPos, Vector3* rayPos, Vector3* rayDir);
 
 private:
 	void recalculateCameraMatrix();
