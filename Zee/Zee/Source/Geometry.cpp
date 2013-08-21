@@ -851,7 +851,7 @@ void Geometry::calculateTriangleNormal(const Triangle& triangle, Vector3* normal
 	Vector3 p0p1 = pos1 - pos0;
 	Vector3 p0p2 = pos2 - pos0;
 
-	*normal = p0p1.Cross(p0p2);
+	*normal = p0p2.Cross(p0p1);
 
 	normal->Normalize();
 }

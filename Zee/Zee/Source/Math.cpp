@@ -151,7 +151,8 @@ float Vector3::Dot(Vector3 vec) const
 	
 Vector3 Vector3::Cross(Vector3 vec) const
 { 
-	return Vector3(y*vec.z - z*vec.y, z*vec.x - x*vec.z, x*vec.y - y*vec.x); 
+	// 因为xyz坐标轴属于左手系, 但向量叉乘和轴旋转又想用右手系判断, 所以加上负号
+	return - Vector3(y*vec.z - z*vec.y, z*vec.x - x*vec.z, x*vec.y - y*vec.x);
 }
 
 float VectorAngle(const Vector3& vec1, const Vector3& vec2)
@@ -342,6 +343,8 @@ Quaternion operator*(const Quaternion& q1, const Quaternion& q2)
 Vector3 operator*(const Vector3& vec, const Quaternion& q)
 {
 	Quaternion vecQ = Quaternion(0, vec.x, vec.y, vec.z);
+
+	// 注意坐标使用的是左手系, 旋转判断使用的左手系(顺时针为正), 四元数是左乘
 	Quaternion resultQ = q * vecQ * q.Conjugate();
 
 	return Vector3(resultQ.x, resultQ.y, resultQ.z);
@@ -398,7 +401,7 @@ D3DXMATRIX Quaternion::Matrix()
 // d*a = b, d为a到b间的difference
 Quaternion Quaternion::Difference(Quaternion quat)
 {
-	return quat * (*this).Conjugate();
+	return quat * this->Conjugate();
 }
 
 void Quaternion::Normalize()

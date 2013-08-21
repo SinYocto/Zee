@@ -210,6 +210,7 @@ void SetUp()
 	Model* cylinderModel = new Model(L"cylinderModel", SceneManager::root, cylinder1, mtl4);
 	cylinderModel->Translate(0, 0, 2);
 	//cylinderModel->SetDrawBBoxFlag(true);
+	cylinderModel->Rotate(PI/2, 0, 0);
 
 }
 
@@ -259,10 +260,12 @@ void RenderLoop()
 			//SceneManager::root->SetDrawBBoxFlag(true);
 			//DebugDrawer::DrawLine(points, 0xffff0000, SceneManager::mainCamera);
 			//DebugDrawer::DrawCircle(Vector3(4, 4, 0), Vector3(1, 1, 1), 1, 0xffff0000, SceneManager::mainCamera);
-			//DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, 1), 1, 0xffff0000, SceneManager::mainCamera); 
 			//DebugDrawer::DrawBox(Vector3::Zero, Quaternion(0, 0, 0), Vector3(1,1,1), 0xffff0000, SceneManager::mainCamera);
 
 			SceneManager::DrawAll();
+
+			DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, -1), 1, 0x7f00ff00, true, SceneManager::mainCamera); 
+			DebugDrawer::DrawCircle(Vector3(-2, 0, -4), Vector3(0, 0, -1), 1, 0x7fffff00, true, SceneManager::mainCamera);
 
 			gGUISystem.Draw();
 

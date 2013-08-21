@@ -199,22 +199,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Mesh.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Mesh.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Object.cpp"
 				>
 			</File>
@@ -228,22 +212,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\OBJParser.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\SceneManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\SceneManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\SceneNode.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\SceneNode.h"
 				>
 			</File>
 			<Filter
@@ -341,6 +309,42 @@
 						</File>
 					</Filter>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="SceneNode"
+				>
+				<File
+					RelativePath=".\Source\Mesh.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Mesh.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Model.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Model.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\SceneManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\SceneManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\SceneNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\SceneNode.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

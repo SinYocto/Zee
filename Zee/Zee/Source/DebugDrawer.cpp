@@ -2,7 +2,7 @@
 #include "D3DUtility.h"
 #include "Camera.h"
 
-bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, Camera* camera, LineType lineType /* = LINE_STRIP */)
+bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, Camera* camera, LINE_TYPE lineType /* = LINE_STRIP */)
 {
 	bool isSucceed = false;
 
@@ -34,7 +34,7 @@ Exit:
 	return isSucceed;
 }
 
-bool DebugDrawer::DrawCircle(const Vector3& center, const Vector3& normal, float radius, D3DCOLOR color, 
+bool DebugDrawer::DrawCircle(const Vector3& center, const Vector3& normal, float radius, D3DCOLOR color, bool isSolid,
 							 Camera* camera, int numSegments /*= 64*/)
 {
 	bool isSucceed = false;
@@ -68,7 +68,14 @@ bool DebugDrawer::DrawCircle(const Vector3& center, const Vector3& normal, float
 			}
 		}
 
-		Assert(DrawLine(points, color, camera));
+		if(isSolid)
+		{
+			Assert(drawSolidTriFan(points, color, camera));
+		}
+		else
+		{
+			Assert(DrawLine(points, color, camera));
+		}
 	}
 
 	isSucceed = true;
@@ -76,7 +83,8 @@ Exit:
 	return isSucceed;
 }
 
-bool DebugDrawer::DrawSquare( const Vector3& center, const Vector3& normal, float size, D3DCOLOR color, Camera* camera )
+bool DebugDrawer::DrawSquare(const Vector3& center, const Vector3& normal, float size, 
+							 D3DCOLOR color, bool isSolid, Camera* camera)
 {
 	bool isSucceed = false;
 
@@ -104,7 +112,14 @@ bool DebugDrawer::DrawSquare( const Vector3& center, const Vector3& normal, floa
 			}
 		}
 
-		Assert(DrawLine(points, color, camera));
+		if(isSolid)
+		{
+			Assert(drawSolidTriFan(points, color, camera));
+		}
+		else
+		{
+			Assert(DrawLine(points, color, camera));
+		}
 	}
 
 	isSucceed = true;
@@ -179,4 +194,42 @@ bool DebugDrawer::DrawAABBox(const AABBox& box, D3DCOLOR color, Camera* camera)
 	Vector3 size = box.mMax - box.mMin;
 
 	return DrawBox(center, Quaternion(0, 0, 0), size, 0xffff0000, camera);
+}
+
+bool DebugDrawer::drawSolidTriFan(const std::vector<Vector3>& points, D3DCOLOR color, Camera* camera)
+{
+	bool isSucceed = false;
+
+	Assert(NULL != camera);
+
+	if(points.size() >= 3)
+	{
+		std::vector<VertexXYZD> verts;
+		for(size_t i = 0; i < points.size(); ++i)
+		{
+			VertexXYZD vert(points[i].x, points[i].y, points[i].z, color);
+			verts.push_back(vert);
+		}
+
+		D3DXMATRIX matWorld;
+		D3DXMatrixIdentity(&matWorld);
+		Driver::D3DDevice->SetTransform(D3DTS_WORLD, &matWorld);
+		Driver::D3DDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
+		Driver::D3DDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
+
+		Driver::D3DDevice->SetRenderState(D3DRS_LIGHTING, false);		// TODO:¹ÜÀíRenderState
+		Driver::D3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);		
+		Driver::D3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		Driver::D3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+		Driver::D3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+		Driver::D3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+		Driver::D3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
+
+		Driver::D3DDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, points.size() - 1, &verts[0], sizeof(VertexXYZD));
+	}
+
+	isSucceed = true;
+Exit:
+	return isSucceed;
+	
 }
