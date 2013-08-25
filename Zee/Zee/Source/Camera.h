@@ -33,6 +33,13 @@ public:
 		return mMatProj;
 	}
 
+	D3DXMATRIX OrthoProjMatrix(float orthoWidth) const
+	{
+		D3DXMATRIX matProj;
+		D3DXMatrixOrthoLH(&matProj, orthoWidth, orthoWidth / mAspect, mNearZ, mFarZ);
+		return matProj;
+	}
+
 	bool IsVisible(AABBox boundingBox);
 
 	void SetAspect(float aspect)

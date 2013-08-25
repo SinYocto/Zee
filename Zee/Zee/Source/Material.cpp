@@ -30,31 +30,43 @@ D3DXMATRIX Material::UVTransformMatrix()
 
 void Material::SetShader(ShadingMethod shadingMethod)
 {
-	SAFE_DELETE(mShader);
-
 	switch(shadingMethod)
 	{
+	case InvalidMethod:
+		_Assert(mShader == NULL);
+		return;
+
 	case Flat:
+		SAFE_DROP(mShader);
 		mShader = new FlatShader(this);
 		break;
 
 	case View:
+		SAFE_DROP(mShader);
 		mShader = new ViewShader(this);
 		break;
 
 	case Diffuse:
+		SAFE_DROP(mShader);
 		mShader = new DiffuseShader(this);
 		break;
 
 	case Specular:
+		SAFE_DROP(mShader);
 		mShader = new SpecularShader(this);
 		break;
 
 	case BumpSpecular:
+		SAFE_DROP(mShader);
 		mShader = new BumpSpecularShader(this);
+		break;
+
+	default:
+		_Assert(false);
 		break;
 	}
 
+	mShadingMethod = shadingMethod;
 	_Assert(NULL != mShader);
 }
 

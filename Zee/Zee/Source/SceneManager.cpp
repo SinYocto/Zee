@@ -21,6 +21,13 @@ void SceneManager::AddSceneNode(SceneNode* node, SceneNode* parent /*= root*/)
 	node->SetID(curID++);			// QUESTION:ID一直加不会溢出吧
 }
 
+void SceneManager::GetSceneNode(const wchar_t* name, SceneNode** sceneNode)
+{
+	// TODO
+	// ...
+}
+
+
 void SceneManager::Destory()
 {
 	SAFE_DELETE(root);

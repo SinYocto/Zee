@@ -50,6 +50,8 @@ public:
 	void TranslateLocal(const Vector3& moveVector);
 	void TranslateLocal(float x, float y, float z);
 
+	void SetScale(const Vector3& scale);
+
 	Vector3 LocalVectorToWorld(const Vector3& localVec);
 	Vector3 WorldVectorToLocal(const Vector3& worldVec);
 
@@ -66,7 +68,14 @@ public:
 	void SetWorldPosition(float x, float y, float z);
 	Vector3 GetWorldPosition();
 
+	Quaternion GetWorldOrient();
+
+	Vector3 GetWorldRight();
+	Vector3 GetWorldUp();
+	Vector3 GetWorldForward();
+
 	void SetRelativeOrientation(float eulerX, float eulerY, float eulerZ);
+	void SetWorldOrientation(Quaternion orient);
 	void SetWorldOrientation(float eulerX, float eulerY, float eulerZ);
 
 private:

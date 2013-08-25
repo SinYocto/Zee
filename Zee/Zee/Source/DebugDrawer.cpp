@@ -1,8 +1,16 @@
 #include "DebugDrawer.h"
 #include "D3DUtility.h"
 #include "Camera.h"
+#include "Primitive.h"
+#include "Mesh.h"
+#include "MaterialManager.h"
+#include "Input.h"
 
-bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, Camera* camera, LINE_TYPE lineType /* = LINE_STRIP */)
+//Mesh* TransGizmo::mCone = NULL;
+//Mesh* TransGizmo::mLine = NULL;
+
+bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, Camera* camera, 
+						   const D3DXMATRIX& matWorld /*= IDENTITY_MATRIX*/, LINE_TYPE lineType /* = LINE_STRIP */)
 {
 	bool isSucceed = false;
 
@@ -17,8 +25,6 @@ bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, C
 			verts.push_back(vert);
 		}
 
-		D3DXMATRIX matWorld;
-		D3DXMatrixIdentity(&matWorld);
 		Driver::D3DDevice->SetTransform(D3DTS_WORLD, &matWorld);
 		Driver::D3DDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
 		Driver::D3DDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
@@ -232,4 +238,286 @@ bool DebugDrawer::drawSolidTriFan(const std::vector<Vector3>& points, D3DCOLOR c
 Exit:
 	return isSucceed;
 	
+}
+
+void TransGizmo::Init()
+{
+	Vector2 vpSize;
+	Driver::GetViewPort(NULL, &vpSize);
+
+	Driver::D3DDevice->CreateRenderTarget((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 
+		0, true, &mRenderTarget, NULL);
+
+	Driver::D3DDevice->CreateDepthStencilSurface((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 
+		0, true, &mDepthStencil, NULL);
+
+	Cylinder* coneGeo = new Cylinder(L"", 0, 0.06f, 0.18f);
+	Cylinder* lineGeo = new Cylinder(L"", 0.01f, 0.01f, 1.0f);
+
+	coneGeo->CalculateNormals();
+	coneGeo->BuildGeometry(XYZ_N);
+
+	lineGeo->CalculateNormals();
+	lineGeo->BuildGeometry(XYZ_N);
+
+	//mCone = new Mesh(L"", NULL, coneGeo, MaterialManager::flatMtl);
+	mCone = new Mesh(L"", NULL, coneGeo, NULL);
+	_Assert(mCone);
+
+	mLine = new Mesh(L"", NULL, lineGeo, NULL);
+	_Assert(mLine);
+}
+
+void TransGizmo::Draw(Object* obj, Camera* camera)
+{
+	// 绘制轴线
+	//D3DXMATRIX matWorld;
+	//float scaleFactor = 1.0f;
+	//{
+	//	D3DXMATRIX matTrans, matScale, matRot;
+
+	//	Vector3 pos = obj->GetWorldPosition();
+	//	Quaternion orient = obj->GetWorldOrient();
+
+	//	float dist = VectorLength(camera->GetWorldPosition() - pos);
+	//	scaleFactor = dist / 6.0f;
+
+	//	D3DXMatrixTranslation(&matTrans, pos.x, pos.y, pos.z);
+	//	D3DXMatrixScaling(&matScale, scaleFactor, scaleFactor, scaleFactor);
+	//	matRot = orient.Matrix();
+
+	//	matWorld = matScale * matRot * matTrans;
+	//}
+
+	//Vector3 posO = Vector3::Zero;
+	//Vector3 posX = Vector3(1.0f, 0, 0);
+	//Vector3 posY = Vector3(0, 1.0f, 0);
+	//Vector3 posZ = Vector3(0, 0, 1.0f);
+
+	//Driver::D3DDevice->SetRenderState(D3DRS_ZENABLE, false);
+	//std::vector<Vector3> linePoints;
+
+	//linePoints.push_back(posO);
+	//linePoints.push_back(posX);
+	//DebugDrawer::DrawLine(linePoints, D3DCOLOR_RED, camera, matWorld);
+
+	//linePoints.pop_back();
+	//linePoints.push_back(posY);
+	//DebugDrawer::DrawLine(linePoints, D3DCOLOR_GREEN, camera, matWorld);
+
+	//linePoints.pop_back();
+	//linePoints.push_back(posZ);
+	//DebugDrawer::DrawLine(linePoints, D3DCOLOR_BLUE, camera, matWorld);
+
+	draw(obj, camera, true);
+
+	mPickColor = GIZMO_COLOR::COLOR_NONE;
+	RECT pickRect;
+	D3DLOCKED_RECT pickLockedRect;
+
+	const int PICK_PIXEL_SIZE = 12;
+
+	Vector2 vpSize;
+	Driver::GetViewPort(NULL, &vpSize);
+
+	SetRect(&pickRect, Input::cursorPos.x - PICK_PIXEL_SIZE / 2, Input::cursorPos.y - PICK_PIXEL_SIZE / 2, 
+		Input::cursorPos.x + PICK_PIXEL_SIZE / 2, Input::cursorPos.y + PICK_PIXEL_SIZE / 2);
+
+	if(pickRect.left < 0)
+		pickRect.left = 0;
+	if(pickRect.left > vpSize.x)
+		pickRect.left = (LONG)vpSize.x;
+
+	if(pickRect.right < 0)
+		pickRect.right = 0;
+	if(pickRect.right > vpSize.x)
+		pickRect.right = (LONG)vpSize.x;
+
+	if(pickRect.top < 0)
+		pickRect.top = 0;
+	if(pickRect.top > vpSize.y)
+		pickRect.top = (LONG)vpSize.y;
+
+	if(pickRect.bottom < 0)
+		pickRect.bottom = 0;
+	if(pickRect.bottom > vpSize.y)
+		pickRect.bottom = (LONG)vpSize.y;
+
+	//Clamp((int)pickRect.left, 0, (int)vpSize.x);
+	//Clamp((int)pickRect.right, 0, (int)vpSize.x);
+	//Clamp((int)pickRect.top, 0, (int)vpSize.y);
+	//Clamp((int)pickRect.bottom, 0, (int)vpSize.y);
+
+	HRESULT hr = mRenderTarget->LockRect(&pickLockedRect, &pickRect, D3DLOCK_READONLY);
+	if(SUCCEEDED(hr))
+	{
+		//int nPixels = (pickRect.right - pickRect.left + 1) * (pickRect.bottom - pickRect.top + 1);
+		//DWORD* ptr = (DWORD*)pickLockedRect.pBits;
+		bool bFind = false;
+		for(int i = 0; i <= pickRect.bottom - pickRect.top; ++i)
+		{
+			//DWORD* ptr = (DWORD*)pickLockedRect.pBits + i * pickLockedRect.Pitch * 4;
+			DWORD* ptr = (DWORD*)pickLockedRect.pBits + i * pickLockedRect.Pitch / 4;
+			for(int j = 0; j <= pickRect.right - pickRect.left; ++j)
+			{
+				D3DCOLOR pixelColor = *(D3DCOLOR*)ptr;
+
+				if(pixelColor != GIZMO_COLOR::COLOR_NONE)
+				{
+					mPickColor = pixelColor;
+					break;
+				}
+				ptr++;
+			}
+
+			if(bFind)
+				break;
+		}
+
+		mRenderTarget->UnlockRect(); 
+	}
+
+	//SetRect(&pickRect, Input::cursorPos.x, Input::cursorPos.y, Input::cursorPos.x + 1, Input::cursorPos.y + 1);
+	//HRESULT hr = mRenderTarget->LockRect(&pickLockedRect, &pickRect, D3DLOCK_READONLY) ;
+	//if(hr == S_OK)
+	//{
+	//	mPickColor = *(D3DCOLOR*)pickLockedRect.pBits;
+	//	mRenderTarget->UnlockRect(); 
+	//}
+
+	draw(obj, camera, false);
+}
+
+void TransGizmo::Destroy()
+{
+	SAFE_DELETE(mCone);
+	SAFE_DELETE(mLine);
+
+	SAFE_RELEASE(mRenderTarget);
+	SAFE_RELEASE(mDepthStencil);
+}
+
+void TransGizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
+{
+	IDirect3DSurface9* oldRT = NULL;
+	IDirect3DSurface9* oldDS = NULL;
+	Material* mtl = NULL;
+
+	if(isColorPickPass)
+		mtl = MaterialManager::flatMtl;
+	else
+		mtl = MaterialManager::viewMtl;
+
+	if(isColorPickPass)
+	{
+		Driver::D3DDevice->GetRenderTarget(0, &oldRT);
+		Driver::D3DDevice->GetDepthStencilSurface(&oldDS);
+
+		_Assert(NULL != oldRT);
+		_Assert(NULL != oldDS);
+
+		Driver::D3DDevice->SetRenderTarget(0, mRenderTarget);			
+		Driver::D3DDevice->SetDepthStencilSurface(mDepthStencil);
+
+		Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);
+	}
+
+	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
+	float scaleFactor = dist / 6.0f;
+
+	// 这里清了zbuffer, 以使gizmo始终在屏幕上显示并内部有深度关系, 所以gizmo在渲染流程的最后
+	Driver::Clear(D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);	
+
+	D3DCOLOR colorX = GIZMO_COLOR::COLOR_X;
+	D3DCOLOR colorY = GIZMO_COLOR::COLOR_Y;
+	D3DCOLOR colorZ = GIZMO_COLOR::COLOR_Z;
+
+	if(!isColorPickPass)
+	{
+		if(mPickColor == colorX)
+			colorX = (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED;
+
+		if(mPickColor == colorY)
+			colorY = (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED;
+
+		if(mPickColor == colorZ)
+			colorZ = (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED;
+	}
+
+	//D3DCOLOR colorX = (D3DCOLOR)(mPickColor == GIZMO_COLOR::COLOR_X) ? (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED : (D3DCOLOR)GIZMO_COLOR::COLOR_X;
+	//D3DCOLOR colorY = (D3DCOLOR)(mPickColor == GIZMO_COLOR::COLOR_Y) ? (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED : (D3DCOLOR)GIZMO_COLOR::COLOR_Y;
+	//D3DCOLOR colorZ = (D3DCOLOR)(mPickColor == GIZMO_COLOR::COLOR_Z) ? (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED : (D3DCOLOR)GIZMO_COLOR::COLOR_Z;
+
+	// y轴线
+	Material* tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(colorY);
+
+	mLine->SetWorldPosition(obj->GetWorldPosition());
+	mLine->SetWorldOrientation(obj->GetWorldOrient());
+	mLine->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
+
+	mLine->SetMaterial(tempMtl);
+	mLine->Draw(camera);
+	tempMtl->Drop();
+
+	// x轴线
+	tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(colorX);
+
+	mLine->RotateLocal(0, 0, -PI / 2.0f);
+
+	mLine->SetMaterial(tempMtl);
+	mLine->Draw(camera);
+	tempMtl->Drop(); 
+
+	// z轴线
+	tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(colorZ);
+
+	mLine->RotateLocal(PI / 2.0f, 0, 0);
+
+	mLine->SetMaterial(tempMtl);
+	mLine->Draw(camera);
+	tempMtl->Drop();
+
+	// y锥
+	tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(colorY);
+
+	mCone->SetWorldPosition(obj->GetWorldPosition());
+	mCone->SetWorldOrientation(obj->GetWorldOrient());
+	mCone->TranslateLocal(0, scaleFactor, 0);
+	mCone->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
+
+	mCone->SetMaterial(tempMtl);
+	mCone->Draw(camera);
+	tempMtl->Drop();
+
+	// x锥
+	tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(colorX);
+
+	mCone->TranslateLocal(scaleFactor, -scaleFactor, 0);
+	mCone->RotateLocal(0, 0, -PI / 2.0f);
+
+	mCone->SetMaterial(tempMtl);
+	mCone->Draw(camera);
+	tempMtl->Drop(); 
+
+	// z锥
+	tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(colorZ);
+
+	mCone->TranslateLocal(0, -scaleFactor, scaleFactor);
+	mCone->RotateLocal(PI / 2.0f, 0, 0);
+
+	mCone->SetMaterial(tempMtl);
+	mCone->Draw(camera);
+	tempMtl->Drop();
+
+	if(isColorPickPass)
+	{
+		Driver::D3DDevice->SetRenderTarget(0, oldRT);			
+		Driver::D3DDevice->SetDepthStencilSurface(oldDS);
+	}
 }

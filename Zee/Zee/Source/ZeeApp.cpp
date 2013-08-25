@@ -31,6 +31,9 @@ IMPLEMENT_APP_CONSOLE(ZeeApp)
 const int WND_WIDTH = 1280;
 const int WND_HEIGHT = 720;
 
+Model* cubeModel1 = NULL;
+TransGizmo* transGizmo = NULL;
+
 LabelStyle* leftAlignStyle;
 
 void ApplyFPCameraControllor(Camera* pCamera, float deltaTime);
@@ -143,12 +146,13 @@ void SetUp()
 	MaterialManager::Init();
 	SceneManager::Init();
 	Time::Start();
+	//TransGizmo::Init();
 
 	SetupGUIStyle();
 
 	// camera
 	SceneManager::CreateMainCamera(Vector3(0, 4.0f, -4.0f), Vector3::Zero,
-		PI/3, (float)Driver::viewPort.Width / (float)Driver::viewPort.Height, 0.1f, 100000.0f);
+		PI/3, (float)Driver::viewPort.Width / (float)Driver::viewPort.Height, 0.1f, 1000.0f);
 
 	// lights
 	DirectionalLight* dirLight1 = new DirectionalLight(L"dirLight1", D3DXCOLOR_RED, Vector3(1.0f, -1.0f, 1.0f));
@@ -201,7 +205,7 @@ void SetUp()
 	mtl4->SetDiffuseColor(D3DXCOLOR_RED);
 
 	// model
-	Model* cubeModel1 = new Model(L"cubeModel1", SceneManager::root, cube1, MaterialManager::diffMtl);
+	cubeModel1 = new Model(L"cubeModel1", SceneManager::root, cube1, MaterialManager::diffMtl);
 	cubeModel1->Translate(2, 0, 0);
 
 	Model* cubeModel2 = new Model(L"cubeModel2", SceneManager::root, cube1, MaterialManager::flatMtl);
@@ -211,6 +215,9 @@ void SetUp()
 	cylinderModel->Translate(0, 0, 2);
 	//cylinderModel->SetDrawBBoxFlag(true);
 	cylinderModel->Rotate(PI/2, 0, 0);
+
+	transGizmo = new TransGizmo;
+	transGizmo->Init();
 
 }
 
@@ -235,7 +242,7 @@ void RenderLoop()
 			MaterialManager::FrameUpdate();
 
 			// render
-			Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff1e90ff);
+			Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
 			Driver::BeginScene();
 
 			Vector2 screenPos(Input::cursorPos.x, Input::cursorPos.y);
@@ -264,10 +271,14 @@ void RenderLoop()
 
 			SceneManager::DrawAll();
 
+
 			DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, -1), 1, 0x7f00ff00, true, SceneManager::mainCamera); 
 			DebugDrawer::DrawCircle(Vector3(-2, 0, -4), Vector3(0, 0, -1), 1, 0x7fffff00, true, SceneManager::mainCamera);
 
 			gGUISystem.Draw();
+
+			//TransGizmo::Draw(cubeModel1, SceneManager::mainCamera);
+			transGizmo->Draw(cubeModel1, SceneManager::mainCamera);
 
 			Driver::EndScene();
 			Driver::Present();
@@ -366,7 +377,7 @@ void GUIUpdate()
 
 
 	static bool enableDirLight1 = false;
-	enableDirLight1 = gGUISystem.GUIToggle(Rect(10, 150, 20, 20), enableDirLight1);
+	// enableDirLight1 = gGUISystem.GUIToggle(Rect(10, 150, 20, 20), enableDirLight1);
 
 	DirectionalLight* dirLight1 = NULL;
 	LightManager::GetDirLight(L"dirLight1", &dirLight1);
@@ -396,12 +407,15 @@ int GetFPS()
 void AppDestroy()
 {
 	SAFE_DELETE(leftAlignStyle);
+	transGizmo->Destroy();
+	SAFE_DELETE(transGizmo);
 
 	Input::Destroy();
 	SceneManager::Destory();
 	GeometryManager::DeleteAll();
 	MaterialManager::DeleteAll();
 	LightManager::Destroy();
+	//TransGizmo::Destroy();
 	Driver::Destory();
 }
 

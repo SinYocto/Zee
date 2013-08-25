@@ -15,7 +15,7 @@ public:
 	static void GetViewPort(Vector2* vpOrigin, Vector2* vpSize);
 	static void Destory();
 
-	static HRESULT Clear(DWORD flag, D3DCOLOR color);
+	static HRESULT Clear(DWORD flag, D3DCOLOR color, float z);
 	static HRESULT BeginScene();
 	static HRESULT EndScene();
 	static HRESULT Present();

@@ -35,6 +35,7 @@ public:
 	}
 
 	virtual void Draw(Camera* camera);
+	void SetMaterial(Material* mtl);
 
 private:
 	virtual void calCurrentAABBox();

@@ -6,9 +6,13 @@
 
 #define PI 3.141592654f
 
+const D3DXMATRIX IDENTITY_MATRIX = D3DXMATRIX();
+
 bool FloatEqual(const float& f1, const float& f2, const float& tolerance);
 bool FloatUnequal(const float& f1, const float& f2, const float& tolerance);
 void Clamp(float& val, const float min, const float max);
+
+void Clamp(int& val, const int min, const int max);
 
 class Vector3
 {
@@ -169,5 +173,9 @@ public:
 public:
 	long left, top, right, bottom;
 };
+
+// TODO:名字其实不科学
+void persPosToOrthoPos(const D3DXMATRIX& matView, const D3DXMATRIX& matProjPers, const D3DXMATRIX& matProjOrtho,
+					   const Vector3& _orthoPos, Vector3* _persPos);
 
 #endif

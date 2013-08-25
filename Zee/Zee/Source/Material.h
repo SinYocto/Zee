@@ -14,6 +14,7 @@ class Material : public IReferenceCounted
 public:
 	Material(const wchar_t* name)
 		:mShader(NULL)
+		,mShadingMethod(InvalidMethod)
 		,mAmbientColor(D3DXCOLOR_WHITE)
 		,mDiffuseColor(D3DXCOLOR_WHITE)
 		,mSpecularColor(D3DXCOLOR_WHITE)
@@ -32,6 +33,34 @@ public:
 		}
 	}
 
+	Material(const Material& mtl)		// 用于复制一个临时使用的mtl, 不纳入manager管理, 不关心id和name
+		:mAmbientColor(mtl.mAmbientColor)
+		,mDiffuseColor(mtl.mDiffuseColor)
+		,mSpecularColor(mtl.mSpecularColor)
+		,mShiness(mtl.mShiness)
+		,mGloss(mtl.mGloss)
+		,mTilesU(mtl.mTilesU)
+		,mTilesV(mtl.mTilesV)
+		,mOffsetU(mtl.mOffsetU)
+		,mOffsetV(mtl.mOffsetV)
+		,mParamsVec1(mtl.mParamsVec1)
+		,mParamsVec2(mtl.mParamsVec2)
+		,mShader(NULL)
+		,mShadingMethod(mtl.mShadingMethod)
+	{
+		YString::Copy(mName, _countof(mName), L"clone");
+
+		SetShader(mShadingMethod);
+
+		for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
+		{
+			mTextureLayer[layerIx] = mtl.mTextureLayer[layerIx];
+
+			if(mTextureLayer[layerIx])
+				mTextureLayer[layerIx]->AddRef();
+		}
+	}
+
 	~Material()
 	{
 		for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
@@ -39,7 +68,7 @@ public:
 			SAFE_RELEASE(mTextureLayer[layerIx]);
 		}
 
-		SAFE_DELETE(mShader);
+		SAFE_DROP(mShader);
 	}
 
 	wchar_t* GetName();
@@ -93,6 +122,8 @@ private:
 	Vector4 mParamsVec2;
 	
 	IDirect3DTexture9* mTextureLayer[MAX_MATERIAL_TEXTURE_LAYERS];
+
+	ShadingMethod mShadingMethod;
 };
 
 #endif

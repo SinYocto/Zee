@@ -2,6 +2,7 @@
 #define SHADER_H
 
 #include "D3DUtility.h"
+#include "IReferenceCounted.h"
 
 enum ShadingMethod 
 { 
@@ -9,7 +10,8 @@ enum ShadingMethod
 	View,
 	Diffuse, 
 	Specular, 
-	BumpSpecular 
+	BumpSpecular,
+	InvalidMethod
 };
 
 class Material;
@@ -47,13 +49,20 @@ struct UtilityShader
 	static LPD3DXEFFECT effect;
 };
 
-interface IShader
+interface IShader : public IReferenceCounted
 {
 public:
+	IShader(Material* material)
+		:mMaterial(material)
+	{
+
+	}
+
 	virtual void SetColorTex(wchar_t* texFileName)
 	{
 
 	}
+
 	virtual void SetNormalTex(wchar_t* texFileName)
 	{
 
@@ -95,13 +104,16 @@ public:
 	{
 
 	}
+
+protected:
+	Material* mMaterial;
 };
 
 class FlatShader : public IShader
 {
 public:
 	FlatShader(Material* material)
-		:mMaterial(material)
+		:IShader(material)
 	{
 
 	}
@@ -131,19 +143,15 @@ public:
 
 	void Render(Object* object, Geometry* geo, Camera* camera);
 
-private:
-	Material* mMaterial;
-
 public:
 	static LPD3DXEFFECT mEffect;
-
 };
 
 class ViewShader : public IShader
 {
 public:
 	ViewShader(Material* _material)
-		:mMaterial(_material)
+		:IShader(_material)
 	{
 
 	}
@@ -173,19 +181,15 @@ public:
 
 	void Render(Object* object, Geometry* geo, Camera* camera);
 
-private:
-	Material* mMaterial;
-
 public:
 	static LPD3DXEFFECT mEffect;
-
 };
 
 class DiffuseShader : public IShader
 {
 public:
 	DiffuseShader(Material* material)
-		:mMaterial(material)
+		:IShader(material)
 	{
 
 	}
@@ -216,9 +220,6 @@ public:
 
 	void Render(Object* object, Geometry* geo, Camera* camera);
 
-private:
-	Material* mMaterial;
-
 public:
 	static LPD3DXEFFECT mEffect;
 };
@@ -227,7 +228,7 @@ class SpecularShader : public IShader
 {
 public:
 	SpecularShader(Material* _material)
-		:mMaterial(_material)
+		:IShader(_material)
 	{
 
 	}
@@ -262,9 +263,6 @@ public:
 
 	void Render(Object* object, Geometry* geo, Camera* camera);
 
-private:
-	Material* mMaterial;
-
 public:
 	static LPD3DXEFFECT mEffect;
 };
@@ -273,7 +271,7 @@ class BumpSpecularShader : public IShader
 {
 public:
 	BumpSpecularShader(Material* material)
-		:mMaterial(material)
+		:IShader(material)
 	{
 
 	}
@@ -308,9 +306,6 @@ public:
 	void SetUVOffset(float offsetU, float offsetV);
 
 	void Render(Object* object, Geometry* geo, Camera* camera);
-
-private:
-	Material* mMaterial;
 
 public:
 	static LPD3DXEFFECT mEffect;

@@ -101,15 +101,19 @@ void Driver::SetViewPort(int offsetX, int offsetY, int width, int height)
 
 void Driver::GetViewPort(Vector2* vpOrigin, Vector2* vpSize)
 {
-	_Assert(NULL != vpOrigin);
-	_Assert(NULL != vpSize);
 	_Assert(NULL != D3DDevice);
 
 	D3DVIEWPORT9 vp;
 	D3DDevice->GetViewport(&vp);
 
-	*vpOrigin = Vector2((float)vp.X, (float)vp.Y);
-	*vpSize = Vector2((float)vp.Width, (float)vp.Height);
+	Vector2 origin = Vector2((float)vp.X, (float)vp.Y);
+	Vector2 size = Vector2((float)vp.Width, (float)vp.Height);
+
+	if(vpOrigin)
+		*vpOrigin = origin;
+
+	if(vpSize)
+		*vpSize = size;
 }
 
 
@@ -119,9 +123,9 @@ void Driver::Destory()
 	SAFE_RELEASE(D3DDevice);
 }
 
-HRESULT Driver::Clear(DWORD flag, D3DCOLOR color)
+HRESULT Driver::Clear(DWORD flag, D3DCOLOR color, float z)
 {
-	return D3DDevice->Clear(0, 0, flag, color, 1.0f, 0);
+	return D3DDevice->Clear(0, 0, flag, color, z, 0);
 }
 
 HRESULT Driver::BeginScene()

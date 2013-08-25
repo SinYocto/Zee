@@ -482,6 +482,14 @@
 				RelativePath=".\Source\DebugDrawer.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Source\Gizmo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Gizmo.h"
+				>
+			</File>
 		</Filter>
 		<File
 			RelativePath=".\Source\ZeeApp.cpp"

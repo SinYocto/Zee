@@ -35,3 +35,13 @@ void Mesh::calCurrentAABBox()
 	_Assert(NULL != mGeo);
 	mGeo->CalcDynamicAABBox(mWorldPos, mWorldOrient, &mAABBox);
 }
+
+void Mesh::SetMaterial(Material* mtl)
+{
+	if(mtl)
+	{
+		SAFE_DROP(mMaterial);
+		mMaterial = mtl;
+		mMaterial->Grab();
+	}
+}

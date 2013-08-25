@@ -26,6 +26,15 @@ void Clamp(float& val, const float min, const float max)
 		val = min;
 }
 
+void Clamp(int& val, const int min, const int max)
+{
+	if(val > max)
+		val = max;
+
+	if(val < min)
+		val = min;
+}
+
 // Vector3
 Vector3 Vector3::Zero = Vector3(0, 0, 0);
 
@@ -468,4 +477,19 @@ void Rect::TransLate(int x, int y)
 	right += x;
 	top += y;
 	bottom += y;
+}
+
+void persPosToOrthoPos(const D3DXMATRIX& matView, const D3DXMATRIX& matProjPers, const D3DXMATRIX& matProjOrtho, 
+					   const Vector3& _persPos, Vector3* _orthoPos)
+{
+	_Assert(NULL != _orthoPos);
+
+	D3DXVECTOR3 orthoPos, clipPos;
+	D3DXMATRIX invTempMatrix;
+
+	D3DXVec3TransformCoord(&clipPos, &(D3DXVECTOR3(_persPos.x, _persPos.y, _persPos.z)), &(matView * matProjPers));
+	D3DXMatrixInverse(&invTempMatrix, 0, &(matView * matProjOrtho));
+	D3DXVec3TransformCoord(&orthoPos, &clipPos, &invTempMatrix);
+
+	*_orthoPos = Vector3(orthoPos.x, orthoPos.y, orthoPos.z);
 }
