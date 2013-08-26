@@ -176,6 +176,12 @@ void SetUp()
 	cylinder1->CalculateNormals();
 	cylinder1->BuildGeometry(XYZ_N);
 
+	Torus* torus1 = new Torus(L"torus1", 1.0f, 0.025f, 32, 8);
+	GeometryManager::AddGeometry(torus1);
+
+	torus1->CalculateNormals();
+	torus1->BuildGeometry(XYZ_N);
+
 	// material
 	Material* mtl1 = new Material(L"mtl1");
 	MaterialManager::AddMaterial(mtl1);
@@ -211,10 +217,10 @@ void SetUp()
 	Model* cubeModel2 = new Model(L"cubeModel2", SceneManager::root, cube1, MaterialManager::flatMtl);
 	cubeModel2->Translate(-2, 0, 0);
 
-	Model* cylinderModel = new Model(L"cylinderModel", SceneManager::root, cylinder1, mtl4);
+	Model* cylinderModel = new Model(L"cylinderModel", SceneManager::root, torus1, mtl4);
 	cylinderModel->Translate(0, 0, 2);
 	//cylinderModel->SetDrawBBoxFlag(true);
-	cylinderModel->Rotate(PI/2, 0, 0);
+	//cylinderModel->Rotate(PI/2, 0, 0);
 
 	transGizmo = new TransGizmo;
 	transGizmo->Init();

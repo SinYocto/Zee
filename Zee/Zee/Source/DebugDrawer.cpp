@@ -6,9 +6,6 @@
 #include "MaterialManager.h"
 #include "Input.h"
 
-//Mesh* TransGizmo::mCone = NULL;
-//Mesh* TransGizmo::mLine = NULL;
-
 bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, Camera* camera, 
 						   const D3DXMATRIX& matWorld /*= IDENTITY_MATRIX*/, LINE_TYPE lineType /* = LINE_STRIP */)
 {
@@ -105,7 +102,7 @@ bool DebugDrawer::DrawSquare(const Vector3& center, const Vector3& normal, float
 		points.push_back(Vector3(-size / 2, 0, -size / 2));
 
 		Vector3 normalizedN = normal.Normalized();
-		if(FloatUnequal(fabsf(normalizedN.Dot(Vector3(0, 1, 0))), 1, 0.0001f))
+		//if(FloatUnequal(fabsf(normalizedN.Dot(Vector3(0, 1, 0))), 1, 0.0001f))
 		{
 			Quaternion rotation = Quaternion::VectorRotation(Vector3(0, 1, 0), normalizedN);
 
@@ -223,6 +220,7 @@ bool DebugDrawer::drawSolidTriFan(const std::vector<Vector3>& points, D3DCOLOR c
 		Driver::D3DDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
 		Driver::D3DDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
 
+		Driver::D3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 		Driver::D3DDevice->SetRenderState(D3DRS_LIGHTING, false);		// TODO:管理RenderState
 		Driver::D3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);		
 		Driver::D3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
@@ -232,6 +230,8 @@ bool DebugDrawer::drawSolidTriFan(const std::vector<Vector3>& points, D3DCOLOR c
 		Driver::D3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
 
 		Driver::D3DDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, points.size() - 1, &verts[0], sizeof(VertexXYZD));
+
+		Driver::D3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	}
 
 	isSucceed = true;
@@ -260,7 +260,6 @@ void TransGizmo::Init()
 	lineGeo->CalculateNormals();
 	lineGeo->BuildGeometry(XYZ_N);
 
-	//mCone = new Mesh(L"", NULL, coneGeo, MaterialManager::flatMtl);
 	mCone = new Mesh(L"", NULL, coneGeo, NULL);
 	_Assert(mCone);
 
@@ -268,60 +267,19 @@ void TransGizmo::Init()
 	_Assert(mLine);
 }
 
-void TransGizmo::Draw(Object* obj, Camera* camera)
+void TransGizmo::getPickColor(D3DCOLOR* pickColor, const int pickPixelSize)
 {
-	// 绘制轴线
-	//D3DXMATRIX matWorld;
-	//float scaleFactor = 1.0f;
-	//{
-	//	D3DXMATRIX matTrans, matScale, matRot;
+	_Assert(NULL != pickColor);
+	*pickColor = 0;
 
-	//	Vector3 pos = obj->GetWorldPosition();
-	//	Quaternion orient = obj->GetWorldOrient();
-
-	//	float dist = VectorLength(camera->GetWorldPosition() - pos);
-	//	scaleFactor = dist / 6.0f;
-
-	//	D3DXMatrixTranslation(&matTrans, pos.x, pos.y, pos.z);
-	//	D3DXMatrixScaling(&matScale, scaleFactor, scaleFactor, scaleFactor);
-	//	matRot = orient.Matrix();
-
-	//	matWorld = matScale * matRot * matTrans;
-	//}
-
-	//Vector3 posO = Vector3::Zero;
-	//Vector3 posX = Vector3(1.0f, 0, 0);
-	//Vector3 posY = Vector3(0, 1.0f, 0);
-	//Vector3 posZ = Vector3(0, 0, 1.0f);
-
-	//Driver::D3DDevice->SetRenderState(D3DRS_ZENABLE, false);
-	//std::vector<Vector3> linePoints;
-
-	//linePoints.push_back(posO);
-	//linePoints.push_back(posX);
-	//DebugDrawer::DrawLine(linePoints, D3DCOLOR_RED, camera, matWorld);
-
-	//linePoints.pop_back();
-	//linePoints.push_back(posY);
-	//DebugDrawer::DrawLine(linePoints, D3DCOLOR_GREEN, camera, matWorld);
-
-	//linePoints.pop_back();
-	//linePoints.push_back(posZ);
-	//DebugDrawer::DrawLine(linePoints, D3DCOLOR_BLUE, camera, matWorld);
-
-	draw(obj, camera, true);
-
-	mPickColor = GIZMO_COLOR::COLOR_NONE;
 	RECT pickRect;
 	D3DLOCKED_RECT pickLockedRect;
-
-	const int PICK_PIXEL_SIZE = 12;
 
 	Vector2 vpSize;
 	Driver::GetViewPort(NULL, &vpSize);
 
-	SetRect(&pickRect, Input::cursorPos.x - PICK_PIXEL_SIZE / 2, Input::cursorPos.y - PICK_PIXEL_SIZE / 2, 
-		Input::cursorPos.x + PICK_PIXEL_SIZE / 2, Input::cursorPos.y + PICK_PIXEL_SIZE / 2);
+	SetRect(&pickRect, Input::cursorPos.x - pickPixelSize / 2, Input::cursorPos.y - pickPixelSize / 2, 
+		Input::cursorPos.x + pickPixelSize / 2, Input::cursorPos.y + pickPixelSize / 2);
 
 	if(pickRect.left < 0)
 		pickRect.left = 0;
@@ -343,28 +301,20 @@ void TransGizmo::Draw(Object* obj, Camera* camera)
 	if(pickRect.bottom > vpSize.y)
 		pickRect.bottom = (LONG)vpSize.y;
 
-	//Clamp((int)pickRect.left, 0, (int)vpSize.x);
-	//Clamp((int)pickRect.right, 0, (int)vpSize.x);
-	//Clamp((int)pickRect.top, 0, (int)vpSize.y);
-	//Clamp((int)pickRect.bottom, 0, (int)vpSize.y);
-
 	HRESULT hr = mRenderTarget->LockRect(&pickLockedRect, &pickRect, D3DLOCK_READONLY);
 	if(SUCCEEDED(hr))
 	{
-		//int nPixels = (pickRect.right - pickRect.left + 1) * (pickRect.bottom - pickRect.top + 1);
-		//DWORD* ptr = (DWORD*)pickLockedRect.pBits;
 		bool bFind = false;
 		for(int i = 0; i <= pickRect.bottom - pickRect.top; ++i)
 		{
-			//DWORD* ptr = (DWORD*)pickLockedRect.pBits + i * pickLockedRect.Pitch * 4;
 			DWORD* ptr = (DWORD*)pickLockedRect.pBits + i * pickLockedRect.Pitch / 4;
 			for(int j = 0; j <= pickRect.right - pickRect.left; ++j)
 			{
 				D3DCOLOR pixelColor = *(D3DCOLOR*)ptr;
 
-				if(pixelColor != GIZMO_COLOR::COLOR_NONE)
+				if(pixelColor != COLOR_NONE)
 				{
-					mPickColor = pixelColor;
+					*pickColor = pixelColor;
 					break;
 				}
 				ptr++;
@@ -376,15 +326,57 @@ void TransGizmo::Draw(Object* obj, Camera* camera)
 
 		mRenderTarget->UnlockRect(); 
 	}
+}
 
-	//SetRect(&pickRect, Input::cursorPos.x, Input::cursorPos.y, Input::cursorPos.x + 1, Input::cursorPos.y + 1);
-	//HRESULT hr = mRenderTarget->LockRect(&pickLockedRect, &pickRect, D3DLOCK_READONLY) ;
-	//if(hr == S_OK)
-	//{
-	//	mPickColor = *(D3DCOLOR*)pickLockedRect.pBits;
-	//	mRenderTarget->UnlockRect(); 
-	//}
+void TransGizmo::determinSelectType(Object* obj, Camera* camera)
+{
+	if(Input::GetLeftButton())		// 左键按下不更新, 保持之前选择状态
+		return;
 
+	draw(obj, camera, true);		// flatMtl绘制, 用于colorPick
+
+	D3DCOLOR pickColor = 0;
+	getPickColor(&pickColor, 8);
+
+	switch(pickColor)
+	{
+	case COLOR_NONE:
+		mSelected = SELECT_NONE;
+		break;
+
+	case COLOR_X:
+		mSelected = SELECT_X;
+		break;
+
+	case COLOR_Y:
+		mSelected = SELECT_Y;
+		break;
+
+	case COLOR_Z:
+		mSelected = SELECT_Z;
+		break;
+
+	case COLOR_XY_PICK:
+		mSelected = SELECT_XY;
+		break;
+
+	case COLOR_XZ_PICK:
+		mSelected = SELECT_XZ;
+		break;
+
+	case COLOR_YZ_PICK:
+		mSelected = SELECT_YZ;
+		break;
+
+	default:
+		mSelected = SELECT_NONE;
+		break;
+	}
+}
+
+void TransGizmo::Draw(Object* obj, Camera* camera)
+{
+	determinSelectType(obj, camera);
 	draw(obj, camera, false);
 }
 
@@ -428,27 +420,49 @@ void TransGizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 	// 这里清了zbuffer, 以使gizmo始终在屏幕上显示并内部有深度关系, 所以gizmo在渲染流程的最后
 	Driver::Clear(D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);	
 
-	D3DCOLOR colorX = GIZMO_COLOR::COLOR_X;
-	D3DCOLOR colorY = GIZMO_COLOR::COLOR_Y;
-	D3DCOLOR colorZ = GIZMO_COLOR::COLOR_Z;
+	D3DCOLOR colorX = COLOR_X;
+	D3DCOLOR colorY = COLOR_Y;
+	D3DCOLOR colorZ = COLOR_Z;
+	D3DCOLOR colorXY = COLOR_XY_PICK;
+	D3DCOLOR colorXZ = COLOR_XZ_PICK;
+	D3DCOLOR colorYZ = COLOR_YZ_PICK;
 
 	if(!isColorPickPass)
 	{
-		if(mPickColor == colorX)
-			colorX = (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED;
+		colorXY = COLOR_XY;
+		colorXZ = COLOR_XZ;
+		colorYZ = COLOR_YZ;
 
-		if(mPickColor == colorY)
-			colorY = (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED;
+		if(mSelected == SELECT_X)
+			colorX = (D3DCOLOR)COLOR_SELECTED;
 
-		if(mPickColor == colorZ)
-			colorZ = (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED;
+		if(mSelected == SELECT_Y)
+			colorY = (D3DCOLOR)COLOR_SELECTED;
+
+		if(mSelected == SELECT_Z)
+			colorZ = (D3DCOLOR)COLOR_SELECTED;
+
+		if(mSelected == SELECT_XY)
+		{
+			colorXY = (D3DCOLOR)COLOR_SELECTED;
+			SETALPHA(colorXY, 0x7f);
+		}
+
+		if(mSelected == SELECT_XZ)
+		{
+			colorXZ = (D3DCOLOR)COLOR_SELECTED;
+			SETALPHA(colorXZ, 0x7f);
+		}
+
+		if(mSelected == SELECT_YZ)
+		{
+			colorYZ = (D3DCOLOR)COLOR_SELECTED;
+			SETALPHA(colorYZ, 0x7f);
+		}
 	}
 
-	//D3DCOLOR colorX = (D3DCOLOR)(mPickColor == GIZMO_COLOR::COLOR_X) ? (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED : (D3DCOLOR)GIZMO_COLOR::COLOR_X;
-	//D3DCOLOR colorY = (D3DCOLOR)(mPickColor == GIZMO_COLOR::COLOR_Y) ? (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED : (D3DCOLOR)GIZMO_COLOR::COLOR_Y;
-	//D3DCOLOR colorZ = (D3DCOLOR)(mPickColor == GIZMO_COLOR::COLOR_Z) ? (D3DCOLOR)GIZMO_COLOR::COLOR_SELECTED : (D3DCOLOR)GIZMO_COLOR::COLOR_Z;
-
-	// y轴线
+	const float SQUARE_SIZE = 0.4f;
+	// y
 	Material* tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(colorY);
 
@@ -458,31 +472,6 @@ void TransGizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 
 	mLine->SetMaterial(tempMtl);
 	mLine->Draw(camera);
-	tempMtl->Drop();
-
-	// x轴线
-	tempMtl = new Material(*mtl);
-	tempMtl->SetDiffuseColor(colorX);
-
-	mLine->RotateLocal(0, 0, -PI / 2.0f);
-
-	mLine->SetMaterial(tempMtl);
-	mLine->Draw(camera);
-	tempMtl->Drop(); 
-
-	// z轴线
-	tempMtl = new Material(*mtl);
-	tempMtl->SetDiffuseColor(colorZ);
-
-	mLine->RotateLocal(PI / 2.0f, 0, 0);
-
-	mLine->SetMaterial(tempMtl);
-	mLine->Draw(camera);
-	tempMtl->Drop();
-
-	// y锥
-	tempMtl = new Material(*mtl);
-	tempMtl->SetDiffuseColor(colorY);
 
 	mCone->SetWorldPosition(obj->GetWorldPosition());
 	mCone->SetWorldOrientation(obj->GetWorldOrient());
@@ -491,28 +480,50 @@ void TransGizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 
 	mCone->SetMaterial(tempMtl);
 	mCone->Draw(camera);
+
+	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(SQUARE_SIZE * 0.5f, 0, SQUARE_SIZE * 0.5f)), 
+		Vector3(0, 1.0f, 0), 0.8f * scaleFactor * SQUARE_SIZE, colorXZ, true, camera);
+
 	tempMtl->Drop();
 
-	// x锥
+	// x
 	tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(colorX);
+
+	mLine->RotateLocal(0, 0, -PI / 2.0f);
+
+	mLine->SetMaterial(tempMtl);
+	mLine->Draw(camera);
 
 	mCone->TranslateLocal(scaleFactor, -scaleFactor, 0);
 	mCone->RotateLocal(0, 0, -PI / 2.0f);
 
 	mCone->SetMaterial(tempMtl);
 	mCone->Draw(camera);
+
+	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(0, SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f)), 
+		Vector3(1.0f, 0, 0), 0.8f * scaleFactor * SQUARE_SIZE, colorYZ, true, camera);
+
 	tempMtl->Drop(); 
 
-	// z锥
+	// z
 	tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(colorZ);
+
+	mLine->RotateLocal(PI / 2.0f, 0, 0);
+
+	mLine->SetMaterial(tempMtl);
+	mLine->Draw(camera);
 
 	mCone->TranslateLocal(0, -scaleFactor, scaleFactor);
 	mCone->RotateLocal(PI / 2.0f, 0, 0);
 
 	mCone->SetMaterial(tempMtl);
 	mCone->Draw(camera);
+
+	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f, 0)), 
+		Vector3(0, 0, 1.0f), 0.8f * scaleFactor * SQUARE_SIZE, colorXY, true, camera);
+
 	tempMtl->Drop();
 
 	if(isColorPickPass)

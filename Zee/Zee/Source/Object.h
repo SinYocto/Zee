@@ -68,6 +68,8 @@ public:
 	void SetWorldPosition(float x, float y, float z);
 	Vector3 GetWorldPosition();
 
+	Vector3 GetWorldPosition(const Vector3& localMoveVector);
+
 	Quaternion GetWorldOrient();
 
 	Vector3 GetWorldRight();

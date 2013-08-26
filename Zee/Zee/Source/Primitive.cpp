@@ -213,3 +213,63 @@ void Cylinder::constructGeometryData()
 //	//tangentData = new Vector3[numVertices];
 //	//bitangentData = new Vector3[numVertices];
 //}
+
+void Torus::constructGeometryData()
+{
+	int numVerts = mSegmentsR * mSegmentsT;
+
+	// positionData
+	float deltaThetaR = 2 * PI / mSegmentsR;
+	float deltaThetaT = 2 * PI / mSegmentsT;
+
+	for(int i = 0; i < mSegmentsR; ++i)
+	{
+		float thetaR = i * deltaThetaR;
+		for(int j = 0; j < mSegmentsT; ++j)
+		{
+			float thetaT = j * deltaThetaT;
+
+			float x = (mRadius + mTubeRadius * cos(thetaT)) * cos(thetaR);
+			float y = mTubeRadius * sin(thetaT);
+			float z = (mRadius + mTubeRadius * cos(thetaT)) * sin(thetaR);
+
+			mPositionData.push_back(Vector3(x, y, z));
+		}
+	}
+
+	// verts
+	for(size_t i = 0; i < mPositionData.size(); ++i)
+	{
+		Geometry::Vert vert(i);
+		mVerts.push_back(vert);
+	}
+
+	// triangles
+	for(int i = 0; i < mSegmentsR; ++i)
+	{
+		for(int j = 0; j < mSegmentsT; ++j)		
+		{
+			Geometry::Triangle tri1;
+			Geometry::Triangle tri2;
+
+			tri1.vertexIndex[0] = mSegmentsT * i + j;
+			tri1.vertexIndex[1] = mSegmentsT * i + (j + 1) % mSegmentsT;
+			tri1.vertexIndex[2] = mSegmentsT * ((i + 1) % mSegmentsR) + j ;
+
+			tri2.vertexIndex[0] = mSegmentsT * ((i + 1) % mSegmentsR) + j;
+			tri2.vertexIndex[1] = mSegmentsT * i + (j + 1) % mSegmentsT;
+			tri2.vertexIndex[2] = mSegmentsT * ((i + 1) % mSegmentsR) + (j + 1) % mSegmentsT;
+
+			_Assert(tri1.vertexIndex[0] < mSegmentsR * mSegmentsT);
+			_Assert(tri1.vertexIndex[1] < mSegmentsR * mSegmentsT);
+			_Assert(tri1.vertexIndex[2] < mSegmentsR * mSegmentsT);
+
+			_Assert(tri2.vertexIndex[0] < mSegmentsR * mSegmentsT);
+			_Assert(tri2.vertexIndex[1] < mSegmentsR * mSegmentsT);
+			_Assert(tri2.vertexIndex[2] < mSegmentsR * mSegmentsT);
+
+			mTriangles.push_back(tri1);
+			mTriangles.push_back(tri2);
+		}
+	}
+}

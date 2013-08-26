@@ -40,6 +40,29 @@ private:
 	int segmentsW;
 	int segmentsH;
 };
+
+class Torus : public Geometry
+{
+public:
+	Torus(const wchar_t* name, float radius, float tubeRadius, int segmentsR = 32, int segmentsT = 24)
+		:Geometry(name)
+		,mRadius(radius)
+		,mTubeRadius(tubeRadius)
+		,mSegmentsR(segmentsR)
+		,mSegmentsT(segmentsT)
+	{
+		constructGeometryData();
+	}
+
+private:
+	virtual void constructGeometryData();
+
+private:
+	float mRadius;
+	float mTubeRadius;
+	int mSegmentsR;
+	int mSegmentsT;
+};
 //
 //class Sphere : public Mesh
 //{

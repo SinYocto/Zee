@@ -14,6 +14,8 @@ void Clamp(float& val, const float min, const float max);
 
 void Clamp(int& val, const int min, const int max);
 
+#define SETALPHA(color, alpha) (color = (((color) & 0x00ffffff) | ((alpha) << 24)))
+
 class Vector3
 {
 public:
