@@ -160,7 +160,7 @@ float Vector3::Dot(Vector3 vec) const
 	
 Vector3 Vector3::Cross(Vector3 vec) const
 { 
-	// 因为xyz坐标轴属于左手系, 但向量叉乘和轴旋转又想用右手系判断, 所以加上负号
+	// 因为xyz坐标轴使用的左手系, 但向量叉乘用右手, 所以加上负号
 	return - Vector3(y*vec.z - z*vec.y, z*vec.x - x*vec.z, x*vec.y - y*vec.x);
 }
 
@@ -492,4 +492,16 @@ void persPosToOrthoPos(const D3DXMATRIX& matView, const D3DXMATRIX& matProjPers,
 	D3DXVec3TransformCoord(&orthoPos, &clipPos, &invTempMatrix);
 
 	*_orthoPos = Vector3(orthoPos.x, orthoPos.y, orthoPos.z);
+}
+
+void GetClipSpacePos(const Vector3& posLocal, const D3DXMATRIX& matWVP, Vector3* posClip)
+{
+	_Assert(NULL != posClip);
+
+	D3DXVECTOR3 _posClip;
+	D3DXVECTOR3 posL(posLocal.x, posLocal.y, posLocal.z);
+
+	D3DXVec3TransformCoord(&_posClip, &posL, &matWVP);
+
+	*posClip = Vector3(_posClip.x, _posClip.y, _posClip.z);
 }

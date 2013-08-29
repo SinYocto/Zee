@@ -9,40 +9,34 @@ class AABBox;
 
 class Object;
 class Mesh;
+class Material;
 
-class TransGizmo
+const float SCALE_FACTOR = 6.0f;
+const float TRANS_SPEED = 8.0f;
+const float ROTATE_SPEED = 2.0f;
+const float SCALE_SPEED = 8.0f;
+
+class Gizmo
 {
 public:
-	TransGizmo()
-		:mCone(NULL)
-		,mLine(NULL)
-		,mRenderTarget(NULL)
-		,mDepthStencil(NULL)
-		,mSelected(SELECT_NONE)
+	enum GIZMO_TYPE
 	{
-
-	}
-
-	void Init();
-	void Destroy();
-
-	void Draw(Object* obj, Camera* camera);
-
-private:
-	void draw(Object* obj, Camera* camera, bool isColorPickPass);
-	void getPickColor(D3DCOLOR* pickColor, const int pickPixelSize);
-	void determinSelectType(Object* obj, Camera* camera);
+		GIZMO_NONE,
+		GIZMO_TRANS,
+		GIZMO_ROTATE,
+		GIZMO_SCALE
+	};
 
 private:
 	enum SELECT_TYPE
 	{
-		SELECT_NONE,
-		SELECT_X,
-		SELECT_Y,
-		SELECT_Z,
-		SELECT_XY,
-		SELECT_XZ,
-		SELECT_YZ
+		AXIS_X = 0,
+		AXIS_Y = 1,
+		AXIS_Z = 2,
+		PLANE_XY = 3,
+		PLANE_XZ = 4,
+		PLANE_YZ = 5,
+		SELECT_NONE
 	};
 
 	enum GIZMO_COLOR
@@ -63,13 +57,54 @@ private:
 		COLOR_SELECTED = 0xffffff00
 	};
 
+public:
+	Gizmo()
+		:mCone(NULL)
+		,mLine(NULL)
+		,mTorus(NULL)
+		,mCube(NULL)
+		,mRenderTarget(NULL)
+		,mDepthStencil(NULL)
+		,mSelected(SELECT_NONE)
+		,mActiveType(GIZMO_NONE)
+	{
+
+	}
+
+	void Init();
+	void Destroy();
+
+	void SetActiveType(GIZMO_TYPE type);
+	void Draw(Object* obj, Camera* camera);
+
+private:
+	void draw(Object* obj, Camera* camera, bool isColorPickPass);
+
+	void drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR elementsColor[6]);
+	void drawRotateGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR elementsColor[6]);
+	void drawScaleGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR elementsColor[6]);
+
+	void getPickColor(D3DCOLOR* pickColor, const int pickPixelSize);
+	void determinSelectType(Object* obj, Camera* camera);
+
+	void applyTrans(Object* obj, Camera* camera, const Vector3& tangentX, const Vector3& tangentY, const Vector3& tangentZ);
+	void applyRotate(Object* obj, Camera* camera, const Vector3& tangent);
+	void applyScale(Object* obj, Camera* camera, const Vector3& tangentX, const Vector3& tangentY, const Vector3& tangentZ);
+
+	void calTransTangent(Object* obj, Camera* camera, Vector3* tangentX, Vector3* tangentY, Vector3* tangentZ);
+	void calRotateTangent(Object* obj, Camera* camera, Vector3* tangent);
+
+private:
 	Mesh* mCone;
 	Mesh* mLine;
+	Mesh* mTorus;
+	Mesh* mCube;
 
 	IDirect3DSurface9* mRenderTarget;
 	IDirect3DSurface9* mDepthStencil;
 
 	SELECT_TYPE mSelected;
+	GIZMO_TYPE mActiveType;
 };
 
 

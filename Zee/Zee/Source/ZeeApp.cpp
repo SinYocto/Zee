@@ -32,7 +32,7 @@ const int WND_WIDTH = 1280;
 const int WND_HEIGHT = 720;
 
 Model* cubeModel1 = NULL;
-TransGizmo* transGizmo = NULL;
+Gizmo* gizmo = NULL;
 
 LabelStyle* leftAlignStyle;
 
@@ -222,8 +222,8 @@ void SetUp()
 	//cylinderModel->SetDrawBBoxFlag(true);
 	//cylinderModel->Rotate(PI/2, 0, 0);
 
-	transGizmo = new TransGizmo;
-	transGizmo->Init();
+	gizmo = new Gizmo;
+	gizmo->Init();
 
 }
 
@@ -257,34 +257,21 @@ void RenderLoop()
 			Vector3 rayDir;
 			SceneManager::mainCamera->GetScreenRay(screenPos, &rayPos, &rayDir);
 
-			//static std::vector<Vector3> points;
-			if(Input::GetLeftButtonUp())
+			static SceneNode* hitNode = NULL;
+			if(Input::GetLeftButtonDown())
 			{
-				SceneNode* hitNode = NULL;
 				hitNode = SceneManager::RayIntersect(rayPos, rayDir, NULL, NULL);
-
-				if(hitNode)
-					hitNode->SetDrawBBoxFlag(true);
-				//points.clear();
-				//points.push_back(rayPos);
-				//points.push_back(rayPos + 100.0f * rayDir.Normalized());
 			}
 
-			//SceneManager::root->SetDrawBBoxFlag(true);
-			//DebugDrawer::DrawLine(points, 0xffff0000, SceneManager::mainCamera);
-			//DebugDrawer::DrawCircle(Vector3(4, 4, 0), Vector3(1, 1, 1), 1, 0xffff0000, SceneManager::mainCamera);
+			SceneManager::root->SetDrawBBoxFlag(true);
 			//DebugDrawer::DrawBox(Vector3::Zero, Quaternion(0, 0, 0), Vector3(1,1,1), 0xffff0000, SceneManager::mainCamera);
 
 			SceneManager::DrawAll();
 
+			//gGUISystem.Draw();
 
-			DebugDrawer::DrawSquare(Vector3(0, 0, 0), Vector3(0, 0, -1), 1, 0x7f00ff00, true, SceneManager::mainCamera); 
-			DebugDrawer::DrawCircle(Vector3(-2, 0, -4), Vector3(0, 0, -1), 1, 0x7fffff00, true, SceneManager::mainCamera);
-
-			gGUISystem.Draw();
-
-			//TransGizmo::Draw(cubeModel1, SceneManager::mainCamera);
-			transGizmo->Draw(cubeModel1, SceneManager::mainCamera);
+			gizmo->SetActiveType(Gizmo::GIZMO_ROTATE);
+			gizmo->Draw(hitNode, SceneManager::mainCamera);
 
 			Driver::EndScene();
 			Driver::Present();
@@ -308,7 +295,7 @@ void RenderLoop()
 
 void ApplyFPCameraControllor(Camera* pCamera, float deltaTime)
 {
-	Vector3 moveVector;
+	Vector3 moveVector = Vector3::Zero;
 	float moveSpeed = 2.0f;
 	float rotateSpeed = 2.0f;
 
@@ -316,23 +303,23 @@ void ApplyFPCameraControllor(Camera* pCamera, float deltaTime)
 		moveSpeed *= 4;
 
 	if(Input::GetKey(DIK_W))
-		moveVector = moveVector + moveSpeed * deltaTime * Vector3(0, 0, 1);
+		moveVector += moveSpeed * deltaTime * Vector3(0, 0, 1);
 	if(Input::GetKey(DIK_S))
-		moveVector = moveVector + moveSpeed * deltaTime * Vector3(0, 0, -1);
+		moveVector += moveSpeed * deltaTime * Vector3(0, 0, -1);
 
 	if(Input::GetKey(DIK_A))
 	{
-		moveVector = moveVector + moveSpeed * deltaTime * Vector3(-1, 0, 0);
+		moveVector += moveSpeed * deltaTime * Vector3(-1, 0, 0);
 	}
 	if(Input::GetKey(DIK_D))
-		moveVector = moveVector + moveSpeed * deltaTime * Vector3(1, 0, 0);
+		moveVector += moveSpeed * deltaTime * Vector3(1, 0, 0);
 
 	moveVector = pCamera->LocalVectorToWorld(moveVector);
 
 	if(Input::GetKey(DIK_Q))
-		moveVector = moveVector + moveSpeed * deltaTime * Vector3(0, -1, 0);
+		moveVector += moveSpeed * deltaTime * Vector3(0, -1, 0);
 	if(Input::GetKey(DIK_E))
-		moveVector = moveVector + moveSpeed * deltaTime * Vector3(0, 1, 0);
+		moveVector += moveSpeed * deltaTime * Vector3(0, 1, 0);
 
 
 	if(moveVector != Vector3::Zero){
@@ -413,8 +400,8 @@ int GetFPS()
 void AppDestroy()
 {
 	SAFE_DELETE(leftAlignStyle);
-	transGizmo->Destroy();
-	SAFE_DELETE(transGizmo);
+	gizmo->Destroy();
+	SAFE_DELETE(gizmo);
 
 	Input::Destroy();
 	SceneManager::Destory();

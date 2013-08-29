@@ -25,7 +25,7 @@ bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, C
 		Driver::D3DDevice->SetTransform(D3DTS_WORLD, &matWorld);
 		Driver::D3DDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
 		Driver::D3DDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
-
+	
 		Driver::D3DDevice->SetRenderState(D3DRS_LIGHTING, false);
 		Driver::D3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
 
@@ -240,7 +240,7 @@ Exit:
 	
 }
 
-void TransGizmo::Init()
+void Gizmo::Init()
 {
 	Vector2 vpSize;
 	Driver::GetViewPort(NULL, &vpSize);
@@ -253,6 +253,8 @@ void TransGizmo::Init()
 
 	Cylinder* coneGeo = new Cylinder(L"", 0, 0.06f, 0.18f);
 	Cylinder* lineGeo = new Cylinder(L"", 0.01f, 0.01f, 1.0f);
+	Torus* torusGeo = new Torus(L"", 1.0f, 0.01f, 32, 8);
+	Cube* cubeGeo = new Cube(L"", 0.1f);
 
 	coneGeo->CalculateNormals();
 	coneGeo->BuildGeometry(XYZ_N);
@@ -260,14 +262,26 @@ void TransGizmo::Init()
 	lineGeo->CalculateNormals();
 	lineGeo->BuildGeometry(XYZ_N);
 
+	torusGeo->CalculateNormals();
+	torusGeo->BuildGeometry(XYZ_N);
+
+	cubeGeo->CalculateNormals();
+	cubeGeo->BuildGeometry(XYZ_N);
+
 	mCone = new Mesh(L"", NULL, coneGeo, NULL);
 	_Assert(mCone);
 
 	mLine = new Mesh(L"", NULL, lineGeo, NULL);
 	_Assert(mLine);
+
+	mTorus = new Mesh(L"", NULL, torusGeo, NULL);
+	_Assert(mTorus);
+
+	mCube = new Mesh(L"", NULL, cubeGeo, NULL);
+	_Assert(mCube);
 }
 
-void TransGizmo::getPickColor(D3DCOLOR* pickColor, const int pickPixelSize)
+void Gizmo::getPickColor(D3DCOLOR* pickColor, const int pickPixelSize)
 {
 	_Assert(NULL != pickColor);
 	*pickColor = 0;
@@ -328,8 +342,11 @@ void TransGizmo::getPickColor(D3DCOLOR* pickColor, const int pickPixelSize)
 	}
 }
 
-void TransGizmo::determinSelectType(Object* obj, Camera* camera)
+void Gizmo::determinSelectType(Object* obj, Camera* camera)
 {
+	_Assert(NULL != obj);
+	_Assert(NULL != camera);
+
 	if(Input::GetLeftButton())		// 左键按下不更新, 保持之前选择状态
 		return;
 
@@ -345,27 +362,27 @@ void TransGizmo::determinSelectType(Object* obj, Camera* camera)
 		break;
 
 	case COLOR_X:
-		mSelected = SELECT_X;
+		mSelected = AXIS_X;
 		break;
 
 	case COLOR_Y:
-		mSelected = SELECT_Y;
+		mSelected = AXIS_Y;
 		break;
 
 	case COLOR_Z:
-		mSelected = SELECT_Z;
+		mSelected = AXIS_Z;
 		break;
 
 	case COLOR_XY_PICK:
-		mSelected = SELECT_XY;
+		mSelected = PLANE_XY;
 		break;
 
 	case COLOR_XZ_PICK:
-		mSelected = SELECT_XZ;
+		mSelected = PLANE_XZ;
 		break;
 
 	case COLOR_YZ_PICK:
-		mSelected = SELECT_YZ;
+		mSelected = PLANE_YZ;
 		break;
 
 	default:
@@ -374,23 +391,64 @@ void TransGizmo::determinSelectType(Object* obj, Camera* camera)
 	}
 }
 
-void TransGizmo::Draw(Object* obj, Camera* camera)
+void Gizmo::Draw(Object* obj, Camera* camera)
 {
+	_Assert(NULL != camera);
+
+	if(!obj || mActiveType == GIZMO_NONE)
+		return;
+
 	determinSelectType(obj, camera);
 	draw(obj, camera, false);
+
+	static Vector3 tangentX;
+	static Vector3 tangentY;
+	static Vector3 tangentZ;
+
+	if(mActiveType == GIZMO_TRANS)
+	{
+		if(Input::GetLeftButtonDown())
+			calTransTangent(obj, camera, &tangentX, &tangentY, &tangentZ);
+
+		if(Input::GetLeftButton())
+			applyTrans(obj, camera, tangentX, tangentY, tangentZ);
+	}
+
+	if(mActiveType == GIZMO_ROTATE)
+	{
+		if(Input::GetLeftButtonDown())
+			calRotateTangent(obj, camera, &tangentX);
+
+		if(Input::GetLeftButton())
+			applyRotate(obj, camera, tangentX);
+	}
+
+	if(mActiveType == GIZMO_SCALE)
+	{
+		if(Input::GetLeftButtonDown())
+			calTransTangent(obj, camera, &tangentX, &tangentY, &tangentZ);
+
+		if(Input::GetLeftButton())
+			applyScale(obj, camera, tangentX, tangentY, tangentZ);
+	}
 }
 
-void TransGizmo::Destroy()
+void Gizmo::Destroy()
 {
 	SAFE_DELETE(mCone);
 	SAFE_DELETE(mLine);
+	SAFE_DELETE(mTorus);
+	SAFE_DELETE(mCube);
 
 	SAFE_RELEASE(mRenderTarget);
 	SAFE_RELEASE(mDepthStencil);
 }
 
-void TransGizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
+void Gizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 {
+	_Assert(NULL != obj);
+	_Assert(NULL != camera);
+
 	IDirect3DSurface9* oldRT = NULL;
 	IDirect3DSurface9* oldDS = NULL;
 	Material* mtl = NULL;
@@ -415,56 +473,64 @@ void TransGizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 	}
 
 	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
-	float scaleFactor = dist / 6.0f;
+	float scaleFactor = dist / SCALE_FACTOR;
 
 	// 这里清了zbuffer, 以使gizmo始终在屏幕上显示并内部有深度关系, 所以gizmo在渲染流程的最后
 	Driver::Clear(D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);	
 
-	D3DCOLOR colorX = COLOR_X;
-	D3DCOLOR colorY = COLOR_Y;
-	D3DCOLOR colorZ = COLOR_Z;
-	D3DCOLOR colorXY = COLOR_XY_PICK;
-	D3DCOLOR colorXZ = COLOR_XZ_PICK;
-	D3DCOLOR colorYZ = COLOR_YZ_PICK;
+	D3DCOLOR elementColor[6];
+	elementColor[AXIS_X] = COLOR_X;
+	elementColor[AXIS_Y] = COLOR_Y;
+	elementColor[AXIS_Z] = COLOR_Z;
+	elementColor[PLANE_XY] = COLOR_XY_PICK;
+	elementColor[PLANE_XZ] = COLOR_XZ_PICK;
+	elementColor[PLANE_YZ] = COLOR_YZ_PICK;
 
 	if(!isColorPickPass)
 	{
-		colorXY = COLOR_XY;
-		colorXZ = COLOR_XZ;
-		colorYZ = COLOR_YZ;
+		elementColor[PLANE_XY] = COLOR_XY;
+		elementColor[PLANE_XZ] = COLOR_XZ;
+		elementColor[PLANE_YZ] = COLOR_YZ;
 
-		if(mSelected == SELECT_X)
-			colorX = (D3DCOLOR)COLOR_SELECTED;
-
-		if(mSelected == SELECT_Y)
-			colorY = (D3DCOLOR)COLOR_SELECTED;
-
-		if(mSelected == SELECT_Z)
-			colorZ = (D3DCOLOR)COLOR_SELECTED;
-
-		if(mSelected == SELECT_XY)
+		if(mSelected != SELECT_NONE)
 		{
-			colorXY = (D3DCOLOR)COLOR_SELECTED;
-			SETALPHA(colorXY, 0x7f);
-		}
-
-		if(mSelected == SELECT_XZ)
-		{
-			colorXZ = (D3DCOLOR)COLOR_SELECTED;
-			SETALPHA(colorXZ, 0x7f);
-		}
-
-		if(mSelected == SELECT_YZ)
-		{
-			colorYZ = (D3DCOLOR)COLOR_SELECTED;
-			SETALPHA(colorYZ, 0x7f);
+			elementColor[mSelected] = (D3DCOLOR)COLOR_SELECTED;
+			SETALPHA(elementColor[mSelected], 0x7f);
 		}
 	}
 
+	switch(mActiveType)
+	{
+	case GIZMO_TRANS:
+		drawTransGizmo(obj, camera, mtl, elementColor);
+		break;
+
+	case GIZMO_ROTATE:
+		drawRotateGizmo(obj, camera, mtl, elementColor);
+		break;
+
+	case GIZMO_SCALE:
+		drawScaleGizmo(obj, camera, mtl, elementColor);
+		break;
+	}
+
+	if(isColorPickPass)
+	{
+		Driver::D3DDevice->SetRenderTarget(0, oldRT);			
+		Driver::D3DDevice->SetDepthStencilSurface(oldDS);
+	}
+}
+
+void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR elementsColor[6])
+{
 	const float SQUARE_SIZE = 0.4f;
+
+	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
+	float scaleFactor = dist / SCALE_FACTOR;
+
 	// y
 	Material* tempMtl = new Material(*mtl);
-	tempMtl->SetDiffuseColor(colorY);
+	tempMtl->SetDiffuseColor(elementsColor[AXIS_Y]);
 
 	mLine->SetWorldPosition(obj->GetWorldPosition());
 	mLine->SetWorldOrientation(obj->GetWorldOrient());
@@ -482,13 +548,13 @@ void TransGizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 	mCone->Draw(camera);
 
 	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(SQUARE_SIZE * 0.5f, 0, SQUARE_SIZE * 0.5f)), 
-		Vector3(0, 1.0f, 0), 0.8f * scaleFactor * SQUARE_SIZE, colorXZ, true, camera);
+		Vector3(0, 1.0f, 0), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_XZ], true, camera);
 
 	tempMtl->Drop();
 
 	// x
 	tempMtl = new Material(*mtl);
-	tempMtl->SetDiffuseColor(colorX);
+	tempMtl->SetDiffuseColor(elementsColor[AXIS_X]);
 
 	mLine->RotateLocal(0, 0, -PI / 2.0f);
 
@@ -502,13 +568,13 @@ void TransGizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 	mCone->Draw(camera);
 
 	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(0, SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f)), 
-		Vector3(1.0f, 0, 0), 0.8f * scaleFactor * SQUARE_SIZE, colorYZ, true, camera);
+		Vector3(1.0f, 0, 0), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_YZ], true, camera);
 
 	tempMtl->Drop(); 
 
 	// z
 	tempMtl = new Material(*mtl);
-	tempMtl->SetDiffuseColor(colorZ);
+	tempMtl->SetDiffuseColor(elementsColor[AXIS_Z]);
 
 	mLine->RotateLocal(PI / 2.0f, 0, 0);
 
@@ -522,13 +588,221 @@ void TransGizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 	mCone->Draw(camera);
 
 	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f, 0)), 
-		Vector3(0, 0, 1.0f), 0.8f * scaleFactor * SQUARE_SIZE, colorXY, true, camera);
+		Vector3(0, 0, 1.0f), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_XY], true, camera);
+
+	tempMtl->Drop();
+}
+
+void Gizmo::drawRotateGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR elementsColor[6])
+{
+	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
+	float scaleFactor = dist / SCALE_FACTOR;
+
+	// y
+	Material* tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(elementsColor[AXIS_Y]);
+
+	mTorus->SetWorldPosition(obj->GetWorldPosition());
+	mTorus->SetWorldOrientation(obj->GetWorldOrient());
+	mTorus->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
+
+	mTorus->SetMaterial(tempMtl);
+	mTorus->Draw(camera);
 
 	tempMtl->Drop();
 
-	if(isColorPickPass)
-	{
-		Driver::D3DDevice->SetRenderTarget(0, oldRT);			
-		Driver::D3DDevice->SetDepthStencilSurface(oldDS);
-	}
+	// x
+	tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(elementsColor[AXIS_X]);
+
+	mTorus->RotateLocal(0, 0, - PI / 2.0f);
+
+	mTorus->SetMaterial(tempMtl);
+	mTorus->Draw(camera);
+
+	tempMtl->Drop();
+
+	// z
+	tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(elementsColor[AXIS_Z]);
+
+	mTorus->RotateLocal(- PI / 2.0f, 0, 0);
+
+	mTorus->SetMaterial(tempMtl);
+	mTorus->Draw(camera);
+
+	tempMtl->Drop();
+}
+
+void Gizmo::drawScaleGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR elementsColor[6])
+{
+	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
+	float scaleFactor = dist / SCALE_FACTOR;
+
+	// y
+	Material* tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(elementsColor[AXIS_Y]);
+
+	mLine->SetWorldPosition(obj->GetWorldPosition());
+	mLine->SetWorldOrientation(obj->GetWorldOrient());
+	mLine->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
+
+	mLine->SetMaterial(tempMtl);
+	mLine->Draw(camera);
+
+	mCube->SetWorldPosition(obj->GetWorldPosition());
+	mCube->SetWorldOrientation(obj->GetWorldOrient());
+	mCube->TranslateLocal(0, scaleFactor, 0);
+	mCube->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
+
+	mCube->SetMaterial(tempMtl);
+	mCube->Draw(camera);
+
+	tempMtl->Drop();
+
+	// x
+	tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(elementsColor[AXIS_X]);
+
+	mLine->RotateLocal(0, 0, -PI / 2.0f);
+	mLine->SetMaterial(tempMtl);
+	mLine->Draw(camera);
+
+	mCube->TranslateLocal(scaleFactor, -scaleFactor, 0);
+	mCube->SetMaterial(tempMtl);
+	mCube->Draw(camera);
+
+	tempMtl->Drop(); 
+
+	// z
+	tempMtl = new Material(*mtl);
+	tempMtl->SetDiffuseColor(elementsColor[AXIS_Z]);
+
+	mLine->RotateLocal(PI / 2.0f, 0, 0);
+	mLine->SetMaterial(tempMtl);
+	mLine->Draw(camera);
+
+	mCube->TranslateLocal(-scaleFactor, 0, scaleFactor);
+	mCube->SetMaterial(tempMtl);
+	mCube->Draw(camera);
+
+	tempMtl->Drop();
+}
+
+void Gizmo::calTransTangent(Object* obj, Camera* camera, Vector3* tangentX, Vector3* tangentY, Vector3* tangentZ)
+{
+	D3DXMATRIX matWVP = obj->LocalToWorldMatrix() * camera->ViewMatrix() * camera->ProjMatrix();
+
+	Vector3 posClipO;
+	Vector3 posClipX;
+	Vector3 posClipY;
+	Vector3 posClipZ;
+
+	GetClipSpacePos(Vector3::Zero, matWVP, &posClipO);
+	GetClipSpacePos(Vector3(1.0f, 0, 0), matWVP, &posClipX);
+	GetClipSpacePos(Vector3(0, 1.0f, 0), matWVP, &posClipY);
+	GetClipSpacePos(Vector3(0, 0, 1.0f), matWVP, &posClipZ);
+
+	Vector3 axisX = (posClipX - posClipO).Normalized();
+	Vector3 axisY = (posClipY - posClipO).Normalized();
+	Vector3 axisZ = (posClipZ - posClipO).Normalized();
+
+	axisX.z = 0;
+	axisY.z = 0;
+	axisZ.z = 0;
+
+	*tangentX = axisX;
+	*tangentY = axisY;
+	*tangentZ = axisZ;
+}
+
+void Gizmo::calRotateTangent(Object* obj, Camera* camera, Vector3* tangent)
+{
+	D3DXMATRIX matWVP = obj->LocalToWorldMatrix() * camera->ViewMatrix() * camera->ProjMatrix();
+
+	Vector3 posScreenO;
+	GetClipSpacePos(Vector3::Zero, matWVP, &posScreenO);
+	posScreenO.y *= -1.0f;		// 屏幕原点使用左上方
+	posScreenO = 0.5f * (posScreenO + Vector3(1.0f, 1.0f, 0));		// 转到0~1范围
+	posScreenO.z = 0;
+
+	Vector2 cursorLocation;
+	Driver::GetScreenLocation(Vector2((float)Input::cursorPos.x, (float)Input::cursorPos.y), &cursorLocation);
+
+	Vector3 posScreenCursor(cursorLocation.x, cursorLocation.y, 0);
+
+	*tangent = (Vector3(0, 0, 1.0f).Cross(posScreenCursor -posScreenO)).Normalized();
+}
+
+void Gizmo::SetActiveType(GIZMO_TYPE type)
+{
+	mActiveType = type;
+}
+
+void Gizmo::applyTrans(Object* obj, Camera* camera, const Vector3& tangentX, const Vector3& tangentY, const Vector3& tangentZ)
+{
+	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
+	float scaleFactor = dist / SCALE_FACTOR;
+
+	Vector3 screenMoveVector((float)Input::mouseState.lX / 1000, -(float)Input::mouseState.lY / 1000, 0);
+	screenMoveVector = TRANS_SPEED * scaleFactor * screenMoveVector;
+
+	float dx = 0;
+	float dy = 0;
+	float dz = 0;
+
+	if(mSelected == AXIS_X || mSelected == PLANE_XY || mSelected == PLANE_XZ)
+		dx = screenMoveVector.Dot(tangentX);
+
+	if(mSelected == AXIS_Y || mSelected == PLANE_XY || mSelected == PLANE_YZ)
+		dy = screenMoveVector.Dot(tangentY);
+
+	if(mSelected == AXIS_Z || mSelected == PLANE_XZ || mSelected == PLANE_YZ)
+		dz = screenMoveVector.Dot(tangentZ);
+
+	obj->TranslateLocal(dx, dy, dz);
+}
+
+void Gizmo::applyRotate(Object* obj, Camera* camera, const Vector3& tangent)
+{
+	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
+	float scaleFactor = dist / SCALE_FACTOR;
+
+	Vector3 screenMoveVector((float)Input::mouseState.lX / 1000, (float)Input::mouseState.lY / 1000, 0);
+	screenMoveVector = ROTATE_SPEED * scaleFactor * screenMoveVector;
+
+	Vector3 lookDir = obj->GetWorldPosition() - camera->GetWorldPosition();
+
+	int signX = sign(lookDir.Dot(obj->GetWorldRight()));
+	int signY = sign(lookDir.Dot(obj->GetWorldUp()));
+	int signZ = sign(lookDir.Dot(obj->GetWorldForward()));
+
+	float delta = screenMoveVector.Dot(tangent);
+
+	if(mSelected == AXIS_X)
+		obj->RotateLocal(signX * delta, 0, 0);
+
+	if(mSelected == AXIS_Y)
+		obj->RotateLocal(0, signY * delta, 0);
+
+	if(mSelected == AXIS_Z)
+		obj->RotateLocal(0, 0, signZ * delta);
+}
+
+void Gizmo::applyScale(Object* obj, Camera* camera, const Vector3& tangentX, const Vector3& tangentY, const Vector3& tangentZ)
+{
+	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
+	float scaleFactor = dist / SCALE_FACTOR;
+
+	Vector3 screenMoveVector((float)Input::mouseState.lX / 1000, -(float)Input::mouseState.lY / 1000, 0);
+	screenMoveVector = SCALE_SPEED * scaleFactor * screenMoveVector;
+
+	if(mSelected == AXIS_X)
+		obj->Scale(Vector3(1 + screenMoveVector.Dot(tangentX), 1.0f, 1.0f));
+
+	if(mSelected == AXIS_Y)
+		obj->Scale(Vector3(1.0f, 1 + screenMoveVector.Dot(tangentY), 1.0f));
+
+	if(mSelected == AXIS_Z)
+		obj->Scale(Vector3(1.0f, 1.0f, 1 + screenMoveVector.Dot(tangentZ)));
 }

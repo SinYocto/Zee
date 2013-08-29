@@ -11,11 +11,10 @@ public:
 		:mParent(parent)
 		,mRelativePos(position)
 		,mRelativeOrient(orient)
-		,mRelativeScale(Vector3(1.0f, 1.0f, 1.0f))
+		,mScale(Vector3(1.0f, 1.0f, 1.0f))
 	{
 		updateWorldPosition();
 		updateWorldOrientation();
-		updateWorldScale();
 		updateLocalAxis();
 
 		if(NULL != mParent)
@@ -51,6 +50,7 @@ public:
 	void TranslateLocal(float x, float y, float z);
 
 	void SetScale(const Vector3& scale);
+	void Scale(const Vector3& scale);
 
 	Vector3 LocalVectorToWorld(const Vector3& localVec);
 	Vector3 WorldVectorToLocal(const Vector3& worldVec);
@@ -83,15 +83,14 @@ public:
 private:
 	void updateWorldPosition();
 	void updateWorldOrientation();
-	void updateWorldScale();
 
 	void updateRelativePostion();
 	void updateRelativeOrientation();
-	void updateRelativeScale();
 
 	void updateLocalAxis();
 
 	void updateChildrenTransform();		// 父对象方位变化后, 更新子对象方位
+	void scaleChildren(const Vector3& scale);
 
 	void rotate(Quaternion worldRotation);
 	void rotateLocal(Quaternion localRotation);
@@ -102,15 +101,15 @@ protected:
 
 	Vector3 mRelativePos;
 	Quaternion mRelativeOrient;
-	Vector3 mRelativeScale;
 
 	Vector3 mWorldPos;
 	Quaternion mWorldOrient;
-	Vector3 mWorldScale;
 
 	Vector3 mWorldRight;
 	Vector3 mWorldUp;
 	Vector3 mWorldForward;
+
+	Vector3 mScale;
 };
 
 

@@ -3,16 +3,18 @@
 void Cube::constructGeometryData()
 {
 	// positionData
-	Vector3 pos[8];
-	pos[0] = Vector3(-1.0f, 1.0f,  1.0f);
-	pos[1] = Vector3( 1.0f, 1.0f,  1.0f);
-	pos[2] = Vector3(-1.0f, 1.0f, -1.0f);
-	pos[3] = Vector3( 1.0f, 1.0f, -1.0f);
+	float halfSize = 0.5f * mSize;
 
-	pos[4] = Vector3(-1.0f, -1.0f,  1.0f);
-	pos[5] = Vector3( 1.0f, -1.0f,  1.0f);
-	pos[6] = Vector3(-1.0f, -1.0f, -1.0f);
-	pos[7] = Vector3( 1.0f, -1.0f, -1.0f);
+	Vector3 pos[8];
+	pos[0] = Vector3(-halfSize, halfSize,  halfSize);
+	pos[1] = Vector3( halfSize, halfSize,  halfSize);
+	pos[2] = Vector3(-halfSize, halfSize, -halfSize);
+	pos[3] = Vector3( halfSize, halfSize, -halfSize);
+
+	pos[4] = Vector3(-halfSize, -halfSize,  halfSize);
+	pos[5] = Vector3( halfSize, -halfSize,  halfSize);
+	pos[6] = Vector3(-halfSize, -halfSize, -halfSize);
+	pos[7] = Vector3( halfSize, -halfSize, -halfSize);
 
 	for(int i = 0; i < 8; ++i)
 		mPositionData.push_back(pos[i]);

@@ -6,14 +6,18 @@
 class Cube : public Geometry
 {
 public:
-	Cube(const wchar_t* _name)
-		:Geometry(_name)
+	Cube(const wchar_t* name, float size = 1.0f)
+		:Geometry(name)
+		,mSize(size)
 	{
 		constructGeometryData();
 	}
 
 private:
 	virtual void constructGeometryData();
+
+private:
+	float mSize;
 };
 
 class Cylinder : public Geometry

@@ -20,7 +20,7 @@ public:
 	static HRESULT EndScene();
 	static HRESULT Present();
 
-	static void GetScreenLocation(const Vector2& screenPos, Vector2* screenLocation);
+	static void GetScreenLocation(const Vector2& screenPos, Vector2* screenLocation);	// 屏幕坐标转为0~1表示
 
 public:
 	static HWND hWnd;

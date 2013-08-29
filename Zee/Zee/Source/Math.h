@@ -6,13 +6,22 @@
 
 #define PI 3.141592654f
 
-const D3DXMATRIX IDENTITY_MATRIX = D3DXMATRIX();
+const D3DXMATRIX IDENTITY_MATRIX = D3DXMATRIX(1, 0, 0, 0,
+											  0, 1, 0, 0,
+											  0, 0, 1, 0,
+											  0, 0, 0, 1);
 
 bool FloatEqual(const float& f1, const float& f2, const float& tolerance);
 bool FloatUnequal(const float& f1, const float& f2, const float& tolerance);
 void Clamp(float& val, const float min, const float max);
 
 void Clamp(int& val, const int min, const int max);
+
+template <typename T>
+int sign(T t) 
+{
+	return (t > 0) - (t < 0);
+}
 
 #define SETALPHA(color, alpha) (color = (((color) & 0x00ffffff) | ((alpha) << 24)))
 
@@ -179,5 +188,7 @@ public:
 // TODO:名字其实不科学
 void persPosToOrthoPos(const D3DXMATRIX& matView, const D3DXMATRIX& matProjPers, const D3DXMATRIX& matProjOrtho,
 					   const Vector3& _orthoPos, Vector3* _persPos);
+
+void GetClipSpacePos(const Vector3& posLocal, const D3DXMATRIX& matWVP, Vector3* posClip);
 
 #endif
