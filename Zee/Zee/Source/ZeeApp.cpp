@@ -17,6 +17,8 @@
 #include "OBJParser.h"
 #include "DebugDrawer.h"
 
+#include "Gizmo.h"
+
 #include <Locale.h>
 
 enum 
@@ -31,7 +33,7 @@ IMPLEMENT_APP_CONSOLE(ZeeApp)
 const int WND_WIDTH = 1280;
 const int WND_HEIGHT = 720;
 
-Model* cubeModel1 = NULL;
+Model* cube = NULL;
 Gizmo* gizmo = NULL;
 
 LabelStyle* leftAlignStyle;
@@ -146,7 +148,6 @@ void SetUp()
 	MaterialManager::Init();
 	SceneManager::Init();
 	Time::Start();
-	//TransGizmo::Init();
 
 	SetupGUIStyle();
 
@@ -164,63 +165,76 @@ void SetUp()
 	LightManager::AddPointLight(pointLight1);
 
 	// geo
-	Cube* cube1 = new Cube(L"cube1");
-	GeometryManager::AddGeometry(cube1);
+	Cube* cubeGeo = new Cube(L"cubeGeo");
+	GeometryManager::AddGeometry(cubeGeo);
 
-	cube1->CalculateTBN();
-	cube1->BuildGeometry(XYZ_UV_TBN);
+	cubeGeo->CalculateTBN();
+	cubeGeo->BuildGeometry(XYZ_UV_TBN);
 
-	Cylinder* cylinder1 = new Cylinder(L"cylinder1", 0, 0.5f, 2.0f);
-	GeometryManager::AddGeometry(cylinder1);
+	Cylinder* coneGeo = new Cylinder(L"coneGeo", 0, 0.5f, 2.0f);
+	GeometryManager::AddGeometry(coneGeo);
 
-	cylinder1->CalculateNormals();
-	cylinder1->BuildGeometry(XYZ_N);
+	coneGeo->CalculateNormals();
+	coneGeo->BuildGeometry(XYZ_N);
 
-	Torus* torus1 = new Torus(L"torus1", 1.0f, 0.025f, 32, 8);
-	GeometryManager::AddGeometry(torus1);
+	Cylinder* cylinderGeo = new Cylinder(L"cylinderGeo", 0.5f, 0.5f, 2.0f);
+	GeometryManager::AddGeometry(cylinderGeo);
 
-	torus1->CalculateNormals();
-	torus1->BuildGeometry(XYZ_N);
+	cylinderGeo->CalculateNormals();
+	cylinderGeo->BuildGeometry(XYZ_N);
+
+	Torus* torusGeo = new Torus(L"torusGeo", 1.0f, 0.025f, 32, 8);
+	GeometryManager::AddGeometry(torusGeo);
+
+	torusGeo->CalculateNormals();
+	torusGeo->BuildGeometry(XYZ_N);
 
 	// material
-	Material* mtl1 = new Material(L"mtl1");
-	MaterialManager::AddMaterial(mtl1);
+	Material* mtlBump = new Material(L"mtl1");
+	MaterialManager::AddMaterial(mtlBump);
 
-	mtl1->SetShader(BumpSpecular);
-	mtl1->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
-	mtl1->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
-	mtl1->mShader->SetSpecShiness(0.4f);
+	mtlBump->SetShader(BumpSpecular);
+	mtlBump->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
+	mtlBump->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
+	mtlBump->mShader->SetSpecShiness(0.4f);
 
-	Material* mtl2 = new Material(L"mtl2");
-	MaterialManager::AddMaterial(mtl2);
+	Material* mtlDiff = new Material(L"mtlDiff");
+	MaterialManager::AddMaterial(mtlDiff);
 
-	mtl2->SetShader(Diffuse);
+	mtlDiff->SetShader(Diffuse);
 	//mtl2->shader->SetColorTex(L"./Assets/Textures/6133.jpg");
 
-	Material* mtl3 = new Material(L"mtl3");
-	MaterialManager::AddMaterial(mtl3);
+	Material* mtlSpec = new Material(L"mtlSpec");
+	MaterialManager::AddMaterial(mtlSpec);
 
-	mtl3->SetShader(Specular);
-	mtl3->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
-	mtl3->mShader->SetSpecShiness(0.4f);
+	mtlSpec->SetShader(Specular);
+	mtlSpec->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
+	mtlSpec->mShader->SetSpecShiness(0.4f);
 
-	Material* mtl4 = new Material(L"mtl4");
-	MaterialManager::AddMaterial(mtl4);
+	Material* mtlView = new Material(L"mtlView");
+	MaterialManager::AddMaterial(mtlView);
 
-	mtl4->SetShader(View);
-	mtl4->SetDiffuseColor(D3DXCOLOR_RED);
+	mtlView->SetShader(View);
+	mtlView->SetDiffuseColor(D3DXCOLOR_RED);
+
+	Material* mtlFlat = new Material(L"mtlFlat");
+	MaterialManager::AddMaterial(mtlFlat);
+
+	mtlFlat->SetShader(Flat);
+	mtlFlat->SetDiffuseColor(D3DXCOLOR_GREEN);
 
 	// model
-	cubeModel1 = new Model(L"cubeModel1", SceneManager::root, cube1, MaterialManager::diffMtl);
-	cubeModel1->Translate(2, 0, 0);
+	cube = new Model(L"cube", SceneManager::root, cubeGeo, mtlBump);
+	cube->Translate(2, 0, 0);
 
-	Model* cubeModel2 = new Model(L"cubeModel2", SceneManager::root, cube1, MaterialManager::flatMtl);
-	cubeModel2->Translate(-2, 0, 0);
+	Model* cylinder = new Model(L"cylinder", SceneManager::root, cylinderGeo, mtlDiff);
+	cylinder->Translate(-2, 0, 0);
 
-	Model* cylinderModel = new Model(L"cylinderModel", SceneManager::root, torus1, mtl4);
-	cylinderModel->Translate(0, 0, 2);
-	//cylinderModel->SetDrawBBoxFlag(true);
-	//cylinderModel->Rotate(PI/2, 0, 0);
+	Model* cone = new Model(L"cone", SceneManager::root, coneGeo, mtlView);
+	cone->Translate(0, 0, -2);
+
+	Model* torus = new Model(L"torus", SceneManager::root, torusGeo, mtlFlat);
+	torus->Translate(0, 0, 2);
 
 	gizmo = new Gizmo;
 	gizmo->Init();
@@ -264,13 +278,11 @@ void RenderLoop()
 			}
 
 			SceneManager::root->SetDrawBBoxFlag(true);
-			//DebugDrawer::DrawBox(Vector3::Zero, Quaternion(0, 0, 0), Vector3(1,1,1), 0xffff0000, SceneManager::mainCamera);
-
 			SceneManager::DrawAll();
 
 			//gGUISystem.Draw();
 
-			gizmo->SetActiveType(Gizmo::GIZMO_ROTATE);
+			gizmo->SetActiveType(Gizmo::GIZMO_TRANS);
 			gizmo->Draw(hitNode, SceneManager::mainCamera);
 
 			Driver::EndScene();
