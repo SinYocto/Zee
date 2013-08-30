@@ -7,16 +7,40 @@
 #include "MaterialManager.h"
 #include "Input.h"
 
+void Gizmo::OnLostDevice()
+{
+	_Assert(mCone && mCone->GetGeometry());
+	_Assert(mLine && mLine->GetGeometry());
+	_Assert(mTorus && mTorus->GetGeometry());
+	_Assert(mCube && mCube->GetGeometry());
+
+	mCone->GetGeometry()->OnLostDevice();
+	mLine->GetGeometry()->OnLostDevice();
+	mTorus->GetGeometry()->OnLostDevice();
+	mCube->GetGeometry()->OnLostDevice();
+
+	SAFE_RELEASE(mRenderTarget);
+	SAFE_RELEASE(mDepthStencil);
+}
+
+void Gizmo::OnResetDevice()
+{
+	_Assert(mCone && mCone->GetGeometry());
+	_Assert(mLine && mLine->GetGeometry());
+	_Assert(mTorus && mTorus->GetGeometry());
+	_Assert(mCube && mCube->GetGeometry());
+
+	mCone->GetGeometry()->OnResetDevice();
+	mLine->GetGeometry()->OnResetDevice();
+	mTorus->GetGeometry()->OnResetDevice();
+	mCube->GetGeometry()->OnResetDevice();
+
+	createRenderTargetDepthStencile();
+}
+
 void Gizmo::Init()
 {
-	Vector2 vpSize;
-	Driver::GetViewPort(NULL, &vpSize);
-
-	Driver::D3DDevice->CreateRenderTarget((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 
-		0, true, &mRenderTarget, NULL);
-
-	Driver::D3DDevice->CreateDepthStencilSurface((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 
-		0, true, &mDepthStencil, NULL);
+	createRenderTargetDepthStencile();
 
 	Cylinder* coneGeo = new Cylinder(L"", 0, 0.06f, 0.18f);
 	Cylinder* lineGeo = new Cylinder(L"", 0.01f, 0.01f, 1.0f);
@@ -46,6 +70,29 @@ void Gizmo::Init()
 
 	mCube = new Mesh(L"", NULL, cubeGeo, NULL);
 	_Assert(mCube);
+
+	SAFE_DROP(coneGeo);
+	SAFE_DROP(lineGeo);
+	SAFE_DROP(torusGeo);
+	SAFE_DROP(cubeGeo);
+}
+
+void Gizmo::createRenderTargetDepthStencile()
+{
+	if(mRenderTarget)
+		SAFE_RELEASE(mRenderTarget);
+
+	if(mDepthStencil)
+		SAFE_RELEASE(mDepthStencil);
+
+	Vector2 vpSize;
+	Driver::GetViewPort(NULL, &vpSize);
+
+	Driver::D3DDevice->CreateRenderTarget((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 
+		0, true, &mRenderTarget, NULL);
+
+	Driver::D3DDevice->CreateDepthStencilSurface((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 
+		0, true, &mDepthStencil, NULL);
 }
 
 void Gizmo::getPickColor(D3DCOLOR* pickColor, const int pickPixelSize)
@@ -572,4 +619,9 @@ void Gizmo::applyScale(Object* obj, Camera* camera, const Vector3& tangentX, con
 
 	if(mSelected == AXIS_Z)
 		obj->Scale(Vector3(1.0f, 1.0f, 1 + screenMoveVector.Dot(tangentZ)));
+}
+
+bool Gizmo::IsSelected()
+{
+	return mSelected !=  SELECT_NONE;
 }

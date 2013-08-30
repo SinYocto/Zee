@@ -73,8 +73,13 @@ public:
 	void Init();
 	void Destroy();
 
+	void OnLostDevice();
+	void OnResetDevice();
+
 	void SetActiveType(GIZMO_TYPE type);
 	void Draw(Object* obj, Camera* camera);
+
+	bool IsSelected();
 
 private:
 	void draw(Object* obj, Camera* camera, bool isColorPickPass);
@@ -92,6 +97,8 @@ private:
 
 	void calTransTangent(Object* obj, Camera* camera, Vector3* tangentX, Vector3* tangentY, Vector3* tangentZ);
 	void calRotateTangent(Object* obj, Camera* camera, Vector3* tangent);
+
+	void createRenderTargetDepthStencile();
 
 private:
 	Mesh* mCone;

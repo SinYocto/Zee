@@ -45,3 +45,8 @@ void Mesh::SetMaterial(Material* mtl)
 		mMaterial->Grab();
 	}
 }
+
+Geometry* Mesh::GetGeometry()
+{
+	return mGeo;
+}

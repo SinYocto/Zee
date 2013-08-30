@@ -4,6 +4,8 @@
 #include "Driver.h"
 #include "Common.h"
 
+#define D3DCOLOR_WHITE 0xffffffff
+#define D3DCOLOR_BLACK 0xff000000
 #define D3DCOLOR_RED 0xffff0000
 #define D3DCOLOR_GREEN 0xff00ff00
 #define D3DCOLOR_BLUE 0xff0000ff

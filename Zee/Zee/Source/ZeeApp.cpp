@@ -274,7 +274,8 @@ void RenderLoop()
 			static SceneNode* hitNode = NULL;
 			if(Input::GetLeftButtonDown())
 			{
-				hitNode = SceneManager::RayIntersect(rayPos, rayDir, NULL, NULL);
+				if(!gizmo->IsSelected())
+					hitNode = SceneManager::RayIntersect(rayPos, rayDir, NULL, NULL);
 			}
 
 			SceneManager::root->SetDrawBBoxFlag(true);
@@ -420,15 +421,15 @@ void AppDestroy()
 	GeometryManager::DeleteAll();
 	MaterialManager::DeleteAll();
 	LightManager::Destroy();
-	//TransGizmo::Destroy();
 	Driver::Destory();
 }
 
 void OnLostDevice()
 {
-	gDefaultLabelStyle.OnLostDevice();
 	leftAlignStyle->OnLostDevice();
+	gizmo->OnLostDevice();
 
+	gDefaultLabelStyle.OnLostDevice();
 	gGUISystem.OnLostDevice();
 
 	MaterialManager::OnLostDevice();
@@ -440,9 +441,10 @@ void OnResetDevice()
 	if(!Driver::Reset())
 		return;
 
-	gDefaultLabelStyle.OnResetDevice();
 	leftAlignStyle->OnResetDevice();
+	gizmo->OnResetDevice();
 
+	gDefaultLabelStyle.OnResetDevice();
 	gGUISystem.OnResetDevice();
 
 	MaterialManager::OnResetDevice();

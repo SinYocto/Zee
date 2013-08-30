@@ -314,6 +314,22 @@
 				Name="SceneNode"
 				>
 				<File
+					RelativePath=".\Source\Billboard.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Billboard.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\BillboardSceneNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\BillboardSceneNode.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\Mesh.cpp"
 					>
 				</File>
