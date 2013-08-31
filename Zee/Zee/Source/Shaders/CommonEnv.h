@@ -1,7 +1,7 @@
 #ifndef COMMONENV_H
 #define COMMONENV_H
 
-#include"LightsDefine.h"
+#include"BasicDefine.h"
 
 shared AmbientLight ambientLight;
 shared DirectionalLight directionalLights[MAX_NUM_DIRECTIONAL_LIGHTS];

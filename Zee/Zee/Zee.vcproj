@@ -273,6 +273,10 @@
 					Name="Shaders"
 					>
 					<File
+						RelativePath=".\Source\Shaders\Billboard.fx"
+						>
+					</File>
+					<File
 						RelativePath=".\Source\Shaders\BumpSpecular.fx"
 						>
 					</File>
@@ -300,11 +304,11 @@
 						Name="Headers"
 						>
 						<File
-							RelativePath=".\Source\Shaders\CommonEnv.h"
+							RelativePath=".\Source\Shaders\BasicDefine.h"
 							>
 						</File>
 						<File
-							RelativePath=".\Source\Shaders\LightsDefine.h"
+							RelativePath=".\Source\Shaders\CommonEnv.h"
 							>
 						</File>
 					</Filter>

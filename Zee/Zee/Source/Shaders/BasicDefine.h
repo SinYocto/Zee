@@ -1,5 +1,5 @@
-#ifndef LIGHTS_DEFINE_H
-#define LIGHTS_DEFINE_H
+#ifndef BASIC_DEFINE_H
+#define BASIC_DEFINE_H
 
 #define MAX_NUM_DIRECTIONAL_LIGHTS 2
 #define MAX_NUM_POINT_LIGHTS 8
@@ -21,5 +21,21 @@ struct AmbientLight
 {
 	float4 color;
 };
+
+float GetAlphaFromColor(float3 color)
+{
+	float alpha = 0;
+
+	if(color.r > alpha)
+		alpha = color.r;
+
+	if(color.g > alpha)
+		alpha = color.g;
+
+	if(color.b > alpha)
+		alpha = color.b;
+
+	return alpha;
+}
 
 #endif

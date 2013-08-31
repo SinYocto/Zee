@@ -442,7 +442,7 @@ Quaternion Quaternion::VectorRotation(Vector3 vec1, Vector3 vec2)
 		return Quaternion(0, 0, 1, 0);
 	}
 
-	Vector3 axis = vec1.Cross(vec2);
+	Vector3 axis = -(vec1.Cross(vec2));
 
 	Quaternion rotation;
 	rotation.x = axis.x;

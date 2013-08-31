@@ -18,6 +18,7 @@
 #include "DebugDrawer.h"
 
 #include "Gizmo.h"
+#include "Billboard.h"
 
 #include <Locale.h>
 
@@ -35,6 +36,7 @@ const int WND_HEIGHT = 720;
 
 Model* cube = NULL;
 Gizmo* gizmo = NULL;
+Billboard* billboard = NULL;
 
 LabelStyle* leftAlignStyle;
 
@@ -236,6 +238,12 @@ void SetUp()
 	Model* torus = new Model(L"torus", SceneManager::root, torusGeo, mtlFlat);
 	torus->Translate(0, 0, 2);
 
+	// billboard
+	billboard = new Billboard(1.0f, 1.0f, D3DXCOLOR_WHITE);
+	billboard->SetTexture(L"./Assets/Textures/light.jpg");
+	billboard->SetColor(D3DXCOLOR_YELLOW);
+
+	// gizmo
 	gizmo = new Gizmo;
 	gizmo->Init();
 
@@ -280,6 +288,8 @@ void RenderLoop()
 
 			SceneManager::root->SetDrawBBoxFlag(true);
 			SceneManager::DrawAll();
+
+			billboard->Draw(Vector3::Zero, SceneManager::mainCamera);
 
 			//gGUISystem.Draw();
 
@@ -415,6 +425,7 @@ void AppDestroy()
 	SAFE_DELETE(leftAlignStyle);
 	gizmo->Destroy();
 	SAFE_DELETE(gizmo);
+	SAFE_DELETE(billboard);
 
 	Input::Destroy();
 	SceneManager::Destory();
@@ -428,6 +439,7 @@ void OnLostDevice()
 {
 	leftAlignStyle->OnLostDevice();
 	gizmo->OnLostDevice();
+	billboard->OnLostDevice();
 
 	gDefaultLabelStyle.OnLostDevice();
 	gGUISystem.OnLostDevice();
@@ -443,6 +455,7 @@ void OnResetDevice()
 
 	leftAlignStyle->OnResetDevice();
 	gizmo->OnResetDevice();
+	billboard->OnResetDevice();
 
 	gDefaultLabelStyle.OnResetDevice();
 	gGUISystem.OnResetDevice();
