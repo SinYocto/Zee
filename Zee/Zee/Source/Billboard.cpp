@@ -42,6 +42,16 @@ void Billboard::createVertexBuffer()
 	CreateVB(Driver::D3DDevice, &mVertexBuffer, (void*)verts, 4, XYZ_UV);
 }
 
+float Billboard::GetWidth()
+{
+	return mWidth;
+}
+
+float Billboard::GetHeight()
+{
+	return mHeight;
+}
+
 void Billboard::SetTexture(const wchar_t* texFileName)
 {
 	if(mTexture)

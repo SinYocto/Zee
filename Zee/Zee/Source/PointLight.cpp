@@ -53,3 +53,9 @@ wchar_t* PointLight::GetName()
 {
 	return mName;
 }
+
+void PointLight::SetPosition(const Vector3& pos)
+{
+	mPosition = pos;
+	LightManager::isPointLightsDirty = true;
+}

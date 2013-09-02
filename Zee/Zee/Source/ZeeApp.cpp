@@ -18,7 +18,8 @@
 #include "DebugDrawer.h"
 
 #include "Gizmo.h"
-#include "Billboard.h"
+#include "BillboardNode.h"
+#include "ResourceMgr.h"
 
 #include <Locale.h>
 
@@ -36,7 +37,6 @@ const int WND_HEIGHT = 720;
 
 Model* cube = NULL;
 Gizmo* gizmo = NULL;
-Billboard* billboard = NULL;
 
 LabelStyle* leftAlignStyle;
 
@@ -239,9 +239,9 @@ void SetUp()
 	torus->Translate(0, 0, 2);
 
 	// billboard
-	billboard = new Billboard(1.0f, 1.0f, D3DXCOLOR_WHITE);
-	billboard->SetTexture(L"./Assets/Textures/light.jpg");
-	billboard->SetColor(D3DXCOLOR_YELLOW);
+	BillboardNode* billboard = new BillboardNode(L"billboard", 1.0f, 1.0f, D3DXCOLOR_YELLOW);
+	SceneManager::AddSceneNode(billboard);
+	billboard->GetBillboard()->SetTexture(L"./Assets/Textures/light.jpg");
 
 	// gizmo
 	gizmo = new Gizmo;
@@ -289,12 +289,17 @@ void RenderLoop()
 			SceneManager::root->SetDrawBBoxFlag(true);
 			SceneManager::DrawAll();
 
-			billboard->Draw(Vector3::Zero, SceneManager::mainCamera);
-
-			//gGUISystem.Draw();
+			gGUISystem.Draw();
 
 			gizmo->SetActiveType(Gizmo::GIZMO_TRANS);
 			gizmo->Draw(hitNode, SceneManager::mainCamera);
+
+			if(hitNode && hitNode->GetNodeType() == SceneNode::SCENE_NODE_BILLBOARD)
+			{
+				PointLight* pointLight1 = NULL;
+				LightManager::GetPointLight(L"pointLight1", &pointLight1);
+				pointLight1->SetPosition(hitNode->GetWorldPosition());
+			}
 
 			Driver::EndScene();
 			Driver::Present();
@@ -425,7 +430,6 @@ void AppDestroy()
 	SAFE_DELETE(leftAlignStyle);
 	gizmo->Destroy();
 	SAFE_DELETE(gizmo);
-	SAFE_DELETE(billboard);
 
 	Input::Destroy();
 	SceneManager::Destory();
@@ -439,13 +443,13 @@ void OnLostDevice()
 {
 	leftAlignStyle->OnLostDevice();
 	gizmo->OnLostDevice();
-	billboard->OnLostDevice();
 
 	gDefaultLabelStyle.OnLostDevice();
 	gGUISystem.OnLostDevice();
 
 	MaterialManager::OnLostDevice();
 	GeometryManager::OnLostDevice();
+	ResourceMgr::OnLostDevice();
 }
 
 void OnResetDevice()
@@ -455,13 +459,13 @@ void OnResetDevice()
 
 	leftAlignStyle->OnResetDevice();
 	gizmo->OnResetDevice();
-	billboard->OnResetDevice();
 
 	gDefaultLabelStyle.OnResetDevice();
 	gGUISystem.OnResetDevice();
 
 	MaterialManager::OnResetDevice();
 	GeometryManager::OnResetDevice();
+	ResourceMgr::OnResetDevice();
 }
 
 

@@ -2,10 +2,11 @@
 #define BILLBOARD_H
 
 #include "D3DUtility.h"
+#include "IReferenceCounted.h"
 
 class Camera;
 
-class Billboard
+class Billboard : public IReferenceCounted
 {
 public:
 	Billboard(float width = 1.0f, float height = 1.0f, D3DCOLOR color = D3DCOLOR_WHITE)
@@ -36,6 +37,9 @@ public:
 
 	void OnLostDevice();
 	void OnResetDevice();
+
+	float GetWidth();
+	float GetHeight();
 
 private:
 	void createEffect();

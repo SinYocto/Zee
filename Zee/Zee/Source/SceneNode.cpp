@@ -115,3 +115,8 @@ SceneNode* SceneNode::RayIntersect(const Vector3& rayPos, const Vector3& rayDir,
 	}
 }
 
+SceneNode::NODE_TYPE SceneNode::GetNodeType()
+{
+	return mType;
+}
+

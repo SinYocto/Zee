@@ -13,7 +13,7 @@ public:
 		float fov = PI/2, float aspect = 1.0f, float nZ = 1.0f, float fZ = 1000.0f);
 
 	static void Destory();
-	static void AddSceneNode(SceneNode* node, SceneNode* parent);
+	static void AddSceneNode(SceneNode* node, SceneNode* parent = root);
 	static void GetSceneNode(const wchar_t* name, SceneNode** sceneNode);
 
 	static SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);

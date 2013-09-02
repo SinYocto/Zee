@@ -13,7 +13,8 @@ public:
 	{
 		SCENE_NODE_NULL,
 		SCENE_NODE_MESH,
-		SCENE_NODE_MODEL
+		SCENE_NODE_MODEL,
+		SCENE_NODE_BILLBOARD
 	};
 
 	enum DISPLAY_MODE
@@ -72,6 +73,8 @@ public:
 			node->DrawAll(camera);
 		}
 	}
+
+	NODE_TYPE GetNodeType();
 
 protected:
 	virtual void calCurrentAABBox();

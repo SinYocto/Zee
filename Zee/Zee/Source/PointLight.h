@@ -47,6 +47,8 @@ public:
 	void SetID(DWORD id);
 	void SetValue(D3DXCOLOR color, Vector3 pos, Vector3 attenuation, float intensity);
 
+	void SetPosition(const Vector3& pos);
+
 	wchar_t* GetName();
 
 	void Enable(bool enable);
