@@ -2,7 +2,6 @@
 #include "Material.h"
 #include "Geometry.h"
 #include "Camera.h"
-#include "Object.h"
 #include "LightManager.h"
 
 // DiffuseShader
@@ -37,7 +36,7 @@ void FlatShader::SetUVOffset(float offsetU, float offsetV)
 	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
-void FlatShader::Render(Object* object, Geometry* geo, Camera* camera)
+void FlatShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
 {
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
@@ -47,8 +46,8 @@ void FlatShader::Render(Object* object, Geometry* geo, Camera* camera)
 
 	FlatShader::mEffect->SetTechnique("Flat");
 
-	FlatShader::mEffect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
-	FlatShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
+	FlatShader::mEffect->SetMatrix("matWVP", &(matWorld * camera->ViewMatrix() * camera->ProjMatrix()));
+	FlatShader::mEffect->SetMatrix("matUVTransform", &matWorld);
 
 	if(NULL == mMaterial->GetTexture(0))
 	{
@@ -92,7 +91,7 @@ void ViewShader::SetUVOffset(float offsetU, float offsetV)
 	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
-void ViewShader::Render(Object* object, Geometry* geo, Camera* camera)
+void ViewShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
 {
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
@@ -102,8 +101,8 @@ void ViewShader::Render(Object* object, Geometry* geo, Camera* camera)
 
 	ViewShader::mEffect->SetTechnique("View");
 
-	ViewShader::mEffect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
-	ViewShader::mEffect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
+	ViewShader::mEffect->SetMatrix("matWVP", &(matWorld * camera->ViewMatrix() * camera->ProjMatrix()));
+	ViewShader::mEffect->SetMatrix("matWorld", &matWorld);
 	ViewShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
 
 	ViewShader::mEffect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));
@@ -155,7 +154,7 @@ void DiffuseShader::SetUVOffset(float offsetU, float offsetV)
 	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
-void DiffuseShader::Render(Object* object, Geometry* geo, Camera* camera)
+void DiffuseShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
 {
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
@@ -165,8 +164,8 @@ void DiffuseShader::Render(Object* object, Geometry* geo, Camera* camera)
 
 	DiffuseShader::mEffect->SetTechnique("Diffuse");
 
-	DiffuseShader::mEffect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
-	DiffuseShader::mEffect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
+	DiffuseShader::mEffect->SetMatrix("matWVP", &(matWorld * camera->ViewMatrix() * camera->ProjMatrix()));
+	DiffuseShader::mEffect->SetMatrix("matWorld", &matWorld);
 	DiffuseShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
 
 	if(NULL == mMaterial->GetTexture(0))
@@ -233,7 +232,7 @@ void SpecularShader::SetUVOffset(float offsetU, float offsetV)
 	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
-void SpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
+void SpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
 {
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
@@ -243,8 +242,8 @@ void SpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 
 	SpecularShader::mEffect->SetTechnique("Specular");
 
-	SpecularShader::mEffect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
-	SpecularShader::mEffect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
+	SpecularShader::mEffect->SetMatrix("matWVP", &(matWorld * camera->ViewMatrix() * camera->ProjMatrix()));
+	SpecularShader::mEffect->SetMatrix("matWorld", &matWorld);
 	SpecularShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
 
 	SpecularShader::mEffect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));
@@ -319,7 +318,7 @@ void BumpSpecularShader::SetUVOffset(float offsetU, float offsetV)
 	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
-void BumpSpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
+void BumpSpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
 {
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
@@ -329,8 +328,8 @@ void BumpSpecularShader::Render(Object* object, Geometry* geo, Camera* camera)
 
 	BumpSpecularShader::mEffect->SetTechnique("BumpSpecular");
 
-	BumpSpecularShader::mEffect->SetMatrix("matWVP", &(object->LocalToWorldMatrix()*camera->ViewMatrix()*camera->ProjMatrix()));
-	BumpSpecularShader::mEffect->SetMatrix("matWorld", &(object->LocalToWorldMatrix()));
+	BumpSpecularShader::mEffect->SetMatrix("matWVP", &(matWorld * camera->ViewMatrix() * camera->ProjMatrix()));
+	BumpSpecularShader::mEffect->SetMatrix("matWorld", &matWorld);
 	BumpSpecularShader::mEffect->SetMatrix("matUVTransform", &(mMaterial->UVTransformMatrix()));
 
 	BumpSpecularShader::mEffect->SetRawValue("eyePos", &(camera->GetRelativePosition()), 0, sizeof(Vector3));

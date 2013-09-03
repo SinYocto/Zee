@@ -137,13 +137,13 @@ void Material::SetUVOffset(float offsetU, float offsetV)
 	mOffsetV = offsetV;
 }
 
-void Material::Render(Object* object, Geometry* geo, Camera* camera)
+void Material::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
 {
 	_Assert(NULL != mShader);
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
 
-	mShader->Render(object, geo, camera);
+	mShader->Render(matWorld, geo, camera);
 }
 
 wchar_t* Material::GetName()

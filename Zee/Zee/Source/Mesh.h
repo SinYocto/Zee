@@ -1,25 +1,19 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "SceneNode.h"
 #include "Geometry.h"
 #include "Material.h"
 
-class Mesh : public SceneNode
+class Mesh : public IReferenceCounted
 {
 public:
-	Mesh(const wchar_t* name, SceneNode* parent, Geometry* geo, Material* material) 
-		:SceneNode(name, parent)
-		,mGeo(geo)
+	Mesh(Geometry* geo, Material* material)
+		:mGeo(geo)
 		,mMaterial(material)
 	{
-		mType = SCENE_NODE_MESH;
-
-		// TODO:构造函数可以暂时传geo和mtl为null,后面加上方法设置geo和material内容
 		if(NULL != mGeo)
 		{
 			mGeo->Grab();
-			mGeo->CalcDynamicAABBox(mWorldPos, mWorldOrient, &mAABBox);
 		}
 
 		if(NULL != mMaterial)
@@ -34,13 +28,9 @@ public:
 		SAFE_DROP(mMaterial);
 	}
 
-	virtual void Draw(Camera* camera);
-	void SetMaterial(Material* mtl);
-
 	Geometry* GetGeometry();
-
-private:
-	virtual void calCurrentAABBox();
+	void SetMaterial(Material* mtl);
+	void Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid);
 
 private:
 	Geometry* mGeo;

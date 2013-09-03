@@ -100,7 +100,7 @@ public:
 
 	}
 
-	virtual void Render(Object* object, Geometry* geo, Camera* camera)
+	virtual void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
 	{
 
 	}
@@ -141,7 +141,7 @@ public:
 	void SetUVTiles(float tilesU, float tilesV);
 	void SetUVOffset(float offsetU, float offsetV);
 
-	void Render(Object* object, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
 
 public:
 	static LPD3DXEFFECT mEffect;
@@ -179,7 +179,7 @@ public:
 	void SetUVTiles(float tilesU, float tilesV);
 	void SetUVOffset(float offsetU, float offsetV);
 
-	void Render(Object* object, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
 
 public:
 	static LPD3DXEFFECT mEffect;
@@ -218,7 +218,7 @@ public:
 	void SetUVTiles(float tilesU, float tilesV);
 	void SetUVOffset(float offsetU, float offsetV);
 
-	void Render(Object* object, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
 
 public:
 	static LPD3DXEFFECT mEffect;
@@ -261,7 +261,7 @@ public:
 	void SetUVTiles(float tilesU, float tilesV);
 	void SetUVOffset(float offsetU, float offsetV);
 
-	void Render(Object* object, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
 
 public:
 	static LPD3DXEFFECT mEffect;
@@ -305,7 +305,7 @@ public:
 	void SetUVTiles(float tilesU, float tilesV);
 	void SetUVOffset(float offsetU, float offsetV);
 
-	void Render(Object* object, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
 
 public:
 	static LPD3DXEFFECT mEffect;

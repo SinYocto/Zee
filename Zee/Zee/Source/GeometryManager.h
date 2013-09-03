@@ -7,14 +7,14 @@ class GeometryManager
 {
 public:
 	static void AddGeometry(Geometry* geo);
-	static void DeleteAll();
+	static void Destroy();
 	static void GetGeometry(const wchar_t* name, Geometry** geo);
 
 	static void OnLostDevice();
 	static void OnResetDevice();
 
 private:
-	static std::list<Geometry*> resourceList;
+	static std::list<Geometry*> geoList;
 	static DWORD curID;
 };
 

@@ -14,7 +14,7 @@ public:
 	static void FrameUpdate();
 
 	static void AddMaterial(Material* material);
-	static void DeleteAll();
+	static void Destroy();
 	static void GetMaterial(const wchar_t* name, Material** material);
 
 private:

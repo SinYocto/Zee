@@ -3,21 +3,21 @@
 #include "D3DUtility.h"
 #include "Camera.h"
 #include "Primitive.h"
-#include "Mesh.h"
+#include "MeshNode.h"
 #include "MaterialManager.h"
 #include "Input.h"
 
 void Gizmo::OnLostDevice()
 {
-	_Assert(mCone && mCone->GetGeometry());
-	_Assert(mLine && mLine->GetGeometry());
-	_Assert(mTorus && mTorus->GetGeometry());
-	_Assert(mCube && mCube->GetGeometry());
+	_Assert(mCone && mCone->GetMesh() && mCone->GetMesh()->GetGeometry());
+	_Assert(mLine && mLine->GetMesh() && mLine->GetMesh()->GetGeometry());
+	_Assert(mTorus && mTorus->GetMesh() && mTorus->GetMesh()->GetGeometry());
+	_Assert(mCube && mCube->GetMesh() && mCube->GetMesh()->GetGeometry());
 
-	mCone->GetGeometry()->OnLostDevice();
-	mLine->GetGeometry()->OnLostDevice();
-	mTorus->GetGeometry()->OnLostDevice();
-	mCube->GetGeometry()->OnLostDevice();
+	mCone->GetMesh()->GetGeometry()->OnLostDevice();
+	mLine->GetMesh()->GetGeometry()->OnLostDevice();
+	mTorus->GetMesh()->GetGeometry()->OnLostDevice();
+	mCube->GetMesh()->GetGeometry()->OnLostDevice();
 
 	SAFE_RELEASE(mRenderTarget);
 	SAFE_RELEASE(mDepthStencil);
@@ -25,15 +25,15 @@ void Gizmo::OnLostDevice()
 
 void Gizmo::OnResetDevice()
 {
-	_Assert(mCone && mCone->GetGeometry());
-	_Assert(mLine && mLine->GetGeometry());
-	_Assert(mTorus && mTorus->GetGeometry());
-	_Assert(mCube && mCube->GetGeometry());
+	_Assert(mCone && mCone->GetMesh() && mCone->GetMesh()->GetGeometry());
+	_Assert(mLine && mLine->GetMesh() && mLine->GetMesh()->GetGeometry());
+	_Assert(mTorus && mTorus->GetMesh() && mTorus->GetMesh()->GetGeometry());
+	_Assert(mCube && mCube->GetMesh() && mCube->GetMesh()->GetGeometry());
 
-	mCone->GetGeometry()->OnResetDevice();
-	mLine->GetGeometry()->OnResetDevice();
-	mTorus->GetGeometry()->OnResetDevice();
-	mCube->GetGeometry()->OnResetDevice();
+	mCone->GetMesh()->GetGeometry()->OnResetDevice();
+	mLine->GetMesh()->GetGeometry()->OnResetDevice();
+	mTorus->GetMesh()->GetGeometry()->OnResetDevice();
+	mCube->GetMesh()->GetGeometry()->OnResetDevice();
 
 	createRenderTargetDepthStencile();
 }
@@ -59,16 +59,16 @@ void Gizmo::Init()
 	cubeGeo->CalculateNormals();
 	cubeGeo->BuildGeometry(XYZ_N);
 
-	mCone = new Mesh(L"", NULL, coneGeo, NULL);
+	mCone = new MeshNode(L"", NULL, coneGeo, NULL);
 	_Assert(mCone);
 
-	mLine = new Mesh(L"", NULL, lineGeo, NULL);
+	mLine = new MeshNode(L"", NULL, lineGeo, NULL);
 	_Assert(mLine);
 
-	mTorus = new Mesh(L"", NULL, torusGeo, NULL);
+	mTorus = new MeshNode(L"", NULL, torusGeo, NULL);
 	_Assert(mTorus);
 
-	mCube = new Mesh(L"", NULL, cubeGeo, NULL);
+	mCube = new MeshNode(L"", NULL, cubeGeo, NULL);
 	_Assert(mCube);
 
 	SAFE_DROP(coneGeo);
@@ -350,7 +350,7 @@ void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	mLine->SetWorldOrientation(obj->GetWorldOrient());
 	mLine->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
-	mLine->SetMaterial(tempMtl);
+	mLine->GetMesh()->SetMaterial(tempMtl);
 	mLine->Draw(camera);
 
 	mCone->SetWorldPosition(obj->GetWorldPosition());
@@ -358,7 +358,7 @@ void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	mCone->TranslateLocal(0, scaleFactor, 0);
 	mCone->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
-	mCone->SetMaterial(tempMtl);
+	mCone->GetMesh()->SetMaterial(tempMtl);
 	mCone->Draw(camera);
 
 	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(SQUARE_SIZE * 0.5f, 0, SQUARE_SIZE * 0.5f)), 
@@ -372,13 +372,13 @@ void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 
 	mLine->RotateLocal(0, 0, -PI / 2.0f);
 
-	mLine->SetMaterial(tempMtl);
+	mLine->GetMesh()->SetMaterial(tempMtl);
 	mLine->Draw(camera);
 
 	mCone->TranslateLocal(scaleFactor, -scaleFactor, 0);
 	mCone->RotateLocal(0, 0, -PI / 2.0f);
 
-	mCone->SetMaterial(tempMtl);
+	mCone->GetMesh()->SetMaterial(tempMtl);
 	mCone->Draw(camera);
 
 	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(0, SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f)), 
@@ -392,13 +392,13 @@ void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 
 	mLine->RotateLocal(PI / 2.0f, 0, 0);
 
-	mLine->SetMaterial(tempMtl);
+	mLine->GetMesh()->SetMaterial(tempMtl);
 	mLine->Draw(camera);
 
 	mCone->TranslateLocal(0, -scaleFactor, scaleFactor);
 	mCone->RotateLocal(PI / 2.0f, 0, 0);
 
-	mCone->SetMaterial(tempMtl);
+	mCone->GetMesh()->SetMaterial(tempMtl);
 	mCone->Draw(camera);
 
 	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f, 0)), 
@@ -420,7 +420,7 @@ void Gizmo::drawRotateGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR
 	mTorus->SetWorldOrientation(obj->GetWorldOrient());
 	mTorus->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
-	mTorus->SetMaterial(tempMtl);
+	mTorus->GetMesh()->SetMaterial(tempMtl);
 	mTorus->Draw(camera);
 
 	tempMtl->Drop();
@@ -431,7 +431,7 @@ void Gizmo::drawRotateGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR
 
 	mTorus->RotateLocal(0, 0, - PI / 2.0f);
 
-	mTorus->SetMaterial(tempMtl);
+	mTorus->GetMesh()->SetMaterial(tempMtl);
 	mTorus->Draw(camera);
 
 	tempMtl->Drop();
@@ -442,7 +442,7 @@ void Gizmo::drawRotateGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR
 
 	mTorus->RotateLocal(- PI / 2.0f, 0, 0);
 
-	mTorus->SetMaterial(tempMtl);
+	mTorus->GetMesh()->SetMaterial(tempMtl);
 	mTorus->Draw(camera);
 
 	tempMtl->Drop();
@@ -461,7 +461,7 @@ void Gizmo::drawScaleGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	mLine->SetWorldOrientation(obj->GetWorldOrient());
 	mLine->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
-	mLine->SetMaterial(tempMtl);
+	mLine->GetMesh()->SetMaterial(tempMtl);
 	mLine->Draw(camera);
 
 	mCube->SetWorldPosition(obj->GetWorldPosition());
@@ -469,7 +469,7 @@ void Gizmo::drawScaleGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	mCube->TranslateLocal(0, scaleFactor, 0);
 	mCube->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
-	mCube->SetMaterial(tempMtl);
+	mCube->GetMesh()->SetMaterial(tempMtl);
 	mCube->Draw(camera);
 
 	tempMtl->Drop();
@@ -479,11 +479,11 @@ void Gizmo::drawScaleGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_X]);
 
 	mLine->RotateLocal(0, 0, -PI / 2.0f);
-	mLine->SetMaterial(tempMtl);
+	mLine->GetMesh()->SetMaterial(tempMtl);
 	mLine->Draw(camera);
 
 	mCube->TranslateLocal(scaleFactor, -scaleFactor, 0);
-	mCube->SetMaterial(tempMtl);
+	mCube->GetMesh()->SetMaterial(tempMtl);
 	mCube->Draw(camera);
 
 	tempMtl->Drop(); 
@@ -493,11 +493,11 @@ void Gizmo::drawScaleGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Z]);
 
 	mLine->RotateLocal(PI / 2.0f, 0, 0);
-	mLine->SetMaterial(tempMtl);
+	mLine->GetMesh()->SetMaterial(tempMtl);
 	mLine->Draw(camera);
 
 	mCube->TranslateLocal(-scaleFactor, 0, scaleFactor);
-	mCube->SetMaterial(tempMtl);
+	mCube->GetMesh()->SetMaterial(tempMtl);
 	mCube->Draw(camera);
 
 	tempMtl->Drop();

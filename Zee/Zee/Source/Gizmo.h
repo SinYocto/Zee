@@ -2,12 +2,11 @@
 #define GIZMO_H
 
 #include "DebugDrawer.h"
-#include "Mesh.h"
 
 class Camera;
 
 class Object;
-class Mesh;
+class MeshNode;
 class Material;
 
 const float SCALE_FACTOR = 6.0f;
@@ -101,10 +100,10 @@ private:
 	void createRenderTargetDepthStencile();
 
 private:
-	Mesh* mCone;
-	Mesh* mLine;
-	Mesh* mTorus;
-	Mesh* mCube;
+	MeshNode* mCone;
+	MeshNode* mLine;
+	MeshNode* mTorus;
+	MeshNode* mCube;
 
 	IDirect3DSurface9* mRenderTarget;
 	IDirect3DSurface9* mDepthStencil;
@@ -112,5 +111,5 @@ private:
 	SELECT_TYPE mSelected;
 	GIZMO_TYPE mActiveType;
 };
-
+     
 #endif

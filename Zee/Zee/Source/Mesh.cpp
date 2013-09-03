@@ -1,7 +1,6 @@
 #include "Mesh.h"
-#include "DebugDrawer.h"
 
-void Mesh::Draw(Camera* camera)
+void Mesh::Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid)
 {
 	if(NULL == mGeo || NULL == mMaterial)
 	{
@@ -10,30 +9,14 @@ void Mesh::Draw(Camera* camera)
 
 	_Assert(NULL != camera);
 
-	switch(mAttribute.displayMode)
-	{
-	case WIRE_FRAME:
-		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-		break;
-	case SOLID:
+	if(isSolid)
 		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-		break;
-	}
+	else
+		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 
-	mMaterial->Render(this, mGeo, camera);
+	mMaterial->Render(matWorld, mGeo, camera);
 
 	Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-
-	if(mAttribute.drawBBox && mAABBox.isValid())
-	{
-		DebugDrawer::DrawAABBox(mAABBox, 0xffff0000, camera);
-	}
-}
-
-void Mesh::calCurrentAABBox()
-{
-	_Assert(NULL != mGeo);
-	mGeo->CalcDynamicAABBox(mWorldPos, mWorldOrient, &mAABBox);
 }
 
 void Mesh::SetMaterial(Material* mtl)

@@ -16,7 +16,7 @@ void MaterialManager::AddMaterial(Material* material)
 	resourceList.push_back(material);
 }
 
-void MaterialManager::DeleteAll()
+void MaterialManager::Destroy()
 {
 	for(std::list<Material*>::iterator iter = resourceList.begin(); iter != resourceList.end(); ++iter)
 	{

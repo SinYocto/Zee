@@ -10,7 +10,7 @@
 #include "MaterialManager.h"
 #include "SceneManager.h"
 
-#include "Model.h"
+#include "ModelNode.h"
 #include "Primitive.h"
 #include "Material.h"
 
@@ -35,7 +35,7 @@ IMPLEMENT_APP_CONSOLE(ZeeApp)
 const int WND_WIDTH = 1280;
 const int WND_HEIGHT = 720;
 
-Model* cube = NULL;
+ModelNode* cube = NULL;
 Gizmo* gizmo = NULL;
 
 LabelStyle* leftAlignStyle;
@@ -226,16 +226,20 @@ void SetUp()
 	mtlFlat->SetDiffuseColor(D3DXCOLOR_GREEN);
 
 	// model
-	cube = new Model(L"cube", SceneManager::root, cubeGeo, mtlBump);
+	cube = new ModelNode(L"cube", NULL, cubeGeo, mtlBump);
+	SceneManager::AddSceneNode(cube);
 	cube->Translate(2, 0, 0);
 
-	Model* cylinder = new Model(L"cylinder", SceneManager::root, cylinderGeo, mtlDiff);
+	ModelNode* cylinder = new ModelNode(L"cylinder", NULL, cylinderGeo, mtlDiff);
+	SceneManager::AddSceneNode(cylinder);
 	cylinder->Translate(-2, 0, 0);
 
-	Model* cone = new Model(L"cone", SceneManager::root, coneGeo, mtlView);
+	ModelNode* cone = new ModelNode(L"cone", NULL, coneGeo, mtlView);
+	SceneManager::AddSceneNode(cone);
 	cone->Translate(0, 0, -2);
 
-	Model* torus = new Model(L"torus", SceneManager::root, torusGeo, mtlFlat);
+	ModelNode* torus = new ModelNode(L"torus", NULL, torusGeo, mtlFlat);
+	SceneManager::AddSceneNode(torus);
 	torus->Translate(0, 0, 2);
 
 	// billboard
@@ -433,8 +437,8 @@ void AppDestroy()
 
 	Input::Destroy();
 	SceneManager::Destory();
-	GeometryManager::DeleteAll();
-	MaterialManager::DeleteAll();
+	GeometryManager::Destroy();
+	MaterialManager::Destroy();
 	LightManager::Destroy();
 	Driver::Destory();
 }

@@ -30,13 +30,13 @@ public:
 	}
 
 public:
+	void OnLostDevice();
+	void OnResetDevice();
+
 	void SetTexture(const wchar_t* texFileName);
 	void SetColor(D3DXCOLOR color);
 
 	void Draw(const Vector3& pos, Camera* camera);
-
-	void OnLostDevice();
-	void OnResetDevice();
 
 	float GetWidth();
 	float GetHeight();

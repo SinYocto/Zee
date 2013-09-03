@@ -97,7 +97,7 @@ public:
 
 	D3DXMATRIX UVTransformMatrix();
 
-	void Render(Object* object, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
 
 public:
 	IShader* mShader;

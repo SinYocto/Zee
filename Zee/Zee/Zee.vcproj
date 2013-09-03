@@ -342,11 +342,27 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Source\MeshNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\MeshNode.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\Model.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\Source\Model.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ModelNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ModelNode.h"
 					>
 				</File>
 				<File

@@ -7,21 +7,41 @@ void Model::LoadModelDataFromFile(wchar_t* filename, ModelFileFormat format)
 
 }
 
-void Model::Draw(Camera* camera)
+void Model::AddSubMesh(Mesh* mesh)
 {
-	if(mAttribute.drawBBox && mAABBox.isValid())
+	_Assert(NULL != mesh);
+
+	if(std::find(mSubMeshes.begin(), mSubMeshes.end(), mesh) != mSubMeshes.end())
 	{
-		DebugDrawer::DrawAABBox(mAABBox, 0xffff0000, camera);
+		return;
+	}
+	else
+	{
+		mSubMeshes.push_back(mesh);
 	}
 }
 
-void Model::calCurrentAABBox()
+void Model::Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid)
 {
-	mAABBox = AABBox::Invalid;
+	for(std::list<Mesh*>::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter)
+	{
+		(*iter)->Draw(matWorld, camera, isSolid);
+	}
+}
+
+void Model::CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, AABBox* box)
+{
+	_Assert(NULL != box);
+	AABBox resultBox = AABBox::Invalid;
 
 	for(std::list<Mesh*>::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter)
 	{
 		Mesh* mesh = *iter;
-		mAABBox = AABBox::CombineBBox(mAABBox, mesh->GetAABBox());
+		AABBox subMeshBBox = AABBox::Invalid;
+
+		mesh->GetGeometry()->CalcDynamicAABBox(pos, orient, &subMeshBBox);
+		resultBox = AABBox::CombineBBox(resultBox, subMeshBBox);
 	}
+
+	*box = resultBox;
 }
