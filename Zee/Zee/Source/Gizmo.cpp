@@ -333,6 +333,9 @@ void Gizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 		Driver::D3DDevice->SetRenderTarget(0, oldRT);			
 		Driver::D3DDevice->SetDepthStencilSurface(oldDS);
 	}
+	
+	SAFE_RELEASE(oldRT);		// GetRenderTarget方法会增加引用计数, 需要release, 否则设备无法恢复
+	SAFE_RELEASE(oldDS);
 }
 
 void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR elementsColor[6])

@@ -199,14 +199,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Object.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Object.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\OBJParser.cpp"
 				>
 			</File>
@@ -363,6 +355,14 @@
 				</File>
 				<File
 					RelativePath=".\Source\ModelNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Object.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Object.h"
 					>
 				</File>
 				<File
