@@ -21,6 +21,8 @@
 #include "BillboardNode.h"
 #include "ResourceMgr.h"
 
+#include "Terrain.h"
+
 #include <Locale.h>
 
 enum 
@@ -37,6 +39,8 @@ const int WND_HEIGHT = 720;
 
 ModelNode* cube = NULL;
 Gizmo* gizmo = NULL;
+
+Terrain* terrain = NULL;
 
 LabelStyle* leftAlignStyle;
 
@@ -251,6 +255,18 @@ void SetUp()
 	gizmo = new Gizmo;
 	gizmo->Init();
 
+	// terrain
+	PerformanceTimer::Begin(L"building 257 terrain");
+	terrain = new Terrain(257, 100.0f, 20.0f);
+	terrain->LoadFromHeightMap(L"./Assets/Textures/heightMap257_bit16.raw", 257);
+	terrain->BuildTerrain(4);
+
+	terrain->SetColorTexes(L"./Assets/Textures/Cliff.jpg", L"./Assets/Textures/Grass_Hill.jpg", 
+		L"./Assets/Textures/DirtGrass.jpg", L"./Assets/Textures/Pebbles.jpg");
+
+	terrain->SetSplatMapTex(L"./Assets/Textures/splat.tga");
+	terrain->SetMtlParameters(30.0f, 30.0f, D3DXCOLOR_WHITE, D3DXCOLOR_WHITE);
+	PerformanceTimer::End();
 }
 
 void RenderLoop()
@@ -263,6 +279,11 @@ void RenderLoop()
 			Time::Tick();
 
 			Input::GetDeviceState(Driver::hWnd);
+
+			if(Input::GetKeyUp(DIK_R))
+			{
+				terrain->createEffect();
+			}
 
 			GUIUpdate();
 
@@ -292,6 +313,8 @@ void RenderLoop()
 
 			SceneManager::root->SetDrawBBoxFlag(true);
 			SceneManager::DrawAll();
+
+			terrain->Draw(SceneManager::mainCamera);
 
 			gGUISystem.Draw();
 
@@ -401,7 +424,7 @@ void GUIUpdate()
 	gGUISystem.GUILabel(text, Rect(10, 40, 300, 25), leftAlignStyle);
 
 
-	static bool enableDirLight1 = false;
+	static bool enableDirLight1 = true;
 	// enableDirLight1 = gGUISystem.GUIToggle(Rect(10, 150, 20, 20), enableDirLight1);
 
 	DirectionalLight* dirLight1 = NULL;
@@ -435,6 +458,8 @@ void AppDestroy()
 	gizmo->Destroy();
 	SAFE_DELETE(gizmo);
 
+	SAFE_DELETE(terrain);
+
 	Input::Destroy();
 	SceneManager::Destory();
 	GeometryManager::Destroy();
@@ -447,6 +472,7 @@ void OnLostDevice()
 {
 	leftAlignStyle->OnLostDevice();
 	gizmo->OnLostDevice();
+	terrain->OnLostDevice();
 
 	gDefaultLabelStyle.OnLostDevice();
 	gGUISystem.OnLostDevice();
@@ -463,6 +489,8 @@ void OnResetDevice()
 
 	leftAlignStyle->OnResetDevice();
 	gizmo->OnResetDevice();
+
+	terrain->OnResetDevice();
 
 	gDefaultLabelStyle.OnResetDevice();
 	gGUISystem.OnResetDevice();

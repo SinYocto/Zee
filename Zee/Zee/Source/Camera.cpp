@@ -38,21 +38,6 @@ void Camera::extractFrustumPlanes()
 
 bool Camera::IsVisible(AABBox boundingBox)
 {
-	/* 以下方法会在invisible时误判为visible。一种解决方法是再加上viewFrustum8个顶点是否在boundingBox内的判断。
-	for(int i = 0; i < 6; ++i){
-
-		bool isBehind = true;
-		for(int j = 0; j < 8; ++j){
-			if(boundingBox.GetVertex(j).Dot(Vector3(frustumPlanes[i].a, frustumPlanes[i].b, frustumPlanes[i].c)) + frustumPlanes[i].d > 0)
-				isBehind = false;
-		}
-
-		if(isBehind)
-			return false;
-	}
-
-	return true;*/
-
 	for(int i = 0; i < 6; ++i){
 		Vector3 vertP = boundingBox.mMin;
 		Vector3 vertN = boundingBox.mMax;
@@ -76,7 +61,6 @@ bool Camera::IsVisible(AABBox boundingBox)
 	}
 
 	return true;
-
 }
 
 void Camera::recalculateCameraMatrix()

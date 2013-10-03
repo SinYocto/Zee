@@ -119,3 +119,8 @@ Exit:
 	else
 		return -1;
 }
+
+int YFile::Read(void* destBuffer, int destSize, int size, int count)
+{
+	return fread_s(destBuffer, destSize, size, count, pFile);
+}
