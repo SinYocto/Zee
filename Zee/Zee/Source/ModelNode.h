@@ -30,7 +30,7 @@ public:
 	virtual void Draw(Camera* camera);
 
 private:
-	virtual void calCurrentAABBox();
+	virtual void calcCurrentAABBox();
 
 private:
 	Model* mModel;

@@ -42,7 +42,7 @@ void SceneNode::SetStaticFlag(bool isStatic)
 
 void SceneNode::FrameUpdate()
 {
-	calCurrentAABBox();		// TODO:当前没管sceneNode的isStatic标志, 通通都更新计算AABB
+	calcCurrentAABBox();		// TODO:当前没管sceneNode的isStatic标志, 通通都更新计算AABB
 
 	for(std::list<Object*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
 	{
@@ -51,7 +51,7 @@ void SceneNode::FrameUpdate()
 	}
 }
 
-void SceneNode::calCurrentAABBox()
+void SceneNode::calcCurrentAABBox()
 {
 	mAABBox = AABBox::Invalid;
 

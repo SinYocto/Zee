@@ -111,28 +111,15 @@ struct VertexN
 
 struct VertexUVN
 {	
-	VertexUVN(float _x = 0, float _y = 0, float _z = 0, float _u = 0, float _v = 0, float _nx = 0, float _ny = 0, float _nz = 0)
+	VertexUVN(float _x = 0, float _y = 0, float _z = 0, float _nx = 0, float _ny = 0, float _nz = 0, float _u = 0, float _v = 0)
 		:x(_x)
 		,y(_y)
 		,z(_z)
-		,u(_u)
-		,v(_v)
 		,nx(_nx)
 		,ny(_ny)
 		,nz(_nz)
-	{
-
-	}
-
-	VertexUVN(const Vector3& pos, const Vector2& uv, const Vector3& normal)
-		:x(pos.x)
-		,y(pos.y)
-		,z(pos.z)
-		,u(uv.x)
-		,v(uv.y)
-		,nx(normal.x)
-		,ny(normal.y)
-		,nz(normal.z)
+		,u(_u)
+		,v(_v)
 	{
 
 	}
@@ -140,15 +127,15 @@ struct VertexUVN
 	float x;
 	float y;
 	float z;
-	
-	float u;
-	float v;
 
 	float nx;
 	float ny;
 	float nz;
+	
+	float u;
+	float v;
 
-	static const DWORD FVF = D3DFVF_XYZ | D3DFVF_TEX1 | D3DFVF_NORMAL;
+	static const DWORD FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 };
 
 struct VertexUVTBN

@@ -1,7 +1,7 @@
 #include "ModelNode.h"
 #include "DebugDrawer.h"
 
-void ModelNode::calCurrentAABBox()
+void ModelNode::calcCurrentAABBox()
 {
 	mModel->CalcDynamicAABBox(mWorldPos, mWorldOrient, &mAABBox);
 }

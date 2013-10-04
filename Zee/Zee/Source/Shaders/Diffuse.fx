@@ -68,19 +68,19 @@ float4 DiffusePS(float2 tex : TEXCOORD0,
 		Kd *= texColor;
 	}
 	
-	CalORadianceAmbient(oColor, ambientLight.color, Ka);	
+	CalcORadianceAmbient(oColor, ambientLight.color, Ka);	
 
 	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
 	{
-		CalORadianceLambert(oColor, directionalLights[i].color, -directionalLights[i].dir, normal, Kd);
+		CalcORadianceLambert(oColor, directionalLights[i].color, -directionalLights[i].dir, normal, Kd);
 	}
 	
 	for(int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i)
 	{	
 		float3 dirL = normalize(pointLights[i].position - posW);
-		float atten = CalAttenuation(posW, pointLights[i].position, pointLights[i].atten);
+		float atten = CalcAttenuation(posW, pointLights[i].position, pointLights[i].atten);
 
-		CalORadianceLambert(oColor, atten * pointLights[i].color, dirL, normal, Kd);
+		CalcORadianceLambert(oColor, atten * pointLights[i].color, dirL, normal, Kd);
 	}
 
 	return oColor;

@@ -102,19 +102,19 @@ float4 BumpSpecularPS(VS_OUT pIn) : COLOR0
 		Kd *= texColor;
 	}
 	
-	CalORadianceAmbient(oColor, ambientLight.color, Ka);
+	CalcORadianceAmbient(oColor, ambientLight.color, Ka);
 
 	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
 	{
-		CalORadianceBlinnPhong(oColor, directionalLights[i].color, -directionalLights[i].dir, normal, dirV, Kd, Ks, Ns);
+		CalcORadianceBlinnPhong(oColor, directionalLights[i].color, -directionalLights[i].dir, normal, dirV, Kd, Ks, Ns);
 	}
 	
 	for(int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i)
 	{	
 		float3 dirL = normalize(pointLights[i].position - pIn.posW);
-		float atten = CalAttenuation(pIn.posW, pointLights[i].position, pointLights[i].atten);
+		float atten = CalcAttenuation(pIn.posW, pointLights[i].position, pointLights[i].atten);
 		
-		CalORadianceBlinnPhong(oColor, atten * pointLights[i].color, dirL, normal, dirV, Kd, Ks, Ns);
+		CalcORadianceBlinnPhong(oColor, atten * pointLights[i].color, dirL, normal, dirV, Kd, Ks, Ns);
 	}
 
 	return oColor;

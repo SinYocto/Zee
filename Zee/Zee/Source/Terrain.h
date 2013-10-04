@@ -71,7 +71,7 @@ public:
 
 	void FrameUpdate();
 
-	void Draw(Camera* camera);
+	void Draw(Camera* camera, bool isSolid);
 	void createEffect();
 
 private:

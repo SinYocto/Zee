@@ -77,7 +77,7 @@ public:
 	NODE_TYPE GetNodeType();
 
 protected:
-	virtual void calCurrentAABBox();
+	virtual void calcCurrentAABBox();
 
 protected:
 	DWORD mID;

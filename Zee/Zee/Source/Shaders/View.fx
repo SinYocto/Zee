@@ -66,7 +66,7 @@ float4 ViewPS(float2 tex : TEXCOORD0,
 		Kd *= tex2D(ColorS, tex);
 	}
 
-	CalORadianceLambert(oColor, float4(1, 1, 1, 1), dirV, normal, Kd);
+	CalcORadianceLambert(oColor, float4(1, 1, 1, 1), dirV, normal, Kd);
 
 	return oColor;
 }

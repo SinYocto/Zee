@@ -10,7 +10,8 @@ public:
 	enum OPEN_MODE
 	{
 		READ,
-		WRITE
+		READ_BINARY,
+		WRITE,
 	};
 
 public:
@@ -26,6 +27,8 @@ public:
 	wchar_t* ReadLine(wchar_t* lineContent, int maxLineSize);
 	int ReadBlock(std::vector<std::wstring>* blockContent, const wchar_t* beginSpecifier, 
 		const wchar_t* endSpecifier = NULL, const wchar_t* firstLineContent = NULL);
+
+	int WriteLine(const wchar_t* format, ...);
 
 	bool Close();
 

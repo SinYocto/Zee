@@ -163,7 +163,7 @@ void SetUp()
 
 	// lights
 	DirectionalLight* dirLight1 = new DirectionalLight(L"dirLight1", D3DXCOLOR_RED, Vector3(1.0f, -1.0f, 1.0f));
-	PointLight* pointLight1 = new PointLight(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(0, 0, 0), Vector3(1.0f, 0, 0));
+	PointLight* pointLight1 = new PointLight(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(0, 0, 0), Vector3(1.0f, 0.05f, 0));
 
 	LightManager::SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
 
@@ -257,7 +257,7 @@ void SetUp()
 
 	// terrain
 	PerformanceTimer::Begin(L"building 257 terrain");
-	terrain = new Terrain(257, 100.0f, 20.0f);
+	terrain = new Terrain(257, 200.0f, 40.0f);
 	terrain->LoadFromHeightMap(L"./Assets/Textures/heightMap257_bit16.raw", 257);
 	terrain->BuildTerrain(4);
 
@@ -311,10 +311,10 @@ void RenderLoop()
 					hitNode = SceneManager::RayIntersect(rayPos, rayDir, NULL, NULL);
 			}
 
+			terrain->Draw(SceneManager::mainCamera, true);
+
 			SceneManager::root->SetDrawBBoxFlag(true);
 			SceneManager::DrawAll();
-
-			terrain->Draw(SceneManager::mainCamera);
 
 			gGUISystem.Draw();
 

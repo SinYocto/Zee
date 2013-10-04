@@ -1,5 +1,6 @@
 #include "Terrain.h"
 #include "Camera.h"
+#include "Shader.h"
 
 LPD3DXEFFECT Terrain::sEffect = NULL;
 
@@ -61,13 +62,13 @@ void TerrainChunk::CreateVertexBuffer()
 
 	for(int i = 0; i < numVerts; ++i)
 	{
-		VertexUVN vert = VertexUVN(mPosData[i].x, mPosData[i].y, mPosData[i].z, mUVData[i].x, mUVData[i].y, 
-			mNormalData[i].x, mNormalData[i].y, mNormalData[i].z);
+		VertexUVN vert = VertexUVN(mPosData[i].x, mPosData[i].y, mPosData[i].z, 
+			mNormalData[i].x, mNormalData[i].y, mNormalData[i].z, mUVData[i].x, mUVData[i].y);
 
 		vertexData[i] = vert;
 	}
 
-	CreateVB(Driver::D3DDevice, &mVertexBuffer, vertexData, numVerts, XYZ_UV_N);
+	CreateVB(Driver::D3DDevice, &mVertexBuffer, (void*)vertexData, numVerts, XYZ_UV_N);
 
 	delete[] vertexData;
 }
@@ -138,14 +139,14 @@ void Terrain::createEffect()
 	SAFE_RELEASE(sEffect);
 
 	D3DXCreateEffectFromFile(Driver::D3DDevice, L"./Source/Shaders/Terrain.fx", NULL, NULL, 
-		D3DXSHADER_DEBUG, NULL, &sEffect, NULL);
+		D3DXSHADER_DEBUG, UtilityShader::pool, &sEffect, NULL);
 
 	_Assert(NULL != sEffect);
 }
 
 void Terrain::LoadFromHeightMap(const wchar_t* fileName, int heightMapSize)
 {
-	YFile* file = YFile::Open(fileName, YFile::READ);
+	YFile* file = YFile::Open(fileName, YFile::READ_BINARY);
 	_Assert(NULL != file);
 
 	mSize = heightMapSize;
@@ -153,6 +154,18 @@ void Terrain::LoadFromHeightMap(const wchar_t* fileName, int heightMapSize)
 	file->Read(mHeightMapData, heightMapSize * heightMapSize * sizeof(WORD), sizeof(WORD), heightMapSize * heightMapSize);
 
 	file->Close();
+
+	//YFile* debugFile = YFile::Open(L"debugHeightMap.txt", YFile::WRITE);
+	//_Assert(NULL != debugFile);
+
+	//for(int i = 0; i < heightMapSize; ++i)
+	//{
+	//	for(int j = 0; j < heightMapSize; ++j)
+	//	{
+	//		debugFile->WriteLine(L"data[%d][%d]: %d", i, j, mHeightMapData[heightMapSize * i + j]);
+	//	}
+	//}
+	//debugFile->Close();
 }
 
 void Terrain::BuildTerrain(int depth)
@@ -193,11 +206,16 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 
 			float x = chunkCenterX + ((float)column - (chunkSize - 1)/2) * chunkLength / (chunkSize - 1);
 			float z = chunkCenterZ + ((chunkSize - 1)/2 - (float)row) * chunkLength / (chunkSize - 1);
-			float y = mHeightMapData[(mSize - 1 - (heightMapBaseRow + row))*mSize + heightMapBaseColumn + column] * mHeight / 16383.0f;
+
+			// 高度图使用了16位, 可表示的范围为0~65535, 偏移32767, 可表示-32767~32768
+			float y = (mHeightMapData[(mSize - 1 - (heightMapBaseRow + row))*mSize + heightMapBaseColumn + column] - 32767) 
+				* mHeight / 32768.0f;
+
+			float u = (float)(heightMapBaseColumn + column)/(mSize - 1);
+			float v = (float)(heightMapBaseRow + row)/(mSize - 1);
 
 			chunk->mPosData.push_back(Vector3(x, y, z));
-			chunk->mUVData.push_back(Vector2((float)(heightMapBaseColumn + column)/(mSize - 1), 
-				(float)(heightMapBaseRow + row)/(mSize - 1))); 
+			chunk->mUVData.push_back(Vector2(u, v)); 
 		}
 
 		chunk->CalculateChunkNormals();
@@ -256,7 +274,7 @@ void Terrain::FrameUpdate()
 	}
 }
 
-void Terrain::Draw(Camera* camera)
+void Terrain::Draw(Camera* camera, bool isSolid)
 {
 	_Assert(sEffect);
 
@@ -271,6 +289,11 @@ void Terrain::Draw(Camera* camera)
 	sEffect->SetTexture("splatMapTex", mMaterial.splatMapTex);
 	sEffect->SetRawValue("mtlAmbient", &mMaterial.ambientColor, 0, sizeof(D3DXCOLOR));
 	sEffect->SetRawValue("mtlDiffuse", &mMaterial.diffuseColor, 0, sizeof(D3DXCOLOR));
+
+	if(isSolid)
+		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	else
+		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 
 	sEffect->Begin(0, 0);
 	sEffect->BeginPass(0);
@@ -292,6 +315,8 @@ void Terrain::Draw(Camera* camera)
 
 	sEffect->EndPass();
 	sEffect->End();
+
+	Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 }
 
 D3DXMATRIX Terrain::uvTransformMatrix()

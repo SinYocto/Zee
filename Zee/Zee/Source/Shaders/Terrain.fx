@@ -92,7 +92,7 @@ VS_OUT TerrainVS(VS_IN vIn)
 
 	vOut.pos = mul(float4(vIn.pos, 1.0f), matWVP);
 	vOut.posW = (mul(float4(vIn.pos, 1.0f), matWorld)).xyz;
-	vOut.tex = (mul(float4(vIn.tex, 0, 1.0f), matUVTransform)).xy;
+	vOut.tex = (mul(float4(vIn.tex, 0, 1.0f), matUVTransform)).xy; 
 	vOut.normal = (mul(float4(vIn.normal, 0), matWorld)).xyz;
 	vOut.texSplat = vIn.tex;
 
@@ -115,22 +115,23 @@ float4 TerrainPS(float2 tex : TEXCOORD0,
 	float4 Ka = mtlAmbient * texColor;
 	float4 Kd = mtlDiffuse * texColor;
 	
-	CalORadianceAmbient(oColor, ambientLight.color, Ka);	
+	CalcORadianceAmbient(oColor, ambientLight.color, Ka);	
 
 	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
 	{
-		CalORadianceLambert(oColor, directionalLights[i].color, -directionalLights[i].dir, normal, Kd);
+		CalcORadianceLambert(oColor, directionalLights[i].color, -directionalLights[i].dir, normal, Kd);
 	}
 	
 	for(int i = 0; i < MAX_NUM_POINT_LIGHTS; ++i)
 	{	
 		float3 dirL = normalize(pointLights[i].position - posW);
-		float atten = CalAttenuation(posW, pointLights[i].position, pointLights[i].atten);
+		float atten = CalcAttenuation(posW, pointLights[i].position, pointLights[i].atten);
 
-		CalORadianceLambert(oColor, atten * pointLights[i].color, dirL, normal, Kd);
+		CalcORadianceLambert(oColor, atten * pointLights[i].color, dirL, normal, Kd);
 	}
-	
-	oColor = splatColor;
+
+	//oColor = ambientLight.color * Ka;
+
 	return oColor;
 }
 

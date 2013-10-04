@@ -95,12 +95,12 @@ void Geometry::BuildGeometry(VertexType type)
 				{
 					VertexUVN vert = VertexUVN(mPositionData[mVerts[i].posIndex].x, 
 						mPositionData[mVerts[i].posIndex].y, 
-						mPositionData[mVerts[i].posIndex].z, 
-						mUVData[mVerts[i].uvIndex].x, 
-						mUVData[mVerts[i].uvIndex].y,
+						mPositionData[mVerts[i].posIndex].z,
 						mNormalData[mVerts[i].normalIndex].x, 
 						mNormalData[mVerts[i].normalIndex].y,
-						mNormalData[mVerts[i].normalIndex].z);
+						mNormalData[mVerts[i].normalIndex].z, 
+						mUVData[mVerts[i].uvIndex].x, 
+						mUVData[mVerts[i].uvIndex].y);
 
 					((VertexUVN*)vertexData)[i] = vert;
 				}

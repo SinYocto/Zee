@@ -154,7 +154,7 @@ void CreateVB(IDirect3DDevice9* d3dDevice,IDirect3DVertexBuffer9** vb, void* ver
 
 		case XYZ_UV_N:
 			sizeofVertex = 32;
-			vertexFVF = D3DFVF_XYZ | D3DFVF_TEX1 | D3DFVF_NORMAL;
+			vertexFVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX1;
 			break;
 
 		case XYZ_UV_TBN:

@@ -10,10 +10,20 @@ YFile* YFile::Open(const wchar_t* filePath, OPEN_MODE mode)
 	file = new YFile();
 	Assert(NULL != file);
 
-	if(mode == READ)
+	switch(mode)
+	{
+	case READ:
 		_wfopen_s(&file->pFile, filePath, L"r");
-	else
+		break;
+	case READ_BINARY:
+		_wfopen_s(&file->pFile, filePath, L"rb");
+		break;
+	case WRITE:
 		_wfopen_s(&file->pFile, filePath, L"w");
+		break;
+	default:
+		Assert(false);
+	}
 
 	Assert(NULL != file->pFile);
 
@@ -124,3 +134,22 @@ int YFile::Read(void* destBuffer, int destSize, int size, int count)
 {
 	return fread_s(destBuffer, destSize, size, count, pFile);
 }
+
+int YFile::WriteLine(const wchar_t* format, ...)
+{
+	Assert(NULL != format);
+
+	va_list args;
+	va_start(args, format);
+	vfwprintf(pFile, format, args);
+	va_end(args);
+
+	fwprintf_s(pFile, L"\n");
+
+	return true;
+Exit:
+	return false;
+	
+}
+
+
