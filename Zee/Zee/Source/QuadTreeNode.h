@@ -29,10 +29,13 @@ public:
 	QuadTreeNode* GetLeftBottom();
 	QuadTreeNode* GetRightBottom();
 
+public:
+	void CalculateBoundingBox(float minY, float maxY);
+	bool IsInFrustum();
+	AABBox GetAABBox();
 
 private:
-	void CalculateBoundingBox(float minY, float maxY);
-	void SetVisible(bool isVisible);
+	void setVisible(bool isVisible);
 
 private:
 	float mCenterX;

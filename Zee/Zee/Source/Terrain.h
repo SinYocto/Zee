@@ -32,8 +32,12 @@ public:
 	void CreateVertexBuffer();
 	void CreateIndexBuffer();
 
+	bool IsInFrustum();
+
 private:
 	int mSize;
+	int mRow;
+	int mColumn;
 
 	std::vector<Vector3> mPosData;
 	std::vector<Vector2> mUVData;
@@ -52,7 +56,7 @@ public:
 	~Terrain()
 	{
 		SAFE_DELETE(mRootNode);
- 
+
 		for(std::vector<TerrainChunk*>::iterator iter = mChunks.begin(); iter != mChunks.end(); ++iter)
 		{
 			SAFE_DELETE(*iter);
@@ -69,7 +73,7 @@ public:
 	void SetSplatMapTex(const wchar_t* texFile);
 	void SetMtlParameters(float tilesU, float tilesV, D3DXCOLOR ambient, D3DXCOLOR diffuse);
 
-	void FrameUpdate();
+	void FrameUpdate(Camera* camera);
 
 	void Draw(Camera* camera, bool isSolid);
 	void createEffect();
@@ -77,6 +81,7 @@ public:
 private:
 	//void createEffect();
 	void buildChunks(QuadTreeNode* node, int depth);
+	TerrainChunk* getChunk(int row, int column);
 
 	//void calculateChunkNormal(const Vector3* posData, const DWORD* indices, int numVerts, int numTris, Vector3** normalData);
 
@@ -85,6 +90,7 @@ private:
 private:
 	QuadTreeNode* mRootNode;
 	std::vector<TerrainChunk*> mChunks;
+	int mChunkCounts;	// 总chunks数为mChunkCounts * mChunkCounts
 
 	int mSize;			// 地形大小(顶点数)
 
@@ -92,6 +98,8 @@ private:
 	float mHeight;		// 高度图最大值代表的高度
 
 	WORD* mHeightMapData;
+
+	bool mDrawBBox;
 
 	struct TerrainMaterial
 	{

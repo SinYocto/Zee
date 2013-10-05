@@ -21,6 +21,9 @@ YFile* YFile::Open(const wchar_t* filePath, OPEN_MODE mode)
 	case WRITE:
 		_wfopen_s(&file->pFile, filePath, L"w");
 		break;
+	case APPEND:
+		_wfopen_s(&file->pFile, filePath, L"a");
+		break;
 	default:
 		Assert(false);
 	}

@@ -293,6 +293,7 @@ void RenderLoop()
 
 			SceneManager::FrameUpdate();
 			MaterialManager::FrameUpdate();
+			terrain->FrameUpdate(SceneManager::mainCamera);
 
 			// render
 			Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);

@@ -88,13 +88,13 @@ AABBox AABBox::CombineBBox(const AABBox& box1, const AABBox& box2)
 
 bool AABBox::isValid()
 {
-	if(mMin.x >= mMax.x)
+	if(mMin.x > mMax.x)
 		return false;
 
-	if(mMin.y >= mMax.y)
+	if(mMin.y > mMax.y)
 		return false;
 
-	if(mMin.z >= mMax.z)
+	if(mMin.z > mMax.z)
 		return false;
 
 	return true;

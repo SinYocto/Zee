@@ -1,6 +1,7 @@
 #include "Terrain.h"
 #include "Camera.h"
 #include "Shader.h"
+#include "DebugDrawer.h"
 
 LPD3DXEFFECT Terrain::sEffect = NULL;
 
@@ -96,8 +97,14 @@ void TerrainChunk::CreateIndexBuffer()
 	}
 
 	CreateIB(Driver::D3DDevice, &mIndexBuffer, indices, 3 * numTris);
+	delete[] indices;
 }
 
+bool TerrainChunk::IsInFrustum()
+{
+	_Assert(NULL != mNode);
+	return mNode->IsInFrustum();
+}
 
 Terrain::Terrain(int size, float length, float height)
 :mSize(size)
@@ -105,6 +112,7 @@ Terrain::Terrain(int size, float length, float height)
 ,mHeight(height)
 ,mHeightMapData(NULL)
 ,mRootNode(NULL)
+,mDrawBBox(false)
 {
 	if(!sEffect)
 		createEffect();
@@ -154,23 +162,14 @@ void Terrain::LoadFromHeightMap(const wchar_t* fileName, int heightMapSize)
 	file->Read(mHeightMapData, heightMapSize * heightMapSize * sizeof(WORD), sizeof(WORD), heightMapSize * heightMapSize);
 
 	file->Close();
-
-	//YFile* debugFile = YFile::Open(L"debugHeightMap.txt", YFile::WRITE);
-	//_Assert(NULL != debugFile);
-
-	//for(int i = 0; i < heightMapSize; ++i)
-	//{
-	//	for(int j = 0; j < heightMapSize; ++j)
-	//	{
-	//		debugFile->WriteLine(L"data[%d][%d]: %d", i, j, mHeightMapData[heightMapSize * i + j]);
-	//	}
-	//}
-	//debugFile->Close();
 }
 
 void Terrain::BuildTerrain(int depth)
 {
 	mRootNode = new QuadTreeNode(0, 0, mLength / 2.0f, depth);
+
+	mChunkCounts = (int)pow(2.0f, depth);
+	mChunks.resize(mChunkCounts * mChunkCounts, NULL);
 	buildChunks(mRootNode, depth);
 }
 
@@ -178,14 +177,13 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 {
 	if(node->GetDepth() == 0)
 	{
-		int chunkCounts = (int)pow(2.0f, depth);	// 总共的chunks数是chunkCounts*chunkCounts个
-		int chunkSize = (mSize - 1) / chunkCounts + 1;  // 每个chunk的边顶点数
+		int chunkSize = (mSize - 1) / mChunkCounts + 1;  // 每个chunk的边顶点数
 		float chunkLength = node->GetHalfSize() * 2;
 		float chunkCenterX = node->GetCenter().x;
 		float chunkCenterZ = node->GetCenter().y;
 
-		int chunkColumn = (int)((chunkCenterX - chunkLength / 2.0f + (chunkCounts / 2)*chunkLength) / chunkLength);
-		int chunkRow = (int)(((chunkCounts / 2)*chunkLength - (chunkCenterZ + chunkLength / 2.0f)) / chunkLength); 
+		int chunkColumn = (int)((chunkCenterX - chunkLength / 2.0f + (mChunkCounts / 2)*chunkLength) / chunkLength);
+		int chunkRow = (int)(((mChunkCounts / 2)*chunkLength - (chunkCenterZ + chunkLength / 2.0f)) / chunkLength); 
 
 		// chunk的第一个顶点对应在heightMapData中的row和column
 		int heightMapBaseRow = (chunkSize - 1)*chunkRow;
@@ -195,10 +193,14 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 		int numChunkTris = (chunkSize - 1) * (chunkSize - 1) * 2;
 
 		TerrainChunk* chunk = new TerrainChunk(node, chunkSize);
+		chunk->mRow = chunkRow;
+		chunk->mColumn = chunkColumn;
 		chunk->mPosData.reserve(numChunkVerts);
 		chunk->mUVData.reserve(numChunkVerts);
 		chunk->mNormalData.reserve(numChunkVerts);
 
+		float minY = FLT_MAX;		// chunk的高度范围, 用于计算BBox然后进行ViewFrustumCulling
+		float maxY = -FLT_MAX;
 		for(int i = 0; i < numChunkVerts; ++i)
 		{
 			int row = i / chunkSize;
@@ -211,6 +213,12 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 			float y = (mHeightMapData[(mSize - 1 - (heightMapBaseRow + row))*mSize + heightMapBaseColumn + column] - 32767) 
 				* mHeight / 32768.0f;
 
+			if(y < minY)
+				minY = y;
+
+			if(y > maxY)
+				maxY = y;
+
 			float u = (float)(heightMapBaseColumn + column)/(mSize - 1);
 			float v = (float)(heightMapBaseRow + row)/(mSize - 1);
 
@@ -220,8 +228,11 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 
 		chunk->CalculateChunkNormals();
 		chunk->CreateVertexBuffer();
-		chunk->CreateIndexBuffer();		// 暂时加上的
-		mChunks.push_back(chunk);
+		chunk->mNode->CalculateBoundingBox(minY, maxY);
+
+		int chunkIndex = mChunkCounts * chunkRow + chunkColumn;
+		_Assert(chunkIndex < mChunkCounts * mChunkCounts);
+		mChunks[chunkIndex] = chunk;
 	}
 	else
 	{
@@ -232,46 +243,22 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 	}
 }
 
-//void Terrain::calculateChunkNormal(const Vector3* posData, const DWORD* indices, int numVerts, int numTris, Vector3** normalData)
-//{
-//	_Assert(posData);
-//	_Assert(normalData);
-//	_Assert(*normalData);
-//
-//	for(int i = 0; i < numVerts; ++i){
-//		(*normalData)[i] = Vector3::Zero;
-//	}
-//
-//	for(int i = 0; i < numTris; ++i){
-//		Vector3 v0 = posData[indices[3*i + 0]];
-//		Vector3 v1 = posData[indices[3*i + 1]];
-//		Vector3 v2 = posData[indices[3*i + 2]];
-//
-//		Vector3 v0v1 = v1 - v0;
-//		Vector3 v0v2 = v2 - v0;
-//
-//		Vector3 normal = v0v2.Cross(v0v1);
-//		normal.Normalize();
-//
-//		for(int k = 0; k < 3; ++k)
-//		{
-//			(*normalData)[indices[3 * i + k]] += normal;
-//		}
-//	}
-//
-//	for(int i = 0; i < numVerts; ++i)
-//	{
-//		(*normalData)[i].Normalize();
-//	}
-//}
-
-void Terrain::FrameUpdate()
+void Terrain::FrameUpdate(Camera* camera)
 {
+	mRootNode->EvaluateVisibility(camera);
+
+	int numChunks = 0;
 	for(std::vector<TerrainChunk*>::iterator iter = mChunks.begin(); iter != mChunks.end(); ++iter)
 	{
 		TerrainChunk* chunk = *iter;
-		chunk->CreateIndexBuffer();
+		if(chunk->IsInFrustum())
+		{
+			chunk->CreateIndexBuffer();		// 挺#耗时#的, 可增加判断在ib改变的时候再create
+			++numChunks;
+		}
 	}
+
+	Log(L"chunks: %d\n", numChunks);
 }
 
 void Terrain::Draw(Camera* camera, bool isSolid)
@@ -301,7 +288,9 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 	for(std::vector<TerrainChunk*>::iterator iter = mChunks.begin(); iter != mChunks.end(); ++iter)
 	{
 		TerrainChunk* chunk = *iter;
-		//chunk->CreateIndexBuffer();
+
+		if(!chunk->mNode->IsInFrustum())
+			continue;
 
 		Driver::D3DDevice->SetStreamSource(0, chunk->mVertexBuffer, 0, SizeofVertex(XYZ_UV_N));
 		Driver::D3DDevice->SetIndices(chunk->mIndexBuffer);
@@ -311,6 +300,11 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 		int numTris = (chunk->mSize - 1) * (chunk->mSize - 1) * 2;
 
 		Driver::D3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, numTris);
+
+		if(mDrawBBox && chunk->mNode->GetAABBox().isValid())
+		{
+			DebugDrawer::DrawAABBox(chunk->mNode->GetAABBox(), 0xffff0000, camera);		// #耗时#
+		}
 	}
 
 	sEffect->EndPass();
@@ -352,4 +346,12 @@ void Terrain::SetMtlParameters(float tilesU, float tilesV, D3DXCOLOR ambient, D3
 	mMaterial.tilesV = tilesV;
 	mMaterial.ambientColor = ambient;
 	mMaterial.diffuseColor = diffuse;
+}
+
+TerrainChunk* Terrain::getChunk(int row, int column)
+{
+	int chunkIndex = row * mChunkCounts + column;
+	_Assert(chunkIndex < (int)mChunks.size());
+
+	return mChunks[chunkIndex];
 }

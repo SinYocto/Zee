@@ -6,9 +6,11 @@ QuadTreeNode::QuadTreeNode(float centerX, float centerZ, float halfSize, int dep
 ,mCenterZ(centerZ)
 ,mHalfSize(halfSize)
 ,mDepth(depth)
-,mMinY(-FLT_MAX)
-,mMaxY(FLT_MAX)
- {
+,mMinY(-100.0f)
+,mMaxY(100.0f)
+{
+	CalculateBoundingBox(mMinY, mMaxY);		// 初始化的quadtreeNode的Y轴范围
+	
 	if(mDepth > 0)
 	{
 		mIsLeaf = false;
@@ -64,7 +66,9 @@ QuadTreeNode* QuadTreeNode::GetRightBottom()
 
 void QuadTreeNode::CalculateBoundingBox(float minY, float maxY)
 {
-	mAABBox = AABBox(Vector3(mCenterX, (maxY + minY) / 2.0f, mCenterZ), 2.0f * mHalfSize, mMaxY - mMinY, 2.0f * mHalfSize);
+	mMinY = minY;
+	mMaxY = maxY;
+	mAABBox = AABBox(Vector3(mCenterX, (maxY + minY) / 2.0f, mCenterZ), 2.0f * mHalfSize, maxY - minY, 2.0f * mHalfSize);
 }
 
 void QuadTreeNode::EvaluateVisibility(Camera* camera)
@@ -74,7 +78,7 @@ void QuadTreeNode::EvaluateVisibility(Camera* camera)
 
 	if(!mIsInFrustum)
 	{
-		SetVisible(false);
+		setVisible(false);
 	}
 	else
 	{
@@ -89,15 +93,25 @@ void QuadTreeNode::EvaluateVisibility(Camera* camera)
 	}
 }
 
-void QuadTreeNode::SetVisible(bool isVisible)
+void QuadTreeNode::setVisible(bool isVisible)
 {
 	mIsInFrustum = isVisible;
 
-	if(!mIsInFrustum && mIsLeaf)
+	if(!mIsInFrustum && !mIsLeaf)	// invisible时需要设置子node也为invisible
 	{
-		mLeftTop->SetVisible(false);
-		mRightTop->SetVisible(false);
-		mLeftBottom->SetVisible(false);
-		mRightBottom->SetVisible(false);
+		mLeftTop->setVisible(false);
+		mRightTop->setVisible(false);
+		mLeftBottom->setVisible(false);
+		mRightBottom->setVisible(false);
 	}
+}
+
+bool QuadTreeNode::IsInFrustum()
+{
+	return mIsInFrustum;
+}
+
+AABBox QuadTreeNode::GetAABBox()
+{
+	return mAABBox;
 }

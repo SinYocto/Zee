@@ -12,6 +12,7 @@ public:
 		READ,
 		READ_BINARY,
 		WRITE,
+		APPEND,
 	};
 
 public:
