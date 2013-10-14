@@ -102,28 +102,21 @@ void TerrainChunk::CreateIndexBuffer(int lodLeft, int lodTop, int lodRight, int 
 			if(leftInterval < interval)
 				leftInterval = interval;
 
-			int row = 0;
-			int centerIndex = mSize * (mSize - 1) / 2 + interval;
-			while(row < mSize - 1)
+			for(int row = 0; row < mSize - 1; row += leftInterval)
 			{
+				for(int r = row; r < row + leftInterval; r += interval)
+				{
+					if(r >= 0 && r + interval <= mSize - 1)
+					{
+						indices.push_back(row * mSize);
+						indices.push_back(r * mSize + interval);
+						indices.push_back((r + interval) * mSize + interval);
+					}
+				}
+
 				indices.push_back(row * mSize);
-				indices.push_back(centerIndex);
+				indices.push_back((row + leftInterval) * mSize + interval);
 				indices.push_back((row + leftInterval) * mSize);
-
-				row += leftInterval;
-			}
-
-			for(row = interval; row < mSize - 1 - interval; row += interval)
-			{
-				int vertIndex = -1;
-				if(row < (mSize - 1) / 2)
-					vertIndex = 0;
-				else
-					vertIndex = mSize * (mSize - 1);
-
-				indices.push_back(vertIndex);
-				indices.push_back(row * mSize + interval);
-				indices.push_back((row + interval)*mSize + interval);
 			}
 		}
 		 
@@ -133,28 +126,21 @@ void TerrainChunk::CreateIndexBuffer(int lodLeft, int lodTop, int lodRight, int 
 			if(rightInterval < interval)
 				rightInterval = interval;
 
-			int row = 0;
-			int centerIndex = mSize * (mSize - 1) / 2 + mSize - 1 - interval;
-			while(row < mSize - 1)
+			for(int row = 0; row < mSize - 1; row += rightInterval)
 			{
-				indices.push_back(centerIndex);
+				for(int r = row; r < row + rightInterval; r += interval)
+				{
+					if(r >= 0 && r + interval <= mSize - 1)
+					{
+						indices.push_back(r * mSize + mSize - 1 - interval);
+						indices.push_back(row * mSize + mSize - 1);
+						indices.push_back((r + interval) * mSize + mSize - 1 - interval);
+					}
+				}
+
 				indices.push_back(row * mSize + mSize - 1);
 				indices.push_back((row + rightInterval) * mSize + mSize - 1);
-
-				row += rightInterval;
-			}
-
-			for(row = interval; row < mSize - 1 - interval; row += interval)
-			{
-				int vertIndex = -1;
-				if(row < (mSize - 1) / 2)
-					vertIndex = mSize - 1;
-				else
-					vertIndex = mSize * mSize - 1;
-
-				indices.push_back(vertIndex);
-				indices.push_back((row + interval)*mSize + mSize - 1 - interval);
-				indices.push_back(row * mSize + mSize - 1 - interval);
+				indices.push_back((row + rightInterval) * mSize + mSize - 1 - interval);
 			}
 		}
 
@@ -164,28 +150,21 @@ void TerrainChunk::CreateIndexBuffer(int lodLeft, int lodTop, int lodRight, int 
 			if(topInterval < interval)
 				topInterval = interval;
 
-			int column = 0;
-			int centerIndex = mSize * interval + (mSize - 1) / 2;
-			while(column < mSize - 1)
+			for(int column = 0; column < mSize - 1; column += topInterval)
 			{
-				indices.push_back(centerIndex);
+				for(int c = column; c < column + topInterval; c += interval)
+				{
+					if(c >= 0 && c + interval <= mSize - 1)
+					{
+						indices.push_back(column);
+						indices.push_back(interval * mSize + c + interval);
+						indices.push_back(interval * mSize + c);
+					}
+				}
+
 				indices.push_back(column);
 				indices.push_back(column + topInterval);
-
-				column += topInterval;
-			}
-
-			for(column = interval; column < mSize - 1 - interval; column += interval)
-			{
-				int vertIndex = -1;
-				if(column < (mSize - 1) / 2)
-					vertIndex = 0;
-				else
-					vertIndex = mSize - 1;
-
-				indices.push_back(vertIndex);
-				indices.push_back(interval * mSize + column + interval);
-				indices.push_back(interval * mSize + column);
+				indices.push_back(interval * mSize + column + topInterval);
 			}
 		}
 
@@ -195,28 +174,21 @@ void TerrainChunk::CreateIndexBuffer(int lodLeft, int lodTop, int lodRight, int 
 			if(bottomInterval < interval)
 				bottomInterval = interval;
 
-			int column = 0;
-			int centerIndex = mSize * (mSize - 1 - interval) + (mSize - 1) / 2;
-			while(column < mSize - 1)
+			for(int column = 0; column < mSize - 1; column += bottomInterval)
 			{
-				indices.push_back(mSize * (mSize - 1) + column);
-				indices.push_back(centerIndex);
-				indices.push_back(mSize * (mSize - 1) + column + bottomInterval);
+				for(int c = column; c < column + bottomInterval; c += interval)
+				{
+					if(c >= 0 && c + interval <= mSize - 1)
+					{
+						indices.push_back((mSize - 1) * mSize + column);
+						indices.push_back((mSize - 1 - interval) * mSize + c);
+						indices.push_back((mSize - 1 - interval) * mSize + c + interval);
+					}
+				}
 
-				column += bottomInterval;
-			}
-
-			for(column = interval; column < mSize - 1 - interval; column += interval)
-			{
-				int vertIndex = -1;
-				if(column < (mSize - 1) / 2)
-					vertIndex = mSize * (mSize - 1);
-				else
-					vertIndex = mSize * mSize - 1;
-
-				indices.push_back(vertIndex);
-				indices.push_back(mSize * (mSize - 1 - interval) + column);
-				indices.push_back(mSize * (mSize - 1 - interval) + column + interval);
+				indices.push_back((mSize - 1) * mSize + column);
+				indices.push_back((mSize - 1 - interval) * mSize + column + bottomInterval);
+				indices.push_back((mSize - 1) * mSize + column + bottomInterval);
 			}
 		}
 

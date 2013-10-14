@@ -312,7 +312,7 @@ void RenderLoop()
 					hitNode = SceneManager::RayIntersect(rayPos, rayDir, NULL, NULL);
 			}
 
-			terrain->Draw(SceneManager::mainCamera, false);
+			terrain->Draw(SceneManager::mainCamera, true);
 
 			SceneManager::root->SetDrawBBoxFlag(true);
 			SceneManager::DrawAll();
@@ -352,7 +352,7 @@ void RenderLoop()
 void ApplyFPCameraControllor(Camera* pCamera, float deltaTime)
 {
 	Vector3 moveVector = Vector3::Zero;
-	float moveSpeed = 2.0f;
+	float moveSpeed = 4.0f;
 	float rotateSpeed = 2.0f;
 
 	if(Input::GetKey(DIK_LSHIFT))
