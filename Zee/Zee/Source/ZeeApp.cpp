@@ -312,7 +312,7 @@ void RenderLoop()
 					hitNode = SceneManager::RayIntersect(rayPos, rayDir, NULL, NULL);
 			}
 
-			terrain->Draw(SceneManager::mainCamera, true);
+			terrain->Draw(SceneManager::mainCamera, false);
 
 			SceneManager::root->SetDrawBBoxFlag(true);
 			SceneManager::DrawAll();

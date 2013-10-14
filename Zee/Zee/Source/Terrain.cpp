@@ -74,36 +74,190 @@ void TerrainChunk::CreateVertexBuffer()
 	delete[] vertexData;
 }
 
-void TerrainChunk::CreateIndexBuffer()
+void TerrainChunk::CreateIndexBuffer(int lodLeft, int lodTop, int lodRight, int lodBottom)
 {
 	SAFE_RELEASE(mIndexBuffer);
 
-	int numVerts = mSize * mSize;
-	int numTris = (mSize - 1) * (mSize - 1) * 2;
+	std::vector<DWORD> indices;
+	int lodChunkSize = (mSize - 1) / (int)pow(2.0f, mLODLevel) + 1;
 
-	DWORD* indices = new DWORD[3 * numTris];
-	for(int i = 0; i < mSize - 1; ++i)
+	if(lodChunkSize == 2)
 	{
-		for(int j = 0; j < mSize - 1; ++j)
-		{
-			indices[6*((mSize - 1)*i + j) + 0] = mSize*i + j;
-			indices[6*((mSize - 1)*i + j) + 1] = mSize*i + j+1;
-			indices[6*((mSize - 1)*i + j) + 2] = mSize*(i+1) + j;
+		indices.resize(6, 0);
+		indices[0] = 0;
+		indices[1] = mSize - 1;
+		indices[2] = mSize * (mSize - 1);
 
-			indices[6*((mSize - 1)*i + j) + 3] = mSize*(i+1) + j;
-			indices[6*((mSize - 1)*i + j) + 4] = mSize*i + j+1;
-			indices[6*((mSize - 1)*i + j) + 5] = mSize*(i+1) + j+1;
+		indices[3] = mSize * (mSize - 1);
+		indices[4] = mSize - 1;
+		indices[5] = mSize * mSize - 1;
+	}
+	else
+	{
+		int interval = (int)pow(2.0f, mLODLevel);
+
+		// left
+		{
+			int leftInterval = (int)pow(2.0f, lodLeft);
+			if(leftInterval < interval)
+				leftInterval = interval;
+
+			int row = 0;
+			int centerIndex = mSize * (mSize - 1) / 2 + interval;
+			while(row < mSize - 1)
+			{
+				indices.push_back(row * mSize);
+				indices.push_back(centerIndex);
+				indices.push_back((row + leftInterval) * mSize);
+
+				row += leftInterval;
+			}
+
+			for(row = interval; row < mSize - 1 - interval; row += interval)
+			{
+				int vertIndex = -1;
+				if(row < (mSize - 1) / 2)
+					vertIndex = 0;
+				else
+					vertIndex = mSize * (mSize - 1);
+
+				indices.push_back(vertIndex);
+				indices.push_back(row * mSize + interval);
+				indices.push_back((row + interval)*mSize + interval);
+			}
+		}
+		 
+		// right
+		{
+			int rightInterval = (int)pow(2.0f, lodRight);
+			if(rightInterval < interval)
+				rightInterval = interval;
+
+			int row = 0;
+			int centerIndex = mSize * (mSize - 1) / 2 + mSize - 1 - interval;
+			while(row < mSize - 1)
+			{
+				indices.push_back(centerIndex);
+				indices.push_back(row * mSize + mSize - 1);
+				indices.push_back((row + rightInterval) * mSize + mSize - 1);
+
+				row += rightInterval;
+			}
+
+			for(row = interval; row < mSize - 1 - interval; row += interval)
+			{
+				int vertIndex = -1;
+				if(row < (mSize - 1) / 2)
+					vertIndex = mSize - 1;
+				else
+					vertIndex = mSize * mSize - 1;
+
+				indices.push_back(vertIndex);
+				indices.push_back((row + interval)*mSize + mSize - 1 - interval);
+				indices.push_back(row * mSize + mSize - 1 - interval);
+			}
+		}
+
+		// top
+		{
+			int topInterval = (int)pow(2.0f, lodTop);
+			if(topInterval < interval)
+				topInterval = interval;
+
+			int column = 0;
+			int centerIndex = mSize * interval + (mSize - 1) / 2;
+			while(column < mSize - 1)
+			{
+				indices.push_back(centerIndex);
+				indices.push_back(column);
+				indices.push_back(column + topInterval);
+
+				column += topInterval;
+			}
+
+			for(column = interval; column < mSize - 1 - interval; column += interval)
+			{
+				int vertIndex = -1;
+				if(column < (mSize - 1) / 2)
+					vertIndex = 0;
+				else
+					vertIndex = mSize - 1;
+
+				indices.push_back(vertIndex);
+				indices.push_back(interval * mSize + column + interval);
+				indices.push_back(interval * mSize + column);
+			}
+		}
+
+		// bottom
+		{
+			int bottomInterval = (int)pow(2.0f, lodBottom);
+			if(bottomInterval < interval)
+				bottomInterval = interval;
+
+			int column = 0;
+			int centerIndex = mSize * (mSize - 1 - interval) + (mSize - 1) / 2;
+			while(column < mSize - 1)
+			{
+				indices.push_back(mSize * (mSize - 1) + column);
+				indices.push_back(centerIndex);
+				indices.push_back(mSize * (mSize - 1) + column + bottomInterval);
+
+				column += bottomInterval;
+			}
+
+			for(column = interval; column < mSize - 1 - interval; column += interval)
+			{
+				int vertIndex = -1;
+				if(column < (mSize - 1) / 2)
+					vertIndex = mSize * (mSize - 1);
+				else
+					vertIndex = mSize * mSize - 1;
+
+				indices.push_back(vertIndex);
+				indices.push_back(mSize * (mSize - 1 - interval) + column);
+				indices.push_back(mSize * (mSize - 1 - interval) + column + interval);
+			}
+		}
+
+		// center 
+		{
+			for(int row = interval; row < mSize - 1 - interval; row += interval)
+			{
+				for(int column = interval; column < mSize - 1 - interval; column += interval)
+				{
+					indices.push_back(mSize * row + column);
+					indices.push_back(mSize * row + column + interval);
+					indices.push_back(mSize * (row + interval) + column);
+
+					indices.push_back(mSize * (row + interval) + column);
+					indices.push_back(mSize * row + column + interval);
+					indices.push_back(mSize * (row + interval) + column + interval);
+				}
+			}
 		}
 	}
 
-	CreateIB(Driver::D3DDevice, &mIndexBuffer, indices, 3 * numTris);
-	delete[] indices;
+	_Assert(indices.size() % 3 == 0);
+	mNumTris = (int)indices.size() / 3;
+
+	CreateIB(Driver::D3DDevice, &mIndexBuffer, (DWORD*)(&indices[0]), 3 * mNumTris);
 }
 
 bool TerrainChunk::IsInFrustum()
 {
 	_Assert(NULL != mNode);
 	return mNode->IsInFrustum();
+}
+
+int TerrainChunk::GetLODLevel()
+{
+	return mLODLevel;
+}
+
+int TerrainChunk::GetTriCounts()
+{
+	return mNumTris;
 }
 
 Terrain::Terrain(int size, float length, float height)
@@ -116,7 +270,7 @@ Terrain::Terrain(int size, float length, float height)
 {
 	if(!sEffect)
 		createEffect();
-}
+} 
 
 void Terrain::OnLostDevice()
 {
@@ -138,7 +292,7 @@ void Terrain::OnResetDevice()
 	{
 		TerrainChunk* chunk = *iter;
 		chunk->CreateVertexBuffer();
-		chunk->CreateIndexBuffer();
+		//chunk->CreateIndexBuffer();
 	}
 }
 
@@ -248,12 +402,45 @@ void Terrain::FrameUpdate(Camera* camera)
 	mRootNode->EvaluateVisibility(camera);
 
 	int numChunks = 0;
-	for(std::vector<TerrainChunk*>::iterator iter = mChunks.begin(); iter != mChunks.end(); ++iter)
+	for(size_t i = 0; i < mChunks.size(); ++i)
 	{
-		TerrainChunk* chunk = *iter;
-		if(chunk->IsInFrustum())
+		TerrainChunk* chunk = mChunks[i];
+
+		int row = i / mChunkCounts;
+		int column = i % mChunkCounts;
+
+		int lodLeft = 0;
+		int lodTop = 0;
+		int lodRight = 0;
+		int lodBottom = 0;
+
+		if(column > 0)
 		{
-			chunk->CreateIndexBuffer();		// 挺#耗时#的, 可增加判断在ib改变的时候再create
+			TerrainChunk* chunkLeft = mChunks[mChunkCounts * row + column - 1];
+			lodLeft = chunkLeft->GetLODLevel();
+		}
+
+		if(column < mChunkCounts - 1)
+		{
+			TerrainChunk* chunkRight = mChunks[mChunkCounts * row + column + 1];
+			lodRight = chunkRight->GetLODLevel();
+		}
+
+		if(row > 0)
+		{
+			TerrainChunk* chunkTop = mChunks[mChunkCounts * (row - 1) + column];
+			lodTop = chunkTop->GetLODLevel();
+		}
+
+		if(row < mChunkCounts - 1)
+		{
+			TerrainChunk* chunkBottom = mChunks[mChunkCounts * (row + 1) + column];
+			lodBottom = chunkBottom->GetLODLevel();
+		}
+
+		if(true && chunk->IsInFrustum())	// TODO:判断是否邻居的lod改变, 没改变不需要重建indexBuffer
+		{
+			chunk->CreateIndexBuffer(lodLeft, lodTop, lodRight, lodBottom);		// 挺#耗时#的, 可增加判断在ib改变的时候再create
 			++numChunks;
 		}
 	}
@@ -297,9 +484,8 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 		Driver::D3DDevice->SetFVF(VertexUVN::FVF);
 
 		int numVerts = chunk->mSize * chunk->mSize;
-		int numTris = (chunk->mSize - 1) * (chunk->mSize - 1) * 2;
 
-		Driver::D3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, numTris);
+		Driver::D3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, chunk->GetTriCounts());
 
 		if(mDrawBBox && chunk->mNode->GetAABBox().isValid())
 		{

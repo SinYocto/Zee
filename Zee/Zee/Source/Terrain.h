@@ -7,6 +7,11 @@
 
 class Camera;
 
+enum 
+{
+	INVALID_VALUE = -1
+};
+
 class TerrainChunk
 {
 	friend class Terrain;
@@ -17,6 +22,8 @@ public:
 		,mIndexBuffer(NULL)
 		,mNode(node)
 		,mSize(size)
+		,mLODLevel(1)
+		,mNumTris(0)
 	{
 
 	}
@@ -27,17 +34,22 @@ public:
 		SAFE_RELEASE(mIndexBuffer);
 	}
 
-public:
 	void CalculateChunkNormals();
 	void CreateVertexBuffer();
-	void CreateIndexBuffer();
+	void CreateIndexBuffer(int lodLeft, int lodTop, int lodRight, int lodBottom);
 
 	bool IsInFrustum();
+	int GetLODLevel();
+	int GetTriCounts();
 
 private:
 	int mSize;
 	int mRow;
 	int mColumn;
+
+	int mLODLevel;
+
+	int mNumTris;		// lodºóµÄnumTris
 
 	std::vector<Vector3> mPosData;
 	std::vector<Vector2> mUVData;

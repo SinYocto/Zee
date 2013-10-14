@@ -130,7 +130,7 @@ float4 TerrainPS(float2 tex : TEXCOORD0,
 		CalcORadianceLambert(oColor, atten * pointLights[i].color, dirL, normal, Kd);
 	}
 
-	//oColor = ambientLight.color * Ka;
+	//oColor = float4(1,1,1,1);
 
 	return oColor;
 }
