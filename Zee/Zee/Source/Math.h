@@ -67,6 +67,7 @@ public:
 	Vector3 operator*=(float val);
 
 	float Length() const;
+	float SquredLength() const;
 	void Normalize();
 	Vector3 Normalized() const;
 	float Dot(Vector3 vec) const;
@@ -87,6 +88,7 @@ Vector3 operator*(float value, const Vector3& vec);
 
 float VectorAngle(const Vector3& vec1, const Vector3& vec2);
 float VectorLength(const Vector3& vec);
+float VectorLengthSqured(const Vector3& vec);
 
 bool Vector3Equal(const Vector3& vec1, const Vector3& vec2, const float& tolerance);
 bool Vector3Unequal(const Vector3& vec1, const Vector3& vec2, const float& tolerance);

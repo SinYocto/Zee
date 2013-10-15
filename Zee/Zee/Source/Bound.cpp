@@ -100,6 +100,13 @@ bool AABBox::isValid()
 	return true;
 }
 
+Vector3 AABBox::GetCenter()
+{
+	_Assert(isValid());
+
+	return 0.5f * (mMin + mMax);
+}
+
 Ray::Ray(const Vector3& pos /*= Vector3::Zero*/, const Vector3& dir /*= Vector3(0, 0, 1)*/)
 {
 	mPos = pos;

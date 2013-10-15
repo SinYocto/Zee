@@ -78,6 +78,8 @@ public:
 
 	void GetScreenRay(const Vector2& screenPos, Vector3* rayPos, Vector3* rayDir);
 
+	void GetCameraParams(float* nearZ, float* farZ, float* fov, float* aspect);
+
 private:
 	void recalculateCameraMatrix();
 	void recalculateViewMatrix();

@@ -22,7 +22,9 @@ public:
 		,mIndexBuffer(NULL)
 		,mNode(node)
 		,mSize(size)
-		,mLODLevel(1)
+		,mLODLevel(0)
+		,mForceRebuildIB(true)
+		,mNeighbLODLevel(0xffffffff)
 		,mNumTris(0)
 	{
 
@@ -38,18 +40,32 @@ public:
 	void CreateVertexBuffer();
 	void CreateIndexBuffer(int lodLeft, int lodTop, int lodRight, int lodBottom);
 
+	void CalcChunkLODDist(Camera* camera, float pixelTolerance);
+	void AdjustLODLevel(const Vector3 cameraPos);
+
 	bool IsInFrustum();
+	bool NeedForceRebuildIB();
+
 	int GetLODLevel();
 	int GetTriCounts();
+	DWORD GetNeighbLODLevel();
+	int GetChunkSize();
 
+	void SetNeighbLODLevel(DWORD neighbLod);
+	void ResetLODLevel();
 private:
 	int mSize;
 	int mRow;
 	int mColumn;
 
 	int mLODLevel;
+	DWORD mNeighbLODLevel;				// neightbour的lodLevel, left,top,right,bottom各占8位
+	bool mForceRebuildIB;
 
-	int mNumTris;		// lod后的numTris
+	std::vector<float> mLODDelta;		// delta[n], 预先计算的各个lodLevel的最大高度偏移
+	std::vector<float> mLODDist;		// D[n], 预先计算的各个lodLevel的距离
+
+	int mNumTris;						// lod后的numTris
 
 	std::vector<Vector3> mPosData;
 	std::vector<Vector2> mUVData;
@@ -80,6 +96,7 @@ public:
 
 	void LoadFromHeightMap(const wchar_t* fileName, int heightMapSize);
 	void BuildTerrain(int depth);
+	void CalcChunkLODDist(Camera* camera, float pixelTolerance);
 
 	void SetColorTexes(const wchar_t* texFile0, const wchar_t* texFile1, const wchar_t* texFile2, const wchar_t* texFile3);
 	void SetSplatMapTex(const wchar_t* texFile);

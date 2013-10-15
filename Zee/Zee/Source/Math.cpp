@@ -136,6 +136,11 @@ float Vector3::Length() const
 { 
 	return sqrt(x*x + y*y + z*z);
 }
+
+float Vector3::SquredLength() const
+{ 
+	return (x*x + y*y + z*z);
+}
 	
 void Vector3::Normalize() 
 { 
@@ -180,6 +185,11 @@ float VectorAngle(const Vector3& vec1, const Vector3& vec2)
 float VectorLength(const Vector3& vec)
 {
 	return vec.Length();
+}
+
+float VectorLengthSqured(const Vector3& vec)
+{
+	return vec.SquredLength();
 }
 
 bool Vector3Equal(const Vector3& vec1, const Vector3& vec2, const float& tolerance)

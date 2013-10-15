@@ -20,6 +20,7 @@ public:
 	AABBox(const Vector3& center, float width, float height, float length);
 
 	Vector3 GetVertex(int ix);
+	Vector3 GetCenter();
 	bool isPointInside(Vector3 vert);
 	bool isValid();
 

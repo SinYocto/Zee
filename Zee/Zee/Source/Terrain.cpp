@@ -232,6 +232,103 @@ int TerrainChunk::GetTriCounts()
 	return mNumTris;
 }
 
+DWORD TerrainChunk::GetNeighbLODLevel()
+{
+	return mNeighbLODLevel;
+}
+
+void TerrainChunk::SetNeighbLODLevel(DWORD neighbLod)
+{
+	mNeighbLODLevel = neighbLod;
+}
+
+void TerrainChunk::CalcChunkLODDist(Camera* camera, float pixelTolerance)
+{
+	_Assert(mPosData.size() == mSize * mSize);
+	_Assert(pixelTolerance > 0);
+
+	float factor = 0;
+	{
+		float nz = 0;
+		float fov = 0;
+		float aspect = 0;
+		Vector2 res(0, 0);
+
+		camera->GetCameraParams(&nz, NULL, &fov, &aspect);
+		Driver::GetViewPort(NULL, &res);
+
+		float top = tan(fov / 2.0f) * nz;
+		factor = nz * res.x / (top * 2 * pixelTolerance);
+	}
+
+	mLODDelta.push_back(0);		// delta[0] = 0, 不使用
+	mLODDist.push_back(0);
+
+	int interval = 2;			// level 1
+	while(interval < mSize)
+	{
+		float maxDelta = 0;
+		for(int row = 0; row < mSize; row += interval)
+		{
+			for(int column = 0; column < mSize - 1; column += interval)
+			{
+				float h0 = mPosData[row * mSize + column].y;
+				float h1 = mPosData[row * mSize + column + interval].y;
+				for(int c = column + 1; c < column + interval; ++c)
+				{
+					float vertHeight = mPosData[row * mSize + column].y;
+					float interpolateHeight = h0 + (h1 - h0) * ((float)(c - column) / interval);
+
+					float delta = fabsf(interpolateHeight - vertHeight);
+					if(delta > maxDelta)
+						maxDelta = delta;
+				}
+			}
+		}
+
+		mLODDelta.push_back(maxDelta);
+		mLODDist.push_back(factor * maxDelta);
+		interval *= 2;
+	}
+}
+
+void TerrainChunk::AdjustLODLevel(const Vector3 cameraPos)
+{
+	Vector3 chunkCenter = mNode->GetAABBox().GetCenter();
+
+	float dist = VectorLength(chunkCenter - cameraPos);
+
+	int lodLevel = 0;
+	for(size_t i = 1; i < mLODDist.size(); ++i, ++lodLevel)
+	{
+		if(dist < mLODDist[i])
+			break;
+	}
+	
+	mForceRebuildIB = false;
+	if(mLODLevel != lodLevel)
+	{	
+		mLODLevel = lodLevel;
+		mForceRebuildIB = true;
+	}
+}
+
+int TerrainChunk::GetChunkSize()
+{
+	return mSize;
+}
+
+bool TerrainChunk::NeedForceRebuildIB()
+{
+	return mForceRebuildIB;
+}
+
+void TerrainChunk::ResetLODLevel()
+{
+	mLODLevel = 0;
+	mNeighbLODLevel = 0xffffffff;
+}
+
 Terrain::Terrain(int size, float length, float height)
 :mSize(size)
 ,mLength(length)
@@ -264,7 +361,7 @@ void Terrain::OnResetDevice()
 	{
 		TerrainChunk* chunk = *iter;
 		chunk->CreateVertexBuffer();
-		//chunk->CreateIndexBuffer();
+		chunk->ResetLODLevel();
 	}
 }
 
@@ -369,11 +466,28 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 	}
 }
 
+void Terrain::CalcChunkLODDist(Camera* camera, float pixelTolerance)
+{
+	for(size_t i = 0; i < mChunks.size(); ++i)
+	{
+		TerrainChunk* chunk = mChunks[i];
+		chunk->CalcChunkLODDist(camera, pixelTolerance);
+	}
+}
+
 void Terrain::FrameUpdate(Camera* camera)
 {
 	mRootNode->EvaluateVisibility(camera);
 
-	int numChunks = 0;
+	for(size_t i = 0; i < mChunks.size(); ++i)
+	{
+		TerrainChunk* chunk = mChunks[i];
+
+		if(chunk->IsInFrustum())
+			chunk->AdjustLODLevel(camera->GetWorldPosition());
+	}
+
+	int numVisibleChunks = 0;
 	for(size_t i = 0; i < mChunks.size(); ++i)
 	{
 		TerrainChunk* chunk = mChunks[i];
@@ -410,14 +524,19 @@ void Terrain::FrameUpdate(Camera* camera)
 			lodBottom = chunkBottom->GetLODLevel();
 		}
 
-		if(true && chunk->IsInFrustum())	// TODO:判断是否邻居的lod改变, 没改变不需要重建indexBuffer
+		DWORD neighbLod = D3DCOLOR_ARGB(lodLeft, lodTop, lodRight, lodBottom);
+
+		if(chunk->IsInFrustum())
+			++numVisibleChunks;
+
+		if(chunk->IsInFrustum() && (chunk->NeedForceRebuildIB() || neighbLod != chunk->GetNeighbLODLevel()))		// neighbLod改变才需要重新生成IB
 		{
 			chunk->CreateIndexBuffer(lodLeft, lodTop, lodRight, lodBottom);		// 挺#耗时#的, 可增加判断在ib改变的时候再create
-			++numChunks;
+			chunk->SetNeighbLODLevel(neighbLod);
 		}
 	}
 
-	Log(L"chunks: %d\n", numChunks);
+	Log(L"chunks: %d\n", numVisibleChunks);
 }
 
 void Terrain::Draw(Camera* camera, bool isSolid)

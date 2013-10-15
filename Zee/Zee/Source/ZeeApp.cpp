@@ -260,6 +260,7 @@ void SetUp()
 	terrain = new Terrain(257, 200.0f, 40.0f);
 	terrain->LoadFromHeightMap(L"./Assets/Textures/heightMap257_bit16.raw", 257);
 	terrain->BuildTerrain(4);
+	terrain->CalcChunkLODDist(SceneManager::mainCamera, 1.0f);
 
 	terrain->SetColorTexes(L"./Assets/Textures/Cliff.jpg", L"./Assets/Textures/Grass_Hill.jpg", 
 		L"./Assets/Textures/DirtGrass.jpg", L"./Assets/Textures/Pebbles.jpg");
@@ -352,7 +353,7 @@ void RenderLoop()
 void ApplyFPCameraControllor(Camera* pCamera, float deltaTime)
 {
 	Vector3 moveVector = Vector3::Zero;
-	float moveSpeed = 4.0f;
+	float moveSpeed = 16.0f;
 	float rotateSpeed = 2.0f;
 
 	if(Input::GetKey(DIK_LSHIFT))

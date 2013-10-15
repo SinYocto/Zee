@@ -90,3 +90,18 @@ void Camera::GetScreenRay(const Vector2& screenPos, Vector3* rayPos, Vector3* ra
 
 	*rayDir = vp - rp;
 }	
+
+void Camera::GetCameraParams(float* nearZ, float* farZ, float* fov, float* aspect)
+{
+	if(nearZ)
+		*nearZ = mNearZ;
+
+	if(farZ)
+		*farZ = mFarZ;
+
+	if(fov)
+		*fov = mFOV;
+
+	if(aspect)
+		*aspect = mAspect;
+}
