@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib winmm.lib dxguid.lib dsound.lib wxbase28ud.lib wxmsw28ud_core.lib wxmsw28ud_xrc.lib wxbase28ud_xml.lib wxmsw28ud_adv.lib wxmsw28ud_aui.lib wxmsw28ud_html.lib rpcrt4.lib comctl32.lib advapi32.lib oleacc.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib winmm.lib dxguid.lib dsound.lib wxbase28ud.lib wxmsw28ud_core.lib wxmsw28ud_xrc.lib wxbase28ud_xml.lib wxmsw28ud_adv.lib wxmsw28ud_aui.lib wxmsw28ud_html.lib rpcrt4.lib comctl32.lib advapi32.lib oleacc.lib wxjpegd.lib wxpngd.lib wxtiffd.lib wxzlibd.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;;&quot;D:\Program Files (x86)\wxMSW-2.8.12\lib\vc_lib&quot;"
 				GenerateDebugInformation="true"
@@ -431,6 +431,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\CameraController.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\CameraController.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\DirectionalLight.cpp"
 				>
 			</File>
@@ -552,6 +560,18 @@
 			</File>
 			<File
 				RelativePath=".\Source\Gizmo.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="wxWnd"
+			>
+			<File
+				RelativePath=".\Source\wxWndTreeGenerator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\wxWndTreeGenerator.h"
 				>
 			</File>
 		</Filter>

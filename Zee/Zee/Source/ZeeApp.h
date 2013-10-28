@@ -2,6 +2,7 @@
 #define ZEEAPP_H
 
 #include "wx/wx.h"
+#include "wxWndTreeGenerator.h"
 
 class D3D9Canvas;
 
@@ -18,11 +19,17 @@ public:
 
 	void OnQuit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+	void OnClose(wxCloseEvent& event);
+	void OnTreeGenerator(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 
 private:
+	void cleanupAndDestory();
+
+private:
 	D3D9Canvas* mCanvas;
+	TreeGeneratorFrame* mWndTreeGenerator;
 };
 
 class D3D9Canvas : public wxWindow

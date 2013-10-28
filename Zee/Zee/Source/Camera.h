@@ -4,6 +4,8 @@
 #include "Object.h"
 #include "Bound.h"
 
+class CameraController;
+
 class Camera : public Object
 {
 public:
@@ -14,6 +16,7 @@ public:
 		,mAspect(aspect)
 		,mNearZ(nZ)
 		,mFarZ(fZ)
+		,mController(NULL)
 	{
 		LookAt(target);
 		recalculateCameraMatrix();
@@ -22,6 +25,8 @@ public:
 		mIsTranformDirty = false;
 		mIsParametersDirty = false;
 	}
+
+	~Camera();
 
 	D3DXMATRIX ViewMatrix() const 
 	{ 
@@ -80,6 +85,9 @@ public:
 
 	void GetCameraParams(float* nearZ, float* farZ, float* fov, float* aspect);
 
+	void SetCameraController(CameraController* controller);
+	void ApplyCameraController();
+
 private:
 	void recalculateCameraMatrix();
 	void recalculateViewMatrix();
@@ -100,6 +108,8 @@ private:
 
 	bool mIsTranformDirty;
 	bool mIsParametersDirty;
+
+	CameraController* mController;
 };
 
 

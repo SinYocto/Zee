@@ -4,6 +4,7 @@
 #include "GUI.h"
 
 #include "Camera.h"
+#include "CameraController.h"
 
 #include "LightManager.h"
 #include "GeometryManager.h"
@@ -29,6 +30,8 @@ enum
 {
 	ID_Quit = 1,
 	ID_About,
+	ID_TreeGenerator,
+	ID_OK,
 };
 
 IMPLEMENT_APP_CONSOLE(ZeeApp)
@@ -62,6 +65,7 @@ void RenderLoop();
 
 bool ZeeApp::OnInit()
 {
+	wxInitAllImageHandlers();
 
 	ZeeFrame* frame = new ZeeFrame(L"Zee", wxPoint(0, 0), wxSize(WND_WIDTH, WND_HEIGHT));
 	frame->Show(true);
@@ -72,21 +76,30 @@ bool ZeeApp::OnInit()
 
 BEGIN_EVENT_TABLE(ZeeFrame, wxFrame)
 	EVT_MENU(ID_Quit, ZeeFrame::OnQuit)
+	EVT_MENU(ID_TreeGenerator, ZeeFrame::OnTreeGenerator)
 	EVT_MENU(ID_About, ZeeFrame::OnAbout)
+	EVT_CLOSE(ZeeFrame::OnClose)
 END_EVENT_TABLE()
 
 ZeeFrame::ZeeFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 :wxFrame((wxFrame*)NULL, -1, title, pos, size, 
 		 wxMINIMIZE_BOX | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN)
 {
-	wxMenu* menuFile = new wxMenu;
+	SetIcon(wxIcon(L"./Assets/Icons/Zee.xpm", wxBITMAP_TYPE_XPM));
 
-	menuFile->Append(ID_About, L"&About");
-	menuFile->AppendSeparator();
+	wxMenu* menuFile = new wxMenu;
 	menuFile->Append(ID_Quit, L"&Quit");
+	
+	wxMenu* menuTerrain = new wxMenu;
+	menuTerrain->Append(ID_TreeGenerator, L"&Tree Generator");
+
+	wxMenu* menuHelp = new wxMenu;
+	menuHelp->Append(ID_About, L"&About\tF1");
 
 	wxMenuBar* menuBar = new wxMenuBar;
 	menuBar->Append(menuFile, L"&File");
+	menuBar->Append(menuTerrain, L"&Terrain");
+	menuBar->Append(menuHelp, L"&Help");
 
 	SetMenuBar(menuBar);
 
@@ -98,18 +111,39 @@ ZeeFrame::ZeeFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 	mCanvas = new D3D9Canvas(this, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
 	mCanvas->InitDriver();
 
+	mWndTreeGenerator = new TreeGeneratorFrame(this, L"Tree Generator", wxPoint(100, 100), wxSize(600, 400));
+	mWndTreeGenerator->Centre();
+	mWndTreeGenerator->Show(false);
+
 	SetUp();
 }
 
 void ZeeFrame::OnQuit(wxCommandEvent& event)
 {
-	AppDestroy();
 	Close(true);
+}
+
+void ZeeFrame::OnClose(wxCloseEvent& event)
+{
+	cleanupAndDestory();
+}
+
+void ZeeFrame::cleanupAndDestory()
+{
+	AppDestroy();
+	mWndTreeGenerator->CleanupAndDestory();
+	Destroy();
 }
 
 void ZeeFrame::OnAbout(wxCommandEvent& event)
 {
 	wxMessageBox(L"Siny - SinYocto@gmail.com", L"Author", wxOK | wxICON_INFORMATION, this);
+}
+
+void ZeeFrame::OnTreeGenerator(wxCommandEvent& event)
+{
+	mWndTreeGenerator->Show(true);
+	mWndTreeGenerator->Raise();
 }
 
 BEGIN_EVENT_TABLE(D3D9Canvas, wxWindow)
@@ -159,7 +193,11 @@ void SetUp()
 
 	// camera
 	SceneManager::CreateMainCamera(Vector3(0, 4.0f, -4.0f), Vector3::Zero,
-		PI/3, (float)Driver::viewPort.Width / (float)Driver::viewPort.Height, 0.1f, 1000.0f);
+		PI/3, (float)Driver::primaryViewPort.Width / (float)Driver::primaryViewPort.Height, 0.1f, 1000.0f);
+
+	//FPCameraController* fpCameraController = new FPCameraController(6.0f, 2.0f, 4.0f);
+	HoverCameraController* hoverCameraController = new HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
+	SceneManager::mainCamera->SetCameraController(hoverCameraController);
 
 	// lights
 	DirectionalLight* dirLight1 = new DirectionalLight(L"dirLight1", D3DXCOLOR_RED, Vector3(1.0f, -1.0f, 1.0f));
@@ -290,13 +328,15 @@ void RenderLoop()
 
 			LightManager::Update();
 
-			ApplyFPCameraControllor(SceneManager::mainCamera, Time::deltaTime);
+			//ApplyFPCameraControllor(SceneManager::mainCamera, Time::deltaTime);
+			SceneManager::mainCamera->ApplyCameraController();
 
 			SceneManager::FrameUpdate();
 			MaterialManager::FrameUpdate();
 			terrain->FrameUpdate(SceneManager::mainCamera);
 
 			// render
+			Driver::RenderToSwapChain(PRIMARY_SWAPCHAIN);
 			Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
 			Driver::BeginScene();
 
@@ -482,6 +522,8 @@ void OnLostDevice()
 	MaterialManager::OnLostDevice();
 	GeometryManager::OnLostDevice();
 	ResourceMgr::OnLostDevice();
+
+	Driver::OnLostDevice(); 
 }
 
 void OnResetDevice()
@@ -500,6 +542,8 @@ void OnResetDevice()
 	MaterialManager::OnResetDevice();
 	GeometryManager::OnResetDevice();
 	ResourceMgr::OnResetDevice();
+
+	Driver::OnResetDevice();
 }
 
 

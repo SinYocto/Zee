@@ -1,5 +1,12 @@
 #include "Camera.h"
 #include "Driver.h"
+#include "CameraController.h"
+#include "Time.h"
+
+Camera::~Camera()
+{
+	SAFE_DELETE(mController);
+}
 
 void Camera::recalculateViewMatrix()
 {
@@ -104,4 +111,15 @@ void Camera::GetCameraParams(float* nearZ, float* farZ, float* fov, float* aspec
 
 	if(aspect)
 		*aspect = mAspect;
+}
+
+void Camera::SetCameraController(CameraController* controller)
+{
+	mController = controller;
+}
+
+void Camera::ApplyCameraController()
+{
+	_Assert(NULL != mController);
+	mController->Apply(this, Time::deltaTime);
 }

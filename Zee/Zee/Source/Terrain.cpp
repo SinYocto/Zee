@@ -1,3 +1,5 @@
+// [ref]:http://www.flipcode.com/archives/article_geomipmaps.pdf
+
 #include "Terrain.h"
 #include "Camera.h"
 #include "Shader.h"
@@ -531,7 +533,7 @@ void Terrain::FrameUpdate(Camera* camera)
 
 		if(chunk->IsInFrustum() && (chunk->NeedForceRebuildIB() || neighbLod != chunk->GetNeighbLODLevel()))		// neighbLod改变才需要重新生成IB
 		{
-			chunk->CreateIndexBuffer(lodLeft, lodTop, lodRight, lodBottom);		// 挺#耗时#的, 可增加判断在ib改变的时候再create
+			chunk->CreateIndexBuffer(lodLeft, lodTop, lodRight, lodBottom);
 			chunk->SetNeighbLODLevel(neighbLod);
 		}
 	}

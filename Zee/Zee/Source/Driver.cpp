@@ -5,9 +5,16 @@ HWND Driver::hWnd = NULL;
 IDirect3D9* Driver::D3D = NULL;
 IDirect3DDevice9* Driver::D3DDevice = NULL;
 
+IDirect3DSwapChain9* Driver::primarySwapChain = NULL;
+IDirect3DSwapChain9* Driver::secondarySwapChain = NULL;
+
+SWAPCHAIN_TYPE Driver::activeSwapChain = PRIMARY_SWAPCHAIN;
+
 D3DPRESENT_PARAMETERS Driver::presentParams;
+D3DPRESENT_PARAMETERS Driver::secondaryPresentParams;
 _D3DMULTISAMPLE_TYPE Driver::multiSampleType;
-D3DVIEWPORT9 Driver::viewPort;
+D3DVIEWPORT9 Driver::primaryViewPort;
+D3DVIEWPORT9 Driver::secondaryViewPort;
 
 void Driver::CreateD3DDevice(HWND _hWnd, _D3DMULTISAMPLE_TYPE _multisampleType)
 {
@@ -72,15 +79,20 @@ void Driver::CreateD3DDevice(HWND _hWnd, _D3DMULTISAMPLE_TYPE _multisampleType)
 	hr = D3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, VPMode, &presentParams, &D3DDevice);
 	_Assert(SUCCEEDED(hr));
 
-	SetViewPort(0, 0, bufferWidth, bufferHeight);
+	D3DDevice->GetSwapChain(0, &primarySwapChain);
+
+	primaryViewPort.X = 0;
+	primaryViewPort.Y = 0;
+	primaryViewPort.Width = bufferWidth;
+	primaryViewPort.Height = bufferHeight;
+	primaryViewPort.MinZ = 0;
+	primaryViewPort.MaxZ = 1.0f;
 }
 
 bool Driver::Reset()
 {
 	if(FAILED(D3DDevice->Reset(&presentParams)))
 		return false;
-
-	SetViewPort(viewPort.X, viewPort.Y, viewPort.Width, viewPort.Height);
 
 	return true;
 }
@@ -89,6 +101,7 @@ void Driver::SetViewPort(int offsetX, int offsetY, int width, int height)
 {
 	_Assert(NULL != D3DDevice);
 
+	D3DVIEWPORT9 viewPort;
 	viewPort.X = offsetX;
 	viewPort.Y = offsetY;
 	viewPort.Width = width;
@@ -97,6 +110,15 @@ void Driver::SetViewPort(int offsetX, int offsetY, int width, int height)
 	viewPort.MaxZ = 1.0f;
 
 	D3DDevice->SetViewport(&viewPort);
+}
+
+void Driver::SetViewPort(SWAPCHAIN_TYPE swapChainType)
+{
+	_Assert(swapChainType == activeSwapChain)
+	if(activeSwapChain == PRIMARY_SWAPCHAIN)
+		D3DDevice->SetViewport(&primaryViewPort);
+	else
+		D3DDevice->SetViewport(&secondaryViewPort);
 }
 
 void Driver::GetViewPort(Vector2* vpOrigin, Vector2* vpSize)
@@ -119,6 +141,8 @@ void Driver::GetViewPort(Vector2* vpOrigin, Vector2* vpSize)
 
 void Driver::Destory()
 {
+	SAFE_RELEASE(primarySwapChain);
+	SAFE_RELEASE(secondarySwapChain);
 	SAFE_RELEASE(D3D);
 	SAFE_RELEASE(D3DDevice);
 }
@@ -138,9 +162,17 @@ HRESULT Driver::EndScene()
 	return D3DDevice->EndScene();
 }
 
-HRESULT Driver::Present()
+HRESULT Driver::Present(HWND _hWnd /* = NULL */)
 {
-	return D3DDevice->Present(0, 0, 0, 0);
+	if(activeSwapChain == PRIMARY_SWAPCHAIN)
+	{
+		return primarySwapChain->Present(NULL, NULL, hWnd, NULL, 0);
+	}
+	else
+	{
+		_Assert(_hWnd != NULL);
+		return secondarySwapChain->Present(NULL, NULL, _hWnd, NULL, 0);
+	}
 }
 
 void Driver::GetScreenLocation(const Vector2& screenPos, Vector2* screenLocation)
@@ -161,4 +193,56 @@ void Driver::GetScreenLocation(const Vector2& screenPos, Vector2* screenLocation
 	Clamp(location.y, 0, 1.0f);
 
 	return;
+}
+
+void Driver::RenderToSwapChain(SWAPCHAIN_TYPE swapChain)
+{
+	activeSwapChain = swapChain;
+
+	IDirect3DSurface9* backBuffer = NULL;
+	if(activeSwapChain == PRIMARY_SWAPCHAIN)
+	{
+		_Assert(primarySwapChain != NULL);
+		primarySwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
+	}
+	else
+	{
+		_Assert(secondarySwapChain != NULL);
+		secondarySwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
+	}
+
+	D3DDevice->SetRenderTarget(0, backBuffer);
+	SetViewPort(activeSwapChain);
+
+	SAFE_RELEASE(backBuffer);
+}
+
+void Driver::OnLostDevice()
+{
+	SAFE_RELEASE(secondarySwapChain);
+}
+
+void Driver::OnResetDevice()
+{
+	D3DDevice->CreateAdditionalSwapChain(&secondaryPresentParams, &secondarySwapChain);
+}
+
+void Driver::CreateSecondarySwapChain(D3DPRESENT_PARAMETERS params)
+{
+	SAFE_RELEASE(secondarySwapChain);
+
+	secondaryPresentParams = params;
+	D3DDevice->CreateAdditionalSwapChain(&secondaryPresentParams, &secondarySwapChain);
+
+	secondaryViewPort.X = 0;
+	secondaryViewPort.Y = 0;
+	secondaryViewPort.Width = params.BackBufferWidth;
+	secondaryViewPort.Height = params.BackBufferHeight;
+	secondaryViewPort.MinZ = 0;
+	secondaryViewPort.MaxZ = 1.0f;
+}
+
+D3DPRESENT_PARAMETERS Driver::GetPresentParameters()
+{
+	return presentParams;
 }
