@@ -43,6 +43,7 @@ public:
 		const wxString& name = wxT("Zee"));
 
 	void InitDriver();
+	void RenderLoop();
 
 protected:
 	void OnSize(wxSizeEvent& event);

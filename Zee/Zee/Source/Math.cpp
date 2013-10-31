@@ -515,3 +515,14 @@ void GetClipSpacePos(const Vector3& posLocal, const D3DXMATRIX& matWVP, Vector3*
 
 	*posClip = Vector3(_posClip.x, _posClip.y, _posClip.z);
 }
+
+float RandomFloat(float a, float b)
+{
+	float random = ((float) rand()) / (float) RAND_MAX;
+	return a + random * (b - a);
+}
+
+float RandomVariation(float val, float variation)
+{
+	return RandomFloat(val - variation, val + variation);
+}

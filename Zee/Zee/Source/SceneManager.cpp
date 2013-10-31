@@ -5,6 +5,7 @@ SceneNode* SceneManager::root = NULL;
 DWORD SceneManager::curID = 0;
 
 Camera* SceneManager::mainCamera = NULL;
+Camera* SceneManager::extraCamera = NULL;
 
 void SceneManager::Init()
 {
@@ -32,12 +33,20 @@ void SceneManager::Destory()
 {
 	SAFE_DELETE(root);
 	SAFE_DELETE(mainCamera);
+	SAFE_DELETE(extraCamera);
 }
 
 void SceneManager::CreateMainCamera( const Vector3 pos /*= Vector3(0, 0, -200)*/, const Vector3 target /*= Vector3::Zero*/, 
 								 float fov /*= PI/2*/, float aspect /*= 1.0f*/, float nZ /*= 1.0f*/, float fZ /*= 1000.0f*/ )
 {
 	mainCamera = new Camera(pos, target, fov, aspect, nZ, fZ);
+}
+
+void SceneManager::CreateExtraCamera( const Vector3 pos /*= Vector3(0, 0, -200)*/, const Vector3 target /*= Vector3::Zero*/, 
+									float fov /*= PI/2*/, float aspect /*= 1.0f*/, float nZ /*= 1.0f*/, float fZ /*= 1000.0f*/ )
+{
+	_Assert(extraCamera == NULL);
+	extraCamera = new Camera(pos, target, fov, aspect, nZ, fZ);
 }
 
 void SceneManager::DrawAll()

@@ -17,6 +17,9 @@ void Clamp(float& val, const float min, const float max);
 
 void Clamp(int& val, const int min, const int max);
 
+float RandomFloat(float a, float b);
+float RandomVariation(float val, float variation);
+
 template <typename T>
 int sign(T t) 
 {
@@ -24,6 +27,8 @@ int sign(T t)
 }
 
 #define SETALPHA(color, alpha) (color = (((color) & 0x00ffffff) | ((alpha) << 24)))
+#define DEGREE_TO_RAD(angle) (angle * PI / 180.0f)
+#define RAD_TO_DEGREE(rad) (rad * 180.0f / PI)
 
 class Vector3
 {

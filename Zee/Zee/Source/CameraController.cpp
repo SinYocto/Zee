@@ -67,7 +67,7 @@ HoverCameraController::HoverCameraController(float rotateSpeed, float zoomSpeed,
 											 ,mMaxDist(maxDist)
 											 ,mTiltAngle(PI/4)
 											 ,mPanAngle(0)
-											 ,mDist(20.0f)
+											 ,mDist(10.0f)
 {
 
 }

@@ -544,7 +544,7 @@ void Geometry::calculateTBN(bool calculateNormal, bool calculateTangent, bool ca
 	{
 		Vector3 curPos = iter->first;		// for each unique position
 
-		TriIDList overAllTriGroup = iter->second;
+		TriIDList& overAllTriGroup = iter->second;		
 
 		if(calculateNormal)
 			processSmoothNormal(curPos, overAllTriGroup);
@@ -599,7 +599,7 @@ void Geometry::buildNormalSmoothGroup(Vector3 curPos, const TriIDList& overAllTr
 		triSmoothGroupMap[curTriID] = triSmoothGroupMap[neighb1ID];
 		triSmoothGroups[triSmoothGroupMap[curTriID]].push_back(curTriID);
 		return;
-	}
+	} 
 	else
 	{
 		triSmoothGroupMap[curTriID] = triSmoothGroups.size();

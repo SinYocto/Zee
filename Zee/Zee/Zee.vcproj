@@ -121,8 +121,8 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include&quot;;&quot;D:\Program Files (x86)\wxMSW-2.8.12\include&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;__WXMSW__;WXUSINGDLL"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -140,9 +140,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib winmm.lib dxguid.lib dsound.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib winmm.lib dxguid.lib dsound.lib wxbase28u.lib wxmsw28u_core.lib wxmsw28u_xrc.lib wxbase28u_xml.lib wxmsw28u_adv.lib wxmsw28u_aui.lib wxmsw28u_html.lib rpcrt4.lib comctl32.lib advapi32.lib oleacc.lib wxjpeg.lib wxpng.lib wxtiff.lib wxzlib.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;"
+				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;;&quot;D:\Program Files (x86)\wxMSW-2.8.12\lib\vc_dll&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -407,6 +407,14 @@
 				</File>
 				<File
 					RelativePath=".\Source\Terrain.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Tree.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Tree.h"
 					>
 				</File>
 			</Filter>

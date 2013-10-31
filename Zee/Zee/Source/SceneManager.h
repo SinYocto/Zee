@@ -11,6 +11,8 @@ public:
 	static void Init();
 	static void CreateMainCamera(const Vector3 pos = Vector3(0, 0, -200), const Vector3 target = Vector3::Zero, 
 		float fov = PI/2, float aspect = 1.0f, float nZ = 1.0f, float fZ = 1000.0f);
+	static void CreateExtraCamera(const Vector3 pos = Vector3(0, 0, -200), const Vector3 target = Vector3::Zero, 
+		float fov = PI/2, float aspect = 1.0f, float nZ = 1.0f, float fZ = 1000.0f);
 
 	static void Destory();
 	static void AddSceneNode(SceneNode* node, SceneNode* parent = root);
@@ -25,6 +27,7 @@ public:
 public:
 	static SceneNode* root;
 	static Camera* mainCamera;
+	static Camera* extraCamera;
 
 private:
 	static DWORD curID;

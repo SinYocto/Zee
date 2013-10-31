@@ -47,8 +47,6 @@ Terrain* terrain = NULL;
 
 LabelStyle* leftAlignStyle;
 
-void ApplyFPCameraControllor(Camera* pCamera, float deltaTime);
-
 void AppDestroy();
 
 void OnLostDevice();
@@ -82,8 +80,8 @@ BEGIN_EVENT_TABLE(ZeeFrame, wxFrame)
 END_EVENT_TABLE()
 
 ZeeFrame::ZeeFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
-:wxFrame((wxFrame*)NULL, -1, title, pos, size, 
-		 wxMINIMIZE_BOX | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN)
+:wxFrame((wxFrame*)NULL, -1, title, pos, size, wxMINIMIZE_BOX | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN)
+,mWndTreeGenerator(NULL)
 {
 	SetIcon(wxIcon(L"./Assets/Icons/Zee.xpm", wxBITMAP_TYPE_XPM));
 
@@ -110,12 +108,13 @@ ZeeFrame::ZeeFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
 	mCanvas = new D3D9Canvas(this, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
 	mCanvas->InitDriver();
+	SetUp();
 
-	mWndTreeGenerator = new TreeGeneratorFrame(this, L"Tree Generator", wxPoint(100, 100), wxSize(600, 400));
+	mWndTreeGenerator = new TreeGeneratorFrame(this, L"Tree Generator", wxDefaultPosition, wxDefaultSize);
 	mWndTreeGenerator->Centre();
 	mWndTreeGenerator->Show(false);
 
-	SetUp();
+	mWndTreeGenerator->Setup();
 }
 
 void ZeeFrame::OnQuit(wxCommandEvent& event)
@@ -131,7 +130,10 @@ void ZeeFrame::OnClose(wxCloseEvent& event)
 void ZeeFrame::cleanupAndDestory()
 {
 	AppDestroy();
-	mWndTreeGenerator->CleanupAndDestory();
+
+	if(mWndTreeGenerator)
+		mWndTreeGenerator->CleanupAndDestory();
+	
 	Destroy();
 }
 
@@ -184,6 +186,11 @@ void SetUp()
 {
 	_wsetlocale(LC_ALL, L"chs");
 
+	//_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	//_CrtSetBreakAlloc(9554);
+	//_CrtSetBreakAlloc(9553);
+	//_CrtSetBreakAlloc(9552);
+
 	Input::Init(GetModuleHandle(0), Driver::hWnd);
 	MaterialManager::Init();
 	SceneManager::Init();
@@ -195,9 +202,9 @@ void SetUp()
 	SceneManager::CreateMainCamera(Vector3(0, 4.0f, -4.0f), Vector3::Zero,
 		PI/3, (float)Driver::primaryViewPort.Width / (float)Driver::primaryViewPort.Height, 0.1f, 1000.0f);
 
-	//FPCameraController* fpCameraController = new FPCameraController(6.0f, 2.0f, 4.0f);
-	HoverCameraController* hoverCameraController = new HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
-	SceneManager::mainCamera->SetCameraController(hoverCameraController);
+	FPCameraController* fpCameraController = new FPCameraController(6.0f, 2.0f, 4.0f);
+	//HoverCameraController* hoverCameraController = new HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
+	SceneManager::mainCamera->SetCameraController(fpCameraController);
 
 	// lights
 	DirectionalLight* dirLight1 = new DirectionalLight(L"dirLight1", D3DXCOLOR_RED, Vector3(1.0f, -1.0f, 1.0f));
@@ -308,7 +315,7 @@ void SetUp()
 	PerformanceTimer::End();
 }
 
-void RenderLoop()
+void D3D9Canvas::RenderLoop()
 {
 	switch(Driver::D3DDevice->TestCooperativeLevel())
 	{
@@ -328,8 +335,8 @@ void RenderLoop()
 
 			LightManager::Update();
 
-			//ApplyFPCameraControllor(SceneManager::mainCamera, Time::deltaTime);
-			SceneManager::mainCamera->ApplyCameraController();
+			if(wxWindow::FindFocus() == this)
+				SceneManager::mainCamera->ApplyCameraController();
 
 			SceneManager::FrameUpdate();
 			MaterialManager::FrameUpdate();
@@ -387,54 +394,6 @@ void RenderLoop()
 		PostQuitMessage(0);
 		break;
 	}
-}
-
-
-void ApplyFPCameraControllor(Camera* pCamera, float deltaTime)
-{
-	Vector3 moveVector = Vector3::Zero;
-	float moveSpeed = 16.0f;
-	float rotateSpeed = 2.0f;
-
-	if(Input::GetKey(DIK_LSHIFT))
-		moveSpeed *= 4;
-
-	if(Input::GetKey(DIK_W))
-		moveVector += moveSpeed * deltaTime * Vector3(0, 0, 1);
-	if(Input::GetKey(DIK_S))
-		moveVector += moveSpeed * deltaTime * Vector3(0, 0, -1);
-
-	if(Input::GetKey(DIK_A))
-	{
-		moveVector += moveSpeed * deltaTime * Vector3(-1, 0, 0);
-	}
-	if(Input::GetKey(DIK_D))
-		moveVector += moveSpeed * deltaTime * Vector3(1, 0, 0);
-
-	moveVector = pCamera->LocalVectorToWorld(moveVector);
-
-	if(Input::GetKey(DIK_Q))
-		moveVector += moveSpeed * deltaTime * Vector3(0, -1, 0);
-	if(Input::GetKey(DIK_E))
-		moveVector += moveSpeed * deltaTime * Vector3(0, 1, 0);
-
-
-	if(moveVector != Vector3::Zero){
-		pCamera->SetTransformDirty(true);
-		pCamera->Translate(moveVector);
-	}
-
-	if(Input::mouseState.rgbButtons[1] & 0x80){
-		float rotationY = rotateSpeed * Input::mouseState.lX / 1000.0f;
-		float rotationX = rotateSpeed * Input::mouseState.lY / 1000.0f;
-
-		if(rotationY != 0 || rotationX != 0){
-			pCamera->SetTransformDirty(true);
-			pCamera->Rotate(0, rotationY, 0);
-			pCamera->RotateLocal(rotationX, 0, 0);
-		}
-	}
-
 }
 
 void SetupGUIStyle()
