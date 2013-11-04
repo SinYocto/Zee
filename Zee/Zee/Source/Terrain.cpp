@@ -538,7 +538,7 @@ void Terrain::FrameUpdate(Camera* camera)
 		}
 	}
 
-	Log(L"chunks: %d\n", numVisibleChunks);
+	//Log(L"chunks: %d\n", numVisibleChunks);
 }
 
 void Terrain::Draw(Camera* camera, bool isSolid)

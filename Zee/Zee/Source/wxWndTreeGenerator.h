@@ -5,6 +5,8 @@
 #include <wx/spinctrl.h>
 #include "wx/collpane.h"
 
+#include "Tree.h"
+
 class TreeGeneratorCanvas;
 class ModelNode;
 
@@ -14,6 +16,7 @@ class TreeGeneratorFrame : public wxFrame
 	{
 		ID_GENERAL_PARAMS,
 		ID_LEVEL0_PARAMS,
+		ID_BUTTON_GENERATE,
 	};
 
 public:
@@ -28,17 +31,26 @@ protected:
 private:
 	void OnCollapsPaneGeneralParams(wxCollapsiblePaneEvent& event);
 	void OnCollapsPaneLevelParams0(wxCollapsiblePaneEvent& event);
-	void OnSpinLevel(wxSpinEvent& event);
-	//void OnSpinValue1(wxSpinEvent& event);
-	//void OnSpinValue2(wxSpinEvent& event);
-	//void OnTextValue3(wxCommandEvent& event);
+	void OnButtonGenerate(wxCommandEvent& event);
+	void OnSpinLevels(wxSpinEvent& event);
+	void OnChoiceLevel(wxCommandEvent& event);
+
+	void createWxCtrls();
+
+	void setValueGeneralParams(TreeGeneralParams generalParams);
+	void setValueLevelParams(TreeLevelParams levelParams);
+
+	void getValueGeneralParams(TreeGeneralParams* generalParams);
+	void getValueLevelParams(TreeLevelParams* levelParams);
+
+	void refreshChoiceLevel();
 
 private:
 	DECLARE_EVENT_TABLE()
-
 	wxScrolledWindow* mCtrlsPanel;
 
 	wxCollapsiblePane* mPanelGeneralParams;
+	wxSpinCtrl* mSpinLevels;
 	wxTextCtrl* mTextScale;
 	wxTextCtrl* mTextScaleV;
 	wxTextCtrl* mTextBaseSize;
@@ -48,21 +60,33 @@ private:
 	wxSpinCtrl* mSpinBaseSplits;
 
 	wxCollapsiblePane* mPanelLevelParmas0;
+
+	wxChoice* mChoiceLevel;
+
 	wxSpinCtrl* mSpinLevel;
 	wxSpinCtrl* mSpinSegSegsW;
 	wxSpinCtrl* mSpinSegSegsH;
+
+	wxTextCtrl* mTextLength;
+	wxTextCtrl* mTextLengthV;
+	wxTextCtrl* mTextTaper;
+
 	wxSpinCtrl* mSpinCurveRes;
 	wxTextCtrl* mTextCurve;
 	wxTextCtrl* mTextCurveV;
 	wxTextCtrl* mTextCurveBack;
+
 	wxTextCtrl* mTextSegSplits;
 	wxTextCtrl* mTextSplitAngle;
 	wxTextCtrl* mTextSplitAngleV;
 	wxSpinCtrl* mSpinBranches;
+
 	wxTextCtrl* mTextDownAngle;
 	wxTextCtrl* mTextDownAngleV;
 	wxTextCtrl* mTextRotateAngle;
 	wxTextCtrl* mTextRotateAngleV;
+
+	wxButton* mButtonGenerate;
 
 	wxPanel* mCanvasPanel;
 	TreeGeneratorCanvas* mCanvas;
@@ -79,6 +103,9 @@ public:
 		long style = 0,
 		const wxString& name = wxT("TreeGenerator"));
 
+	void OnLostDevice();
+	void OnResetDevice();
+
 	void Setup();
 
 	void RenderWindow();
@@ -93,6 +120,7 @@ private:
 	DECLARE_EVENT_TABLE()
 
 	ModelNode* mCube;
+	Tree* mTree;
 };
 
 

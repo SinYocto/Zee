@@ -147,6 +147,10 @@ private:
 	void calculateTriangleTangent(const Triangle& triangle, Vector3* tangent);
 	void calculateTriangleBitanget(const Triangle& triangle, Vector3* bitangent);
 
+	void calculateTriangleNormalWeighted(const Triangle& triangle, const Vector3& pos, Vector3* normal);
+	//void calculateTriangleTangentWeighted(const Triangle& triangle, const Vector3& pos, Vector3* tangent);
+	//void calculateTriangleBitangentWeighted(const Triangle& triangle, const Vector3& pos, Vector3* bitangent);
+
 	void calculateAABBox();
 
 public:

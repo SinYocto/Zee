@@ -271,9 +271,10 @@ void Geometry::processSmoothNormal(const Vector3& curPos, const TriIDList& overA
 			const Triangle& tri = mTriangles[curGroup[k]];
 
 			Vector3 triNormal;
-			calculateTriangleNormal(tri, &triNormal);
+			calculateTriangleNormalWeighted(tri, curPos, &triNormal);	// tri张角加成
+			//calculateTriangleNormal(tri, &triNormal);
 
-			groupNormal += triNormal;		// TODO:面积加成 
+			groupNormal += triNormal;
 		}
 
 		groupNormal.Normalize();
@@ -554,6 +555,20 @@ void Geometry::calculateTBN(bool calculateNormal, bool calculateTangent, bool ca
 
 		if(calculateBitangent)
 			processSmoothBitangent(curPos, overAllTriGroup);
+
+		//// 对于存在孤立的点的特殊情况(不会被任何smoothgroup处理, 所以没计算tbn), 暂时设置tbn索引都为0
+		//for(std::vector<Vert>::iterator iter = mVerts.begin(); iter != mVerts.end(); ++iter)
+		//{
+		//	Vert& vert = *iter;
+		//	if(calculateNormal && vert.normalIndex == INVALID_INDEX)
+		//		vert.normalIndex = 0;
+
+		//	if(calculateTangent && vert.tangentIndex == INVALID_INDEX)
+		//		vert.tangentIndex = 0;
+
+		//	if(calculateBitangent && vert.bitangentIndex == INVALID_INDEX)
+		//		vert.bitangentIndex = 0;
+		//}
 	}
 }
 
@@ -840,6 +855,49 @@ bool Geometry::canSmoothBitangent(const Triangle& triangle0, const Triangle& tri
 		return true;
 	else
 		return false;
+}
+
+void Geometry::calculateTriangleNormalWeighted(const Triangle& triangle, const Vector3& pos, Vector3* normal)
+{
+	Vector3 pos0 = mPositionData[mVerts[triangle.vertexIndex[0]].posIndex];
+	Vector3 pos1 = mPositionData[mVerts[triangle.vertexIndex[1]].posIndex];
+	Vector3 pos2 = mPositionData[mVerts[triangle.vertexIndex[2]].posIndex];
+
+	Vector3 p1;
+	Vector3 p2;
+
+	if(Vector3Equal(pos0, pos, 0.0001f))
+	{
+		p1 = pos2 - pos0;
+		p2 = pos1 - pos0;
+	}
+	else if(Vector3Equal(pos1, pos, 0.0001f))
+	{
+		p1 = pos0 - pos1;
+		p2 = pos2 - pos1;
+	}
+	else if(Vector3Equal(pos2, pos, 0.0001f))
+	{
+		p1 = pos1 - pos2;
+		p2 = pos0 - pos2;
+	}
+	else
+	{
+		_Assert(false);
+		return;
+	}
+
+	if(p1.Length() == 0 || p2.Length() == 0)
+	{
+		*normal = Vector3::Zero;
+	}
+	else
+	{
+		*normal = p1.Cross(p2);
+
+		normal->Normalize();
+		*normal *= VectorAngle(p1, p2) / (2*PI);
+	}
 }
 
 void Geometry::calculateTriangleNormal(const Triangle& triangle, Vector3* normal)

@@ -174,7 +174,8 @@ void CreateVB(IDirect3DDevice9* d3dDevice,IDirect3DVertexBuffer9** vb, void* ver
 	}
 
 	void *ptr;
-	d3dDevice->CreateVertexBuffer(sizeofVertex*numVertices, 0, vertexFVF, D3DPOOL_DEFAULT, vb, 0);
+	HRESULT hr = d3dDevice->CreateVertexBuffer(sizeofVertex*numVertices, 0, vertexFVF, D3DPOOL_DEFAULT, vb, 0);
+	_Assert(SUCCEEDED(hr));
 	(*vb)->Lock(0,0, (void**)&ptr, 0);
 	memcpy(ptr, vertexData, sizeofVertex*numVertices);
 	(*vb)->Unlock();

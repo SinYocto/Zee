@@ -27,8 +27,8 @@ int sign(T t)
 }
 
 #define SETALPHA(color, alpha) (color = (((color) & 0x00ffffff) | ((alpha) << 24)))
-#define DEGREE_TO_RAD(angle) (angle * PI / 180.0f)
-#define RAD_TO_DEGREE(rad) (rad * 180.0f / PI)
+#define DEGREE_TO_RAD(angle) ((angle) * PI / 180.0f)
+#define RAD_TO_DEGREE(rad) ((rad) * 180.0f / PI)
 
 class Vector3
 {
@@ -180,6 +180,8 @@ public:
 };
 Quaternion operator*(const Quaternion& q1, const Quaternion& q2);
 Vector3 operator*(const Vector3& vec, const Quaternion& q);
+Vector3 WorldVectorToLocal(const Vector3& worldVec, const Quaternion& orient);	// 世界坐标下的vec转到orient坐标下的vec
+Quaternion WorldRotationToLocal(const Quaternion& worldRotation, const Quaternion& orient);	// 世界坐标下的rotation转到orient坐标下的rotation
 
 class Rect
 {

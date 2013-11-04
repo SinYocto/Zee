@@ -169,7 +169,7 @@ Vector3 Vector3::Cross(Vector3 vec) const
 	return - Vector3(y*vec.z - z*vec.y, z*vec.x - x*vec.z, x*vec.y - y*vec.x);
 }
 
-float VectorAngle(const Vector3& vec1, const Vector3& vec2)
+float VectorAngle(const Vector3& vec1, const Vector3& vec2)		// ½á¹ûÊÇ0~pi
 {
 	float length1 = vec1.Length();
 	float length2 = vec2.Length();
@@ -525,4 +525,27 @@ float RandomFloat(float a, float b)
 float RandomVariation(float val, float variation)
 {
 	return RandomFloat(val - variation, val + variation);
+}
+
+Vector3 WorldVectorToLocal(const Vector3& worldVec, const Quaternion& orient)
+{
+	return worldVec * orient.Conjugate();
+}
+
+Quaternion WorldRotationToLocal(const Quaternion& worldRotation, const Quaternion& orient)
+{
+	if(worldRotation.w == 1)
+		return worldRotation;
+
+	float s = sqrt(1 - worldRotation.w * worldRotation.w);
+
+	Vector3 worldRotAxis = (1 / s) * Vector3(worldRotation.x, worldRotation.y, worldRotation.z);
+	Vector3 localRotAxis = WorldVectorToLocal(worldRotAxis, orient);
+
+	Quaternion localRotation = Quaternion(worldRotation.w,
+		localRotAxis.x * s,
+		localRotAxis.y * s,
+		localRotAxis.z * s);
+
+	return localRotation;
 }
