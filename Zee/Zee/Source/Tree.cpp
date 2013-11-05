@@ -16,6 +16,11 @@ TreeSegment::TreeSegment()
 
 TreeSegment::~TreeSegment()
 {
+	for(std::vector<TreeStem*>::iterator iter = mBranches.begin(); iter != mBranches.end(); ++iter)
+	{
+		SAFE_DELETE(*iter);
+	}
+
 	for(std::vector<TreeSegment*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
 	{
 		SAFE_DELETE(*iter);
@@ -33,6 +38,11 @@ void TreeSegment::Draw(const D3DXMATRIX& matParent, Camera* camera)
 
 	mGeo->Render(matWorld, camera);
 
+	for(std::vector<TreeStem*>::iterator iter = mBranches.begin(); iter != mBranches.end(); ++iter)
+	{
+		(*iter)->Draw(matWorld, camera);
+	}
+
 	for(std::vector<TreeSegment*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
 	{
 		(*iter)->Draw(matWorld, camera);
@@ -43,6 +53,11 @@ void TreeSegment::OnLostDevice()
 {
 	if(mGeo)
 		mGeo->OnLostDevice();
+
+	for(std::vector<TreeStem*>::iterator iter = mBranches.begin(); iter != mBranches.end(); ++iter)
+	{
+		(*iter)->OnLostDevice();
+	}
 
 	for(std::vector<TreeSegment*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
 	{
@@ -55,6 +70,11 @@ void TreeSegment::OnResetDevice()
 	if(mGeo)
 		mGeo->OnResetDevice();
 
+	for(std::vector<TreeStem*>::iterator iter = mBranches.begin(); iter != mBranches.end(); ++iter)
+	{
+		(*iter)->OnResetDevice();
+	}
+
 	for(std::vector<TreeSegment*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
 	{
 		(*iter)->OnResetDevice();
@@ -66,29 +86,147 @@ TreeStem::TreeStem(Tree* tree, int level)
 ,mOrient(Quaternion(1, 0, 0, 0))
 ,mLength(0)
 ,mBaseRadius(0)
+,mNumBranches(0)
 ,mLevelParams(level)
+,mParentSeg(NULL)
 ,mFirstSeg(NULL)
 ,mTree(tree)
 {
 
 }
 
-void TreeStem::Build(TreeGeneralParams generalParams, TreeLevelParams levelParams, LevelContext& context)
+float TreeStem::calcStemLength(TreeGeneralParams generalParams, float parentLength, float stemOffset)
+{
+	float stemLength = 0;
+	if(mLevelParams.level == 0)
+	{
+		stemLength = RandomVariation(generalParams.scale, generalParams.scaleV) * 
+			RandomVariation(mLevelParams.length, mLevelParams.lengthV);
+	}
+	else if(mLevelParams.level == 1)
+	{
+		float baseLength = generalParams.baseSize * parentLength;
+
+		stemLength = RandomVariation(mLevelParams.length, mLevelParams.lengthV) * parentLength *
+			ShapeRatio(generalParams.shape, (parentLength - stemOffset) / (parentLength - baseLength));
+	}
+	else
+	{
+		stemLength = RandomVariation(mLevelParams.length, mLevelParams.lengthV) * (parentLength - 0.6f * stemOffset);
+	}
+
+	return stemLength;
+}
+
+float TreeStem::calcStemBaseRadius(TreeGeneralParams generalParams, float parentLength, float stemOffset)
+{
+	float baseRadius = 0;
+	if(mLevelParams.level == 0)
+	{
+		baseRadius = mLength * generalParams.radiusRatio;
+	}
+	else
+	{
+		baseRadius = mParentSeg->mStem->GetBaseRadius() * pow((mLength / parentLength), generalParams.ratioPower);
+
+		float maxRadius = mParentSeg->mStem->GetStemRadius(stemOffset / parentLength);
+		if(baseRadius > maxRadius)
+			baseRadius = maxRadius;
+	}
+
+	return baseRadius;
+}
+
+void TreeStem::calcStemBranchInterval(float parentLength, float stemOffset, float baseLength,
+									  int* numBranches, float* branchInterval)
+{
+	_Assert(NULL != numBranches);
+	_Assert(NULL != branchInterval);
+
+	if(mLevelParams.level == 0)
+	{
+		*numBranches = mLevelParams.branches;
+	}
+	else if(mLevelParams.level == 1)
+	{
+		float lengthChildMax = RandomVariation(mLevelParams.length, mLevelParams.lengthV) * parentLength;
+		*numBranches = (int)(mLevelParams.branches * (0.2f + 0.8f * mLength / parentLength / lengthChildMax));
+	}
+	else
+	{
+		*numBranches = (int)(mLevelParams.branches * (1.0f - 0.5f * stemOffset / parentLength));
+	}
+
+	*branchInterval = (mLength - baseLength) / (*numBranches + 1);
+}
+
+void TreeStem::calcBranchAngle(float parentLength, float stemOffset, float baseLength, float curRotateAngle, 
+							   float* downAngle, float* rotateAngle)
+{
+	_Assert(NULL != downAngle);
+	_Assert(NULL != rotateAngle);
+
+	if(mLevelParams.level == 0 || mLevelParams.downAngleV >= 0)
+	{
+		*downAngle = RandomVariation(mLevelParams.downAngle, mLevelParams.downAngleV);
+	}
+	else
+	{
+		*downAngle = RandomVariation(mLevelParams.downAngle, 
+			mLevelParams.downAngleV * (1.0f - 2.0f * (ShapeRatio(0, (parentLength - stemOffset) / (parentLength - baseLength)))));
+	}
+
+	*rotateAngle = curRotateAngle + RandomVariation(mLevelParams.rotateAngle, mLevelParams.rotateAngleV);
+}
+
+void TreeStem::Build(TreeSegment* parentSeg, float offset, TreeGeneralParams generalParams, TreeLevelParams levelParams, 
+					 LevelContext& context)
 {
 	SAFE_DELETE(mFirstSeg);
-
-	mPos = Vector3::Zero;
-	mOrient = Quaternion(DEGREE_TO_RAD(RandomVariation(levelParams.downAngle, levelParams.downAngleV)), 
-		DEGREE_TO_RAD(RandomVariation(levelParams.rotateAngle, levelParams.rotateAngleV)), 0);
-
-	mLength = RandomVariation(generalParams.scale, generalParams.scaleV) * 
-		RandomVariation(levelParams.length, levelParams.lengthV);
-
-	mBaseRadius = mLength * generalParams.radiusRatio;
-
+	mParentSeg = parentSeg;
 	mLevelParams = levelParams;
 
-	buildSegment(generalParams, NULL, 0, 0, 0, 0, context);
+	float parentLength = 0;
+	float stemOffset = 0;
+
+	if(parentSeg)
+	{
+		mPos = Vector3(0, offset, 0);		// offset: 当stem是parentSeg的一个枝条时, stem在parentSeg上长出的位置
+
+		parentLength = mParentSeg->mStem->GetLength();
+		stemOffset = mParentSeg->mSegIndex * mParentSeg->mStem->GetSegLength() + offset;
+	}
+	else
+	{
+		_Assert(mLevelParams.level == 0);	// 只有trunk不存在parentSeg
+		mPos = Vector3::Zero;
+	}
+
+	mLength = calcStemLength(generalParams, parentLength, stemOffset);
+	mBaseRadius = calcStemBaseRadius(generalParams, parentLength, stemOffset);
+
+	float baseLength = 0;
+	if(mLevelParams.level == 0)
+	{
+		baseLength = generalParams.baseSize * mLength;
+	}
+	calcStemBranchInterval(parentLength, stemOffset, baseLength, &mNumBranches, &mBranchInterval);
+
+	float parentBaseLength = 0;
+	if(mLevelParams.level == 1)
+	{
+		parentBaseLength = generalParams.baseSize * parentLength;
+	}
+
+	float downAngle = 0;
+	float rotateAngle = 0;
+	calcBranchAngle(parentLength, stemOffset, parentBaseLength, context.rotateAngle, &downAngle, &rotateAngle);
+
+	context.rotateAngle = rotateAngle;
+
+	mOrient = Quaternion(0, DEGREE_TO_RAD(rotateAngle), DEGREE_TO_RAD(downAngle));
+
+	buildSegment(generalParams, NULL, 0, 0, 0, 0, LevelContext());
 }
 
 void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSeg, int segIndex, 
@@ -127,7 +265,6 @@ void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSe
 
 	seg->mPos = basePos;
 	seg->mOrient = Quaternion(0, DEGREE_TO_RAD(divergeAngle), DEGREE_TO_RAD(curveDelta + splitAngle));
-	//seg->mOrient = Quaternion(0, 0, DEGREE_TO_RAD(curveDelta + splitAngle));
 	seg->mSegIndex = segIndex;
 	seg->mParent = prevSeg;
 	seg->mStem = this;
@@ -145,34 +282,19 @@ void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSe
 	}
 
 	// divergeAngle是绕世界的y轴旋转
-	//seg->mOrientWorld = seg->mOrient * parentOrientWorld;
-	//seg->mOrient = WorldRotationToLocal(Quaternion(0, DEGREE_TO_RAD(divergeAngle), 0), seg->mOrientWorld) * seg->mOrient;
-	//seg->mOrientWorld = seg->mOrient * parentOrientWorld;
-
-
-	//seg->mOrientWorld = Quaternion(0, DEGREE_TO_RAD(rotateYAngle), 0) * (seg->mOrient * parentOrientWorld);
-	//seg->mOrient = WorldRotationToLocal(parentOrientWorld.Difference(seg->mOrientWorld), parentOrientWorld);
-	//seg->mOrientWorld = (seg->mOrient * parentOrientWorld);
-
-	Vector3 euler0 = seg->mOrient.EulerAngle();
-	Vector3 up0 = Vector3(0, 1.0f, 0) * seg->mOrient;
-	Vector3 right = Vector3(1, 0, 0) * seg->mOrient;
-	Vector3 forward = Vector3(0, 0, 1) * seg->mOrient;
-
 	seg->mOrientWorld = Quaternion(0, DEGREE_TO_RAD(rotateYAngle), 0) * (parentOrientWorld * seg->mOrient);
 	seg->mOrient = WorldRotationToLocal(parentOrientWorld.Difference(seg->mOrientWorld), parentOrientWorld);
 
-	Vector3 up = Vector3(0, 1.0f, 0) * seg->mOrientWorld;
-	Vector3 euler = seg->mOrientWorld.EulerAngle();
-
 	// create seg vb ...
 	std::vector<float> segRadius;
-	float offset = (float)segIndex / numSegs;
-	float offsetDelta = 1.0f / numSegs / mLevelParams.segSegsH;
-	for(int i = 0; i <= mLevelParams.segSegsH; ++i)
 	{
-		segRadius.push_back(GetStemRadius(offset));
-		offset += offsetDelta;
+		float offset = (float)segIndex / numSegs;
+		float offsetDelta = 1.0f / numSegs / mLevelParams.segSegsH;
+		for(int i = 0; i <= mLevelParams.segSegsH; ++i)
+		{
+			segRadius.push_back(GetStemRadius(offset));
+			offset += offsetDelta;
+		}
 	}
 
 	bool closeTop = true;
@@ -187,6 +309,43 @@ void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSe
 	seg->mGeo->CalculateNormals();
 	seg->mGeo->BuildGeometry(XYZ_N);
 
+	// branches
+	if(seg->mStem->GetNumBranches() != 0 && mLevelParams.level < generalParams.levels - 1)
+	{
+		float baseOffset = 0;
+		if(mLevelParams.level == 0)
+		{
+			float baseLength = generalParams.baseSize * mLength;
+			baseOffset = baseLength - segIndex * segLength;
+		}
+
+		float offset = 0;
+		if(baseOffset <= 0)
+		{
+			offset = mBranchInterval - context.branchDistError;
+		}
+		else if(baseOffset < segLength)
+		{
+			offset = baseOffset + mBranchInterval;
+		}
+		else
+		{
+			offset = segLength + mBranchInterval;
+		}
+
+		while(offset < segLength)
+		{
+			TreeStem* branch = new TreeStem(mTree, mLevelParams.level + 1);
+			branch->Build(seg, offset, generalParams, mTree->GetLevelParams(mLevelParams.level + 1), context);
+			seg->mBranches.push_back(branch);
+
+			offset += mBranchInterval;
+		}
+
+		context.branchDistError = segLength - (offset - mBranchInterval);
+	}
+
+	// splits
 	if(segIndex == numSegs - 1)
 		return;
 
@@ -207,11 +366,11 @@ void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSe
 	}
 	else
 	{			
-		Vector3 vecUp = Vector3(0, 1, 0) * seg->mOrient;
+		Vector3 vecUp = Vector3(0, 1, 0) * seg->mOrientWorld;
 		float declination = VectorAngle(Vector3(0, 1, 0), vecUp);
 
 		float splitAngleFactor = 1.0f;		// 调整此算法来使splitAngle随枝干的水平角度加成变化
-		//splitAngleFactor = fabs(declination - PI/2) / (PI/2);
+		splitAngleFactor = fabs(declination - PI/2) / (PI/2);
 
 		float childSplitAngle = max(0, splitAngleFactor * RandomVariation(mLevelParams.splitAngle, mLevelParams.splitAngleV));	
 
@@ -275,19 +434,24 @@ float TreeStem::GetStemRadius(float offset)
 	return radius;
 }
 
+float TreeStem::GetLength()
+{
+	return mLength;
+}
+
 TreeStem::~TreeStem()
 {
 	SAFE_DELETE(mFirstSeg);
 }
 
-void TreeStem::Draw(Camera* camera)
+void TreeStem::Draw(D3DXMATRIX matParent, Camera* camera)
 {
 	if(mFirstSeg)
 	{
 		D3DXMATRIX matRot, matTrans, matWorld;
 		matRot = mOrient.Matrix();
 		D3DXMatrixTranslation(&matTrans, mPos.x, mPos.y, mPos.z);
-		matWorld = matRot * matTrans;
+		matWorld = matRot * matTrans * matParent;
 
 		mFirstSeg->Draw(matWorld, camera);
 	}
@@ -303,6 +467,73 @@ void TreeStem::OnResetDevice()
 {
 	if(mFirstSeg)
 		mFirstSeg->OnResetDevice();
+}
+
+float TreeStem::ShapeRatio(int shape, float ratio)
+{
+	float resultVal = 0;
+
+	switch(shape)
+	{
+	case 0:		// conical
+		resultVal = 0.2f + 0.8f * ratio;
+		break;
+
+	case 1:		// spherical
+		resultVal = 0.2f + 0.8f * sin(PI * ratio);
+		break;
+
+	case 2:		// hemispherical
+		resultVal = 0.2f + 0.8f * sin(0.5f * PI * ratio);
+		break;
+
+	case 3:		// cylindrical
+		resultVal = 1.0f;
+		break;
+
+	case 4:		// taped cylindrical
+		resultVal = 0.5f + 0.5f * ratio;
+		break;
+
+	case 5:		// flame
+		if(ratio <= 0.7f)
+			resultVal = ratio / 0.7f;
+		else
+			resultVal = (1.0f - ratio) / 0.3f;
+		break;
+
+	case 6:		// inverse conical
+		resultVal = 1.0f - 0.8f * ratio;
+		break;
+
+	case 7:		// tend flame
+		if(ratio <= 0.7f)
+			resultVal = 0.5f + 0.5f * ratio / 0.7f;
+		else
+			resultVal = 0.5f + 0.5f * (1.0f - ratio) / 0.3f;
+		break;
+
+	default:
+		_Assert(false);
+		break;
+	}
+
+	return resultVal;
+}
+
+float TreeStem::GetSegLength()
+{
+	return mLength / mLevelParams.curveRes;
+}
+
+float TreeStem::GetBaseRadius()
+{
+	return mBaseRadius;
+}
+
+int TreeStem::GetNumBranches()
+{
+	return mNumBranches;
 }
 
 TreeSegGeo::TreeSegGeo(float length, int segmentsW, int segmentsH, std::vector<float> radius, Quaternion orient,
@@ -461,7 +692,7 @@ void Tree::Generate()
 	SAFE_DELETE(mTrunk);
 
 	mTrunk = new TreeStem(this, 0);
-	mTrunk->Build(mGeneralParams, mLevelParams[0], LevelContext());
+	mTrunk->Build(NULL, 0, mGeneralParams, mLevelParams[0], LevelContext());
 }
 
 void Tree::OnLostDevice()
@@ -479,7 +710,7 @@ void Tree::OnResetDevice()
 void Tree::Draw(Camera* camera)
 {
 	if(mTrunk)
-		mTrunk->Draw(camera);
+		mTrunk->Draw(IDENTITY_MATRIX, camera);
 }
 
 TreeGeneralParams Tree::GetGeneralParams()

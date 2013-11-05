@@ -62,6 +62,7 @@ private:
 	wxCollapsiblePane* mPanelLevelParmas0;
 
 	wxChoice* mChoiceLevel;
+	int mSelectedLevel;
 
 	wxSpinCtrl* mSpinLevel;
 	wxSpinCtrl* mSpinSegSegsW;

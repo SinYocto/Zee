@@ -12,11 +12,15 @@ struct LevelContext
 {
 	LevelContext()
 		:splitError(0)
+		,branchDistError(0)
+		,rotateAngle(0)
 	{
 
 	}
 
 	float splitError;
+	float branchDistError;
+	float rotateAngle;
 };
 
 struct TreeLevelParams
@@ -153,13 +157,27 @@ public:
 	void OnResetDevice();
 
 	float GetStemRadius(float offset);
-	void Build(TreeGeneralParams generalParams, TreeLevelParams levelParams, LevelContext& context);
+	float GetLength();
+	float GetSegLength();
+	float GetBaseRadius();
+	int GetNumBranches();
 
-	void Draw(Camera* camera);
+	float ShapeRatio(int shape, float ratio);
+
+	void Build(TreeSegment* parentSeg, float offset, TreeGeneralParams generalParams, TreeLevelParams levelParams, 
+		LevelContext& context);
+
+	void Draw(D3DXMATRIX matParent, Camera* camera);
 
 private:
 	void buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSeg, int segIndex, 
 		float splitAngle, float divergeAngle, float rotateYAngle, LevelContext& context);
+
+	float calcStemLength(TreeGeneralParams generalParams, float parentLength, float stemOffset);
+	float calcStemBaseRadius(TreeGeneralParams generalParams, float parentLength, float stemOffset);
+	void calcStemBranchInterval(float parentLength, float stemOffset, float baseLength, int* numBranches, float* branchInterval);
+	void calcBranchAngle(float parentLength, float stemOffset, float baseLength, float curRotateAngle, 
+		float* downAngle, float* rotateAngle);
 
 private:
 	Tree* mTree;
@@ -167,7 +185,10 @@ private:
 
 	float mBaseRadius;
 	float mLength;
+	int mNumBranches;
+	float mBranchInterval;
 
+	TreeSegment* mParentSeg;
 	TreeSegment* mFirstSeg;
 
 	Vector3 mPos;

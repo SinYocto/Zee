@@ -17,8 +17,9 @@ EVT_COLLAPSIBLEPANE_CHANGED(ID_LEVEL0_PARAMS, TreeGeneratorFrame::OnCollapsPaneL
 EVT_BUTTON(ID_BUTTON_GENERATE, TreeGeneratorFrame::OnButtonGenerate)
 END_EVENT_TABLE()
 
-TreeGeneratorFrame::TreeGeneratorFrame(wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size):
-wxFrame(parent, -1, title, pos, size, wxMINIMIZE_BOX | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX | wxFRAME_FLOAT_ON_PARENT)
+TreeGeneratorFrame::TreeGeneratorFrame(wxWindow* parent, const wxString& title, const wxPoint& pos, const wxSize& size)
+:wxFrame(parent, -1, title, pos, size, wxMINIMIZE_BOX | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX | wxFRAME_FLOAT_ON_PARENT)
+,mSelectedLevel(0)
 {
 	createWxCtrls();
 
@@ -125,6 +126,7 @@ void TreeGeneratorFrame::createWxCtrls()
 	choices.Add(wxT("0"));
 	mChoiceLevel = new wxChoice(levelParamsWnd, -1, wxDefaultPosition, wxDefaultSize, choices);
 	mChoiceLevel->SetSelection(0);
+	mSelectedLevel = 0;
 
 	wxStaticText* textSegSegsW = new wxStaticText(levelParamsWnd, -1, L"SegSegsW");
 	mSpinSegSegsW = new wxSpinCtrl(levelParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
@@ -419,7 +421,14 @@ void TreeGeneratorFrame::OnSpinLevels(wxSpinEvent& event)
 
 void TreeGeneratorFrame::OnChoiceLevel(wxCommandEvent& event)
 {
-	setValueLevelParams(mCanvas->mTree->GetLevelParams(mChoiceLevel->GetCurrentSelection()));
+	TreeLevelParams levelParams;
+	getValueLevelParams(&levelParams);
+	levelParams.level = mSelectedLevel;
+
+	mCanvas->mTree->SetLevelParams(mSelectedLevel, levelParams);
+
+	mSelectedLevel = mChoiceLevel->GetCurrentSelection();
+	setValueLevelParams(mCanvas->mTree->GetLevelParams(mSelectedLevel));
 }
 
 //void TreeGeneratorFrame::OnTextValue3(wxCommandEvent& event)
