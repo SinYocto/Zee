@@ -207,13 +207,14 @@ void SetUp()
 	SceneManager::mainCamera->SetCameraController(fpCameraController);
 
 	// lights
-	DirectionalLight* dirLight1 = new DirectionalLight(L"dirLight1", D3DXCOLOR_RED, Vector3(1.0f, -1.0f, 1.0f));
+	DirectionalLight* dirLight1 = new DirectionalLight(L"dirLight1", D3DXCOLOR_WHITE, Vector3(1.0f, -1.0f, 1.0f));
 	PointLight* pointLight1 = new PointLight(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(0, 0, 0), Vector3(1.0f, 0.05f, 0));
 
 	LightManager::SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
 
 	LightManager::AddDirectionalLight(dirLight1);
 	LightManager::AddPointLight(pointLight1);
+	pointLight1->Enable(false);
 
 	// geo
 	Cube* cubeGeo = new Cube(L"cubeGeo");

@@ -333,7 +333,7 @@ void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSe
 			offset = segLength + mBranchInterval;
 		}
 
-		while(offset < segLength)
+		while(offset < segLength - 0.0001f)
 		{
 			TreeStem* branch = new TreeStem(mTree, mLevelParams.level + 1);
 			branch->Build(seg, offset, generalParams, mTree->GetLevelParams(mLevelParams.level + 1), context);
@@ -636,8 +636,8 @@ void TreeSegGeo::constructGeometryData(Quaternion orient, bool topPlane, bool bo
 
 void TreeSegGeo::Render(D3DXMATRIX matWorld, Camera* camera)
 {
-	_Assert(NULL != MaterialManager::viewMtl);
-	MaterialManager::viewMtl->Render(matWorld, this, camera);
+	_Assert(NULL != MaterialManager::diffMtl);
+	MaterialManager::diffMtl->Render(matWorld, this, camera);
 }
 
 Tree::Tree()
@@ -731,4 +731,88 @@ void Tree::SetGeneralParamsLevels(int levels)
 
 	if(mGeneralParams.levels != curLevels)
 		OnParamsLevelsChanged();
+}
+
+void Tree::LoadParamsFromFile(const wchar_t* filePath)
+{
+	mLevelParams.clear();
+
+	TreeGeneralParams generalParams;
+
+	generalParams.levels = GetPrivateProfileInt(L"GeneralParams", L"Levels", 0, filePath);
+	generalParams.shape = GetPrivateProfileInt(L"GeneralParams", L"Shape", 0, filePath);
+	generalParams.baseSplits = GetPrivateProfileInt(L"GeneralParams", L"BaseSplits", 0, filePath);
+
+	wchar_t strTemp[MAX_STR_LEN];
+
+	GetPrivateProfileString(L"GeneralParams", L"Scale", L"10.0", strTemp, MAX_STR_LEN, filePath);
+	generalParams.scale = (float)_wtof(strTemp);
+
+	GetPrivateProfileString(L"GeneralParams", L"ScaleV", L"0", strTemp, MAX_STR_LEN, filePath);
+	generalParams.scaleV = (float)_wtof(strTemp);
+
+	GetPrivateProfileString(L"GeneralParams", L"BaseSize", L"0", strTemp, MAX_STR_LEN, filePath);
+	generalParams.baseSize = (float)_wtof(strTemp);
+
+	GetPrivateProfileString(L"GeneralParams", L"RadiusRatio", L"0.02", strTemp, MAX_STR_LEN, filePath);
+	generalParams.radiusRatio = (float)_wtof(strTemp);
+
+	GetPrivateProfileString(L"GeneralParams", L"RatioPower", L"1", strTemp, MAX_STR_LEN, filePath);
+	generalParams.ratioPower = (float)_wtof(strTemp);
+
+	mGeneralParams = generalParams;
+
+	for(int i = 0; i < generalParams.levels; ++i)
+	{
+		TreeLevelParams levelParams(i);
+
+		wchar_t strLevelSection[MAX_STR_LEN];
+		YString::Format(strLevelSection, L"LevelParams%d", i);
+
+		levelParams.segSegsW = GetPrivateProfileInt(strLevelSection, L"SegSegsW", 8, filePath);
+		levelParams.segSegsH = GetPrivateProfileInt(strLevelSection, L"SegSegsH", 4, filePath);
+		levelParams.branches = GetPrivateProfileInt(strLevelSection, L"Branches", 0, filePath);
+		levelParams.curveRes = GetPrivateProfileInt(strLevelSection, L"CurveRes", 3, filePath);
+
+		GetPrivateProfileString(strLevelSection, L"SegSplits", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.segSplits = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"SplitAngle", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.splitAngle = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"SplitAngleV", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.splitAngleV = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"DownAngle", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.downAngle = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"DownAngleV", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.downAngleV = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"RotateAngle", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.rotateAngle = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"RotateAngleV", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.rotateAngleV = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"Length", L"1", strTemp, MAX_STR_LEN, filePath);
+		levelParams.length = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"LengthV", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.lengthV = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"Taper", L"1", strTemp, MAX_STR_LEN, filePath);
+		levelParams.taper = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"Curve", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.curve = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"CurveV", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.curveV = (float)_wtof(strTemp);
+
+		GetPrivateProfileString(strLevelSection, L"CurveBack", L"0", strTemp, MAX_STR_LEN, filePath);
+		levelParams.curveBack = (float)_wtof(strTemp);
+
+		mLevelParams.push_back(levelParams);
+	}
 }

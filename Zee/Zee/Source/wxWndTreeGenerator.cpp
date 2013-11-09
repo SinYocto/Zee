@@ -12,6 +12,7 @@
 
 BEGIN_EVENT_TABLE(TreeGeneratorFrame, wxFrame)
 EVT_CLOSE(TreeGeneratorFrame::OnClose)
+EVT_MENU(ID_MENU_OPEN, TreeGeneratorFrame::OnOpenFile)
 EVT_COLLAPSIBLEPANE_CHANGED(ID_GENERAL_PARAMS, TreeGeneratorFrame::OnCollapsPaneGeneralParams)
 EVT_COLLAPSIBLEPANE_CHANGED(ID_LEVEL0_PARAMS, TreeGeneratorFrame::OnCollapsPaneLevelParams0)
 EVT_BUTTON(ID_BUTTON_GENERATE, TreeGeneratorFrame::OnButtonGenerate)
@@ -35,6 +36,19 @@ TreeGeneratorFrame::TreeGeneratorFrame(wxWindow* parent, const wxString& title, 
 
 void TreeGeneratorFrame::createWxCtrls()
 {
+	// menu
+	SetIcon(wxIcon(L"./Assets/Icons/Zee.xpm", wxBITMAP_TYPE_XPM));
+
+	wxMenu* menuFile = new wxMenu;
+	menuFile->Append(ID_MENU_OPEN, L"&Open");
+	menuFile->Append(ID_MENU_SAVE, L"&Save");
+
+	wxMenuBar* menuBar = new wxMenuBar;
+	menuBar->Append(menuFile, L"&File");
+
+	SetMenuBar(menuBar);
+
+	// wnd
 	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 
 	// left
@@ -295,6 +309,21 @@ void TreeGeneratorFrame::OnClose(wxCloseEvent& event)
 	Show(false);		// 点右上角x时, 不关闭, 隐藏
 }
 
+void TreeGeneratorFrame::OnOpenFile(wxCommandEvent& event)
+{
+	wxFileDialog dialog(this, L"Open", wxEmptyString, wxEmptyString, _T("Tree ini files (*.ini*)|*.ini*"), wxFD_MULTIPLE);
+	if (dialog.ShowModal() == wxID_OK)
+	{
+		// ...
+		mCanvas->LoadParamsFromFile(dialog.GetPath().wchar_str());
+
+		setValueGeneralParams(mCanvas->mTree->GetGeneralParams());
+		setValueLevelParams(mCanvas->mTree->GetLevelParams(0));
+
+		refreshChoiceLevel();
+	}
+}
+
 void TreeGeneratorFrame::OnCollapsPaneGeneralParams(wxCollapsiblePaneEvent& event)
 {
 	mCtrlsPanel->FitInside();
@@ -462,7 +491,7 @@ void TreeGeneratorFrame::setValueGeneralParams(TreeGeneralParams generalParams)
 	wxString scale = wxString::Format(wxT("%.2f"), generalParams.scale);
 	wxString scaleV = wxString::Format(wxT("%.2f"), generalParams.scaleV);
 	wxString baseSize = wxString::Format(wxT("%.2f"), generalParams.baseSize);
-	wxString radiusRatio = wxString::Format(wxT("%.2f"), generalParams.radiusRatio);
+	wxString radiusRatio = wxString::Format(wxT("%.3f"), generalParams.radiusRatio);
 	wxString ratioPower = wxString::Format(wxT("%.2f"), generalParams.ratioPower);
 
 	mTextScale->SetValue(scale);
@@ -653,4 +682,10 @@ void TreeGeneratorCanvas::OnResetDevice()
 
 	if(mTree)
 		mTree->OnResetDevice();
+}
+
+void TreeGeneratorCanvas::LoadParamsFromFile(const wchar_t* filePath)
+{
+	_Assert(mTree);
+	mTree->LoadParamsFromFile(filePath);
 }

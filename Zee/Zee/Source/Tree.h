@@ -205,6 +205,8 @@ public:
 
 	void Generate();
 
+	void LoadParamsFromFile(const wchar_t* filePath);
+
 	TreeGeneralParams GetGeneralParams();
 	TreeLevelParams GetLevelParams(int level);
 	void SetGeneralParamsLevels(int levels);

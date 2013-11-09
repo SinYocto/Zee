@@ -14,6 +14,8 @@ class TreeGeneratorFrame : public wxFrame
 {
 	enum
 	{
+		ID_MENU_OPEN,
+		ID_MENU_SAVE,
 		ID_GENERAL_PARAMS,
 		ID_LEVEL0_PARAMS,
 		ID_BUTTON_GENERATE,
@@ -27,6 +29,7 @@ public:
 
 protected:
 	void OnClose(wxCloseEvent& event);
+	void OnOpenFile(wxCommandEvent& event);
 
 private:
 	void OnCollapsPaneGeneralParams(wxCollapsiblePaneEvent& event);
@@ -108,6 +111,8 @@ public:
 	void OnResetDevice();
 
 	void Setup();
+
+	void LoadParamsFromFile(const wchar_t* filePath);
 
 	void RenderWindow();
 	void CleanupAndDestory();
