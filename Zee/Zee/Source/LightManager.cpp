@@ -1,21 +1,46 @@
 #include "LightManager.h"
 
-int LightManager::numActiveDirectionalLights = 0;
-int LightManager::numActivePointLights = 0;
+LightManager::LightManager()
+:mAmbientLight(NULL)
+,curDirLightID(0)
+,curPointLightID(0)
+,numActiveDirectionalLights(0)
+,numActivePointLights(0)
+,isDirectionalLightsDirty(true)
+,isPointLightsDirty(true)
+{
 
-AmbientLight LightManager::mAmbientLight;
-std::list<DirectionalLight*> LightManager::mDirlLights;
-std::list<PointLight*> LightManager::mPointLights;
+}
 
-DirectionalLightData LightManager::directionalLightsData[MAX_NUM_DIRECTIONAL_LIGHTS];
-PointLightData LightManager::pointLightsData[MAX_NUM_POINT_LIGHTS];
+LightManager::~LightManager()
+{
+	Destroy();
+}
 
-bool LightManager::isDirectionalLightsDirty = true;
-bool LightManager::isPointLightsDirty = true;
 
-DWORD LightManager::curDirLightID = 0;
-DWORD LightManager::curPointLightID = 0;
+void LightManager::Init()
+{
+	mAmbientLight = new AmbientLight();
+}
 
+void LightManager::Destroy()
+{
+	for(std::list<DirectionalLight*>::iterator iter = mDirlLights.begin(); iter != mDirlLights.end(); ++iter)
+	{
+		SAFE_DELETE(*iter);
+	}
+
+	mDirlLights.clear();
+
+	for(std::list<DirectionalLight*>::iterator iter = mDirlLights.begin(); iter != mDirlLights.end(); ++iter)
+	{
+		SAFE_DELETE(*iter);
+	}
+
+	mPointLights.clear();
+
+	SAFE_DELETE(mAmbientLight);
+}
 
 void LightManager::AddDirectionalLight(DirectionalLight* light)
 {
@@ -49,7 +74,7 @@ void LightManager::AddPointLight(PointLight* light)
 	}
 }
 
-void LightManager::Update()
+void LightManager::FrameUpdate()
 {
 	if(isDirectionalLightsDirty)
 	{
@@ -94,12 +119,12 @@ void LightManager::Update()
 
 void LightManager::SetAmbientLight(D3DXCOLOR _color, float _intensity)
 {
-	mAmbientLight.SetValue(_color, _intensity);
+	mAmbientLight->SetValue(_color, _intensity);
 }
 
 D3DXCOLOR LightManager::GetFinalAmbientColor()
 {
-	return mAmbientLight.FinalColor();
+	return mAmbientLight->FinalColor();
 }
 
 void LightManager::GetDirLight(const wchar_t* name, DirectionalLight** dirLight)
@@ -134,19 +159,61 @@ void LightManager::GetPointLight(const wchar_t* name, PointLight** pointLight)
 	}
 }
 
-void LightManager::Destroy()
+void LightManager::EnableOneDirectionalLight(bool enable)
 {
-	for(std::list<DirectionalLight*>::iterator iter = mDirlLights.begin(); iter != mDirlLights.end(); ++iter)
+	if(enable)
 	{
-		SAFE_DELETE(*iter);
+		numActiveDirectionalLights++;
+		SetDirectionalLightDirtyFlag(true);
 	}
-
-	mDirlLights.clear();
-
-	for(std::list<DirectionalLight*>::iterator iter = mDirlLights.begin(); iter != mDirlLights.end(); ++iter)
+	else
 	{
-		SAFE_DELETE(*iter);
+		numActiveDirectionalLights--;
+		SetDirectionalLightDirtyFlag(true);
 	}
+}
 
-	mPointLights.clear();
+void LightManager::EnableOnePointLight( bool enable )
+{
+	if(enable)
+	{
+		numActivePointLights++;
+		SetPointLightDirtyFlag(true);
+	}
+	else
+	{
+		numActivePointLights--;
+		SetPointLightDirtyFlag(true);
+	}
+}
+
+
+void LightManager::SetDirectionalLightDirtyFlag(bool isDirty)
+{
+	isDirectionalLightsDirty = isDirty;
+}
+
+void LightManager::SetPointLightDirtyFlag(bool isDirty)
+{
+	isPointLightsDirty = isDirty;
+}
+
+DirectionalLightData* LightManager::GetDirectionalLightsData()
+{
+	return directionalLightsData;
+}
+
+PointLightData* LightManager::GetPointLightsData()
+{
+	return pointLightsData;
+}
+
+int LightManager::GetActiveDirectionalLightCounts()
+{
+	return numActiveDirectionalLights;
+}
+
+int LightManager::GetActivePointLightCounts()
+{
+	return numActivePointLights;
 }

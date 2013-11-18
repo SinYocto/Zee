@@ -1,3 +1,6 @@
+#ifndef LIGHT_MANAGER_H
+#define LIGHT_MANAGER_H
+
 #include "AmbientLight.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
@@ -5,35 +8,52 @@
 class LightManager
 {
 public:
-	static void AddDirectionalLight(DirectionalLight* light);
-	static void AddPointLight(PointLight* light);
+	LightManager();
+	~LightManager();
 
-	static void SetAmbientLight(D3DXCOLOR _color, float _intensity);
-	static D3DXCOLOR GetFinalAmbientColor();
+	void Init();
+	void Destroy();
 
-	static void GetDirLight(const wchar_t* name, DirectionalLight** dirLight);
-	static void GetPointLight(const wchar_t* name, PointLight** pointLight);
+	void FrameUpdate();
 
-	static void Update();
+	void AddDirectionalLight(DirectionalLight* light);
+	void AddPointLight(PointLight* light);
 
-	static void Destroy();
+	void SetAmbientLight(D3DXCOLOR _color, float _intensity);
+	D3DXCOLOR GetFinalAmbientColor();
 
-public:
-	static int numActiveDirectionalLights;
-	static int numActivePointLights;
+	void GetDirLight(const wchar_t* name, DirectionalLight** dirLight);
+	void GetPointLight(const wchar_t* name, PointLight** pointLight);
 
-	static bool isDirectionalLightsDirty;
-	static bool isPointLightsDirty;
+	DirectionalLightData* GetDirectionalLightsData();
+	PointLightData* GetPointLightsData();
 
-	static DirectionalLightData directionalLightsData[MAX_NUM_DIRECTIONAL_LIGHTS];
-	static PointLightData pointLightsData[MAX_NUM_POINT_LIGHTS];
+	int GetActiveDirectionalLightCounts();
+	int GetActivePointLightCounts();
+
+	void SetDirectionalLightDirtyFlag(bool isDirty);
+	void SetPointLightDirtyFlag(bool isDirty);
+
+	void EnableOneDirectionalLight(bool enable);
+	void EnableOnePointLight(bool enable);
 
 private:
-	static AmbientLight mAmbientLight;
+	AmbientLight* mAmbientLight;
 
-	static std::list<DirectionalLight*> mDirlLights;
-	static std::list<PointLight*> mPointLights;
+	std::list<DirectionalLight*> mDirlLights;
+	std::list<PointLight*> mPointLights;
 
-	static DWORD curDirLightID;
-	static DWORD curPointLightID;
+	DWORD curDirLightID;
+	DWORD curPointLightID;
+
+	int numActiveDirectionalLights;
+	int numActivePointLights;
+
+	bool isDirectionalLightsDirty;
+	bool isPointLightsDirty;
+
+	DirectionalLightData directionalLightsData[MAX_NUM_DIRECTIONAL_LIGHTS];
+	PointLightData pointLightsData[MAX_NUM_POINT_LIGHTS];
 };
+
+#endif

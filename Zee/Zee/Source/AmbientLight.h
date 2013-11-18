@@ -3,7 +3,8 @@
 
 #include "D3DUtility.h"
 
-class AmbientLight{
+class AmbientLight
+{
 public:
 	AmbientLight(D3DXCOLOR color = D3DXCOLOR_WHITE, float intensity = 0)
 		:mColor(color)

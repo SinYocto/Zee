@@ -1,7 +1,6 @@
 #include "OBJParser.h"
 #include "Model.h"
-#include "GeometryManager.h"
-#include "MaterialManager.h"
+#include "Engine.h"
 #include "SceneManager.h"
 
 DWORD OBJParser::mDataContentType = 0;
@@ -201,7 +200,7 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 				{
 					Assert((*curGeo) == NULL);
 					(*curGeo) = new Geometry(L"geo");				// TODO:给个按序号增加的默认名?
-					GeometryManager::AddGeometry((*curGeo));
+					gEngine->GetGeometryManager()->AddGeometry((*curGeo));
 
 					mGeoList.push_back((*curGeo));
 
@@ -443,7 +442,7 @@ void OBJParser::parseMtlLine(const wchar_t* lineContent, Material** curMaterial,
 			Assert(*curMaterial == NULL);
 
 			*curMaterial = new Material(mtlName);
-			MaterialManager::AddMaterial(*curMaterial);			// TODO:改到Material的构造函数中	
+			gEngine->GetMaterialManager()->AddMaterial(*curMaterial);			// TODO:改到Material的构造函数中	
 
 			break;
 		}

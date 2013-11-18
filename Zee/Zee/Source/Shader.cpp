@@ -2,7 +2,8 @@
 #include "Material.h"
 #include "Geometry.h"
 #include "Camera.h"
-#include "LightManager.h"
+//#include "LightManager.h"
+#include "Engine.h"
 
 // DiffuseShader
 LPD3DXEFFECTPOOL UtilityShader::pool = NULL;
@@ -364,7 +365,13 @@ void UtilityShader::SetupSharedParams()
 {
 	_Assert(NULL != effect);
 
-	effect->SetRawValue("ambientLight", &(LightManager::GetFinalAmbientColor()), 0 , sizeof(Vector3));
-	effect->SetRawValue("directionalLights", LightManager::directionalLightsData, 0, sizeof(LightManager::directionalLightsData));
-	effect->SetRawValue("pointLights", LightManager::pointLightsData, 0, sizeof(LightManager::pointLightsData));
+	LightManager* lightMgr = gEngine->GetLightManager();
+
+	effect->SetRawValue("ambientLight", &(lightMgr->GetFinalAmbientColor()), 0 , sizeof(Vector3));
+
+	effect->SetRawValue("directionalLights", lightMgr->GetDirectionalLightsData(), 0, 
+		MAX_NUM_DIRECTIONAL_LIGHTS * sizeof(DirectionalLightData));
+
+	effect->SetRawValue("pointLights", lightMgr->GetPointLightsData(), 0, 
+		MAX_NUM_POINT_LIGHTS * sizeof(PointLightData));
 }

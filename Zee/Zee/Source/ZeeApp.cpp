@@ -1,14 +1,12 @@
 #include "ZeeApp.h"
 #include "D3DUtility.h"
+#include "Engine.h"
 #include "Input.h"
 #include "GUI.h"
 
 #include "Camera.h"
 #include "CameraController.h"
 
-#include "LightManager.h"
-#include "GeometryManager.h"
-#include "MaterialManager.h"
 #include "SceneManager.h"
 
 #include "ModelNode.h"
@@ -104,10 +102,14 @@ ZeeFrame::ZeeFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 	CreateStatusBar();
 	SetStatusText(L"Welcome To WanderLand!");
 
-	wxSize clientSize = GetClientSize();
+	wxSize clientSize = GetClientSize(); 
 
 	mCanvas = new D3D9Canvas(this, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
 	mCanvas->InitDriver();
+
+	gEngine = new Engine();
+	gEngine->Init();
+
 	SetUp();
 
 	mWndTreeGenerator = new TreeGeneratorFrame(this, L"Tree Generator", wxDefaultPosition, wxDefaultSize);
@@ -186,15 +188,8 @@ void SetUp()
 {
 	_wsetlocale(LC_ALL, L"chs");
 
-	//_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
-	//_CrtSetBreakAlloc(9554);
-	//_CrtSetBreakAlloc(9553);
-	//_CrtSetBreakAlloc(9552);
-
 	Input::Init(GetModuleHandle(0), Driver::hWnd);
-	MaterialManager::Init();
 	SceneManager::Init();
-	Time::Start();
 
 	SetupGUIStyle();
 
@@ -210,40 +205,45 @@ void SetUp()
 	DirectionalLight* dirLight1 = new DirectionalLight(L"dirLight1", D3DXCOLOR_WHITE, Vector3(1.0f, -1.0f, 1.0f));
 	PointLight* pointLight1 = new PointLight(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(0, 0, 0), Vector3(1.0f, 0.05f, 0));
 
-	LightManager::SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
+	LightManager* lightMgr = gEngine->GetLightManager();
+	lightMgr->SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
 
-	LightManager::AddDirectionalLight(dirLight1);
-	LightManager::AddPointLight(pointLight1);
+	lightMgr->AddDirectionalLight(dirLight1);
+	lightMgr->AddPointLight(pointLight1);
 	pointLight1->Enable(false);
 
 	// geo
+	GeometryManager* geometryMgr = gEngine->GetGeometryManager();
+
 	Cube* cubeGeo = new Cube(L"cubeGeo");
-	GeometryManager::AddGeometry(cubeGeo);
+	geometryMgr->AddGeometry(cubeGeo);
 
 	cubeGeo->CalculateTBN();
 	cubeGeo->BuildGeometry(XYZ_UV_TBN);
 
 	Cylinder* coneGeo = new Cylinder(L"coneGeo", 0, 0.5f, 2.0f);
-	GeometryManager::AddGeometry(coneGeo);
+	geometryMgr->AddGeometry(coneGeo);
 
 	coneGeo->CalculateNormals();
 	coneGeo->BuildGeometry(XYZ_N);
 
 	Cylinder* cylinderGeo = new Cylinder(L"cylinderGeo", 0.5f, 0.5f, 2.0f);
-	GeometryManager::AddGeometry(cylinderGeo);
+	geometryMgr->AddGeometry(cylinderGeo);
 
 	cylinderGeo->CalculateNormals();
 	cylinderGeo->BuildGeometry(XYZ_N);
 
 	Torus* torusGeo = new Torus(L"torusGeo", 1.0f, 0.025f, 32, 8);
-	GeometryManager::AddGeometry(torusGeo);
+	geometryMgr->AddGeometry(torusGeo);
 
 	torusGeo->CalculateNormals();
 	torusGeo->BuildGeometry(XYZ_N);
 
 	// material
+	MaterialManager* materialMgr = gEngine->GetMaterialManager();
+
 	Material* mtlBump = new Material(L"mtl1");
-	MaterialManager::AddMaterial(mtlBump);
+	materialMgr->AddMaterial(mtlBump);
 
 	mtlBump->SetShader(BumpSpecular);
 	mtlBump->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
@@ -251,26 +251,26 @@ void SetUp()
 	mtlBump->mShader->SetSpecShiness(0.4f);
 
 	Material* mtlDiff = new Material(L"mtlDiff");
-	MaterialManager::AddMaterial(mtlDiff);
+	materialMgr->AddMaterial(mtlDiff);
 
 	mtlDiff->SetShader(Diffuse);
 	//mtl2->shader->SetColorTex(L"./Assets/Textures/6133.jpg");
 
 	Material* mtlSpec = new Material(L"mtlSpec");
-	MaterialManager::AddMaterial(mtlSpec);
+	materialMgr->AddMaterial(mtlSpec);
 
 	mtlSpec->SetShader(Specular);
 	mtlSpec->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
 	mtlSpec->mShader->SetSpecShiness(0.4f);
 
 	Material* mtlView = new Material(L"mtlView");
-	MaterialManager::AddMaterial(mtlView);
+	materialMgr->AddMaterial(mtlView);
 
 	mtlView->SetShader(View);
 	mtlView->SetDiffuseColor(D3DXCOLOR_RED);
 
 	Material* mtlFlat = new Material(L"mtlFlat");
-	MaterialManager::AddMaterial(mtlFlat);
+	materialMgr->AddMaterial(mtlFlat);
 
 	mtlFlat->SetShader(Flat);
 	mtlFlat->SetDiffuseColor(D3DXCOLOR_GREEN);
@@ -323,7 +323,7 @@ void D3D9Canvas::RenderLoop()
 	case D3D_OK:
 		{
 			// update state
-			Time::Tick();
+			gEngine->FrameUpdate();
 
 			Input::GetDeviceState(Driver::hWnd);
 
@@ -334,13 +334,11 @@ void D3D9Canvas::RenderLoop()
 
 			GUIUpdate();
 
-			LightManager::Update();
 
 			if(wxWindow::FindFocus() == this)
 				SceneManager::mainCamera->ApplyCameraController();
 
 			SceneManager::FrameUpdate();
-			MaterialManager::FrameUpdate();
 			terrain->FrameUpdate(SceneManager::mainCamera);
 
 			// render
@@ -374,7 +372,7 @@ void D3D9Canvas::RenderLoop()
 			if(hitNode && hitNode->GetNodeType() == SceneNode::SCENE_NODE_BILLBOARD)
 			{
 				PointLight* pointLight1 = NULL;
-				LightManager::GetPointLight(L"pointLight1", &pointLight1);
+				gEngine->GetLightManager()->GetPointLight(L"pointLight1", &pointLight1);
 				pointLight1->SetPosition(hitNode->GetWorldPosition());
 			}
 
@@ -430,7 +428,7 @@ void GUIUpdate()
 	// enableDirLight1 = gGUISystem.GUIToggle(Rect(10, 150, 20, 20), enableDirLight1);
 
 	DirectionalLight* dirLight1 = NULL;
-	LightManager::GetDirLight(L"dirLight1", &dirLight1);
+	gEngine->GetLightManager()->GetDirLight(L"dirLight1", &dirLight1);
 	dirLight1->Enable(enableDirLight1);
 }
 
@@ -448,7 +446,7 @@ int GetFPS()
 		elapseTime = 0;
 	}
 
-	elapseTime += Time::deltaTime;
+	elapseTime += gEngine->GetFrameTimer()->GetDeltaTime();
 	fpsAccumulator++;
 
 	return fps;
@@ -462,12 +460,13 @@ void AppDestroy()
 
 	SAFE_DELETE(terrain);
 
+	gEngine->Destroy();
+
 	Input::Destroy();
 	SceneManager::Destory();
-	GeometryManager::Destroy();
-	MaterialManager::Destroy();
-	LightManager::Destroy();
 	Driver::Destory();
+
+	SAFE_DELETE(gEngine);
 }
 
 void OnLostDevice()
@@ -479,9 +478,9 @@ void OnLostDevice()
 	gDefaultLabelStyle.OnLostDevice();
 	gGUISystem.OnLostDevice();
 
-	MaterialManager::OnLostDevice();
-	GeometryManager::OnLostDevice();
 	ResourceMgr::OnLostDevice();
+
+	gEngine->OnLostDevice();
 
 	Driver::OnLostDevice(); 
 }
@@ -499,9 +498,9 @@ void OnResetDevice()
 	gDefaultLabelStyle.OnResetDevice();
 	gGUISystem.OnResetDevice();
 
-	MaterialManager::OnResetDevice();
-	GeometryManager::OnResetDevice();
 	ResourceMgr::OnResetDevice();
+
+	gEngine->OnResetDevice();
 
 	Driver::OnResetDevice();
 }

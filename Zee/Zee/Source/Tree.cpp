@@ -1,5 +1,5 @@
 #include "Tree.h"
-#include "MaterialManager.h"
+#include "Engine.h"
 #include "Camera.h"
 
 TreeSegment::TreeSegment()
@@ -182,6 +182,10 @@ void TreeStem::calcBranchAngle(float parentLength, float stemOffset, float baseL
 void TreeStem::Build(TreeSegment* parentSeg, float offset, TreeGeneralParams generalParams, TreeLevelParams levelParams, 
 					 LevelContext& context)
 {
+	static int dbNumStems[4];
+	dbNumStems[levelParams.level]++;
+	Log(L"current numStems: (0-%d),(1-%d),(2-%d),(3-%d)\n", dbNumStems[0], dbNumStems[1], dbNumStems[2], dbNumStems[3]);
+
 	SAFE_DELETE(mFirstSeg);
 	mParentSeg = parentSeg;
 	mLevelParams = levelParams;
@@ -233,6 +237,10 @@ void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSe
 							float splitAngle, float divergeAngle, float rotateYAngle, LevelContext& context)
 {
 	_Assert(segIndex < mLevelParams.curveRes);
+
+	static int dbNumSegs[4];
+	dbNumSegs[mLevelParams.level]++;
+	Log(L"current numSegs: (0-%d),(1-%d),(2-%d),(3-%d)\n", dbNumSegs[0], dbNumSegs[1], dbNumSegs[2], dbNumSegs[3]);
 
 	int numSegs = mLevelParams.curveRes;
 	float segLength = mLength / numSegs;
@@ -636,8 +644,7 @@ void TreeSegGeo::constructGeometryData(Quaternion orient, bool topPlane, bool bo
 
 void TreeSegGeo::Render(D3DXMATRIX matWorld, Camera* camera)
 {
-	_Assert(NULL != MaterialManager::diffMtl);
-	MaterialManager::diffMtl->Render(matWorld, this, camera);
+	gEngine->GetMaterialManager()->GetDefaultDiffMtl()->Render(matWorld, this, camera);
 }
 
 Tree::Tree()

@@ -10,7 +10,7 @@ Camera* SceneManager::extraCamera = NULL;
 void SceneManager::Init()
 {
 	root = new SceneNode(L"root");
-	root->SetID(curID++);
+	root->SetID(curID++); 
 }
 
 void SceneManager::AddSceneNode(SceneNode* node, SceneNode* parent /*= root*/)

@@ -6,30 +6,36 @@
 class MaterialManager
 {
 public:
-	static void Init();
+	MaterialManager();
 
-	static void OnLostDevice();
-	static void OnResetDevice();
+	void Init();
+	void Destroy();
 
-	static void FrameUpdate();
+	void OnLostDevice();
+	void OnResetDevice();
 
-	static void AddMaterial(Material* material);
-	static void Destroy();
-	static void GetMaterial(const wchar_t* name, Material** material);
+	void FrameUpdate();
+
+	void AddMaterial(Material* material);
+	void GetMaterial(const wchar_t* name, Material** material);
+
+	Material* GetDefaultFlatMtl();
+	Material* GetDefaultViewMtl();
+	Material* GetDefaultDiffMtl();
+	Material* GetDefaultSpecMtl();
 
 private:
-	static void createDefaultMtls();
-	static void deleteDefaultMtls();
+	void createDefaultMtls();
+	void deleteDefaultMtls();
 
 private:
-	static std::list<Material*> resourceList;
-	static DWORD curID;
-
-public:
-	static Material* flatMtl;
-	static Material* viewMtl;
-	static Material* diffMtl;
-	static Material* specMtl;
+	std::list<Material*> materialList;
+	DWORD curID;
+	
+	Material* flatMtl;
+	Material* viewMtl;
+	Material* diffMtl;
+	Material* specMtl;
 };
 
 

@@ -6,16 +6,19 @@
 class GeometryManager
 {
 public:
-	static void AddGeometry(Geometry* geo);
-	static void Destroy();
-	static void GetGeometry(const wchar_t* name, Geometry** geo);
+	GeometryManager();
 
-	static void OnLostDevice();
-	static void OnResetDevice();
+	void Destroy();
+
+	void AddGeometry(Geometry* geo);
+	void GetGeometry(const wchar_t* name, Geometry** geo);
+
+	void OnLostDevice();
+	void OnResetDevice();
 
 private:
-	static std::list<Geometry*> geoList;
-	static DWORD curID;
+	std::list<Geometry*> geoList;
+	DWORD curID;
 };
 
 

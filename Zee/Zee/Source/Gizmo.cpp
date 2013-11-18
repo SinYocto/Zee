@@ -1,10 +1,10 @@
 #include "Gizmo.h"
 
 #include "D3DUtility.h"
+#include "Engine.h"
 #include "Camera.h"
 #include "Primitive.h"
 #include "MeshNode.h"
-#include "MaterialManager.h"
 #include "Input.h"
 
 void Gizmo::OnLostDevice()
@@ -268,9 +268,9 @@ void Gizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 	Material* mtl = NULL;
 
 	if(isColorPickPass)
-		mtl = MaterialManager::flatMtl;
+		mtl = gEngine->GetMaterialManager()->GetDefaultFlatMtl();
 	else
-		mtl = MaterialManager::viewMtl;
+		mtl = gEngine->GetMaterialManager()->GetDefaultViewMtl();
 
 	if(isColorPickPass)
 	{

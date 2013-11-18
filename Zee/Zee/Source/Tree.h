@@ -10,7 +10,7 @@ class Camera;
 
 struct LevelContext
 {
-	LevelContext()
+	LevelContext()  
 		:splitError(0)
 		,branchDistError(0)
 		,rotateAngle(0)
@@ -98,6 +98,28 @@ struct TreeGeneralParams
 	float baseSize;
 	float radiusRatio;
 	float ratioPower;
+};
+
+struct TreeLeafParams
+{
+	TreeLeafParams()
+		:leaves(0)
+		,leafScale(0.1f)
+		,leafScaleX(0.1f)
+		,leafStemLen(0.5f)
+	{
+
+	}
+
+	int leaves;
+	float leafScale;
+	float leafScaleX;
+	float leafStemLen;
+};
+
+class TreeLeaf
+{
+
 };
 
 class TreeSegGeo : public Geometry

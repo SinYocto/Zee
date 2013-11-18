@@ -41,6 +41,8 @@ struct UtilityShader
 	{
 		_Assert(NULL != pool);
 		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, pool, &effect, NULL);
+
+		_Assert(NULL != effect);
 	}
 
 	static void SetupSharedParams();
@@ -132,6 +134,8 @@ public:
 	{
 		_Assert(NULL != UtilityShader::pool);
 		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+
+		_Assert(NULL != mEffect);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -170,6 +174,8 @@ public:
 	{
 		_Assert(NULL != UtilityShader::pool);
 		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+
+		_Assert(NULL != mEffect);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -208,6 +214,8 @@ public:
 	{
 		_Assert(NULL != UtilityShader::pool);
 		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+
+		_Assert(NULL != mEffect);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -247,6 +255,8 @@ public:
 	{
 		_Assert(NULL != UtilityShader::pool);
 		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+
+		_Assert(NULL != mEffect);
 	}
 
 	void SetColorTex(wchar_t* texFileName);
@@ -290,6 +300,8 @@ public:
 	{
 		_Assert(NULL != UtilityShader::pool);
 		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+
+		_Assert(NULL != mEffect);
 	}
 
 	void SetColorTex(wchar_t* texFileName);

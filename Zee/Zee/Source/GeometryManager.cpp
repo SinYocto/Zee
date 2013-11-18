@@ -1,7 +1,10 @@
 #include "GeometryManager.h"
 
-std::list<Geometry*> GeometryManager::geoList;
-DWORD GeometryManager::curID = 0;
+GeometryManager::GeometryManager()
+:curID(0)
+{
+
+}
 
 void GeometryManager::AddGeometry(Geometry* geo)
 {

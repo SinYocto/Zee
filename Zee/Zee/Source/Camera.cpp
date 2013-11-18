@@ -1,7 +1,7 @@
 #include "Camera.h"
 #include "Driver.h"
 #include "CameraController.h"
-#include "Time.h"
+#include "Engine.h"
 
 Camera::~Camera()
 {
@@ -121,5 +121,5 @@ void Camera::SetCameraController(CameraController* controller)
 void Camera::ApplyCameraController()
 {
 	_Assert(NULL != mController);
-	mController->Apply(this, Time::deltaTime);
+	mController->Apply(this, gEngine->GetFrameTimer()->GetDeltaTime());
 }

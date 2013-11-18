@@ -195,6 +195,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Engine.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Engine.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\IReferenceCounted.h"
 				>
 			</File>

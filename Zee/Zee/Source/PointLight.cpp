@@ -1,5 +1,5 @@
 #include"PointLight.h"
-#include "LightManager.h"
+#include "Engine.h"
 
 void PointLight::Enable(bool enable)
 {
@@ -9,22 +9,19 @@ void PointLight::Enable(bool enable)
 	}
 	else
 	{
+		LightManager* lightMgr = gEngine->GetLightManager();
 		if(enable == true)
 		{
-			if(LightManager::numActivePointLights < MAX_NUM_POINT_LIGHTS)
+			if(lightMgr->GetActivePointLightCounts() < MAX_NUM_POINT_LIGHTS)
 			{
 				mIsEnabled = true;
-				LightManager::numActivePointLights++;
-
-				LightManager::isPointLightsDirty = true;
+				lightMgr->EnableOnePointLight(true);
 			}
 		}
 		else
 		{
 			mIsEnabled = false;
-			LightManager::numActivePointLights--;
-
-			LightManager::isPointLightsDirty = true;
+			lightMgr->EnableOnePointLight(false);
 		}
 	}
 }
@@ -46,7 +43,7 @@ void PointLight::SetValue(D3DXCOLOR color, Vector3 pos, Vector3 attenuation, flo
 	mAttenuation = attenuation;
 	mIntensity = intensity;
 
-	LightManager::isPointLightsDirty = true;
+	gEngine->GetLightManager()->SetPointLightDirtyFlag(true);
 }
 
 wchar_t* PointLight::GetName()
@@ -57,5 +54,5 @@ wchar_t* PointLight::GetName()
 void PointLight::SetPosition(const Vector3& pos)
 {
 	mPosition = pos;
-	LightManager::isPointLightsDirty = true;
+	gEngine->GetLightManager()->SetPointLightDirtyFlag(true);
 }

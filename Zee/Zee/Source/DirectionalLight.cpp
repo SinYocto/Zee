@@ -1,5 +1,5 @@
 #include"DirectionalLight.h"
-#include "LightManager.h"
+#include "Engine.h"
 
 void DirectionalLight::Enable(bool enable)
 {
@@ -9,22 +9,19 @@ void DirectionalLight::Enable(bool enable)
 	}
 	else
 	{
+		LightManager* lightMgr = gEngine->GetLightManager();
 		if(enable == true)
 		{
-			if(LightManager::numActiveDirectionalLights < MAX_NUM_DIRECTIONAL_LIGHTS)
+			if(lightMgr->GetActiveDirectionalLightCounts() < MAX_NUM_DIRECTIONAL_LIGHTS)
 			{
 				mIsEnabled = true;
-				LightManager::numActiveDirectionalLights++;
-
-				LightManager::isDirectionalLightsDirty = true;
+				lightMgr->EnableOneDirectionalLight(true);
 			}
 		}
 		else
 		{
 			mIsEnabled = false;
-			LightManager::numActiveDirectionalLights--;
-
-			LightManager::isDirectionalLightsDirty = true;
+			lightMgr->EnableOneDirectionalLight(false);
 		}
 	}
 }
@@ -45,7 +42,7 @@ void DirectionalLight::SetValue(D3DXCOLOR color, Vector3 dir, float intensity)
 	mDirection = dir;
 	mIntensity = intensity;
 
-	LightManager::isDirectionalLightsDirty = true;
+	gEngine->GetLightManager()->SetDirectionalLightDirtyFlag(true);
 }
 
 wchar_t* DirectionalLight::GetName()

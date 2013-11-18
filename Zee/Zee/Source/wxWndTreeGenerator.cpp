@@ -4,8 +4,7 @@
 #include "Camera.h"
 #include "CameraController.h"
 #include "ModelNode.h"
-#include "GeometryManager.h"
-#include "MaterialManager.h"
+#include "Engine.h"
 #include "Primitive.h"
 #include "SceneManager.h"
 #include "Time.h"
@@ -659,12 +658,12 @@ void TreeGeneratorCanvas::Setup()
 	SceneManager::extraCamera->SetCameraController(hoverCameraController);
 
 	Cube* cubeGeo = new Cube(L"cubeGeo1");
-	GeometryManager::AddGeometry(cubeGeo);
+	gEngine->GetGeometryManager()->AddGeometry(cubeGeo);
 
 	cubeGeo->CalculateTBN();
 	cubeGeo->BuildGeometry(XYZ_UV_TBN);
 
-	mCube = new ModelNode(L"cube", NULL, cubeGeo, MaterialManager::flatMtl);
+	mCube = new ModelNode(L"cube", NULL, cubeGeo, gEngine->GetMaterialManager()->GetDefaultFlatMtl());
 
 	mTree = new Tree();
 }

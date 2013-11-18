@@ -88,25 +88,27 @@ private:
 	static int curPerformanceIndex;
 };
 
-class Time
+class FrameTimer
 {
 public:
-	static void Start()
+	void Start()
 	{
 		timer.Reset();
 	}
 
-	static void Tick()
+	void Tick()
 	{
 		deltaTime = timer.GetElapsedTime();
 		timer.Reset();
 	}
 
+	float GetDeltaTime();
+
 public:
-	static float deltaTime;
+	float deltaTime;
 
 private:
-	static Timer timer;
+	Timer timer;
 };
 
 #endif
