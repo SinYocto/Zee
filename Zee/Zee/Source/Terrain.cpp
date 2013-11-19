@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "DebugDrawer.h"
+#include "Engine.h"
 
 LPD3DXEFFECT Terrain::sEffect = NULL;
 
@@ -71,7 +72,7 @@ void TerrainChunk::CreateVertexBuffer()
 		vertexData[i] = vert;
 	}
 
-	CreateVB(Driver::D3DDevice, &mVertexBuffer, (void*)vertexData, numVerts, XYZ_UV_N);
+	CreateVB(gEngine->GetDriver()->GetD3DDevice(), &mVertexBuffer, (void*)vertexData, numVerts, XYZ_UV_N);
 
 	delete[] vertexData;
 }
@@ -215,7 +216,7 @@ void TerrainChunk::CreateIndexBuffer(int lodLeft, int lodTop, int lodRight, int 
 	_Assert(indices.size() % 3 == 0);
 	mNumTris = (int)indices.size() / 3;
 
-	CreateIB(Driver::D3DDevice, &mIndexBuffer, (DWORD*)(&indices[0]), 3 * mNumTris);
+	CreateIB(gEngine->GetDriver()->GetD3DDevice(), &mIndexBuffer, (DWORD*)(&indices[0]), 3 * mNumTris);
 }
 
 bool TerrainChunk::IsInFrustum()
@@ -257,7 +258,7 @@ void TerrainChunk::CalcChunkLODDist(Camera* camera, float pixelTolerance)
 		Vector2 res(0, 0);
 
 		camera->GetCameraParams(&nz, NULL, &fov, &aspect);
-		Driver::GetViewPort(NULL, &res);
+		gEngine->GetDriver()->GetViewPort(NULL, &res);
 
 		float top = tan(fov / 2.0f) * nz;
 		factor = nz * res.x / (top * 2 * pixelTolerance);
@@ -371,7 +372,7 @@ void Terrain::createEffect()
 {
 	SAFE_RELEASE(sEffect);
 
-	D3DXCreateEffectFromFile(Driver::D3DDevice, L"./Source/Shaders/Terrain.fx", NULL, NULL, 
+	D3DXCreateEffectFromFile(gEngine->GetDriver()->GetD3DDevice(), L"./Source/Shaders/Terrain.fx", NULL, NULL, 
 		D3DXSHADER_DEBUG, UtilityShader::pool, &sEffect, NULL);
 
 	_Assert(NULL != sEffect);
@@ -545,6 +546,8 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 {
 	_Assert(sEffect);
 
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 	sEffect->SetTechnique("Terrain");
 	sEffect->SetMatrix("matWVP", &(camera->ViewMatrix() * camera->ProjMatrix()));
 	sEffect->SetMatrix("matWorld", &(IDENTITY_MATRIX));
@@ -558,9 +561,9 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 	sEffect->SetRawValue("mtlDiffuse", &mMaterial.diffuseColor, 0, sizeof(D3DXCOLOR));
 
 	if(isSolid)
-		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+		d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	else
-		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+		d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 
 	sEffect->Begin(0, 0);
 	sEffect->BeginPass(0);
@@ -572,13 +575,13 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 		if(!chunk->mNode->IsInFrustum())
 			continue;
 
-		Driver::D3DDevice->SetStreamSource(0, chunk->mVertexBuffer, 0, SizeofVertex(XYZ_UV_N));
-		Driver::D3DDevice->SetIndices(chunk->mIndexBuffer);
-		Driver::D3DDevice->SetFVF(VertexUVN::FVF);
+		d3dDevice->SetStreamSource(0, chunk->mVertexBuffer, 0, SizeofVertex(XYZ_UV_N));
+		d3dDevice->SetIndices(chunk->mIndexBuffer);
+		d3dDevice->SetFVF(VertexUVN::FVF);
 
 		int numVerts = chunk->mSize * chunk->mSize;
 
-		Driver::D3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, chunk->GetTriCounts());
+		d3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, chunk->GetTriCounts());
 
 		if(mDrawBBox && chunk->mNode->GetAABBox().isValid())
 		{
@@ -589,7 +592,7 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 	sEffect->EndPass();
 	sEffect->End();
 
-	Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 }
 
 D3DXMATRIX Terrain::uvTransformMatrix()
@@ -607,16 +610,18 @@ void Terrain::SetColorTexes(const wchar_t* texFile0, const wchar_t* texFile1, co
 	SAFE_RELEASE(mMaterial.colorTexes[2]);
 	SAFE_RELEASE(mMaterial.colorTexes[3]);
 
-	D3DXCreateTextureFromFile(Driver::D3DDevice, texFile0, &mMaterial.colorTexes[0]);	
-	D3DXCreateTextureFromFile(Driver::D3DDevice, texFile1, &mMaterial.colorTexes[1]);	
-	D3DXCreateTextureFromFile(Driver::D3DDevice, texFile2, &mMaterial.colorTexes[2]);	
-	D3DXCreateTextureFromFile(Driver::D3DDevice, texFile3, &mMaterial.colorTexes[3]);		
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
+	D3DXCreateTextureFromFile(d3dDevice, texFile0, &mMaterial.colorTexes[0]);	
+	D3DXCreateTextureFromFile(d3dDevice, texFile1, &mMaterial.colorTexes[1]);	
+	D3DXCreateTextureFromFile(d3dDevice, texFile2, &mMaterial.colorTexes[2]);	
+	D3DXCreateTextureFromFile(d3dDevice, texFile3, &mMaterial.colorTexes[3]);		
 }
 
 void Terrain::SetSplatMapTex(const wchar_t* texFile)
 {
 	SAFE_RELEASE(mMaterial.splatMapTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, texFile, &mMaterial.splatMapTex);
+	D3DXCreateTextureFromFile(gEngine->GetDriver()->GetD3DDevice(), texFile, &mMaterial.splatMapTex);
 }
 
 void Terrain::SetMtlParameters(float tilesU, float tilesV, D3DXCOLOR ambient, D3DXCOLOR diffuse)

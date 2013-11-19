@@ -85,13 +85,16 @@ void Gizmo::createRenderTargetDepthStencile()
 	if(mDepthStencil)
 		SAFE_RELEASE(mDepthStencil);
 
-	Vector2 vpSize;
-	Driver::GetViewPort(NULL, &vpSize);
+	Driver* driver = gEngine->GetDriver();
+	IDirect3DDevice9* d3dDevice = driver->GetD3DDevice();
 
-	Driver::D3DDevice->CreateRenderTarget((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 
+	Vector2 vpSize;
+	driver->GetViewPort(NULL, &vpSize);
+
+	d3dDevice->CreateRenderTarget((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 
 		0, true, &mRenderTarget, NULL);
 
-	Driver::D3DDevice->CreateDepthStencilSurface((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 
+	d3dDevice->CreateDepthStencilSurface((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 
 		0, true, &mDepthStencil, NULL);
 }
 
@@ -104,10 +107,12 @@ void Gizmo::getPickColor(D3DCOLOR* pickColor, const int pickPixelSize)
 	D3DLOCKED_RECT pickLockedRect;
 
 	Vector2 vpSize;
-	Driver::GetViewPort(NULL, &vpSize);
+	gEngine->GetDriver()->GetViewPort(NULL, &vpSize);
 
-	SetRect(&pickRect, Input::cursorPos.x - pickPixelSize / 2, Input::cursorPos.y - pickPixelSize / 2, 
-		Input::cursorPos.x + pickPixelSize / 2, Input::cursorPos.y + pickPixelSize / 2);
+	POINT cursorPos = gEngine->GetInput()->GetCursorPos();
+
+	SetRect(&pickRect, cursorPos.x - pickPixelSize / 2, cursorPos.y - pickPixelSize / 2, 
+		cursorPos.x + pickPixelSize / 2, cursorPos.y + pickPixelSize / 2);
 
 	if(pickRect.left < 0)
 		pickRect.left = 0;
@@ -161,7 +166,7 @@ void Gizmo::determinSelectType(Object* obj, Camera* camera)
 	_Assert(NULL != obj);
 	_Assert(NULL != camera);
 
-	if(Input::GetLeftButton())		// 左键按下不更新, 保持之前选择状态
+	if(gEngine->GetInput()->GetLeftButton())		// 左键按下不更新, 保持之前选择状态
 		return;
 
 	draw(obj, camera, true);		// flatMtl绘制, 用于colorPick
@@ -212,6 +217,8 @@ void Gizmo::Draw(Object* obj, Camera* camera)
 	if(!obj || mActiveType == GIZMO_NONE)
 		return;
 
+	Input* input = gEngine->GetInput();
+
 	determinSelectType(obj, camera);
 	draw(obj, camera, false);
 
@@ -221,28 +228,28 @@ void Gizmo::Draw(Object* obj, Camera* camera)
 
 	if(mActiveType == GIZMO_TRANS)
 	{
-		if(Input::GetLeftButtonDown())
+		if(input->GetLeftButtonDown())
 			calTransTangent(obj, camera, &tangentX, &tangentY, &tangentZ);
 
-		if(Input::GetLeftButton())
+		if(input->GetLeftButton())
 			applyTrans(obj, camera, tangentX, tangentY, tangentZ);
 	}
 
 	if(mActiveType == GIZMO_ROTATE)
 	{
-		if(Input::GetLeftButtonDown())
+		if(input->GetLeftButtonDown())
 			calRotateTangent(obj, camera, &tangentX);
 
-		if(Input::GetLeftButton())
+		if(input->GetLeftButton())
 			applyRotate(obj, camera, tangentX);
 	}
 
 	if(mActiveType == GIZMO_SCALE)
 	{
-		if(Input::GetLeftButtonDown())
+		if(input->GetLeftButtonDown())
 			calTransTangent(obj, camera, &tangentX, &tangentY, &tangentZ);
 
-		if(Input::GetLeftButton())
+		if(input->GetLeftButton())
 			applyScale(obj, camera, tangentX, tangentY, tangentZ);
 	}
 }
@@ -263,6 +270,9 @@ void Gizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 	_Assert(NULL != obj);
 	_Assert(NULL != camera);
 
+	Driver* driver = gEngine->GetDriver();
+	IDirect3DDevice9* d3dDevice = driver->GetD3DDevice();
+
 	IDirect3DSurface9* oldRT = NULL;
 	IDirect3DSurface9* oldDS = NULL;
 	Material* mtl = NULL;
@@ -274,23 +284,23 @@ void Gizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 
 	if(isColorPickPass)
 	{
-		Driver::D3DDevice->GetRenderTarget(0, &oldRT);
-		Driver::D3DDevice->GetDepthStencilSurface(&oldDS);
+		d3dDevice->GetRenderTarget(0, &oldRT);
+		d3dDevice->GetDepthStencilSurface(&oldDS);
 
 		_Assert(NULL != oldRT);
 		_Assert(NULL != oldDS);
 
-		Driver::D3DDevice->SetRenderTarget(0, mRenderTarget);			
-		Driver::D3DDevice->SetDepthStencilSurface(mDepthStencil);
+		d3dDevice->SetRenderTarget(0, mRenderTarget);			
+		d3dDevice->SetDepthStencilSurface(mDepthStencil);
 
-		Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);
+		driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);
 	}
 
 	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
 	float scaleFactor = dist / SCALE_FACTOR;
 
 	// 这里清了zbuffer, 以使gizmo始终在屏幕上显示并内部有深度关系, 所以gizmo在渲染流程的最后
-	Driver::Clear(D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);	
+	driver->Clear(D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);	
 
 	D3DCOLOR elementColor[6];
 	elementColor[AXIS_X] = COLOR_X;
@@ -330,8 +340,8 @@ void Gizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 
 	if(isColorPickPass)
 	{
-		Driver::D3DDevice->SetRenderTarget(0, oldRT);			
-		Driver::D3DDevice->SetDepthStencilSurface(oldDS);
+		d3dDevice->SetRenderTarget(0, oldRT);			
+		d3dDevice->SetDepthStencilSurface(oldDS);
 	}
 	
 	SAFE_RELEASE(oldRT);		// GetRenderTarget方法会增加引用计数, 需要release, 否则设备无法恢复
@@ -543,8 +553,10 @@ void Gizmo::calRotateTangent(Object* obj, Camera* camera, Vector3* tangent)
 	posScreenO = 0.5f * (posScreenO + Vector3(1.0f, 1.0f, 0));		// 转到0~1范围
 	posScreenO.z = 0;
 
+	POINT cursorPos = gEngine->GetInput()->GetCursorPos();
+
 	Vector2 cursorLocation;
-	Driver::GetScreenLocation(Vector2((float)Input::cursorPos.x, (float)Input::cursorPos.y), &cursorLocation);
+	gEngine->GetDriver()->GetScreenLocation(Vector2((float)cursorPos.x, (float)cursorPos.y), &cursorLocation);
 
 	Vector3 posScreenCursor(cursorLocation.x, cursorLocation.y, 0);
 
@@ -561,7 +573,8 @@ void Gizmo::applyTrans(Object* obj, Camera* camera, const Vector3& tangentX, con
 	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
 	float scaleFactor = dist / SCALE_FACTOR;
 
-	Vector3 screenMoveVector((float)Input::mouseState.lX / 1000, -(float)Input::mouseState.lY / 1000, 0);
+	DIMOUSESTATE mouseState = gEngine->GetInput()->GetMouseState();
+	Vector3 screenMoveVector((float)mouseState.lX / 1000, -(float)mouseState.lY / 1000, 0);
 	screenMoveVector = TRANS_SPEED * scaleFactor * screenMoveVector;
 
 	float dx = 0;
@@ -585,7 +598,8 @@ void Gizmo::applyRotate(Object* obj, Camera* camera, const Vector3& tangent)
 	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
 	float scaleFactor = dist / SCALE_FACTOR;
 
-	Vector3 screenMoveVector((float)Input::mouseState.lX / 1000, (float)Input::mouseState.lY / 1000, 0);
+	DIMOUSESTATE mouseState = gEngine->GetInput()->GetMouseState();
+	Vector3 screenMoveVector((float)mouseState.lX / 1000, (float)mouseState.lY / 1000, 0);
 	screenMoveVector = ROTATE_SPEED * scaleFactor * screenMoveVector;
 
 	Vector3 lookDir = obj->GetWorldPosition() - camera->GetWorldPosition();
@@ -611,7 +625,8 @@ void Gizmo::applyScale(Object* obj, Camera* camera, const Vector3& tangentX, con
 	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
 	float scaleFactor = dist / SCALE_FACTOR;
 
-	Vector3 screenMoveVector((float)Input::mouseState.lX / 1000, -(float)Input::mouseState.lY / 1000, 0);
+	DIMOUSESTATE mouseState = gEngine->GetInput()->GetMouseState();
+	Vector3 screenMoveVector((float)mouseState.lX / 1000, -(float)mouseState.lY / 1000, 0);
 	screenMoveVector = SCALE_SPEED * scaleFactor * screenMoveVector;
 
 	if(mSelected == AXIS_X)

@@ -3,6 +3,7 @@
 
 #include "Common.h"
 #include "D3DUtility.h"
+#include "Engine.h"
 
 enum ButtonState { Normal, Hover, Active };
 
@@ -27,7 +28,8 @@ public:
 
 	bool CreateFont()
 	{
-		Assert(Driver::D3DDevice);
+		IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+		_Assert(d3dDevice);
 		{
 			SAFE_RELEASE(font);
 
@@ -41,7 +43,7 @@ public:
 			fontDesc.Quality = DEFAULT_QUALITY ;
 			fontDesc.OutputPrecision = OUT_OUTLINE_PRECIS;
 
-			Assert(SUCCEEDED(D3DXCreateFontIndirect(Driver::D3DDevice, &fontDesc, &font)));
+			Assert(SUCCEEDED(D3DXCreateFontIndirect(d3dDevice, &fontDesc, &font)));
 		}
 
 		return true;

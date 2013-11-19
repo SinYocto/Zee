@@ -2,39 +2,42 @@
 #define INPUT_H
 
 #define DIRECTINPUT_VERSION 0x0800
-#include"dinput.h"
+#include "dinput.h"
 
 class Input
 {
 public:
+	Input();
 
-	static bool Init(HINSTANCE hInst, HWND hWnd);
-	static void Destroy();
+	bool Init(HINSTANCE hInst, HWND hWnd);
+	void Destroy();
 
-	static void GetDeviceState(HWND hWnd);
-	static bool GetKey(BYTE keyCode);
-	static bool GetKeyDown(BYTE keyCode);
-	static bool GetKeyUp(BYTE keyCode);
-	static bool GetLeftButton();
-	static bool GetLeftButtonDown();
-	static bool GetLeftButtonUp();
-	static bool GetRightButton();
-	static bool GetRightButtonDown();
-	static bool GetRightButtonUp();
+	void GetDeviceState(HWND hWnd);
+	bool GetKey(BYTE keyCode);
+	bool GetKeyDown(BYTE keyCode);
+	bool GetKeyUp(BYTE keyCode);
+	bool GetLeftButton();
+	bool GetLeftButtonDown();
+	bool GetLeftButtonUp();
+	bool GetRightButton();
+	bool GetRightButtonDown();
+	bool GetRightButtonUp();
 
-public:
-	static DIMOUSESTATE mouseState;
-	static POINT cursorPos;
-
-	static IDirectInputDevice8 *DIDKeyboard;
-	static IDirectInputDevice8 *DIDMouse;
+	DIMOUSESTATE GetMouseState();
+	POINT GetCursorPos();
 
 private:
-	static char keyState[256];
+	IDirectInputDevice8 *DIDKeyboard;
+	IDirectInputDevice8 *DIDMouse;
 
-	static POINT lastCursorPos;
-	static char lastKeyState[256];
-	static DIMOUSESTATE lastMouseState;
+	DIMOUSESTATE mouseState;
+	POINT cursorPos;
+
+	char keyState[256];
+
+	POINT lastCursorPos;
+	char lastKeyState[256];
+	DIMOUSESTATE lastMouseState;
 };
 
 #endif

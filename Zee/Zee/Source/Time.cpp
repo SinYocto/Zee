@@ -75,3 +75,23 @@ float FrameTimer::GetDeltaTime()
 {
 	return deltaTime;
 }
+
+int FrameTimer::GetFPS()
+{
+	static int fps = 0;
+	static int fpsAccumulator = 0;
+	static float elapseTime = 0;
+
+	if(elapseTime > 1.0f)
+	{
+		fps = fpsAccumulator;
+
+		fpsAccumulator = 0;
+		elapseTime = 0;
+	}
+
+	elapseTime += deltaTime;
+	fpsAccumulator++;
+
+	return fps;
+}

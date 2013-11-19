@@ -1,24 +1,20 @@
 #include "Driver.h"
 #include "Common.h"
 
-HWND Driver::hWnd = NULL;
-IDirect3D9* Driver::D3D = NULL;
-IDirect3DDevice9* Driver::D3DDevice = NULL;
-
-IDirect3DSwapChain9* Driver::primarySwapChain = NULL;
-IDirect3DSwapChain9* Driver::secondarySwapChain = NULL;
-
-SWAPCHAIN_TYPE Driver::activeSwapChain = PRIMARY_SWAPCHAIN;
-
-D3DPRESENT_PARAMETERS Driver::presentParams;
-D3DPRESENT_PARAMETERS Driver::secondaryPresentParams;
-_D3DMULTISAMPLE_TYPE Driver::multiSampleType;
-D3DVIEWPORT9 Driver::primaryViewPort;
-D3DVIEWPORT9 Driver::secondaryViewPort;
-
-void Driver::CreateD3DDevice(HWND _hWnd, _D3DMULTISAMPLE_TYPE _multisampleType)
+Driver::Driver()
+:D3D(NULL)
+,D3DDevice(NULL)
+,hWnd(NULL)
+,primarySwapChain(NULL)
+,secondarySwapChain(NULL)
+,activeSwapChain(PRIMARY_SWAPCHAIN)
 {
-	hWnd = _hWnd;
+
+}
+
+void Driver::CreateD3DDevice(D3DDeviceParams params)
+{
+	hWnd = params.hWnd;
 	D3D = Direct3DCreate9(D3D_SDK_VERSION);
 
 	// identify adapter
@@ -38,13 +34,13 @@ void Driver::CreateD3DDevice(HWND _hWnd, _D3DMULTISAMPLE_TYPE _multisampleType)
 	else 
 		VPMode = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
-	multiSampleType = _multisampleType;
+	multiSampleType = params.multisampleType;
 	DWORD multisampleQuality = 0;
 
 	if(SUCCEEDED(D3D->CheckDeviceMultiSampleType(d3dcaps.AdapterOrdinal, d3dcaps.DeviceType, D3DFMT_A8B8G8R8, 
-		FALSE, _multisampleType, &multisampleQuality)))		// TODO: Ê§°Ü
+		FALSE, params.multisampleType, &multisampleQuality)))		// TODO: Ê§°Ü
 	{
-		multiSampleType = _multisampleType;
+		multiSampleType = params.multisampleType;
 	}
 	else
 	{
@@ -245,4 +241,24 @@ void Driver::CreateSecondarySwapChain(D3DPRESENT_PARAMETERS params)
 D3DPRESENT_PARAMETERS Driver::GetPresentParameters()
 {
 	return presentParams;
+}
+
+IDirect3DDevice9* Driver::GetD3DDevice()
+{
+	return D3DDevice;
+}
+
+HWND Driver::GetHWnd()
+{
+	return hWnd;
+}
+
+D3DVIEWPORT9 Driver::GetPrimaryViewPort()
+{
+	return primaryViewPort;
+}
+
+D3DVIEWPORT9 Driver::GetSecondaryViewPort()
+{
+	return secondaryViewPort;
 }

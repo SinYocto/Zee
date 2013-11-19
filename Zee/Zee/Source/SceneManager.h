@@ -8,29 +8,35 @@ class Camera;
 class SceneManager
 {
 public:
-	static void Init();
-	static void CreateMainCamera(const Vector3 pos = Vector3(0, 0, -200), const Vector3 target = Vector3::Zero, 
+	SceneManager();
+
+	void Init();
+	void Destory();
+
+	void FrameUpdate();
+
+	SceneNode* GetRoot();
+	Camera* GetMainCamera();
+	Camera* GetExtraCamera();
+
+	void CreateMainCamera(const Vector3 pos = Vector3(0, 0, -200), const Vector3 target = Vector3::Zero, 
 		float fov = PI/2, float aspect = 1.0f, float nZ = 1.0f, float fZ = 1000.0f);
-	static void CreateExtraCamera(const Vector3 pos = Vector3(0, 0, -200), const Vector3 target = Vector3::Zero, 
+	void CreateExtraCamera(const Vector3 pos = Vector3(0, 0, -200), const Vector3 target = Vector3::Zero, 
 		float fov = PI/2, float aspect = 1.0f, float nZ = 1.0f, float fZ = 1000.0f);
 
-	static void Destory();
-	static void AddSceneNode(SceneNode* node, SceneNode* parent = root);
-	static void GetSceneNode(const wchar_t* name, SceneNode** sceneNode);
+	void AddSceneNode(SceneNode* node, SceneNode* parent = NULL);
+	void GetSceneNode(const wchar_t* name, SceneNode** sceneNode);
 
-	static SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
+	SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
 
-	static void FrameUpdate();
-
-	static void DrawAll();
-
-public:
-	static SceneNode* root;
-	static Camera* mainCamera;
-	static Camera* extraCamera;
+	void DrawAll();
 
 private:
-	static DWORD curID;
+	SceneNode* root;
+	Camera* mainCamera;
+	Camera* extraCamera;
+
+	DWORD curNodeID;
 };
 
 #endif

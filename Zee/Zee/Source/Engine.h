@@ -14,7 +14,7 @@ class Engine
 public:
 	Engine();
 
-	void Init();
+	void Init(D3DDeviceParams params);
 	void Destroy();
 
 	void OnLostDevice();

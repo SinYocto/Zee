@@ -11,47 +11,61 @@ enum SWAPCHAIN_TYPE
 	SECONDARY_SWAPCHAIN
 };
 
+struct D3DDeviceParams
+{
+	HWND hWnd;
+	_D3DMULTISAMPLE_TYPE multisampleType;
+};
+
 class Driver
 {
 public:
-	static void CreateD3DDevice(HWND _hWnd, _D3DMULTISAMPLE_TYPE _multisampleType);
-	static bool Reset();
+	Driver();
 
-	static void OnLostDevice();
-	static void OnResetDevice();
+	void Destory();
 
-	static void SetViewPort(int offsetX, int offsetY, int width, int height);
-	static void SetViewPort(SWAPCHAIN_TYPE swapChainType);
-	static void GetViewPort(Vector2* vpOrigin, Vector2* vpSize);
-	static void Destory();
+	void CreateD3DDevice(D3DDeviceParams params);
+	bool Reset();
 
-	static HRESULT Clear(DWORD flag, D3DCOLOR color, float z);
-	static HRESULT BeginScene();
-	static HRESULT EndScene();
-	static HRESULT Present(HWND _hWnd = NULL);
+	void OnLostDevice();
+	void OnResetDevice();
 
-	static void CreateSecondarySwapChain(D3DPRESENT_PARAMETERS params);
-	static void RenderToSwapChain(SWAPCHAIN_TYPE swapChain);
+	IDirect3DDevice9* GetD3DDevice();
+	HWND GetHWnd();
+	D3DVIEWPORT9 GetPrimaryViewPort();
+	D3DVIEWPORT9 GetSecondaryViewPort();
 
-	static void GetScreenLocation(const Vector2& screenPos, Vector2* screenLocation);	// 屏幕坐标转为0~1表示
-	static D3DPRESENT_PARAMETERS GetPresentParameters();
+	void SetViewPort(int offsetX, int offsetY, int width, int height);
+	void SetViewPort(SWAPCHAIN_TYPE swapChainType);
+	void GetViewPort(Vector2* vpOrigin, Vector2* vpSize);
+
+	HRESULT Clear(DWORD flag, D3DCOLOR color, float z);
+	HRESULT BeginScene();
+	HRESULT EndScene();
+	HRESULT Present(HWND _hWnd = NULL);
+
+	void CreateSecondarySwapChain(D3DPRESENT_PARAMETERS params);
+	void RenderToSwapChain(SWAPCHAIN_TYPE swapChain);
+
+	void GetScreenLocation(const Vector2& screenPos, Vector2* screenLocation);	// 屏幕坐标转为0~1表示
+	D3DPRESENT_PARAMETERS GetPresentParameters();
 
 public:
-	static HWND hWnd;
-	static IDirect3DDevice9* D3DDevice;
-	static D3DVIEWPORT9 primaryViewPort;
-	static D3DVIEWPORT9 secondaryViewPort;
+	HWND hWnd;
+	IDirect3DDevice9* D3DDevice;
+	D3DVIEWPORT9 primaryViewPort;
+	D3DVIEWPORT9 secondaryViewPort;
 
 private:
-	static IDirect3D9* D3D;
-	static IDirect3DSwapChain9* primarySwapChain;
-	static IDirect3DSwapChain9* secondarySwapChain;
+	IDirect3D9* D3D;
+	IDirect3DSwapChain9* primarySwapChain;
+	IDirect3DSwapChain9* secondarySwapChain;
 
-	static D3DPRESENT_PARAMETERS presentParams;
-	static D3DPRESENT_PARAMETERS secondaryPresentParams;
-	static _D3DMULTISAMPLE_TYPE multiSampleType;
+	D3DPRESENT_PARAMETERS presentParams;
+	D3DPRESENT_PARAMETERS secondaryPresentParams;
+	_D3DMULTISAMPLE_TYPE multiSampleType;
 
-	static SWAPCHAIN_TYPE activeSwapChain;
+	SWAPCHAIN_TYPE activeSwapChain;
 };
 
 #endif

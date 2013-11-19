@@ -25,6 +25,7 @@ public:
 	DECLARE_EVENT_TABLE()
 
 private:
+	void createWxCtrls();
 	void cleanupAndDestory();
 
 private:
@@ -42,7 +43,6 @@ public:
 		long style = 0,
 		const wxString& name = wxT("Zee"));
 
-	void InitDriver();
 	void RenderLoop();
 
 protected:

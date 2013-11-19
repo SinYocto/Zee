@@ -82,7 +82,7 @@ void Camera::GetScreenRay(const Vector2& screenPos, Vector3* rayPos, Vector3* ra
 	_Assert(NULL != rayDir);
 
 	Vector2 screenLocation;
-	Driver::GetScreenLocation(screenPos, &screenLocation);
+	gEngine->GetDriver()->GetScreenLocation(screenPos, &screenLocation);
 
 	Vector3& rp = *rayPos;
 	rp = mWorldPos;

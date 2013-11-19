@@ -15,8 +15,14 @@ Engine::Engine()
 	
 }
 
-void Engine::Init()
+void Engine::Init(D3DDeviceParams params)
 {
+	mDriver = new Driver();
+	mDriver->CreateD3DDevice(params);
+
+	mInput = new Input();
+	mInput->Init(GetModuleHandle(0), mDriver->GetHWnd());
+
 	mLightMgr = new LightManager();
 	mLightMgr->Init();
 
@@ -27,6 +33,9 @@ void Engine::Init()
 
 	mMaterialMgr = new MaterialManager();
 	mMaterialMgr->Init();
+
+	mSceneMgr = new SceneManager();
+	mSceneMgr->Init();
 }
 
 Input* Engine::GetInput()
@@ -42,6 +51,9 @@ LightManager* Engine::GetLightManager()
 void Engine::FrameUpdate()
 {
 	mTimer->Tick();
+	mInput->GetDeviceState(mDriver->GetHWnd());
+
+	mSceneMgr->FrameUpdate();
 	mLightMgr->FrameUpdate();
 	mMaterialMgr->FrameUpdate();
 }
@@ -51,6 +63,15 @@ void Engine::Destroy()
 	mLightMgr->Destroy();
 	mGeometryMgr->Destroy();
 	mMaterialMgr->Destroy();
+	mSceneMgr->Destory();
+
+	mInput->Destroy();
+	mDriver->Destory();
+}
+
+Driver* Engine::GetDriver()
+{
+	return mDriver;
 }
 
 FrameTimer* Engine::GetFrameTimer()
@@ -70,12 +91,19 @@ MaterialManager* Engine::GetMaterialManager()
 
 void Engine::OnLostDevice()
 {
+	mDriver->OnLostDevice();
 	mGeometryMgr->OnLostDevice();
 	mMaterialMgr->OnLostDevice();
 }
 
 void Engine::OnResetDevice()
 {
+	mDriver->OnResetDevice();
 	mGeometryMgr->OnResetDevice();
 	mMaterialMgr->OnResetDevice();
+}
+
+SceneManager* Engine::GetSceneManager()
+{
+	return mSceneMgr;
 }

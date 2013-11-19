@@ -2,15 +2,12 @@
 #include "Common.h"
 #include"D3DUtility.h"
 
-IDirectInputDevice8* Input::DIDKeyboard;
-IDirectInputDevice8* Input::DIDMouse;
+Input::Input()
+:DIDKeyboard(NULL)
+,DIDMouse(NULL)
+{
 
-char Input::lastKeyState[256];
-char Input::keyState[256];
-DIMOUSESTATE Input::lastMouseState;
-DIMOUSESTATE Input::mouseState;
-POINT Input::lastCursorPos;
-POINT Input::cursorPos;
+}
 
 bool Input::Init(HINSTANCE hInst, HWND hWnd)
 {
@@ -66,7 +63,7 @@ void Input::GetDeviceState(HWND hWnd)
 		hr = DIDMouse->Acquire();
 	}
 
-	GetCursorPos(&cursorPos);
+	::GetCursorPos(&cursorPos);
 	ScreenToClient(hWnd, &cursorPos);
 }
 
@@ -134,3 +131,12 @@ bool Input::GetRightButtonUp()
 	return false;
 }
 
+DIMOUSESTATE Input::GetMouseState()
+{
+	return mouseState;
+}
+
+POINT Input::GetCursorPos()
+{
+	return cursorPos;
+}

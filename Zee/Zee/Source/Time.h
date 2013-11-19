@@ -103,6 +103,7 @@ public:
 	}
 
 	float GetDeltaTime();
+	int GetFPS();
 
 public:
 	float deltaTime;

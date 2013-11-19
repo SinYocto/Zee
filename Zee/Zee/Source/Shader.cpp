@@ -2,7 +2,6 @@
 #include "Material.h"
 #include "Geometry.h"
 #include "Camera.h"
-//#include "LightManager.h"
 #include "Engine.h"
 
 // DiffuseShader
@@ -71,6 +70,24 @@ void FlatShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camer
 	FlatShader::mEffect->End();
 }
 
+void FlatShader::OnLostDevice()
+{
+	mEffect->OnLostDevice();
+}
+
+void FlatShader::OnResetDevice()
+{
+	mEffect->OnResetDevice();
+}
+
+void FlatShader::CreateEffectFromFile( wchar_t* FXFileName )
+{
+	_Assert(NULL != UtilityShader::pool);
+	D3DXCreateEffectFromFile(gEngine->GetDriver()->GetD3DDevice(), FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+
+	_Assert(NULL != mEffect);
+}
+
 // ViewShader
 void ViewShader::SetColorTex(wchar_t* texFileName)
 {
@@ -127,6 +144,24 @@ void ViewShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camer
 
 	ViewShader::mEffect->EndPass();
 	ViewShader::mEffect->End();
+}
+
+void ViewShader::OnLostDevice()
+{
+	mEffect->OnLostDevice();
+}
+
+void ViewShader::OnResetDevice()
+{
+	mEffect->OnResetDevice();
+}
+
+void ViewShader::CreateEffectFromFile( wchar_t* FXFileName )
+{
+	_Assert(NULL != UtilityShader::pool);
+	D3DXCreateEffectFromFile(gEngine->GetDriver()->GetD3DDevice(), FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+
+	_Assert(NULL != mEffect);
 }
 
 // DiffuseShader
@@ -189,6 +224,24 @@ void DiffuseShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* ca
 
 	DiffuseShader::mEffect->EndPass();
 	DiffuseShader::mEffect->End();
+}
+
+void DiffuseShader::OnLostDevice()
+{
+	mEffect->OnLostDevice();
+}
+
+void DiffuseShader::OnResetDevice()
+{
+	mEffect->OnResetDevice();
+}
+
+void DiffuseShader::CreateEffectFromFile( wchar_t* FXFileName )
+{
+	_Assert(NULL != UtilityShader::pool);
+	D3DXCreateEffectFromFile(gEngine->GetDriver()->GetD3DDevice(), FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+
+	_Assert(NULL != mEffect);
 }
 
 // SpecularShader
@@ -271,6 +324,24 @@ void SpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* c
 
 	SpecularShader::mEffect->EndPass();
 	SpecularShader::mEffect->End();
+}
+
+void SpecularShader::OnLostDevice()
+{
+	mEffect->OnLostDevice();
+}
+
+void SpecularShader::OnResetDevice()
+{
+	mEffect->OnResetDevice();
+}
+
+void SpecularShader::CreateEffectFromFile( wchar_t* FXFileName )
+{
+	_Assert(NULL != UtilityShader::pool);
+	D3DXCreateEffectFromFile(gEngine->GetDriver()->GetD3DDevice(), FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+
+	_Assert(NULL != mEffect);
 }
 
 // BumpSpecularShader
@@ -361,6 +432,24 @@ void BumpSpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camer
 	BumpSpecularShader::mEffect->End();
 }
 
+void BumpSpecularShader::OnLostDevice()
+{
+	mEffect->OnLostDevice();
+}
+
+void BumpSpecularShader::OnResetDevice()
+{
+	mEffect->OnResetDevice();
+}
+
+void BumpSpecularShader::CreateEffectFromFile( wchar_t* FXFileName )
+{
+	_Assert(NULL != UtilityShader::pool);
+	D3DXCreateEffectFromFile(gEngine->GetDriver()->GetD3DDevice(), FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
+
+	_Assert(NULL != mEffect);
+}
+
 void UtilityShader::SetupSharedParams()
 {
 	_Assert(NULL != effect);
@@ -374,4 +463,28 @@ void UtilityShader::SetupSharedParams()
 
 	effect->SetRawValue("pointLights", lightMgr->GetPointLightsData(), 0, 
 		MAX_NUM_POINT_LIGHTS * sizeof(PointLightData));
+}
+
+void UtilityShader::OnLostDevice()
+{
+	effect->OnLostDevice();
+}
+
+void UtilityShader::OnResetDevice()
+{
+	effect->OnResetDevice();
+}
+
+void UtilityShader::CreateEffectPool()
+{
+	HRESULT hr = D3DXCreateEffectPool(&pool);
+	_Assert(SUCCEEDED(hr));
+}
+
+void UtilityShader::CreateEffectFromFile( wchar_t* FXFileName )
+{
+	_Assert(NULL != pool);
+	D3DXCreateEffectFromFile(gEngine->GetDriver()->GetD3DDevice(), FXFileName, NULL, NULL, D3DXSHADER_DEBUG, pool, &effect, NULL);
+
+	_Assert(NULL != effect);
 }

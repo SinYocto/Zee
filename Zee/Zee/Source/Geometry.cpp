@@ -1,9 +1,10 @@
 #include "Geometry.h"
 #include "Bound.h"
+#include "Engine.h"
 
 void Geometry::createVertexBuffer(void* vertexData)
 {
-	CreateVB(Driver::D3DDevice, &mVertexBuffer, vertexData, mVerts.size(), mVertexType);
+	CreateVB(gEngine->GetDriver()->GetD3DDevice(), &mVertexBuffer, vertexData, mVerts.size(), mVertexType);
 }
 
 void Geometry::createIndexBuffer()
@@ -18,7 +19,7 @@ void Geometry::createIndexBuffer()
 		indexData[3*triIndex + 2] = mTriangles[triIndex].vertexIndex[2];
 	}
 
-	CreateIB(Driver::D3DDevice, &mIndexBuffer, indexData, numIndices);
+	CreateIB(gEngine->GetDriver()->GetD3DDevice(), &mIndexBuffer, indexData, numIndices);
 }
 
 // BuildGeometry之前先要获取相应VertexType所需的顶点数据
@@ -163,7 +164,7 @@ void Geometry::createVertexDeclaration()
 			if(mVertexDecl)
 				SAFE_RELEASE(mVertexDecl);
 
-			Driver::D3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
+			gEngine->GetDriver()->GetD3DDevice()->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_UV:
@@ -177,7 +178,7 @@ void Geometry::createVertexDeclaration()
 			if(mVertexDecl)
 				SAFE_RELEASE(mVertexDecl);
 
-			Driver::D3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
+			gEngine->GetDriver()->GetD3DDevice()->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_N:
@@ -191,7 +192,7 @@ void Geometry::createVertexDeclaration()
 			if(mVertexDecl)
 				SAFE_RELEASE(mVertexDecl);
 
-			Driver::D3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
+			gEngine->GetDriver()->GetD3DDevice()->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_UV_N:
@@ -206,7 +207,7 @@ void Geometry::createVertexDeclaration()
 			if(mVertexDecl)
 				SAFE_RELEASE(mVertexDecl);
 
-			Driver::D3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
+			gEngine->GetDriver()->GetD3DDevice()->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	case XYZ_UV_TBN:
@@ -223,7 +224,7 @@ void Geometry::createVertexDeclaration()
 			if(mVertexDecl)
 				SAFE_RELEASE(mVertexDecl);
 
-			Driver::D3DDevice->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
+			gEngine->GetDriver()->GetD3DDevice()->CreateVertexDeclaration(NMVertexElements, &mVertexDecl);
 			break;
 		}
 	}
@@ -231,18 +232,19 @@ void Geometry::createVertexDeclaration()
 
 void Geometry::SetVertexDeclaration()
 {
-	Driver::D3DDevice->SetVertexDeclaration(mVertexDecl);
+	gEngine->GetDriver()->GetD3DDevice()->SetVertexDeclaration(mVertexDecl);
 }
 
 void Geometry::Draw()
 {
-	Driver::D3DDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, mVerts.size(), 0, mTriangles.size());
+	gEngine->GetDriver()->GetD3DDevice()->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, mVerts.size(), 0, mTriangles.size());
 }
 
 void Geometry::SetVertexStream()
 {	
-	Driver::D3DDevice->SetStreamSource(0, mVertexBuffer, 0, SizeofVertex(mVertexType));
-	Driver::D3DDevice->SetIndices(mIndexBuffer);
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+	d3dDevice->SetStreamSource(0, mVertexBuffer, 0, SizeofVertex(mVertexType));
+	d3dDevice->SetIndices(mIndexBuffer);
 }
 
 void Geometry::processSmoothNormal(const Vector3& curPos, const TriIDList& overAllTriGroup)

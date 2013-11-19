@@ -1,5 +1,5 @@
 #include "BillboardNode.h"
-#include "SceneManager.h"
+#include "Engine.h"
 #include "Camera.h"
 
 void BillboardNode::Draw(Camera* camera)
@@ -14,7 +14,7 @@ Billboard* BillboardNode::GetBillboard()
 
 void BillboardNode::calCurrentAABBox()
 {
-	Camera* camera = SceneManager::mainCamera;		// TODO:这里直接使用了mainCamera
+	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();		// TODO:这里直接使用了mainCamera
 
 	Vector3 pos[4];
 	pos[0] = mWorldPos - 0.5f * mBillboard->GetWidth() * camera->GetWorldRight().Normalized()

@@ -1,4 +1,5 @@
 #include "Material.h"
+#include "Engine.h"
 
 void Material::SetTexture(int layerIx, wchar_t* texFileName)	// TODO:²»Ó¦¸ÃÖ±½Ó´ÓÎÄ¼þÖÐCreateTextureÔÙSet, Ôö¼ÓTextureManagerÀà
 {
@@ -8,7 +9,7 @@ void Material::SetTexture(int layerIx, wchar_t* texFileName)	// TODO:²»Ó¦¸ÃÖ±½Ó´
 	if(mTextureLayer[layerIx])
 		SAFE_RELEASE(mTextureLayer[layerIx]);
 
-	D3DXCreateTextureFromFile(Driver::D3DDevice, texFileName, &mTextureLayer[layerIx]);		
+	D3DXCreateTextureFromFile(gEngine->GetDriver()->GetD3DDevice(), texFileName, &mTextureLayer[layerIx]);		
 }
 
 IDirect3DTexture9* Material::GetTexture(int layerIx)

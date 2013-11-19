@@ -38,9 +38,7 @@ IMPLEMENT_APP_CONSOLE(ZeeApp)
 const int WND_WIDTH = 1280;
 const int WND_HEIGHT = 720;
 
-ModelNode* cube = NULL;
 Gizmo* gizmo = NULL;
-
 Terrain* terrain = NULL;
 
 LabelStyle* leftAlignStyle;
@@ -53,14 +51,13 @@ void OnResetDevice();
 void SetupGUIStyle();
 void GUIUpdate();
 
-int GetFPS();
-
-void SetUp();
-void RenderLoop();
+void CreateScene();
 // -------------------------------------------
 
 bool ZeeApp::OnInit()
 {
+	_wsetlocale(LC_ALL, L"chs");
+
 	wxInitAllImageHandlers();
 
 	ZeeFrame* frame = new ZeeFrame(L"Zee", wxPoint(0, 0), wxSize(WND_WIDTH, WND_HEIGHT));
@@ -81,11 +78,45 @@ ZeeFrame::ZeeFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 :wxFrame((wxFrame*)NULL, -1, title, pos, size, wxMINIMIZE_BOX | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX | wxCLIP_CHILDREN)
 ,mWndTreeGenerator(NULL)
 {
+	createWxCtrls();
+
+	// canvas
+	wxSize clientSize = GetClientSize(); 
+	mCanvas = new D3D9Canvas(this, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
+
+	D3DDeviceParams deviceParams;
+	deviceParams.hWnd = (HWND)mCanvas->GetHWND();
+	deviceParams.multisampleType = D3DMULTISAMPLE_4_SAMPLES;
+
+	// init engine
+	gEngine = new Engine();
+	gEngine->Init(deviceParams);
+
+	// gui
+	::SetupGUIStyle();
+
+	// gizmo
+	gizmo = new Gizmo;
+	gizmo->Init();
+
+	// load/create scene
+	::CreateScene();
+
+	//// treeGenerator
+	//mWndTreeGenerator = new TreeGeneratorFrame(this, L"Tree Generator", wxDefaultPosition, wxDefaultSize);
+	//mWndTreeGenerator->Centre();
+	//mWndTreeGenerator->Show(false);
+
+	//mWndTreeGenerator->Setup();
+}
+
+void ZeeFrame::createWxCtrls()
+{
 	SetIcon(wxIcon(L"./Assets/Icons/Zee.xpm", wxBITMAP_TYPE_XPM));
 
 	wxMenu* menuFile = new wxMenu;
 	menuFile->Append(ID_Quit, L"&Quit");
-	
+
 	wxMenu* menuTerrain = new wxMenu;
 	menuTerrain->Append(ID_TreeGenerator, L"&Tree Generator");
 
@@ -101,22 +132,6 @@ ZeeFrame::ZeeFrame(const wxString& title, const wxPoint& pos, const wxSize& size
 
 	CreateStatusBar();
 	SetStatusText(L"Welcome To WanderLand!");
-
-	wxSize clientSize = GetClientSize(); 
-
-	mCanvas = new D3D9Canvas(this, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
-	mCanvas->InitDriver();
-
-	gEngine = new Engine();
-	gEngine->Init();
-
-	SetUp();
-
-	mWndTreeGenerator = new TreeGeneratorFrame(this, L"Tree Generator", wxDefaultPosition, wxDefaultSize);
-	mWndTreeGenerator->Centre();
-	mWndTreeGenerator->Show(false);
-
-	mWndTreeGenerator->Setup();
 }
 
 void ZeeFrame::OnQuit(wxCommandEvent& event)
@@ -131,7 +146,7 @@ void ZeeFrame::OnClose(wxCloseEvent& event)
 
 void ZeeFrame::cleanupAndDestory()
 {
-	AppDestroy();
+	::AppDestroy();
 
 	if(mWndTreeGenerator)
 		mWndTreeGenerator->CleanupAndDestory();
@@ -146,8 +161,11 @@ void ZeeFrame::OnAbout(wxCommandEvent& event)
 
 void ZeeFrame::OnTreeGenerator(wxCommandEvent& event)
 {
-	mWndTreeGenerator->Show(true);
-	mWndTreeGenerator->Raise();
+	if(mWndTreeGenerator)
+	{
+		mWndTreeGenerator->Show(true);
+		mWndTreeGenerator->Raise();
+	}
 }
 
 BEGIN_EVENT_TABLE(D3D9Canvas, wxWindow)
@@ -165,7 +183,7 @@ D3D9Canvas::D3D9Canvas(wxWindow* parent, wxWindowID id /* = wxID_ANY */,
 
 void D3D9Canvas::OnIdle(wxIdleEvent& event)
 {
-	if(Driver::D3DDevice)
+	if(gEngine && gEngine->GetDriver() && gEngine->GetDriver()->GetD3DDevice())
 		RenderLoop();
 
 	event.RequestMore(true);
@@ -175,31 +193,26 @@ void D3D9Canvas::OnSize(wxSizeEvent& event)
 {
 	// TODO:暂且使用固定窗口, 以后再增加拉伸窗口功能
 	wxSize vpSize = GetClientSize();
-	Driver::SetViewPort(0, 0, vpSize.x, vpSize.y);
-	SceneManager::mainCamera->SetAspect((float)vpSize.x / (float)vpSize.y);
+	gEngine->GetDriver()->SetViewPort(0, 0, vpSize.x, vpSize.y);
+	gEngine->GetSceneManager()->GetMainCamera()->SetAspect((float)vpSize.x / (float)vpSize.y);
 }
 
-void D3D9Canvas::InitDriver()
+void CreateScene()
 {
-	Driver::CreateD3DDevice((HWND)GetHWND(), D3DMULTISAMPLE_4_SAMPLES);
-}
-
-void SetUp()
-{
-	_wsetlocale(LC_ALL, L"chs");
-
-	Input::Init(GetModuleHandle(0), Driver::hWnd);
-	SceneManager::Init();
-
-	SetupGUIStyle();
+	Driver* driver = gEngine->GetDriver();
 
 	// camera
-	SceneManager::CreateMainCamera(Vector3(0, 4.0f, -4.0f), Vector3::Zero,
-		PI/3, (float)Driver::primaryViewPort.Width / (float)Driver::primaryViewPort.Height, 0.1f, 1000.0f);
+	SceneManager* sceneMgr = gEngine->GetSceneManager();
+
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	sceneMgr->CreateMainCamera(Vector3(0, 4.0f, -4.0f), Vector3::Zero,
+		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 1000.0f);
+
+	Camera* mainCamera = sceneMgr->GetMainCamera();
 
 	FPCameraController* fpCameraController = new FPCameraController(6.0f, 2.0f, 4.0f);
 	//HoverCameraController* hoverCameraController = new HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
-	SceneManager::mainCamera->SetCameraController(fpCameraController);
+	mainCamera->SetCameraController(fpCameraController);
 
 	// lights
 	DirectionalLight* dirLight1 = new DirectionalLight(L"dirLight1", D3DXCOLOR_WHITE, Vector3(1.0f, -1.0f, 1.0f));
@@ -276,37 +289,33 @@ void SetUp()
 	mtlFlat->SetDiffuseColor(D3DXCOLOR_GREEN);
 
 	// model
-	cube = new ModelNode(L"cube", NULL, cubeGeo, mtlBump);
-	SceneManager::AddSceneNode(cube);
+	ModelNode* cube = new ModelNode(L"cube", NULL, cubeGeo, mtlBump);
+	sceneMgr->AddSceneNode(cube);
 	cube->Translate(2, 0, 0);
 
 	ModelNode* cylinder = new ModelNode(L"cylinder", NULL, cylinderGeo, mtlDiff);
-	SceneManager::AddSceneNode(cylinder);
+	sceneMgr->AddSceneNode(cylinder);
 	cylinder->Translate(-2, 0, 0);
 
 	ModelNode* cone = new ModelNode(L"cone", NULL, coneGeo, mtlView);
-	SceneManager::AddSceneNode(cone);
+	sceneMgr->AddSceneNode(cone);
 	cone->Translate(0, 0, -2);
 
 	ModelNode* torus = new ModelNode(L"torus", NULL, torusGeo, mtlFlat);
-	SceneManager::AddSceneNode(torus);
+	sceneMgr->AddSceneNode(torus);
 	torus->Translate(0, 0, 2);
 
 	// billboard
 	BillboardNode* billboard = new BillboardNode(L"billboard", 1.0f, 1.0f, D3DXCOLOR_YELLOW);
-	SceneManager::AddSceneNode(billboard);
+	sceneMgr->AddSceneNode(billboard);
 	billboard->GetBillboard()->SetTexture(L"./Assets/Textures/light.jpg");
-
-	// gizmo
-	gizmo = new Gizmo;
-	gizmo->Init();
 
 	// terrain
 	PerformanceTimer::Begin(L"building 257 terrain");
 	terrain = new Terrain(257, 200.0f, 40.0f);
 	terrain->LoadFromHeightMap(L"./Assets/Textures/heightMap257_bit16.raw", 257);
 	terrain->BuildTerrain(4);
-	terrain->CalcChunkLODDist(SceneManager::mainCamera, 1.0f);
+	terrain->CalcChunkLODDist(mainCamera, 1.0f);
 
 	terrain->SetColorTexes(L"./Assets/Textures/Cliff.jpg", L"./Assets/Textures/Grass_Hill.jpg", 
 		L"./Assets/Textures/DirtGrass.jpg", L"./Assets/Textures/Pebbles.jpg");
@@ -318,16 +327,20 @@ void SetUp()
 
 void D3D9Canvas::RenderLoop()
 {
-	switch(Driver::D3DDevice->TestCooperativeLevel())
+	Driver* driver = gEngine->GetDriver();
+	Input* input = gEngine->GetInput();
+
+	SceneManager* sceneMgr = gEngine->GetSceneManager();
+	Camera* mainCamera = sceneMgr->GetMainCamera();
+
+	switch(driver->GetD3DDevice()->TestCooperativeLevel())
 	{
 	case D3D_OK:
 		{
 			// update state
 			gEngine->FrameUpdate();
 
-			Input::GetDeviceState(Driver::hWnd);
-
-			if(Input::GetKeyUp(DIK_R))
+			if(input->GetKeyUp(DIK_R))
 			{
 				terrain->createEffect();
 			}
@@ -336,38 +349,37 @@ void D3D9Canvas::RenderLoop()
 
 
 			if(wxWindow::FindFocus() == this)
-				SceneManager::mainCamera->ApplyCameraController();
+				mainCamera->ApplyCameraController();
 
-			SceneManager::FrameUpdate();
-			terrain->FrameUpdate(SceneManager::mainCamera);
+			terrain->FrameUpdate(mainCamera);
 
 			// render
-			Driver::RenderToSwapChain(PRIMARY_SWAPCHAIN);
-			Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
-			Driver::BeginScene();
+			driver->RenderToSwapChain(PRIMARY_SWAPCHAIN);
+			driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
+			driver->BeginScene();
 
-			Vector2 screenPos(Input::cursorPos.x, Input::cursorPos.y);
+			Vector2 screenPos(input->GetCursorPos().x, input->GetCursorPos().y);
 
 			Vector3 rayPos;
 			Vector3 rayDir;
-			SceneManager::mainCamera->GetScreenRay(screenPos, &rayPos, &rayDir);
+			mainCamera->GetScreenRay(screenPos, &rayPos, &rayDir);
 
 			static SceneNode* hitNode = NULL;
-			if(Input::GetLeftButtonDown())
+			if(input->GetLeftButtonDown())
 			{
 				if(!gizmo->IsSelected())
-					hitNode = SceneManager::RayIntersect(rayPos, rayDir, NULL, NULL);
+					hitNode = sceneMgr->RayIntersect(rayPos, rayDir, NULL, NULL);
 			}
 
-			terrain->Draw(SceneManager::mainCamera, true);
+			terrain->Draw(mainCamera, true);
 
-			SceneManager::root->SetDrawBBoxFlag(true);
-			SceneManager::DrawAll();
+			sceneMgr->GetRoot()->SetDrawBBoxFlag(true);
+			sceneMgr->DrawAll();
 
 			gGUISystem.Draw();
 
 			gizmo->SetActiveType(Gizmo::GIZMO_TRANS);
-			gizmo->Draw(hitNode, SceneManager::mainCamera);
+			gizmo->Draw(hitNode, mainCamera);
 
 			if(hitNode && hitNode->GetNodeType() == SceneNode::SCENE_NODE_BILLBOARD)
 			{
@@ -376,8 +388,8 @@ void D3D9Canvas::RenderLoop()
 				pointLight1->SetPosition(hitNode->GetWorldPosition());
 			}
 
-			Driver::EndScene();
-			Driver::Present();
+			driver->EndScene();
+			driver->Present();
 
 			break;
 		}
@@ -385,8 +397,8 @@ void D3D9Canvas::RenderLoop()
 		break;
 	case D3DERR_DEVICENOTRESET:
 		{
-			OnLostDevice();
-			OnResetDevice();
+			::OnLostDevice();
+			::OnResetDevice();
 			break;
 		}
 	default:
@@ -411,15 +423,16 @@ void GUIUpdate()
 {
 	gGUISystem.clear();
 
-	Vector2 screenPos(Input::cursorPos.x, Input::cursorPos.y);
+	POINT cursorPos = gEngine->GetInput()->GetCursorPos();
+	Vector2 screenPos(cursorPos.x, cursorPos.y);
 	Vector2 screenLocation;
-	Driver::GetScreenLocation(screenPos, &screenLocation);
+	gEngine->GetDriver()->GetScreenLocation(screenPos, &screenLocation);
 
 	wchar_t text[MAX_STR_LEN];
-	YString::Format(text, TEXT("fps:%d"), GetFPS());
+	YString::Format(text, TEXT("fps:%d"), gEngine->GetFrameTimer()->GetFPS());
 	gGUISystem.GUILabel(text, Rect(10, 10, 300, 25), leftAlignStyle);
 
-	YString::Format(text, L"screenPos:%d, %d(%f, %f)", Input::cursorPos.x, Input::cursorPos.y, 
+	YString::Format(text, L"screenPos:%d, %d(%f, %f)", cursorPos.x, cursorPos.y, 
 		screenLocation.x, screenLocation.y);
 	gGUISystem.GUILabel(text, Rect(10, 40, 300, 25), leftAlignStyle);
 
@@ -432,26 +445,6 @@ void GUIUpdate()
 	dirLight1->Enable(enableDirLight1);
 }
 
-int GetFPS()
-{
-	static int fps = 0;
-	static int fpsAccumulator = 0;
-	static float elapseTime = 0;
-
-	if(elapseTime > 1.0f)
-	{
-		fps = fpsAccumulator;
-
-		fpsAccumulator = 0;
-		elapseTime = 0;
-	}
-
-	elapseTime += gEngine->GetFrameTimer()->GetDeltaTime();
-	fpsAccumulator++;
-
-	return fps;
-}
-
 void AppDestroy()
 {
 	SAFE_DELETE(leftAlignStyle);
@@ -461,11 +454,6 @@ void AppDestroy()
 	SAFE_DELETE(terrain);
 
 	gEngine->Destroy();
-
-	Input::Destroy();
-	SceneManager::Destory();
-	Driver::Destory();
-
 	SAFE_DELETE(gEngine);
 }
 
@@ -481,13 +469,11 @@ void OnLostDevice()
 	ResourceMgr::OnLostDevice();
 
 	gEngine->OnLostDevice();
-
-	Driver::OnLostDevice(); 
 }
 
 void OnResetDevice()
 {
-	if(!Driver::Reset())
+	if(!gEngine->GetDriver()->Reset())
 		return;
 
 	leftAlignStyle->OnResetDevice();
@@ -501,8 +487,6 @@ void OnResetDevice()
 	ResourceMgr::OnResetDevice();
 
 	gEngine->OnResetDevice();
-
-	Driver::OnResetDevice();
 }
 
 

@@ -1,6 +1,6 @@
 #include "SceneNode.h"
-#include "SceneManager.h"
 #include "DebugDrawer.h"
+#include "Engine.h"
 
 void SceneNode::SetID(DWORD id)
 {
@@ -10,7 +10,7 @@ void SceneNode::SetID(DWORD id)
 void SceneNode::Detach()
 {
 	Object::Detach();
-	SetParent(SceneManager::root);
+	SetParent(gEngine->GetSceneManager()->GetRoot());
 }
 
 void SceneNode::SetDrawBBoxFlag(bool drawBBox)

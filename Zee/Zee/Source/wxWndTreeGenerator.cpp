@@ -26,11 +26,11 @@ TreeGeneratorFrame::TreeGeneratorFrame(wxWindow* parent, const wxString& title, 
 	wxSize clientSize = mCanvasPanel->GetClientSize();
 	mCanvas = new TreeGeneratorCanvas(mCanvasPanel, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
 
-	D3DPRESENT_PARAMETERS presentParams = Driver::GetPresentParameters();
+	D3DPRESENT_PARAMETERS presentParams = gEngine->GetDriver()->GetPresentParameters();
 	presentParams.BackBufferWidth = clientSize.x;
 	presentParams.BackBufferHeight = clientSize.y;
 
-	Driver::CreateSecondarySwapChain(presentParams);
+	gEngine->GetDriver()->CreateSecondarySwapChain(presentParams);
 }
 
 void TreeGeneratorFrame::createWxCtrls()
@@ -591,7 +591,7 @@ void TreeGeneratorCanvas::OnSize(wxSizeEvent& event)
 
 void TreeGeneratorCanvas::OnIdle(wxIdleEvent& event)
 {
-	if(Driver::D3DDevice)
+	if(gEngine->GetDriver()->GetD3DDevice())
 		RenderWindow();
 
 	event.RequestMore(true);
@@ -599,29 +599,33 @@ void TreeGeneratorCanvas::OnIdle(wxIdleEvent& event)
  
 void TreeGeneratorCanvas::RenderWindow()
 {
-	switch(Driver::D3DDevice->TestCooperativeLevel())
+	Driver* driver = gEngine->GetDriver();
+	IDirect3DDevice9* d3dDevice = driver->GetD3DDevice();
+	Camera* extraCamera = gEngine->GetSceneManager()->GetExtraCamera();
+
+	switch(d3dDevice->TestCooperativeLevel())
 	{
 	case D3D_OK:
 		{
-			SceneManager::extraCamera->FrameUpdate();
+			extraCamera->FrameUpdate();
 
 			if(wxWindow::FindFocus() == this)
-				SceneManager::extraCamera->ApplyCameraController();
+				extraCamera->ApplyCameraController();
 
-			Driver::RenderToSwapChain(SECONDARY_SWAPCHAIN);
-			Driver::Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
-			Driver::BeginScene();
+			driver->RenderToSwapChain(SECONDARY_SWAPCHAIN);
+			driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
+			driver->BeginScene();
 
 			std::vector<Vector3> points;
 			points.push_back(Vector3::Zero);
 			points.push_back(Vector3(2, 0, 0));
-			DebugDrawer::DrawLine(points, 0xffff0000, SceneManager::extraCamera);
+			DebugDrawer::DrawLine(points, 0xffff0000, extraCamera);
 
 			if(mTree)
-				mTree->Draw(SceneManager::extraCamera);
+				mTree->Draw(extraCamera);
 
-			Driver::EndScene();
-			Driver::Present((HWND)GetHWND());
+			driver->EndScene();
+			driver->Present((HWND)GetHWND());
 
 			break;
 		}
@@ -651,11 +655,16 @@ void TreeGeneratorCanvas::CleanupAndDestory()
 
 void TreeGeneratorCanvas::Setup()
 {
-	SceneManager::CreateExtraCamera(Vector3(0, 0, -10.0f), Vector3::Zero,
-		PI/3, (float)Driver::secondaryViewPort.Width / (float)Driver::secondaryViewPort.Height, 0.1f, 1000.0f);
+	SceneManager* sceneMgr = gEngine->GetSceneManager();
+
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetSecondaryViewPort();
+	sceneMgr->CreateExtraCamera(Vector3(0, 0, -10.0f), Vector3::Zero,
+		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 1000.0f);
+
+	Camera* extraCamera = sceneMgr->GetExtraCamera();
 
 	HoverCameraController* hoverCameraController = new HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
-	SceneManager::extraCamera->SetCameraController(hoverCameraController);
+	extraCamera->SetCameraController(hoverCameraController);
 
 	Cube* cubeGeo = new Cube(L"cubeGeo1");
 	gEngine->GetGeometryManager()->AddGeometry(cubeGeo);
@@ -676,7 +685,9 @@ void TreeGeneratorCanvas::OnLostDevice()
 
 void TreeGeneratorCanvas::OnResetDevice()
 {
-	if(!Driver::Reset())
+	Driver* driver = gEngine->GetDriver();
+
+	if(!driver->Reset())
 		return;
 
 	if(mTree)

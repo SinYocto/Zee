@@ -1,5 +1,5 @@
 #include "GUI.h"
-#include "Input.h"
+#include "Engine.h"
 
 LabelStyle gDefaultLabelStyle(TEXT("Consolas"), 7, 15, 100, 0xffe3b706, DT_CENTER | DT_VCENTER);
 ButtonStyle gDefaultButtonStyle(TEXT("./Assets/Textures/GUI/buttonNormal3.tga"), TEXT("./Assets/Textures/GUI/buttonHover3.tga"), TEXT("./Assets/Textures/GUI/buttonActive3.tga"));
@@ -57,7 +57,9 @@ Label::Label(wchar_t* label_text, Rect label_rect, LabelStyle* label_style)
 
 	rect = label_rect;
 	screenRect = rect;
-	screenRect.TransLate(Driver::primaryViewPort.X, Driver::primaryViewPort.Y);
+
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	screenRect.TransLate(viewPort.X, viewPort.Y);
 
     wcscpy_s(text, _countof(text), label_text);
 }
@@ -75,17 +77,19 @@ ButtonStyle::ButtonStyle(wchar_t *_normalTexFilePath, wchar_t *_hoverTexFilePath
 
 void ButtonStyle::CreateTextures()
 {
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 	if(normalTex)
 		SAFE_RELEASE(normalTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, normalTexFilePath, &normalTex);
+	D3DXCreateTextureFromFile(d3dDevice, normalTexFilePath, &normalTex);
 	
 	if(hoverTex)
 		SAFE_RELEASE(hoverTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, hoverTexFilePath, &hoverTex);
+	D3DXCreateTextureFromFile(d3dDevice, hoverTexFilePath, &hoverTex);
 	
 	if(activeTex)
 		SAFE_RELEASE(activeTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, activeTexFilePath, &activeTex);
+	D3DXCreateTextureFromFile(d3dDevice, activeTexFilePath, &activeTex);
 }
 
 void Button::CreateVertexBuffer()
@@ -96,7 +100,7 @@ void Button::CreateVertexBuffer()
 	vertexData[2] = VertexXYZRHWUV((float)screenRect.left, (float)screenRect.bottom, 0, 1, 0, 1);
 	vertexData[3] = VertexXYZRHWUV((float)screenRect.right, (float)screenRect.bottom, 0, 1, 1, 1);
 
-	CreateVB(Driver::D3DDevice, &vertexBuffer, vertexData, 4, XYZRHW_UV);
+	CreateVB(gEngine->GetDriver()->GetD3DDevice(), &vertexBuffer, vertexData, 4, XYZRHW_UV);
 }
 
 Button::Button(LPWSTR button_text, Rect button_rect, ButtonStyle *button_style, LabelStyle* label_style)
@@ -115,17 +119,22 @@ Button::Button(LPWSTR button_text, Rect button_rect, ButtonStyle *button_style, 
 
 	rect = button_rect;
 	screenRect = rect;
-	screenRect.TransLate(Driver::primaryViewPort.X, Driver::primaryViewPort.Y);
+
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	screenRect.TransLate(viewPort.X, viewPort.Y);
 
 	CreateVertexBuffer();
 }
 
 void Button::GetButtonState()
 {
-	if(Input::cursorPos.x > rect.left && Input::cursorPos.x < rect.right &&
-		Input::cursorPos.y > rect.top && Input::cursorPos.y < rect.bottom)
+	Input* input = gEngine->GetInput();
+
+	POINT cursorPos = input->GetCursorPos();
+	if(cursorPos.x > rect.left && cursorPos.x < rect.right &&
+		cursorPos.y > rect.top && cursorPos.y < rect.bottom)
 	{
-		if(Input::GetLeftButton())
+		if(input->GetLeftButton())
 			state = Active;
 		else
 			state = Hover;
@@ -151,21 +160,23 @@ ToggleStyle::ToggleStyle(wchar_t* _offNormalTexFilePath, wchar_t* _offHoverTexFi
 
 void ToggleStyle::CreateTextures()
 {
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 	if(offNormalTex)
 		SAFE_RELEASE(offNormalTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, offNormalTexFilePath, &offNormalTex);
+	D3DXCreateTextureFromFile(d3dDevice, offNormalTexFilePath, &offNormalTex);
 	
 	if(offHoverTex)
 		SAFE_RELEASE(offHoverTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, offHoverTexFilePath, &offHoverTex);
+	D3DXCreateTextureFromFile(d3dDevice, offHoverTexFilePath, &offHoverTex);
 	
 	if(onNormalTex)
 		SAFE_RELEASE(onNormalTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, onNormalTexFilePath, &onNormalTex);
+	D3DXCreateTextureFromFile(d3dDevice, onNormalTexFilePath, &onNormalTex);
 	
 	if(onHoverTex)
 		SAFE_RELEASE(onHoverTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, onHoverTexFilePath, &onHoverTex);
+	D3DXCreateTextureFromFile(d3dDevice, onHoverTexFilePath, &onHoverTex);
 }
 
 Toggle::Toggle(Rect toggle_rect, bool _value, ToggleStyle *toggle_style)
@@ -177,7 +188,9 @@ Toggle::Toggle(Rect toggle_rect, bool _value, ToggleStyle *toggle_style)
 
 	rect = toggle_rect;
 	screenRect = rect;
-	screenRect.TransLate(Driver::primaryViewPort.X, Driver::primaryViewPort.Y);
+
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	screenRect.TransLate(viewPort.X, viewPort.Y);
 
 	value = _value;
 
@@ -192,15 +205,18 @@ void Toggle::CreateVertexBuffer()
 	vertexData[2] = VertexXYZRHWUV((float)screenRect.left, (float)screenRect.bottom, 0, 1, 0, 1);
 	vertexData[3] = VertexXYZRHWUV((float)screenRect.right, (float)screenRect.bottom, 0, 1, 1, 1);
 
-	CreateVB(Driver::D3DDevice, &vertexBuffer, vertexData, 4, XYZRHW_UV);
+	CreateVB(gEngine->GetDriver()->GetD3DDevice(), &vertexBuffer, vertexData, 4, XYZRHW_UV);
 }
 
 void Toggle::GetButtonState()
 {
-	if(Input::cursorPos.x > screenRect.left && Input::cursorPos.x < screenRect.right &&
-		Input::cursorPos.y > screenRect.top && Input::cursorPos.y < screenRect.bottom)
+	Input* input = gEngine->GetInput();
+
+	POINT cursorPos = input->GetCursorPos();
+	if(cursorPos.x > screenRect.left && cursorPos.x < screenRect.right &&
+		cursorPos.y > screenRect.top && cursorPos.y < screenRect.bottom)
 	{
-		if(Input::GetLeftButton())
+		if(input->GetLeftButton())
 			state = Active;
 		else
 			state = Hover;
@@ -227,21 +243,23 @@ SliderStyle::SliderStyle(wchar_t *_sliderBarTexFilePath, wchar_t *_normalTexFile
 
 void SliderStyle::CreateTextures()
 {
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 	if(sliderBarTex)
 		SAFE_RELEASE(sliderBarTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, sliderBarTexFilePath, &sliderBarTex);
+	D3DXCreateTextureFromFile(d3dDevice, sliderBarTexFilePath, &sliderBarTex);
 
 	if(normalTex)
 		SAFE_RELEASE(normalTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, normalTexFilePath, &normalTex);
+	D3DXCreateTextureFromFile(d3dDevice, normalTexFilePath, &normalTex);
 	
 	if(hoverTex)
 		SAFE_RELEASE(hoverTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, hoverTexFilePath, &hoverTex);
+	D3DXCreateTextureFromFile(d3dDevice, hoverTexFilePath, &hoverTex);
 	
 	if(activeTex)
 		SAFE_RELEASE(activeTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, activeTexFilePath, &activeTex);
+	D3DXCreateTextureFromFile(d3dDevice, activeTexFilePath, &activeTex);
 }
 
 Slider::Slider(Rect slider_rect, float _minValue, float _maxValue, float _value, char* slider_id, SliderStyle *slider_style)
@@ -255,7 +273,9 @@ Slider::Slider(Rect slider_rect, float _minValue, float _maxValue, float _value,
 
 	rect = slider_rect;
 	screenRect = rect;
-	screenRect.TransLate(Driver::primaryViewPort.X, Driver::primaryViewPort.Y);
+
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	screenRect.TransLate(viewPort.X, viewPort.Y);
 
 	minValue = _minValue;
 	maxValue = _maxValue;
@@ -270,13 +290,15 @@ Slider::Slider(Rect slider_rect, float _minValue, float _maxValue, float _value,
 
 void Slider::CreateVertexBuffer()
 {
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 	VertexXYZRHWUV barVertexData[4];
 	barVertexData[0] = VertexXYZRHWUV((float)screenRect.left, (float)screenRect.top, 0, 1, 0, 0);
 	barVertexData[1] = VertexXYZRHWUV((float)screenRect.right, (float)screenRect.top, 0, 1, 1, 0);
 	barVertexData[2] = VertexXYZRHWUV((float)screenRect.left, (float)screenRect.bottom, 0, 1, 0, 1);
 	barVertexData[3] = VertexXYZRHWUV((float)screenRect.right, (float)screenRect.bottom, 0, 1, 1, 1);
 
-	CreateVB(Driver::D3DDevice, &sliderBarVB, barVertexData, 4, XYZRHW_UV);
+	CreateVB(d3dDevice, &sliderBarVB, barVertexData, 4, XYZRHW_UV);
 
 	VertexXYZRHWUV thumbVertexData[4];
 	float offset = ((value - minValue)/(maxValue - minValue)) * 
@@ -288,27 +310,30 @@ void Slider::CreateVertexBuffer()
 	thumbVertexData[2] = VertexXYZRHWUV(screenRect.left + offset, (float)screenRect.bottom, 0, 1, 0, 1);
 	thumbVertexData[3] = VertexXYZRHWUV(screenRect.left + offset + width, (float)screenRect.bottom, 0, 1, 1, 1);
 
-	CreateVB(Driver::D3DDevice, &sliderThumbVB, thumbVertexData, 4, XYZRHW_UV);
+	CreateVB(d3dDevice, &sliderThumbVB, thumbVertexData, 4, XYZRHW_UV);
 }
 
 void Slider::GetButtonState()
 {
-	if(state == Active && Input::GetLeftButton())
+	Input* input = gEngine->GetInput();
+	POINT cursorPos = input->GetCursorPos();
+
+	if(state == Active && input->GetLeftButton())
 		return;
 
 	float offset = ((value - minValue)/(maxValue - minValue)) * 
 		(screenRect.right - style->sliderBarSize*(screenRect.bottom - screenRect.top) - screenRect.left);
 	float width = style->sliderBarSize * (screenRect.bottom - screenRect.top);
 
-	if(Input::cursorPos.x > screenRect.left && Input::cursorPos.x < screenRect.right &&
-		Input::cursorPos.y > screenRect.top && Input::cursorPos.y < screenRect.bottom && Input::GetLeftButton())
+	if(cursorPos.x > screenRect.left && cursorPos.x < screenRect.right &&
+		cursorPos.y > screenRect.top && cursorPos.y < screenRect.bottom && input->GetLeftButton())
 	{
 		state = Active;
 		return;
 	}
 
-	if(Input::cursorPos.x > screenRect.left + offset && Input::cursorPos.x < screenRect.left + offset + width &&
-		Input::cursorPos.y > screenRect.top && Input::cursorPos.y < screenRect.bottom)
+	if(cursorPos.x > screenRect.left + offset && cursorPos.x < screenRect.left + offset + width &&
+		cursorPos.y > screenRect.top && cursorPos.y < screenRect.bottom)
 	{
 		state = Hover;
 	}
@@ -335,25 +360,29 @@ ListBoxStyle::ListBoxStyle(LabelStyle* _labelStyle, wchar_t* _buttonNormalTexFil
 
 void ListBoxStyle::CreateTextures()
 {
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 	if(buttonNormalTex)
 		SAFE_RELEASE(buttonNormalTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, buttonNormalTexFilePath, &buttonNormalTex);
+	D3DXCreateTextureFromFile(d3dDevice, buttonNormalTexFilePath, &buttonNormalTex);
 	
 	if(buttonHoverTex)
 		SAFE_RELEASE(buttonHoverTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, buttonHoverTexFilePath, &buttonHoverTex);
+	D3DXCreateTextureFromFile(d3dDevice, buttonHoverTexFilePath, &buttonHoverTex);
 	
 	if(itemNormalTex)
 		SAFE_RELEASE(itemNormalTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, itemNormalTexFilePath, &itemNormalTex);
+	D3DXCreateTextureFromFile(d3dDevice, itemNormalTexFilePath, &itemNormalTex);
 	
 	if(itemHoverTex)
 		SAFE_RELEASE(itemHoverTex);
-	D3DXCreateTextureFromFile(Driver::D3DDevice, itemHoverTexFilePath, &itemHoverTex);
+	D3DXCreateTextureFromFile(d3dDevice, itemHoverTexFilePath, &itemHoverTex);
 }
 
 void ListBox::CreateBodyVB()
 {
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 	int height= rect.bottom - rect.top;
 
 	VertexXYZRHWUV labelVertexData[4];
@@ -362,7 +391,7 @@ void ListBox::CreateBodyVB()
 	labelVertexData[2] = VertexXYZRHWUV((float)screenRect.left, (float)screenRect.bottom, 0, 1, 0, 1);
 	labelVertexData[3] = VertexXYZRHWUV((float)screenRect.right - height, (float)screenRect.bottom, 0, 1, 1, 1);
 
-	CreateVB(Driver::D3DDevice, &labelVB, labelVertexData, 4, XYZRHW_UV);
+	CreateVB(d3dDevice, &labelVB, labelVertexData, 4, XYZRHW_UV);
 	
 	VertexXYZRHWUV buttonVertexData[4];
 	buttonVertexData[0] = VertexXYZRHWUV((float)screenRect.right - height, (float)screenRect.top, 0, 1, 0, 0);
@@ -370,11 +399,13 @@ void ListBox::CreateBodyVB()
 	buttonVertexData[2] = VertexXYZRHWUV((float)screenRect.right - height, (float)screenRect.bottom, 0, 1, 0, 1);
 	buttonVertexData[3] = VertexXYZRHWUV((float)screenRect.right, (float)screenRect.bottom, 0, 1, 1, 1);
 
-	CreateVB(Driver::D3DDevice, &buttonVB, buttonVertexData, 4, XYZRHW_UV);
+	CreateVB(d3dDevice, &buttonVB, buttonVertexData, 4, XYZRHW_UV);
 }
 
 void ListBox::CreateItemVB(int itemIx)
 {
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 	VertexXYZRHWUV vertexData[4];
 	int height= rect.bottom - rect.top;
 	vertexData[0] = VertexXYZRHWUV((float)screenRect.left, (float)screenRect.top + (itemIx+1)*height, 0, 1, 0, 0);
@@ -382,7 +413,7 @@ void ListBox::CreateItemVB(int itemIx)
 	vertexData[2] = VertexXYZRHWUV((float)screenRect.left, (float)screenRect.bottom + (itemIx+1)*height, 0, 1, 0, 1);
 	vertexData[3] = VertexXYZRHWUV((float)screenRect.right, (float)screenRect.bottom + (itemIx+1)*height, 0, 1, 1, 1);
 
-	CreateVB(Driver::D3DDevice, &(items[itemIx].vertexBuffer), vertexData, 4, XYZRHW_UV);
+	CreateVB(d3dDevice, &(items[itemIx].vertexBuffer), vertexData, 4, XYZRHW_UV);
 }
 
 ListBox::ListBox(std::vector<wchar_t*> _texts, Rect _rect, int _ix, char* _id, ListBoxStyle* listBox_style)
@@ -394,7 +425,9 @@ ListBox::ListBox(std::vector<wchar_t*> _texts, Rect _rect, int _ix, char* _id, L
 
 	rect = _rect;
 	screenRect = rect;
-	screenRect.TransLate(Driver::primaryViewPort.X, Driver::primaryViewPort.Y);
+
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	screenRect.TransLate(viewPort.X, viewPort.Y);
 
 	selectedIx = _ix;
 	strcpy_s(id, _countof(id), _id);
@@ -417,23 +450,29 @@ void ListBox::AddItem(wchar_t* _text)
 
 void ListBox::GetState()
 {
+	Input* input = gEngine->GetInput();
+	POINT cursorPos = input->GetCursorPos();
+
 	int height = screenRect.bottom - screenRect.top;
 
-	if(Input::cursorPos.x < (int)screenRect.left || Input::cursorPos.x > (int)screenRect.right ||
-		Input::cursorPos.y < (int)screenRect.top || Input::cursorPos.y > (int)screenRect.bottom + (int)items.size() * height)
+	if(cursorPos.x < (int)screenRect.left || cursorPos.x > (int)screenRect.right ||
+		cursorPos.y < (int)screenRect.top || cursorPos.y > (int)screenRect.bottom + (int)items.size() * height)
 	{
 		cursorState = 0;
 		return;
 	}
 
-	cursorState = (int)(Input::cursorPos.y - screenRect.top) / height + 1;
+	cursorState = (int)(cursorPos.y - screenRect.top) / height + 1;
 
-	if(cursorState == 1){
-		if(Input::GetLeftButtonUp())
+	if(cursorState == 1)
+	{
+		if(input->GetLeftButtonUp())
 			isSelecting = !isSelecting;
 	}
-	else{
-		if(Input::GetLeftButtonUp() && isSelecting == true){
+	else
+	{
+		if(input->GetLeftButtonUp() && isSelecting == true)
+		{
 			selectedIx = cursorState - 2;
 			isSelecting = false;
 		}
@@ -511,7 +550,7 @@ bool GUI::GUIButton(wchar_t* button_text, Rect button_rect, ButtonStyle *button_
 	AddButton(button);
 
 	button->GetButtonState();
-	if(Input::GetLeftButtonUp() && button->state == Hover)
+	if(gEngine->GetInput()->GetLeftButtonUp() && button->state == Hover)
 		return true;
 	return false;
 }
@@ -522,7 +561,7 @@ bool GUI::GUIToggle(Rect toggle_rect, bool _value, ToggleStyle *toggle_style)
 	AddToggle(toggle);
 
 	toggle->GetButtonState();
-	if(toggle->state != Normal && Input::GetLeftButtonUp())
+	if(toggle->state != Normal && gEngine->GetInput()->GetLeftButtonUp())
 		toggle->value = !toggle->value;
 
 	return toggle->value;
@@ -543,7 +582,9 @@ float GUI::GUISlider(Rect slider_rect, float _minValue, float _maxValue, float _
 
 	if(slider->state == Active){
 		float width = slider->style->sliderBarSize*(slider->rect.bottom - slider->rect.top);
-		slider->value = slider->minValue + (slider->maxValue - slider->minValue)*(Input::cursorPos.x - width/2 - slider->rect.left)/
+
+		POINT cursorPos = gEngine->GetInput()->GetCursorPos();
+		slider->value = slider->minValue + (slider->maxValue - slider->minValue)*(cursorPos.x - width/2 - slider->rect.left)/
 			(slider->rect.right - slider->rect.left - width);
 
 		if(slider->value < slider->minValue)
@@ -572,12 +613,14 @@ int GUI::GUIListBox(std::vector<LPWSTR> _texts, Rect _rect, int _ix, char* _id, 
 
 void GUI::Draw()
 {
-	Driver::D3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	Driver::D3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	Driver::D3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
+	d3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	d3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	d3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	
-	Driver::D3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	Driver::D3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	d3dDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	d3dDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
 	for(std::list<Label*>::iterator iter = labels.begin(); iter != labels.end(); ++iter){
 		RECT rect;
@@ -590,22 +633,22 @@ void GUI::Draw()
 	}
 
 	for(std::list<Button*>::iterator iter = buttons.begin(); iter != buttons.end(); ++iter){
-		Driver::D3DDevice->SetStreamSource(0, (*iter)->vertexBuffer, 0, sizeof(VertexXYZRHWUV));
-		Driver::D3DDevice->SetFVF(VertexXYZRHWUV::FVF);
+		d3dDevice->SetStreamSource(0, (*iter)->vertexBuffer, 0, sizeof(VertexXYZRHWUV));
+		d3dDevice->SetFVF(VertexXYZRHWUV::FVF);
 
 		switch((*iter)->state){
 			case Normal:
-				Driver::D3DDevice->SetTexture(0, (*iter)->buttonStyle->normalTex);
+				d3dDevice->SetTexture(0, (*iter)->buttonStyle->normalTex);
 				break;
 			case Hover:
-				Driver::D3DDevice->SetTexture(0, (*iter)->buttonStyle->hoverTex);
+				d3dDevice->SetTexture(0, (*iter)->buttonStyle->hoverTex);
 				break;
 			case Active:
-				Driver::D3DDevice->SetTexture(0, (*iter)->buttonStyle->activeTex);
+				d3dDevice->SetTexture(0, (*iter)->buttonStyle->activeTex);
 				break;
 		}
 
-		Driver::D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+		d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 
 		RECT rect;
 		rect.left = (*iter)->screenRect.left;
@@ -617,65 +660,65 @@ void GUI::Draw()
 	}
 
 	for(std::list<Toggle*>::iterator iter = toggles.begin(); iter != toggles.end(); ++iter){
-		Driver::D3DDevice->SetStreamSource(0, (*iter)->vertexBuffer, 0, sizeof(VertexXYZRHWUV));
-		Driver::D3DDevice->SetFVF(VertexXYZRHWUV::FVF);
+		d3dDevice->SetStreamSource(0, (*iter)->vertexBuffer, 0, sizeof(VertexXYZRHWUV));
+		d3dDevice->SetFVF(VertexXYZRHWUV::FVF);
 
 		if((*iter)->value == false){
 			if((*iter)->state == Normal)
-				Driver::D3DDevice->SetTexture(0, (*iter)->style->offNormalTex);
+				d3dDevice->SetTexture(0, (*iter)->style->offNormalTex);
 			else
-				Driver::D3DDevice->SetTexture(0, (*iter)->style->offHoverTex);
+				d3dDevice->SetTexture(0, (*iter)->style->offHoverTex);
 		}
 		else{
 			if((*iter)->state == Normal)
-				Driver::D3DDevice->SetTexture(0, (*iter)->style->onNormalTex);
+				d3dDevice->SetTexture(0, (*iter)->style->onNormalTex);
 			else
-				Driver::D3DDevice->SetTexture(0, (*iter)->style->onHoverTex);
+				d3dDevice->SetTexture(0, (*iter)->style->onHoverTex);
 		}
 
-		Driver::D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+		d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 	}
 
 	for(std::list<Slider*>::iterator iter = sliders.begin(); iter != sliders.end(); ++iter){
-		Driver::D3DDevice->SetFVF(VertexXYZRHWUV::FVF);
+		d3dDevice->SetFVF(VertexXYZRHWUV::FVF);
 
-		Driver::D3DDevice->SetStreamSource(0, (*iter)->sliderBarVB, 0, sizeof(VertexXYZRHWUV));
-		Driver::D3DDevice->SetTexture(0, (*iter)->style->sliderBarTex);
-		Driver::D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+		d3dDevice->SetStreamSource(0, (*iter)->sliderBarVB, 0, sizeof(VertexXYZRHWUV));
+		d3dDevice->SetTexture(0, (*iter)->style->sliderBarTex);
+		d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 
-		Driver::D3DDevice->SetStreamSource(0, (*iter)->sliderThumbVB, 0, sizeof(VertexXYZRHWUV));
+		d3dDevice->SetStreamSource(0, (*iter)->sliderThumbVB, 0, sizeof(VertexXYZRHWUV));
 		switch((*iter)->state){
 			case Normal:
-				Driver::D3DDevice->SetTexture(0, (*iter)->style->normalTex);
+				d3dDevice->SetTexture(0, (*iter)->style->normalTex);
 				break;
 			case Hover:
-				Driver::D3DDevice->SetTexture(0, (*iter)->style->hoverTex);
+				d3dDevice->SetTexture(0, (*iter)->style->hoverTex);
 				break;
 			case Active:
-				Driver::D3DDevice->SetTexture(0, (*iter)->style->activeTex);
+				d3dDevice->SetTexture(0, (*iter)->style->activeTex);
 				break;
 		}
-		Driver::D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+		d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 	}
 
 	
 	for(std::list<ListBox*>::iterator iter = listBoxes.begin(); iter != listBoxes.end(); ++iter){
-		Driver::D3DDevice->SetStreamSource(0, (*iter)->labelVB, 0, sizeof(VertexXYZRHWUV));
-		Driver::D3DDevice->SetFVF(VertexXYZRHWUV::FVF);
+		d3dDevice->SetStreamSource(0, (*iter)->labelVB, 0, sizeof(VertexXYZRHWUV));
+		d3dDevice->SetFVF(VertexXYZRHWUV::FVF);
 
 		if((*iter)->cursorState == 1)
-			Driver::D3DDevice->SetTexture(0, (*iter)->style->itemHoverTex);
+			d3dDevice->SetTexture(0, (*iter)->style->itemHoverTex);
 		else
-			Driver::D3DDevice->SetTexture(0, (*iter)->style->itemNormalTex);
+			d3dDevice->SetTexture(0, (*iter)->style->itemNormalTex);
 
-		Driver::D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+		d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 		
-		Driver::D3DDevice->SetStreamSource(0, (*iter)->buttonVB, 0, sizeof(VertexXYZRHWUV));
+		d3dDevice->SetStreamSource(0, (*iter)->buttonVB, 0, sizeof(VertexXYZRHWUV));
 		if((*iter)->cursorState == 1)
-			Driver::D3DDevice->SetTexture(0, (*iter)->style->buttonHoverTex);
+			d3dDevice->SetTexture(0, (*iter)->style->buttonHoverTex);
 		else
-			Driver::D3DDevice->SetTexture(0, (*iter)->style->buttonNormalTex);
-		Driver::D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+			d3dDevice->SetTexture(0, (*iter)->style->buttonNormalTex);
+		d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 
 		RECT rect;
 		rect.left = (*iter)->screenRect.left;
@@ -687,14 +730,14 @@ void GUI::Draw()
 
 		if((*iter)->isSelecting){
 			for(size_t i = 0; i < (*iter)->items.size(); ++i){
-				Driver::D3DDevice->SetStreamSource(0, (*iter)->items[i].vertexBuffer, 0, sizeof(VertexXYZRHWUV));
+				d3dDevice->SetStreamSource(0, (*iter)->items[i].vertexBuffer, 0, sizeof(VertexXYZRHWUV));
 
 				if((*iter)->cursorState == (*iter)->items[i].ix + 2)
-					Driver::D3DDevice->SetTexture(0, (*iter)->style->itemHoverTex);
+					d3dDevice->SetTexture(0, (*iter)->style->itemHoverTex);
 				else
-					Driver::D3DDevice->SetTexture(0, (*iter)->style->itemNormalTex);
+					d3dDevice->SetTexture(0, (*iter)->style->itemNormalTex);
 
-				Driver::D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+				d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 				
 				RECT rect;
 				int height = (*iter)->screenRect.bottom - (*iter)->screenRect.top;
@@ -708,5 +751,5 @@ void GUI::Draw()
 		}
 	}
 	
-	Driver::D3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	d3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
 }

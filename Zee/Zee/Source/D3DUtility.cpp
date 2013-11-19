@@ -1,58 +1,58 @@
 #include "D3DUtility.h"
 #include "Input.h"
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-	switch(Msg)
-	{
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break; 
-
-	case WM_ACTIVATEAPP:
-		if(Input::DIDKeyboard) 
-			Input::DIDKeyboard->Acquire();
-
-		if(Input::DIDMouse) 
-			Input::DIDMouse->Acquire();
-
-		break;
-	}
-
-	return DefWindowProc(hWnd, Msg, wParam, lParam);
-}
-
-HWND RegisterAndCreateWindow(LPCWSTR wndClassName, LPCWSTR wndName, int wndWidth, int wndHeight, WNDPROC WndProc)
-{
-	HINSTANCE hInstance = GetModuleHandle(0);
-	HWND hWnd = NULL;
-
-	WNDCLASSEX wndClass;
-
-	wndClass.cbSize			= sizeof(WNDCLASSEX); 
-	wndClass.style			= CS_HREDRAW | CS_VREDRAW;
-	wndClass.lpfnWndProc	= WndProc;
-	wndClass.cbClsExtra		= 0;
-	wndClass.cbWndExtra		= 0;
-	wndClass.hInstance		= hInstance;
-	wndClass.hIcon			= NULL;
-	wndClass.hCursor		= NULL;
-	wndClass.hbrBackground  = NULL;
-	wndClass.lpszMenuName	= NULL;
-	wndClass.lpszClassName  = wndClassName;
-	wndClass.hIconSm		= NULL;
-
-	RegisterClassEx(&wndClass);
-
-	hWnd = CreateWindow(wndClassName, wndName, WS_CAPTION | WS_SYSMENU, 0, 0, wndWidth, wndHeight, NULL, NULL, hInstance, NULL);
-	Assert(NULL != hWnd);
-
-	ShowWindow(hWnd, SW_NORMAL);
-	UpdateWindow(hWnd);
-
-Exit:
-	return hWnd;
-}
+//LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+//{
+//	switch(Msg)
+//	{
+//	case WM_DESTROY:
+//		PostQuitMessage(0);
+//		break; 
+//
+//	case WM_ACTIVATEAPP:
+//		if(Input::DIDKeyboard) 
+//			Input::DIDKeyboard->Acquire();
+//
+//		if(Input::DIDMouse) 
+//			Input::DIDMouse->Acquire();
+//
+//		break;
+//	}
+//
+//	return DefWindowProc(hWnd, Msg, wParam, lParam);
+//}
+//
+//HWND RegisterAndCreateWindow(LPCWSTR wndClassName, LPCWSTR wndName, int wndWidth, int wndHeight, WNDPROC WndProc)
+//{
+//	HINSTANCE hInstance = GetModuleHandle(0);
+//	HWND hWnd = NULL;
+//
+//	WNDCLASSEX wndClass;
+//
+//	wndClass.cbSize			= sizeof(WNDCLASSEX); 
+//	wndClass.style			= CS_HREDRAW | CS_VREDRAW;
+//	wndClass.lpfnWndProc	= WndProc;
+//	wndClass.cbClsExtra		= 0;
+//	wndClass.cbWndExtra		= 0;
+//	wndClass.hInstance		= hInstance;
+//	wndClass.hIcon			= NULL;
+//	wndClass.hCursor		= NULL;
+//	wndClass.hbrBackground  = NULL;
+//	wndClass.lpszMenuName	= NULL;
+//	wndClass.lpszClassName  = wndClassName;
+//	wndClass.hIconSm		= NULL;
+//
+//	RegisterClassEx(&wndClass);
+//
+//	hWnd = CreateWindow(wndClassName, wndName, WS_CAPTION | WS_SYSMENU, 0, 0, wndWidth, wndHeight, NULL, NULL, hInstance, NULL);
+//	Assert(NULL != hWnd);
+//
+//	ShowWindow(hWnd, SW_NORMAL);
+//	UpdateWindow(hWnd);
+//
+//Exit:
+//	return hWnd;
+//}
 
 bool CreateD3DDevice(HWND hWnd, int bufferWidth, int bufferHeight, _D3DMULTISAMPLE_TYPE multisampleType, 
 					 IDirect3D9** ppD3D, IDirect3DDevice9** ppD3DDevice, D3DPRESENT_PARAMETERS* presentParams)

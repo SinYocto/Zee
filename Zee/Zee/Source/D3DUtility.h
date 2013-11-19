@@ -276,8 +276,8 @@ enum VertexType
 	XYZRHW_D 
 };
 
-HWND RegisterAndCreateWindow(LPCWSTR wndClassName, LPCWSTR wndName, int wndWidth, int wndHeight, WNDPROC WndProc);
-LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+//HWND RegisterAndCreateWindow(LPCWSTR wndClassName, LPCWSTR wndName, int wndWidth, int wndHeight, WNDPROC WndProc);
+//LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 bool CreateD3DDevice(HWND hWnd, int bufferWidth, int bufferHeight, _D3DMULTISAMPLE_TYPE multisampleType, 
 					 IDirect3D9** ppD3D, IDirect3DDevice9** ppD3DDevice, D3DPRESENT_PARAMETERS* presentParams);
 bool run();

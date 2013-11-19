@@ -1,6 +1,7 @@
 #include "DebugDrawer.h"
 #include "D3DUtility.h"
 #include "Camera.h"
+#include "Engine.h"
 
 bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, Camera* camera, 
 						   const D3DXMATRIX& matWorld /*= IDENTITY_MATRIX*/, LINE_TYPE lineType /* = LINE_STRIP */)
@@ -18,14 +19,16 @@ bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, C
 			verts.push_back(vert);
 		}
 
-		Driver::D3DDevice->SetTransform(D3DTS_WORLD, &matWorld);
-		Driver::D3DDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
-		Driver::D3DDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
-	
-		Driver::D3DDevice->SetRenderState(D3DRS_LIGHTING, false);
-		Driver::D3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
+		IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
 
-		Driver::D3DDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, points.size() - 1, &verts[0], sizeof(VertexXYZD));
+		d3dDevice->SetTransform(D3DTS_WORLD, &matWorld);
+		d3dDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
+		d3dDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
+	
+		d3dDevice->SetRenderState(D3DRS_LIGHTING, false);
+		d3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
+
+		d3dDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, points.size() - 1, &verts[0], sizeof(VertexXYZD));
 	}
 
 	isSucceed = true;
@@ -210,24 +213,26 @@ bool DebugDrawer::drawSolidTriFan(const std::vector<Vector3>& points, D3DCOLOR c
 			verts.push_back(vert);
 		}
 
+		IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 		D3DXMATRIX matWorld;
 		D3DXMatrixIdentity(&matWorld);
-		Driver::D3DDevice->SetTransform(D3DTS_WORLD, &matWorld);
-		Driver::D3DDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
-		Driver::D3DDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
+		d3dDevice->SetTransform(D3DTS_WORLD, &matWorld);
+		d3dDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
+		d3dDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
 
-		Driver::D3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-		Driver::D3DDevice->SetRenderState(D3DRS_LIGHTING, false);		// TODO:管理RenderState
-		Driver::D3DDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);		
-		Driver::D3DDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-		Driver::D3DDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-		Driver::D3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
-		Driver::D3DDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
-		Driver::D3DDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
+		d3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+		d3dDevice->SetRenderState(D3DRS_LIGHTING, false);		// TODO:管理RenderState
+		d3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);		
+		d3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		d3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+		d3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
+		d3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+		d3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
 
-		Driver::D3DDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, points.size() - 1, &verts[0], sizeof(VertexXYZD));
+		d3dDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, points.size() - 1, &verts[0], sizeof(VertexXYZD));
 
-		Driver::D3DDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+		d3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	}
 
 	isSucceed = true;

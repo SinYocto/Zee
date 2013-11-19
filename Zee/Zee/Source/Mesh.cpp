@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "Engine.h"
 
 void Mesh::Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid)
 {
@@ -9,14 +10,16 @@ void Mesh::Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid)
 
 	_Assert(NULL != camera);
 
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 	if(isSolid)
-		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+		d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	else
-		Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+		d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 
 	mMaterial->Render(matWorld, mGeo, camera);
 
-	Driver::D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 }
 
 void Mesh::SetMaterial(Material* mtl)

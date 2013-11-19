@@ -1,25 +1,30 @@
 #include "SceneManager.h"
 #include "Camera.h"
 
-SceneNode* SceneManager::root = NULL;
-DWORD SceneManager::curID = 0;
+SceneManager::SceneManager()
+:root(NULL)
+,mainCamera(NULL)
+,extraCamera(NULL)
+,curNodeID(0)
+{
 
-Camera* SceneManager::mainCamera = NULL;
-Camera* SceneManager::extraCamera = NULL;
+}
 
 void SceneManager::Init()
 {
 	root = new SceneNode(L"root");
-	root->SetID(curID++); 
+	root->SetID(curNodeID++); 
 }
 
 void SceneManager::AddSceneNode(SceneNode* node, SceneNode* parent /*= root*/)
 {
 	_Assert(NULL != node);
-	_Assert(NULL != parent);
+
+	if(parent == NULL)
+		parent = root;
 
 	parent->AddChild(node);
-	node->SetID(curID++);			// QUESTION:ID一直加不会溢出吧
+	node->SetID(curNodeID++);			// QUESTION:ID一直加不会溢出吧
 }
 
 void SceneManager::GetSceneNode(const wchar_t* name, SceneNode** sceneNode)
@@ -60,10 +65,28 @@ void SceneManager::FrameUpdate()
 	_Assert(NULL != mainCamera);
 	mainCamera->FrameUpdate();
 
+	if(extraCamera)
+		extraCamera->FrameUpdate();
+
 	root->FrameUpdate();
 }
 
 SceneNode* SceneManager::RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist)
 {
 	return root->RayIntersect(rayPos, rayDir, hitPos, dist);
+}
+
+SceneNode* SceneManager::GetRoot()
+{
+	return root;
+}
+
+Camera* SceneManager::GetMainCamera()
+{
+	return mainCamera;
+}
+
+Camera* SceneManager::GetExtraCamera()
+{
+	return extraCamera;
 }

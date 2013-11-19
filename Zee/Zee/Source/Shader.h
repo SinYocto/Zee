@@ -21,29 +21,11 @@ class Geometry;
 
 struct UtilityShader
 {
-	static void OnLostDevice()
-	{
-		effect->OnLostDevice();
-	}
+	static void OnLostDevice();
+	static void OnResetDevice();
 
-	static void OnResetDevice()
-	{
-		effect->OnResetDevice();
-	}
-
-	static void CreateEffectPool()
-	{
-		HRESULT hr = D3DXCreateEffectPool(&pool);
-		_Assert(SUCCEEDED(hr));
-	}
-
-	static void CreateEffectFromFile(wchar_t* FXFileName)
-	{
-		_Assert(NULL != pool);
-		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, pool, &effect, NULL);
-
-		_Assert(NULL != effect);
-	}
+	static void CreateEffectPool();
+	static void CreateEffectFromFile(wchar_t* FXFileName);
 
 	static void SetupSharedParams();
 
@@ -120,23 +102,10 @@ public:
 
 	}
 
-	static void OnLostDevice()
-	{
-		mEffect->OnLostDevice();
-	}
+	static void OnLostDevice();
+	static void OnResetDevice();
 
-	static void OnResetDevice()
-	{
-		mEffect->OnResetDevice();
-	}
-
-	static void CreateEffectFromFile(wchar_t* FXFileName)
-	{
-		_Assert(NULL != UtilityShader::pool);
-		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
-
-		_Assert(NULL != mEffect);
-	}
+	static void CreateEffectFromFile(wchar_t* FXFileName);
 
 	void SetColorTex(wchar_t* texFileName);
 
@@ -160,23 +129,10 @@ public:
 
 	}
 
-	static void OnLostDevice()
-	{
-		mEffect->OnLostDevice();
-	}
+	static void OnLostDevice();
+	static void OnResetDevice();
 
-	static void OnResetDevice()
-	{
-		mEffect->OnResetDevice();
-	}
-
-	static void CreateEffectFromFile(wchar_t* FXFileName)
-	{
-		_Assert(NULL != UtilityShader::pool);
-		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
-
-		_Assert(NULL != mEffect);
-	}
+	static void CreateEffectFromFile(wchar_t* FXFileName);
 
 	void SetColorTex(wchar_t* texFileName);
 
@@ -200,23 +156,10 @@ public:
 
 	}
 
-	static void OnLostDevice()
-	{
-		mEffect->OnLostDevice();
-	}
+	static void OnLostDevice();
+	static void OnResetDevice();
 
-	static void OnResetDevice()
-	{
-		mEffect->OnResetDevice();
-	}
-
-	static void CreateEffectFromFile(wchar_t* FXFileName)
-	{
-		_Assert(NULL != UtilityShader::pool);
-		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
-
-		_Assert(NULL != mEffect);
-	}
+	static void CreateEffectFromFile(wchar_t* FXFileName);
 
 	void SetColorTex(wchar_t* texFileName);
 
@@ -241,23 +184,10 @@ public:
 
 	}
 
-	static void OnLostDevice()
-	{
-		mEffect->OnLostDevice();
-	}
+	static void OnLostDevice();
+	static void OnResetDevice();
 
-	static void OnResetDevice()
-	{
-		mEffect->OnResetDevice();
-	}
-
-	static void CreateEffectFromFile(wchar_t* FXFileName)
-	{
-		_Assert(NULL != UtilityShader::pool);
-		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
-
-		_Assert(NULL != mEffect);
-	}
+	static void CreateEffectFromFile(wchar_t* FXFileName);
 
 	void SetColorTex(wchar_t* texFileName);
 
@@ -286,23 +216,10 @@ public:
 
 	}
 
-	static void OnLostDevice()
-	{
-		mEffect->OnLostDevice();
-	}
+	static void OnLostDevice();
+	static void OnResetDevice();
 
-	static void OnResetDevice()
-	{
-		mEffect->OnResetDevice();
-	}
-
-	static void CreateEffectFromFile(wchar_t* FXFileName)
-	{
-		_Assert(NULL != UtilityShader::pool);
-		D3DXCreateEffectFromFile(Driver::D3DDevice, FXFileName, NULL, NULL, D3DXSHADER_DEBUG, UtilityShader::pool, &mEffect, NULL);
-
-		_Assert(NULL != mEffect);
-	}
+	static void CreateEffectFromFile(wchar_t* FXFileName);
 
 	void SetColorTex(wchar_t* texFileName);
 	void SetNormalTex(wchar_t* texFileName);
