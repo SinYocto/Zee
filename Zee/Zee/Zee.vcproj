@@ -592,6 +592,14 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\Source\SceneEditor.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\SceneEditor.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Source\ZeeApp.cpp"
 			>
 		</File>
