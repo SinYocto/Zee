@@ -20,6 +20,8 @@ void Engine::Init(D3DDeviceParams params)
 	mDriver = new Driver();
 	mDriver->CreateD3DDevice(params);
 
+	mIDAllocator = new IDAllocator();
+
 	mInput = new Input();
 	mInput->Init(GetModuleHandle(0), mDriver->GetHWnd());
 
@@ -67,6 +69,15 @@ void Engine::Destroy()
 
 	mInput->Destroy();
 	mDriver->Destory();
+
+	SAFE_DELETE(mDriver);
+	SAFE_DELETE(mInput);
+	SAFE_DELETE(mLightMgr);
+	SAFE_DELETE(mGeometryMgr);
+	SAFE_DELETE(mMaterialMgr);
+	SAFE_DELETE(mSceneMgr);
+	SAFE_DELETE(mTimer);
+	SAFE_DELETE(mIDAllocator);
 }
 
 Driver* Engine::GetDriver()
@@ -106,4 +117,9 @@ void Engine::OnResetDevice()
 SceneManager* Engine::GetSceneManager()
 {
 	return mSceneMgr;
+}
+
+IDAllocator* Engine::GetIDAllocator()
+{
+	return mIDAllocator;
 }

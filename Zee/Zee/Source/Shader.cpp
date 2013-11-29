@@ -36,7 +36,7 @@ void FlatShader::SetUVOffset(float offsetU, float offsetV)
 	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
-void FlatShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
+void FlatShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone)
 {
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
@@ -61,13 +61,21 @@ void FlatShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camer
 
 	FlatShader::mEffect->SetRawValue("mtlColor", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
 
-	FlatShader::mEffect->Begin(0, 0);
-	FlatShader::mEffect->BeginPass(0);
+	FlatShader::mEffect->CommitChanges();
+
+	if(isStandAlone)
+	{
+		FlatShader::mEffect->Begin(0, 0);
+		FlatShader::mEffect->BeginPass(0);
+	}
 
 	geo->Draw();
 
-	FlatShader::mEffect->EndPass();
-	FlatShader::mEffect->End();
+	if(isStandAlone)
+	{
+		FlatShader::mEffect->EndPass();
+		FlatShader::mEffect->End();
+	}
 }
 
 void FlatShader::OnLostDevice()
@@ -109,7 +117,7 @@ void ViewShader::SetUVOffset(float offsetU, float offsetV)
 	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
-void ViewShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
+void ViewShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone)
 {
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
@@ -137,13 +145,21 @@ void ViewShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camer
 
 	ViewShader::mEffect->SetRawValue("mtlColor", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
 
-	ViewShader::mEffect->Begin(0, 0);
-	ViewShader::mEffect->BeginPass(0);
+	ViewShader::mEffect->CommitChanges();
+
+	if(isStandAlone)
+	{
+		ViewShader::mEffect->Begin(0, 0);
+		ViewShader::mEffect->BeginPass(0);
+	}
 
 	geo->Draw();
 
-	ViewShader::mEffect->EndPass();
-	ViewShader::mEffect->End();
+	if(isStandAlone)
+	{
+		ViewShader::mEffect->EndPass();
+		ViewShader::mEffect->End();
+	}
 }
 
 void ViewShader::OnLostDevice()
@@ -190,7 +206,7 @@ void DiffuseShader::SetUVOffset(float offsetU, float offsetV)
 	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
-void DiffuseShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
+void DiffuseShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone)
 {
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
@@ -217,13 +233,21 @@ void DiffuseShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* ca
 	DiffuseShader::mEffect->SetRawValue("mtlAmbient", &(mMaterial->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
 	DiffuseShader::mEffect->SetRawValue("mtlDiffuse", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
 
-	DiffuseShader::mEffect->Begin(0, 0);
-	DiffuseShader::mEffect->BeginPass(0);
+	DiffuseShader::mEffect->CommitChanges();
+
+	if(isStandAlone)
+	{
+		DiffuseShader::mEffect->Begin(0, 0);
+		DiffuseShader::mEffect->BeginPass(0);
+	}
 
 	geo->Draw();
-
-	DiffuseShader::mEffect->EndPass();
-	DiffuseShader::mEffect->End();
+	
+	if(isStandAlone)
+	{
+		DiffuseShader::mEffect->EndPass();
+		DiffuseShader::mEffect->End();
+	}
 }
 
 void DiffuseShader::OnLostDevice()
@@ -286,7 +310,7 @@ void SpecularShader::SetUVOffset(float offsetU, float offsetV)
 	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
-void SpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
+void SpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone)
 {
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
@@ -317,13 +341,21 @@ void SpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* c
 	SpecularShader::mEffect->SetRawValue("mtlSpec", &(mMaterial->GetFinalSpecularColor()), 0, sizeof(D3DXCOLOR));
 	SpecularShader::mEffect->SetFloat("gloss", mMaterial->GetSpecGloss());
 
-	SpecularShader::mEffect->Begin(0, 0);
-	SpecularShader::mEffect->BeginPass(0);
+	SpecularShader::mEffect->CommitChanges();
+
+	if(isStandAlone)
+	{
+		SpecularShader::mEffect->Begin(0, 0);
+		SpecularShader::mEffect->BeginPass(0);
+	}
 
 	geo->Draw();
 
-	SpecularShader::mEffect->EndPass();
-	SpecularShader::mEffect->End();
+	if(isStandAlone)
+	{
+		SpecularShader::mEffect->EndPass();
+		SpecularShader::mEffect->End();
+	}
 }
 
 void SpecularShader::OnLostDevice()
@@ -390,7 +422,7 @@ void BumpSpecularShader::SetUVOffset(float offsetU, float offsetV)
 	mMaterial->SetUVOffset(offsetU, offsetV);
 }
 
-void BumpSpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
+void BumpSpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone)
 {
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
@@ -423,13 +455,21 @@ void BumpSpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camer
 	BumpSpecularShader::mEffect->SetRawValue("mtlSpec", &(mMaterial->GetFinalSpecularColor()), 0, sizeof(D3DXCOLOR));
 	BumpSpecularShader::mEffect->SetFloat("gloss", mMaterial->GetSpecGloss());
 
-	BumpSpecularShader::mEffect->Begin(0, 0);
-	BumpSpecularShader::mEffect->BeginPass(0);
+	BumpSpecularShader::mEffect->CommitChanges();
+
+	if(isStandAlone)
+	{
+		BumpSpecularShader::mEffect->Begin(0, 0);
+		BumpSpecularShader::mEffect->BeginPass(0);
+	}
 
 	geo->Draw();
 
-	BumpSpecularShader::mEffect->EndPass();
-	BumpSpecularShader::mEffect->End();
+	if(isStandAlone)
+	{
+		BumpSpecularShader::mEffect->EndPass();
+		BumpSpecularShader::mEffect->End();
+	}
 }
 
 void BumpSpecularShader::OnLostDevice()

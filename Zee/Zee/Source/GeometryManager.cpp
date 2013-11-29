@@ -1,7 +1,7 @@
 #include "GeometryManager.h"
+#include "Engine.h"
 
 GeometryManager::GeometryManager()
-:curID(0)
 {
 
 }
@@ -10,7 +10,7 @@ void GeometryManager::AddGeometry(Geometry* geo)
 {
 	_Assert(NULL != geo);
 
-	geo->SetID(curID++);			// QUESTION:ID一直加不会溢出吧
+	gEngine->GetIDAllocator()->AllocateGeometryID(geo);
 	geoList.push_back(geo);
 }
 

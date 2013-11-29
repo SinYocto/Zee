@@ -8,6 +8,7 @@
 #include "LightManager.h"
 #include "Input.h"
 #include "Time.h"
+#include "IDAllocator.h"
 
 class Engine
 {
@@ -29,6 +30,7 @@ public:
 	LightManager* GetLightManager();
 	Input* GetInput();
 	FrameTimer* GetFrameTimer();
+	IDAllocator* GetIDAllocator();
 
 private:
 	Driver* mDriver;
@@ -37,6 +39,8 @@ private:
 	GeometryManager* mGeometryMgr;
 	MaterialManager* mMaterialMgr;
 	LightManager* mLightMgr;
+
+	IDAllocator* mIDAllocator;
 
 	Input* mInput;
 	FrameTimer* mTimer;

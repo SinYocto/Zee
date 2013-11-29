@@ -1,11 +1,15 @@
 #include "SceneManager.h"
 #include "Camera.h"
+#include "MeshNode.h"
+#include "BillboardNode.h"
+#include "Engine.h"
+#include "Renderer.h"
+#include "DebugDrawer.h"
 
 SceneManager::SceneManager()
 :root(NULL)
 ,mainCamera(NULL)
 ,extraCamera(NULL)
-,curNodeID(0)
 {
 
 }
@@ -13,7 +17,8 @@ SceneManager::SceneManager()
 void SceneManager::Init()
 {
 	root = new SceneNode(L"root");
-	root->SetID(curNodeID++); 
+
+	gEngine->GetIDAllocator()->AllocateSceneNodeID(root);
 }
 
 void SceneManager::AddSceneNode(SceneNode* node, SceneNode* parent /*= root*/)
@@ -24,7 +29,7 @@ void SceneManager::AddSceneNode(SceneNode* node, SceneNode* parent /*= root*/)
 		parent = root;
 
 	parent->AddChild(node);
-	node->SetID(curNodeID++);			// QUESTION:ID一直加不会溢出吧
+	gEngine->GetIDAllocator()->AllocateSceneNodeID(node);
 }
 
 void SceneManager::GetSceneNode(const wchar_t* name, SceneNode** sceneNode)
@@ -60,6 +65,54 @@ void SceneManager::DrawAll()
 	root->DrawAll(mainCamera);
 }
 
+void SceneManager::DrawAllUseRenderer()
+{
+	// AABBoxes
+	for(std::list<AABBox>::iterator iter = mAABBoxes.begin(); iter != mAABBoxes.end(); ++iter)
+	{
+		AABBox& box = *iter;
+		DebugDrawer::DrawAABBox(box, 0xffff0000, mainCamera);
+	}
+
+	// wireframe
+	Renderer::Begin(WireFrame);
+	for(MeshNodeList::iterator iter = mWireFrameMeshNodeList.begin(); iter != mWireFrameMeshNodeList.end(); ++iter)
+	{
+		MeshNode* meshNode = *iter;
+		Mesh* mesh = meshNode->GetMesh();
+
+		Renderer::DrawMesh(meshNode->LocalToWorldMatrix(), mesh->GetGeometry(), mesh->GetMaterial(), mainCamera);
+	}
+	Renderer::End(WireFrame);
+
+	// 以ShadingMethod为分类, 统一设置RenderState然后绘制
+	for(ShadingMethodMeshNodeListMap::iterator mapIter = mMeshNodeLists.begin(); mapIter != mMeshNodeLists.end(); ++mapIter)
+	{
+		ShadingMethod method = mapIter->first;
+		MeshNodeList& meshNodeList = mapIter->second;
+
+		Renderer::Begin(method);
+		for(MeshNodeList::iterator listIter = meshNodeList.begin(); listIter != meshNodeList.end(); ++listIter)
+		{
+			MeshNode* meshNode = *listIter;
+			Mesh* mesh = meshNode->GetMesh();
+
+			Renderer::DrawMesh(meshNode->LocalToWorldMatrix(), mesh->GetGeometry(), mesh->GetMaterial(), mainCamera);
+		}
+		Renderer::End(method);
+	}
+
+	// billboard
+	Renderer::Begin(BillboardMethod);
+	for(std::list<BillboardNode*>::iterator iter = mBillboardNodeList.begin(); iter != mBillboardNodeList.end(); ++iter)
+	{
+		BillboardNode* billBoradNode = *iter;
+
+		Renderer::DrawBillboard(billBoradNode->GetWorldPosition(), billBoradNode->GetBillboard(), mainCamera);
+	}
+	Renderer::End(BillboardMethod);
+}
+
 void SceneManager::FrameUpdate()
 {
 	_Assert(NULL != mainCamera);
@@ -69,6 +122,8 @@ void SceneManager::FrameUpdate()
 		extraCamera->FrameUpdate();
 
 	root->FrameUpdate();
+
+	collectSceneEntities();
 }
 
 SceneNode* SceneManager::RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist)
@@ -90,3 +145,73 @@ Camera* SceneManager::GetExtraCamera()
 {
 	return extraCamera;
 }
+
+void SceneManager::collectSceneEntities()
+{
+	mMeshNodeLists.clear();
+	mWireFrameMeshNodeList.clear();
+	mBillboardNodeList.clear();
+	mAABBoxes.clear();
+
+	collectSceneNode(root);
+}
+
+void SceneManager::collectSceneNode(SceneNode* sceneNode)
+{
+	if(!mainCamera->IsVisible(sceneNode->GetAABBox()))
+		return;
+
+	if(sceneNode->GetDrawBBoxFlag())
+	{
+		AABBox box = sceneNode->GetAABBox();
+
+		if(box.isValid())
+			mAABBoxes.push_back(box);
+	}
+
+	if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_MESH)
+	{
+		MeshNode* meshNode = static_cast<MeshNode*>(sceneNode);
+
+		Mesh* mesh = meshNode->GetMesh();
+		_Assert(NULL != mesh);
+
+		if(sceneNode->GetDisplayMode() == SceneNode::SOLID || sceneNode->GetDisplayMode() == SceneNode::SOLID_WIRE_FRAME)
+		{
+			Material* meshMaterial = meshNode->GetMesh()->GetMaterial();
+			_Assert(NULL != meshMaterial);
+
+			ShadingMethod method = meshMaterial->GetShadingMethod();
+
+			ShadingMethodMeshNodeListMap::iterator iter = mMeshNodeLists.find(method);
+			if(iter != mMeshNodeLists.end())
+			{
+				iter->second.push_back(meshNode);
+			}
+			else
+			{
+				MeshNodeList meshList;
+				meshList.push_back(meshNode);
+				mMeshNodeLists[method] = meshList;
+			}
+		}
+
+		if(sceneNode->GetDisplayMode() == SceneNode::WIRE_FRAME || sceneNode->GetDisplayMode() == SceneNode::SOLID_WIRE_FRAME)
+		{
+			mWireFrameMeshNodeList.push_back(meshNode);
+		}
+	}
+	else if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_BILLBOARD)
+	{
+		BillboardNode* billboardNode = static_cast<BillboardNode*>(sceneNode);
+		mBillboardNodeList.push_back(billboardNode);
+	}
+
+	std::list<Object*> children = sceneNode->GetChildren();
+	for(std::list<Object*>::iterator iter = children.begin(); iter != children.end(); ++iter)
+	{
+		SceneNode* node = static_cast<SceneNode*>(*iter);
+		collectSceneNode(node);
+	}	
+}
+

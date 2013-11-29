@@ -1,6 +1,23 @@
 #include "Mesh.h"
 #include "Engine.h"
 
+Mesh::Mesh(const wchar_t* name, Geometry* geo, Material* material) 
+:mGeo(geo)
+,mMaterial(material)
+{
+	YString::Copy(mName, _countof(mName), name);
+
+	if(NULL != mGeo)
+	{
+		mGeo->Grab();
+	}
+
+	if(NULL != mMaterial)
+	{
+		mMaterial->Grab();
+	}
+}
+
 void Mesh::Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid)
 {
 	if(NULL == mGeo || NULL == mMaterial)
@@ -35,4 +52,9 @@ void Mesh::SetMaterial(Material* mtl)
 Geometry* Mesh::GetGeometry()
 {
 	return mGeo;
+}
+
+Material* Mesh::GetMaterial()
+{
+	return mMaterial;
 }

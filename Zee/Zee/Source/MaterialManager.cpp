@@ -1,11 +1,11 @@
 #include "MaterialManager.h"
+#include "Engine.h"
 
 MaterialManager::MaterialManager()
 :flatMtl(NULL)
 ,viewMtl(NULL)
 ,diffMtl(NULL)
 ,specMtl(NULL)
-,curID(0)
 {
 
 }
@@ -14,7 +14,7 @@ void MaterialManager::AddMaterial(Material* material)
 {
 	_Assert(NULL != material);
 
-	material->SetID(curID++);			// QUESTION:ID一直加不会溢出吧
+	gEngine->GetIDAllocator()->AllocateMaterialID(material);
 	materialList.push_back(material);
 }
 
@@ -89,21 +89,23 @@ void MaterialManager::FrameUpdate()
 
 void MaterialManager::createDefaultMtls()
 {
+	IDAllocator* idAllocator = gEngine->GetIDAllocator();
+
 	flatMtl = new Material(L"defaultFlatMtl");
 	flatMtl->SetShader(Flat);
-	flatMtl->SetID(curID++);
+	idAllocator->AllocateMaterialID(flatMtl);
 
 	viewMtl = new Material(L"defaultViewMtl");
 	viewMtl->SetShader(View);
-	viewMtl->SetID(curID++);
+	idAllocator->AllocateMaterialID(viewMtl);
 
 	diffMtl = new Material(L"defaultDiffMtl");
 	diffMtl->SetShader(Diffuse);
-	diffMtl->SetID(curID++);
+	idAllocator->AllocateMaterialID(diffMtl);
 
 	specMtl = new Material(L"defaultSpecMtl");
 	specMtl->SetShader(Specular);
-	specMtl->SetID(curID++);
+	idAllocator->AllocateMaterialID(specMtl);
 }
 
 void MaterialManager::deleteDefaultMtls()

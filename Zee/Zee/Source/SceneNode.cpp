@@ -42,7 +42,7 @@ void SceneNode::SetStaticFlag(bool isStatic)
 
 void SceneNode::FrameUpdate()
 {
-	calcCurrentAABBox();		// TODO:当前没管sceneNode的isStatic标志, 通通都更新计算AABB
+	updateAABBox();		// TODO:当前没管sceneNode的isStatic标志, 通通都更新计算AABB
 
 	for(std::list<Object*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
 	{
@@ -51,8 +51,8 @@ void SceneNode::FrameUpdate()
 	}
 }
 
-void SceneNode::calcCurrentAABBox()
-{
+void SceneNode::updateAABBox()
+ {
 	mAABBox = AABBox::Invalid;
 
 	for(std::list<Object*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
@@ -118,5 +118,15 @@ SceneNode* SceneNode::RayIntersect(const Vector3& rayPos, const Vector3& rayDir,
 SceneNode::NODE_TYPE SceneNode::GetNodeType()
 {
 	return mType;
+}
+
+SceneNode::DISPLAY_MODE SceneNode::GetDisplayMode()
+{
+	return mAttribute.displayMode;
+}
+
+bool SceneNode::GetDrawBBoxFlag()
+{
+	return mAttribute.drawBBox;
 }
 

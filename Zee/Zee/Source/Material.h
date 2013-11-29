@@ -12,26 +12,7 @@ class Object;
 class Material : public IReferenceCounted
 {
 public:
-	Material(const wchar_t* name)
-		:mShader(NULL)
-		,mShadingMethod(InvalidMethod)
-		,mAmbientColor(D3DXCOLOR_WHITE)
-		,mDiffuseColor(D3DXCOLOR_WHITE)
-		,mSpecularColor(D3DXCOLOR_WHITE)
-		,mShiness(1.0f)
-		,mGloss(50.0f)
-		,mTilesU(1.0f)
-		,mTilesV(1.0f)
-		,mOffsetU(0)
-		,mOffsetV(0)
-	{
-		YString::Copy(mName, _countof(mName), name);
-
-		for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
-		{
-			mTextureLayer[layerIx] = NULL;
-		}
-	}
+	Material(const wchar_t* name);
 
 	Material(const Material& mtl)		// 用于复制一个临时使用的mtl, 不纳入manager管理, 不关心id和name
 		:mAmbientColor(mtl.mAmbientColor)
@@ -83,6 +64,8 @@ public:
 	void SetSpecShiness(float shiness);
 	void SetSpecGloss(float gloss);
 
+	ShadingMethod GetShadingMethod();
+
 	IDirect3DTexture9* GetTexture(int layerIx);
 
 	D3DXCOLOR GetAmbientColor();
@@ -97,7 +80,7 @@ public:
 
 	D3DXMATRIX UVTransformMatrix();
 
-	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone = false);
 
 public:
 	IShader* mShader;

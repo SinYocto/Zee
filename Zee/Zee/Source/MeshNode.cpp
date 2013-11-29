@@ -1,6 +1,22 @@
 #include "MeshNode.h"
 #include "DebugDrawer.h"
 
+MeshNode::MeshNode(const wchar_t* name, SceneNode* parent, Geometry* geo, Material* material) 
+:SceneNode(name, parent)
+{
+	mType = SCENE_NODE_MESH;
+	mMesh = new Mesh(name, geo, material);
+}
+
+MeshNode::MeshNode(const wchar_t* name, SceneNode* parent, Mesh* mesh)
+:SceneNode(name, parent)
+{
+	_Assert(NULL != mesh);
+	mType = SCENE_NODE_MESH;
+	mMesh = mesh;
+	mMesh->Grab();
+}
+
 void MeshNode::Draw(Camera* camera)
 {
 	_Assert(NULL != camera);
@@ -18,7 +34,7 @@ void MeshNode::Draw(Camera* camera)
 	}
 }
 
-void MeshNode::calCurrentAABBox()
+void MeshNode::updateAABBox()
 {
 	_Assert(mMesh && mMesh->GetGeometry())
 	mMesh->GetGeometry()->CalcDynamicAABBox(mWorldPos, mWorldOrient, &mAABBox);

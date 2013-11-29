@@ -30,7 +30,6 @@ private:
 
 private:
 	std::list<Material*> materialList;
-	DWORD curID;
 	
 	Material* flatMtl;
 	Material* viewMtl;

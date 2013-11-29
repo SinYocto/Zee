@@ -16,6 +16,8 @@ public:
 	};
 
 public:
+	static void SetRenderState();
+
 	static bool DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, Camera* camera, 
 		const D3DXMATRIX& matWorld = IDENTITY_MATRIX, LINE_TYPE lineType = LINE_STRIP);
 

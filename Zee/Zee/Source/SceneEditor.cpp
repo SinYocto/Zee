@@ -9,6 +9,7 @@
 #include "CameraController.h"
 
 #include "SceneManager.h"
+#include "TextureManager.h"
 
 #include "ModelNode.h"
 #include "Primitive.h"
@@ -20,6 +21,8 @@
 #include "Gizmo.h"
 #include "BillboardNode.h"
 #include "ResourceMgr.h"
+
+#include <hash_map>
 
 #include "Terrain.h"
 
@@ -173,6 +176,17 @@ void SceneEditorCanvas::OnSize(wxSizeEvent& event)
 void CreateScene()
 {
 	Driver* driver = gEngine->GetDriver();
+
+	stdext::hash_map<const wchar_t*, int, stdext::hash_compare<const wchar_t*, WCharLess>> wCharHash;
+	wCharHash[L"a"] = 123;
+	wCharHash[L"b"] = 456;
+
+	stdext::hash_map<const wchar_t*, int, stdext::hash_compare<const wchar_t*, WCharLess>>::iterator it = wCharHash.find(L"b");
+
+	if(it != wCharHash.end())
+	{
+		int val = it->second;
+	}
 
 	// camera
 	SceneManager* sceneMgr = gEngine->GetSceneManager();
@@ -347,11 +361,12 @@ void SceneEditorCanvas::RenderLoop()
 			terrain->Draw(mainCamera, true);
 
 			sceneMgr->GetRoot()->SetDrawBBoxFlag(true);
-			sceneMgr->DrawAll();
+			//sceneMgr->DrawAll();
+			sceneMgr->DrawAllUseRenderer();
 
 			gGUISystem.Draw();
 
-			gizmo->SetActiveType(Gizmo::GIZMO_TRANS);
+			gizmo->SetActiveType(Gizmo::GIZMO_SCALE);
 			gizmo->Draw(hitNode, mainCamera);
 
 			if(hitNode && hitNode->GetNodeType() == SceneNode::SCENE_NODE_BILLBOARD)

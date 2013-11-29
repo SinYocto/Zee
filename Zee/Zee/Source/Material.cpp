@@ -1,5 +1,28 @@
 #include "Material.h"
 #include "Engine.h"
+#include "IDAllocator.h"
+
+Material::Material( const wchar_t* name ) 
+:mID(IDAllocator::ID_ANY)
+,mShader(NULL)
+,mShadingMethod(InvalidMethod)
+,mAmbientColor(D3DXCOLOR_WHITE)
+,mDiffuseColor(D3DXCOLOR_WHITE)
+,mSpecularColor(D3DXCOLOR_WHITE)
+,mShiness(1.0f)
+,mGloss(50.0f)
+,mTilesU(1.0f)
+,mTilesV(1.0f)
+,mOffsetU(0)
+,mOffsetV(0)
+{
+	YString::Copy(mName, _countof(mName), name);
+
+	for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
+	{
+		mTextureLayer[layerIx] = NULL;
+	}
+}
 
 void Material::SetTexture(int layerIx, wchar_t* texFileName)	// TODO:不应该直接从文件中CreateTexture再Set, 增加TextureManager类
 {
@@ -138,13 +161,13 @@ void Material::SetUVOffset(float offsetU, float offsetV)
 	mOffsetV = offsetV;
 }
 
-void Material::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
+void Material::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone /*= false*/)
 {
 	_Assert(NULL != mShader);
 	_Assert(NULL != geo);
 	_Assert(NULL != camera);
 
-	mShader->Render(matWorld, geo, camera);
+	mShader->Render(matWorld, geo, camera, isStandAlone);
 }
 
 wchar_t* Material::GetName()
@@ -155,4 +178,9 @@ wchar_t* Material::GetName()
 void Material::SetID(DWORD id)
 {
 	mID = id;
+}
+
+ShadingMethod Material::GetShadingMethod()
+{
+	return mShadingMethod;
 }

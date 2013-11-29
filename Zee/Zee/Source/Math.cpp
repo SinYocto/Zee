@@ -549,3 +549,13 @@ Quaternion WorldRotationToLocal(const Quaternion& worldRotation, const Quaternio
 
 	return localRotation;
 }
+
+unsigned int BKDRHash(const wchar_t* str)
+{
+	unsigned int hash = 0;  
+	while (unsigned int ch = (unsigned int)*str++)  
+	{         
+		hash = hash * 131 + ch;       
+	}  
+	return hash;
+}

@@ -89,9 +89,9 @@ void Billboard::Draw(const Vector3& pos, Camera* camera)
 	d3dDevice->SetStreamSource(0, mVertexBuffer, 0, SizeofVertex(XYZ_UV));
 	d3dDevice->SetFVF(VertexUV::FVF);
 
-	d3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);	
-	d3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	d3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	//d3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);	
+	//d3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	//d3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 	effect->SetTechnique("Billboard");
 	effect->SetMatrix("matWVP", &matWVP);
@@ -99,14 +99,15 @@ void Billboard::Draw(const Vector3& pos, Camera* camera)
 	effect->SetTexture("colorTex", mTexture);
 	effect->SetBool("isAlphaFromColor", true);	
 
-	effect->Begin(0, 0);
-	effect->BeginPass(0);
+	effect->CommitChanges();
+
+	//effect->Begin(0, 0);
+	//effect->BeginPass(0);
 
 	d3dDevice->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, 2);
 
-	effect->EndPass();
-	effect->End();
+	//effect->EndPass();
+	//effect->End();
 
-	d3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);	
+	//d3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);	
 }
-

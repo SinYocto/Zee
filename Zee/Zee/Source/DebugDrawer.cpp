@@ -240,3 +240,15 @@ Exit:
 	return isSucceed;
 	
 }
+
+void DebugDrawer::SetRenderState()
+{
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
+	d3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	d3dDevice->SetRenderState(D3DRS_LIGHTING, false);
+
+	d3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);		
+	d3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	d3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+}

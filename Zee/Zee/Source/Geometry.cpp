@@ -1,6 +1,17 @@
 #include "Geometry.h"
 #include "Bound.h"
 #include "Engine.h"
+#include "IDAllocator.h"
+
+Geometry::Geometry( const wchar_t* name ) 
+:mVertexBuffer(NULL)
+,mIndexBuffer(NULL)
+,mVertexDecl(NULL)
+,mVertexType(VERTEX_TYPE_INVALID)
+,mID(IDAllocator::ID_ANY)
+{
+	YString::Copy(mName, _countof(mName), name);
+}
 
 void Geometry::createVertexBuffer(void* vertexData)
 {

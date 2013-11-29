@@ -6,6 +6,8 @@
 
 class Object
 {
+	typedef std::list<Object*> ObjectList;
+
 public:
 	Object(Object* parent = NULL, Vector3 position = Vector3::Zero, Quaternion orient = Quaternion(0, 0, 0))
 		:mParent(parent)
@@ -72,6 +74,8 @@ public:
 
 	Quaternion GetWorldOrient();
 
+	ObjectList GetChildren();
+
 	Vector3 GetWorldRight();
 	Vector3 GetWorldUp();
 	Vector3 GetWorldForward();
@@ -97,7 +101,7 @@ private:
 
 protected:
 	Object* mParent;
-	std::list<Object*> mChildren;
+	ObjectList mChildren;
 
 	Vector3 mRelativePos;
 	Quaternion mRelativeOrient;

@@ -18,7 +18,6 @@ public:
 
 private:
 	std::list<Geometry*> geoList;
-	DWORD curID;
 };
 
 

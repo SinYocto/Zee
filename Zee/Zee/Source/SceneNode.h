@@ -20,7 +20,8 @@ public:
 	enum DISPLAY_MODE
 	{
 		WIRE_FRAME,
-		SOLID
+		SOLID,
+		SOLID_WIRE_FRAME,
 	};
 
 	struct Attribute
@@ -55,6 +56,9 @@ public:
 	void SetStaticFlag(bool isStatic);
 	void SetDisplayMode(DISPLAY_MODE displayMode);
 
+	DISPLAY_MODE GetDisplayMode();
+	bool GetDrawBBoxFlag();
+
 	AABBox GetAABBox();
 
 	SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
@@ -77,7 +81,7 @@ public:
 	NODE_TYPE GetNodeType();
 
 protected:
-	virtual void calcCurrentAABBox();
+	virtual void updateAABBox();
 
 protected:
 	DWORD mID;

@@ -45,6 +45,9 @@ private:
 	void createEffect();
 	void createVertexBuffer();
 
+public:
+	static LPD3DXEFFECT effect;
+
 private:
 	D3DCOLOR mColor;
 	float mWidth;
@@ -52,8 +55,6 @@ private:
 
 	IDirect3DVertexBuffer9* mVertexBuffer;
 	IDirect3DTexture9* mTexture;
-
-	static LPD3DXEFFECT effect;
 
 	bool mNeedResetEffect;
 };

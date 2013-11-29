@@ -11,7 +11,12 @@ enum ShadingMethod
 	Diffuse, 
 	Specular, 
 	BumpSpecular,
-	InvalidMethod
+
+	BillboardMethod,
+
+	WireFrame,
+
+	InvalidMethod,
 };
 
 class Material;
@@ -84,7 +89,7 @@ public:
 
 	}
 
-	virtual void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
+	virtual void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone)
 	{
 
 	}
@@ -114,7 +119,7 @@ public:
 	void SetUVTiles(float tilesU, float tilesV);
 	void SetUVOffset(float offsetU, float offsetV);
 
-	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone);
 
 public:
 	static LPD3DXEFFECT mEffect;
@@ -141,7 +146,7 @@ public:
 	void SetUVTiles(float tilesU, float tilesV);
 	void SetUVOffset(float offsetU, float offsetV);
 
-	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone);
 
 public:
 	static LPD3DXEFFECT mEffect;
@@ -169,7 +174,7 @@ public:
 	void SetUVTiles(float tilesU, float tilesV);
 	void SetUVOffset(float offsetU, float offsetV);
 
-	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone);
 
 public:
 	static LPD3DXEFFECT mEffect;
@@ -201,7 +206,7 @@ public:
 	void SetUVTiles(float tilesU, float tilesV);
 	void SetUVOffset(float offsetU, float offsetV);
 
-	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone);
 
 public:
 	static LPD3DXEFFECT mEffect;
@@ -234,7 +239,7 @@ public:
 	void SetUVTiles(float tilesU, float tilesV);
 	void SetUVOffset(float offsetU, float offsetV);
 
-	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
+	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone);
 
 public:
 	static LPD3DXEFFECT mEffect;

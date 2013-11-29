@@ -7,20 +7,8 @@
 class ModelNode : public SceneNode
 {
 public:
-	ModelNode(const wchar_t* name, SceneNode* parent, Model* model)
-		:SceneNode(name, parent)
-	{
-		mType = SCENE_NODE_MODEL;
-		mModel = model;
-		mModel->Grab();
-	}
-
-	ModelNode(const wchar_t* name, SceneNode* parent, Geometry* geo, Material* material)
-		:SceneNode(name, parent)
-	{
-		mType = SCENE_NODE_MODEL;
-		mModel = new Model(geo, material);
-	}
+	ModelNode(const wchar_t* name, SceneNode* parent, Model* model);
+	ModelNode(const wchar_t* name, SceneNode* parent, Geometry* geo, Material* material);
 
 	~ModelNode()
 	{
@@ -30,7 +18,7 @@ public:
 	virtual void Draw(Camera* camera);
 
 private:
-	virtual void calcCurrentAABBox();
+	//virtual void updateAABBox();
 
 private:
 	Model* mModel;

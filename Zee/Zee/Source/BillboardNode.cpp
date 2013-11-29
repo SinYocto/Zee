@@ -12,7 +12,7 @@ Billboard* BillboardNode::GetBillboard()
 	return mBillboard;
 }
 
-void BillboardNode::calCurrentAABBox()
+void BillboardNode::updateAABBox()
 {
 	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();		// TODO:这里直接使用了mainCamera
 

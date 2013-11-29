@@ -364,56 +364,50 @@ void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	mLine->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
 	mLine->GetMesh()->SetMaterial(tempMtl);
-	mLine->Draw(camera);
-
 	mCone->SetWorldPosition(obj->GetWorldPosition());
 	mCone->SetWorldOrientation(obj->GetWorldOrient());
 	mCone->TranslateLocal(0, scaleFactor, 0);
 	mCone->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
 	mCone->GetMesh()->SetMaterial(tempMtl);
-	mCone->Draw(camera);
+
+	tempMtl->Render(mLine->LocalToWorldMatrix(), mLine->GetMesh()->GetGeometry(), camera, true);
+	tempMtl->Render(mCone->LocalToWorldMatrix(), mCone->GetMesh()->GetGeometry(), camera, true);
 
 	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(SQUARE_SIZE * 0.5f, 0, SQUARE_SIZE * 0.5f)), 
 		Vector3(0, 1.0f, 0), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_XZ], true, camera);
 
-	tempMtl->Drop();
-
 	// x
-	tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_X]);
 
 	mLine->RotateLocal(0, 0, -PI / 2.0f);
 
 	mLine->GetMesh()->SetMaterial(tempMtl);
-	mLine->Draw(camera);
 
 	mCone->TranslateLocal(scaleFactor, -scaleFactor, 0);
 	mCone->RotateLocal(0, 0, -PI / 2.0f);
 
 	mCone->GetMesh()->SetMaterial(tempMtl);
-	mCone->Draw(camera);
 
+	tempMtl->Render(mLine->LocalToWorldMatrix(), mLine->GetMesh()->GetGeometry(), camera, true);
+	tempMtl->Render(mCone->LocalToWorldMatrix(), mCone->GetMesh()->GetGeometry(), camera, true);
 	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(0, SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f)), 
 		Vector3(1.0f, 0, 0), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_YZ], true, camera);
 
-	tempMtl->Drop(); 
-
 	// z
-	tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Z]);
 
 	mLine->RotateLocal(PI / 2.0f, 0, 0);
 
 	mLine->GetMesh()->SetMaterial(tempMtl);
-	mLine->Draw(camera);
 
 	mCone->TranslateLocal(0, -scaleFactor, scaleFactor);
 	mCone->RotateLocal(PI / 2.0f, 0, 0);
 
 	mCone->GetMesh()->SetMaterial(tempMtl);
-	mCone->Draw(camera);
 
+	tempMtl->Render(mLine->LocalToWorldMatrix(), mLine->GetMesh()->GetGeometry(), camera, true);
+	tempMtl->Render(mCone->LocalToWorldMatrix(), mCone->GetMesh()->GetGeometry(), camera, true);
 	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f, 0)), 
 		Vector3(0, 0, 1.0f), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_XY], true, camera);
 
@@ -433,30 +427,17 @@ void Gizmo::drawRotateGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR
 	mTorus->SetWorldOrientation(obj->GetWorldOrient());
 	mTorus->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
-	mTorus->GetMesh()->SetMaterial(tempMtl);
-	mTorus->Draw(camera);
-
-	tempMtl->Drop();
+	tempMtl->Render(mTorus->LocalToWorldMatrix(), mTorus->GetMesh()->GetGeometry(), camera, true);
 
 	// x
-	tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_X]);
-
 	mTorus->RotateLocal(0, 0, - PI / 2.0f);
-
-	mTorus->GetMesh()->SetMaterial(tempMtl);
-	mTorus->Draw(camera);
-
-	tempMtl->Drop();
+	tempMtl->Render(mTorus->LocalToWorldMatrix(), mTorus->GetMesh()->GetGeometry(), camera, true);
 
 	// z
-	tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Z]);
-
 	mTorus->RotateLocal(- PI / 2.0f, 0, 0);
-
-	mTorus->GetMesh()->SetMaterial(tempMtl);
-	mTorus->Draw(camera);
+	tempMtl->Render(mTorus->LocalToWorldMatrix(), mTorus->GetMesh()->GetGeometry(), camera, true);
 
 	tempMtl->Drop();
 }
@@ -474,44 +455,31 @@ void Gizmo::drawScaleGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	mLine->SetWorldOrientation(obj->GetWorldOrient());
 	mLine->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
-	mLine->GetMesh()->SetMaterial(tempMtl);
-	mLine->Draw(camera);
-
 	mCube->SetWorldPosition(obj->GetWorldPosition());
 	mCube->SetWorldOrientation(obj->GetWorldOrient());
 	mCube->TranslateLocal(0, scaleFactor, 0);
 	mCube->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
-	mCube->GetMesh()->SetMaterial(tempMtl);
-	mCube->Draw(camera);
-
-	tempMtl->Drop();
+	tempMtl->Render(mLine->LocalToWorldMatrix(), mLine->GetMesh()->GetGeometry(), camera, true);
+	tempMtl->Render(mCube->LocalToWorldMatrix(), mCube->GetMesh()->GetGeometry(), camera, true);
 
 	// x
-	tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_X]);
 
 	mLine->RotateLocal(0, 0, -PI / 2.0f);
-	mLine->GetMesh()->SetMaterial(tempMtl);
-	mLine->Draw(camera);
-
 	mCube->TranslateLocal(scaleFactor, -scaleFactor, 0);
-	mCube->GetMesh()->SetMaterial(tempMtl);
-	mCube->Draw(camera);
 
-	tempMtl->Drop(); 
+	tempMtl->Render(mLine->LocalToWorldMatrix(), mLine->GetMesh()->GetGeometry(), camera, true);
+	tempMtl->Render(mCube->LocalToWorldMatrix(), mCube->GetMesh()->GetGeometry(), camera, true);
 
 	// z
-	tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Z]);
 
 	mLine->RotateLocal(PI / 2.0f, 0, 0);
-	mLine->GetMesh()->SetMaterial(tempMtl);
-	mLine->Draw(camera);
-
 	mCube->TranslateLocal(-scaleFactor, 0, scaleFactor);
-	mCube->GetMesh()->SetMaterial(tempMtl);
-	mCube->Draw(camera);
+
+	tempMtl->Render(mLine->LocalToWorldMatrix(), mLine->GetMesh()->GetGeometry(), camera, true);
+	tempMtl->Render(mCube->LocalToWorldMatrix(), mCube->GetMesh()->GetGeometry(), camera, true);
 
 	tempMtl->Drop();
 }

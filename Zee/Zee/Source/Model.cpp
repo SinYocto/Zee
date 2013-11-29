@@ -2,6 +2,22 @@
 #include "Camera.h"
 #include "DebugDrawer.h"
 
+Model::Model(const wchar_t* name, Geometry* geo, Material* material)
+{
+	YString::Copy(mName, _countof(mName), name);
+
+	Mesh* mesh = new Mesh(name, geo, material);
+	AddSubMesh(mesh);
+}
+
+Model::~Model()
+{
+	for(std::list<Mesh*>::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter)
+	{
+		SAFE_DROP(*iter);
+	}
+}
+
 void Model::LoadModelDataFromFile(wchar_t* filename, ModelFileFormat format)
 {
 
@@ -44,4 +60,9 @@ void Model::CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, AABB
 	}
 
 	*box = resultBox;
+}
+
+std::list<Mesh*> Model::GetSubMeshList()
+{
+	return mSubMeshes;
 }

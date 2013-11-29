@@ -2,8 +2,11 @@
 #define SCENE_MANAGER_H
 
 #include "SceneNode.h"
+#include "Shader.h"
 
 class Camera;
+class MeshNode;
+class BillboardNode;
 
 class SceneManager
 {
@@ -31,12 +34,24 @@ public:
 
 	void DrawAll();
 
+	void DrawAllUseRenderer();
+
+private:
+	void collectSceneEntities();
+	void collectSceneNode(SceneNode* sceneNode);
+
 private:
 	SceneNode* root;
 	Camera* mainCamera;
 	Camera* extraCamera;
 
-	DWORD curNodeID;
+	typedef std::list<MeshNode*> MeshNodeList;
+	typedef std::map<ShadingMethod, MeshNodeList> ShadingMethodMeshNodeListMap;
+
+	MeshNodeList mWireFrameMeshNodeList;
+	ShadingMethodMeshNodeListMap mMeshNodeLists;		// ½ö°üº¬MeshNodeºÍModelNode
+	std::list<AABBox> mAABBoxes;
+	std::list<BillboardNode*> mBillboardNodeList;
 };
 
 #endif

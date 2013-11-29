@@ -205,10 +205,10 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 					mGeoList.push_back((*curGeo));
 
 					if(mResultModel == NULL)
-						mResultModel = new Model(NULL, NULL);
+						mResultModel = new Model(L"model", NULL, NULL);
 					Assert(NULL != mResultModel);
 
-					subMesh = new Mesh((*curGeo), material);
+					subMesh = new Mesh(L"mesh", (*curGeo), material);
 					mResultModel->AddSubMesh(subMesh);
 				}
 

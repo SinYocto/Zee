@@ -14,19 +14,9 @@ class AABBox;
 class Model : public IReferenceCounted
 {
 public:
-	Model(Geometry* geo, Material* material)
-	{
-		Mesh* mesh = new Mesh(geo, material);
-		AddSubMesh(mesh);
-	}
+	Model(const wchar_t* name, Geometry* geo, Material* material);
 
-	~Model()
-	{
-		for(std::list<Mesh*>::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter)
-		{
-			SAFE_DROP(*iter);
-		}
-	}
+	~Model();
 
 	void AddSubMesh(Mesh* mesh);
 	void LoadModelDataFromFile(wchar_t* filename, ModelFileFormat format);
@@ -35,7 +25,10 @@ public:
 
 	void CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, AABBox* box);
 
+	std::list<Mesh*> GetSubMeshList();
+
 private:
+	wchar_t mName[MAX_STR_LEN];
 	std::list<Mesh*> mSubMeshes;
 };
 

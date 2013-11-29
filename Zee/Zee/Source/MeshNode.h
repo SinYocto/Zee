@@ -7,12 +7,8 @@
 class MeshNode : public SceneNode
 {
 public:
-	MeshNode(const wchar_t* name, SceneNode* parent, Geometry* geo, Material* material)
-		:SceneNode(name, parent)
-	{
-		mType = SCENE_NODE_BILLBOARD;
-		mMesh = new Mesh(geo, material);
-	}
+	MeshNode(const wchar_t* name, SceneNode* parent, Geometry* geo, Material* material);
+	MeshNode(const wchar_t* name, SceneNode* parent, Mesh* mesh);
 
 	~MeshNode()
 	{
@@ -24,7 +20,7 @@ public:
 	Mesh* GetMesh();
 
 private:
-	virtual void calCurrentAABBox();
+	virtual void updateAABBox();
 
 private:
 	Mesh* mMesh;

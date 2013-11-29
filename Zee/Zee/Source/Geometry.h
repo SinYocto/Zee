@@ -68,14 +68,7 @@ private:
 	typedef std::vector<int> TriIDList;
 
 public:
-	Geometry(const wchar_t* name)
-		:mVertexBuffer(NULL)
-		,mIndexBuffer(NULL)
-		,mVertexDecl(NULL)
-		,mVertexType(VERTEX_TYPE_INVALID)
-	{
-		YString::Copy(mName, _countof(mName), name);
-	}
+	Geometry(const wchar_t* name);
 
 	~Geometry()
 	{

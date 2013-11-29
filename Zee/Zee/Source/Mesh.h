@@ -7,20 +7,7 @@
 class Mesh : public IReferenceCounted
 {
 public:
-	Mesh(Geometry* geo, Material* material)
-		:mGeo(geo)
-		,mMaterial(material)
-	{
-		if(NULL != mGeo)
-		{
-			mGeo->Grab();
-		}
-
-		if(NULL != mMaterial)
-		{
-			mMaterial->Grab();
-		}
-	}
+	Mesh(const wchar_t* name, Geometry* geo, Material* material);
 
 	~Mesh()
 	{
@@ -29,10 +16,13 @@ public:
 	}
 
 	Geometry* GetGeometry();
+	Material* GetMaterial();
 	void SetMaterial(Material* mtl);
 	void Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid);
 
 private:
+	wchar_t mName[MAX_STR_LEN];
+
 	Geometry* mGeo;
 	Material* mMaterial; 
 };

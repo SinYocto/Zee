@@ -592,11 +592,43 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\Source\IDAllocator.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\IDAllocator.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\Renderer.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\Renderer.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Source\SceneEditor.cpp"
 			>
 		</File>
 		<File
 			RelativePath=".\Source\SceneEditor.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\Texture.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\Texture.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\TextureManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\TextureManager.h"
 			>
 		</File>
 		<File
