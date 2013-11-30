@@ -55,6 +55,8 @@ void TerrainChunk::CalculateChunkNormals()
 	{
 		mNormalData[i].Normalize();
 	}
+
+	delete[] indices;
 }
 
 void TerrainChunk::CreateVertexBuffer()

@@ -31,6 +31,8 @@ void Geometry::createIndexBuffer()
 	}
 
 	CreateIB(gEngine->GetDriver()->GetD3DDevice(), &mIndexBuffer, indexData, numIndices);
+
+	delete[] indexData;
 }
 
 // BuildGeometry之前先要获取相应VertexType所需的顶点数据

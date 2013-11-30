@@ -83,6 +83,8 @@ public:
 	Terrain(int size, float length, float height);
 	~Terrain()
 	{
+		delete[] mHeightMapData;
+
 		SAFE_DELETE(mRootNode);
 
 		for(std::vector<TerrainChunk*>::iterator iter = mChunks.begin(); iter != mChunks.end(); ++iter)

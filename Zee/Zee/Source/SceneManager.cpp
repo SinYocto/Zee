@@ -103,14 +103,17 @@ void SceneManager::DrawAllUseRenderer()
 	}
 
 	// billboard
-	Renderer::Begin(BillboardMethod);
-	for(std::list<BillboardNode*>::iterator iter = mBillboardNodeList.begin(); iter != mBillboardNodeList.end(); ++iter)
+	if(!mBillboardNodeList.empty())
 	{
-		BillboardNode* billBoradNode = *iter;
+		Renderer::Begin(BillboardMethod);
+		for(std::list<BillboardNode*>::iterator iter = mBillboardNodeList.begin(); iter != mBillboardNodeList.end(); ++iter)
+		{
+			BillboardNode* billBoradNode = *iter;
 
-		Renderer::DrawBillboard(billBoradNode->GetWorldPosition(), billBoradNode->GetBillboard(), mainCamera);
+			Renderer::DrawBillboard(billBoradNode->GetWorldPosition(), billBoradNode->GetBillboard(), mainCamera);
+		}
+		Renderer::End(BillboardMethod);
 	}
-	Renderer::End(BillboardMethod);
 }
 
 void SceneManager::FrameUpdate()

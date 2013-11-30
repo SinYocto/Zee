@@ -124,6 +124,9 @@ void SceneEditorFrame::cleanupAndDestory()
 {
 	::AppDestroy();
 
+	if(mCanvas)
+		mCanvas->Destroy();
+
 	if(mWndTreeGenerator)
 		mWndTreeGenerator->CleanupAndDestory();
 

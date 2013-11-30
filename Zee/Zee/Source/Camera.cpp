@@ -115,6 +115,8 @@ void Camera::GetCameraParams(float* nearZ, float* farZ, float* fov, float* aspec
 
 void Camera::SetCameraController(CameraController* controller)
 {
+	SAFE_DELETE(mController);
+
 	mController = controller;
 }
 

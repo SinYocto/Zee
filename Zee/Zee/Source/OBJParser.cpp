@@ -210,6 +210,7 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 
 					subMesh = new Mesh(L"mesh", (*curGeo), material);
 					mResultModel->AddSubMesh(subMesh);
+					SAFE_DROP(subMesh);
 				}
 
 				break;
@@ -443,7 +444,7 @@ void OBJParser::parseMtlLine(const wchar_t* lineContent, Material** curMaterial,
 
 			*curMaterial = new Material(mtlName);
 			gEngine->GetMaterialManager()->AddMaterial(*curMaterial);			// TODO:改到Material的构造函数中	
-
+			SAFE_DROP(*curMaterial);
 			break;
 		}
 	case AMBIENT_COLOR:
