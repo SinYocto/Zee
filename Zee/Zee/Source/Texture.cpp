@@ -7,6 +7,11 @@ Texture::Texture()
 
 }
 
+Texture::~Texture()
+{
+	SAFE_RELEASE(mD3DTexture);
+}
+
 wchar_t* Texture::GetFilePath()
 {
 	return mFilePath;

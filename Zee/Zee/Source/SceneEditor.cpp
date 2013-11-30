@@ -177,17 +177,6 @@ void CreateScene()
 {
 	Driver* driver = gEngine->GetDriver();
 
-	stdext::hash_map<const wchar_t*, int, stdext::hash_compare<const wchar_t*, WCharLess>> wCharHash;
-	wCharHash[L"a"] = 123;
-	wCharHash[L"b"] = 456;
-
-	stdext::hash_map<const wchar_t*, int, stdext::hash_compare<const wchar_t*, WCharLess>>::iterator it = wCharHash.find(L"b");
-
-	if(it != wCharHash.end())
-	{
-		int val = it->second;
-	}
-
 	// camera
 	SceneManager* sceneMgr = gEngine->GetSceneManager();
 

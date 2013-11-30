@@ -56,7 +56,7 @@ void FlatShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camer
 	else
 	{
 		FlatShader::mEffect->SetBool("useColorTex", true);	
-		FlatShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
+		FlatShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0)->GetD3DTexture());
 	}
 
 	FlatShader::mEffect->SetRawValue("mtlColor", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
@@ -140,7 +140,7 @@ void ViewShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camer
 	else
 	{
 		ViewShader::mEffect->SetBool("useColorTex", true);	
-		ViewShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
+		ViewShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0)->GetD3DTexture());
 	}
 
 	ViewShader::mEffect->SetRawValue("mtlColor", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
@@ -227,7 +227,7 @@ void DiffuseShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* ca
 	else
 	{
 		DiffuseShader::mEffect->SetBool("useColorTex", true);	
-		DiffuseShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
+		DiffuseShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0)->GetD3DTexture());
 	}
 
 	DiffuseShader::mEffect->SetRawValue("mtlAmbient", &(mMaterial->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
@@ -333,7 +333,7 @@ void SpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* c
 	else
 	{
 		SpecularShader::mEffect->SetBool("useColorTex", true);	
-		SpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
+		SpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0)->GetD3DTexture());
 	}
 
 	SpecularShader::mEffect->SetRawValue("mtlAmbient", &(mMaterial->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
@@ -445,10 +445,10 @@ void BumpSpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camer
 	else
 	{
 		BumpSpecularShader::mEffect->SetBool("useColorTex", true);	
-		BumpSpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0));
+		BumpSpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0)->GetD3DTexture());
 	}
 
-	BumpSpecularShader::mEffect->SetTexture("normalTex", mMaterial->GetTexture(1));
+	BumpSpecularShader::mEffect->SetTexture("normalTex", mMaterial->GetTexture(1)->GetD3DTexture());
 
 	BumpSpecularShader::mEffect->SetRawValue("mtlAmbient", &(mMaterial->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
 	BumpSpecularShader::mEffect->SetRawValue("mtlDiffuse", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));

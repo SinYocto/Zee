@@ -3,6 +3,7 @@
 
 #include "Driver.h"
 #include "SceneManager.h"
+#include "TextureManager.h"
 #include "GeometryManager.h"
 #include "MaterialManager.h"
 #include "LightManager.h"
@@ -25,6 +26,7 @@ public:
 
 	Driver* GetDriver();
 	SceneManager* GetSceneManager();
+	TextureManager* GetTextureManger();
 	GeometryManager* GetGeometryManager();
 	MaterialManager* GetMaterialManager();
 	LightManager* GetLightManager();
@@ -36,6 +38,7 @@ private:
 	Driver* mDriver;
 
 	SceneManager* mSceneMgr;
+	TextureManager* mTextureMgr;
 	GeometryManager* mGeometryMgr;
 	MaterialManager* mMaterialMgr;
 	LightManager* mLightMgr;

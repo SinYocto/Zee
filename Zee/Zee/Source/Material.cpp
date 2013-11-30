@@ -30,12 +30,13 @@ void Material::SetTexture(int layerIx, wchar_t* texFileName)	// TODO:²»Ó¦¸ÃÖ±½Ó´
 		return;
 
 	if(mTextureLayer[layerIx])
-		SAFE_RELEASE(mTextureLayer[layerIx]);
+		SAFE_DROP(mTextureLayer[layerIx]);
 
-	D3DXCreateTextureFromFile(gEngine->GetDriver()->GetD3DDevice(), texFileName, &mTextureLayer[layerIx]);		
+	mTextureLayer[layerIx] = gEngine->GetTextureManger()->GetOrCreateD3DTexture(texFileName);
+	mTextureLayer[layerIx]->Grab();	
 }
 
-IDirect3DTexture9* Material::GetTexture(int layerIx)
+Texture* Material::GetTexture(int layerIx)
 {
 	if(layerIx < 0 || layerIx >= MAX_MATERIAL_TEXTURE_LAYERS)
 		return NULL;

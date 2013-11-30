@@ -4,10 +4,12 @@
 #include "D3DUtility.h"
 #include "IReferenceCounted.h"
 #include "Shader.h"
+#include "Texture.h"
 
 #define MAX_MATERIAL_TEXTURE_LAYERS 4
 
 class Object;
+class Texture;
 
 class Material : public IReferenceCounted
 {
@@ -38,7 +40,7 @@ public:
 			mTextureLayer[layerIx] = mtl.mTextureLayer[layerIx];
 
 			if(mTextureLayer[layerIx])
-				mTextureLayer[layerIx]->AddRef();
+				mTextureLayer[layerIx]->Grab();
 		}
 	}
 
@@ -46,7 +48,7 @@ public:
 	{
 		for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
 		{
-			SAFE_RELEASE(mTextureLayer[layerIx]);
+			SAFE_DROP(mTextureLayer[layerIx]);
 		}
 
 		SAFE_DROP(mShader);
@@ -66,7 +68,7 @@ public:
 
 	ShadingMethod GetShadingMethod();
 
-	IDirect3DTexture9* GetTexture(int layerIx);
+	Texture* GetTexture(int layerIx);
 
 	D3DXCOLOR GetAmbientColor();
 	D3DXCOLOR GetDiffuseColor();
@@ -104,7 +106,7 @@ private:
 	Vector4 mParamsVec1;
 	Vector4 mParamsVec2;
 	
-	IDirect3DTexture9* mTextureLayer[MAX_MATERIAL_TEXTURE_LAYERS];
+	Texture* mTextureLayer[MAX_MATERIAL_TEXTURE_LAYERS];
 
 	ShadingMethod mShadingMethod;
 };

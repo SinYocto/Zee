@@ -17,7 +17,9 @@ public:
 class TextureManager
 {
 public:
-	IDirect3DTexture9* GetOrCreateD3DTexture(const wchar_t* filePath);
+	Texture* GetOrCreateD3DTexture(const wchar_t* filePath);
+
+	void Destory();
 
 private:
 	typedef stdext::hash_map<const wchar_t*, Texture*, stdext::hash_compare<const wchar_t*, WCharLess>> TexHashMap;

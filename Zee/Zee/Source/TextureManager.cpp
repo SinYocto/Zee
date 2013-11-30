@@ -2,7 +2,7 @@
 #include "Math.h"
 #include "Engine.h"
 
-IDirect3DTexture9* TextureManager::GetOrCreateD3DTexture(const wchar_t* filePath)
+Texture* TextureManager::GetOrCreateD3DTexture(const wchar_t* filePath)
 {
 	Texture* resultTexture = NULL;
 
@@ -15,11 +15,21 @@ IDirect3DTexture9* TextureManager::GetOrCreateD3DTexture(const wchar_t* filePath
 	else
 	{
 		resultTexture = new Texture();
-		resultTexture->CreateFromFile(filePath);
+		resultTexture->CreateFromFile(filePath);	// TODO:文件不存在, 创建失败时
 
 		mTextures[filePath] = resultTexture;
 	}
 
-	return resultTexture->GetD3DTexture();
+	return resultTexture;
+}
+
+void TextureManager::Destory()
+{
+	for(TexHashMap::iterator iter = mTextures.begin(); iter != mTextures.end(); ++iter)
+	{
+		SAFE_DROP(iter->second);
+	}
+
+	mTextures.clear();
 }
 

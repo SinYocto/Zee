@@ -2,11 +2,13 @@
 #define TEXTURE_H
 
 #include "D3DUtility.h"
+#include "IReferenceCounted.h"
 
-class Texture
+class Texture : public IReferenceCounted
 {
 public:
 	Texture();
+	~Texture();
 
 	void CreateFromFile(const wchar_t* filePath);
 
