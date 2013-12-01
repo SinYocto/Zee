@@ -139,3 +139,8 @@ Material* MaterialManager::GetDefaultSpecMtl()
 	_Assert(NULL != specMtl);
 	return specMtl;
 }
+
+std::list<Material*> MaterialManager::GetMaterialList()
+{
+	return materialList;
+}

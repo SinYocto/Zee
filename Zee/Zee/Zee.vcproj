@@ -583,6 +583,62 @@
 			Name="wxWnd"
 			>
 			<File
+				RelativePath=".\Source\GeometryPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GeometryPanel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\LightPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\LightPanel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\MaterialPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\MaterialPanel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ModelPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ModelPanel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\SceneEditorPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\SceneEditorPanel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\SceneGraphPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\SceneGraphPanel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\TexturePanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\TexturePanel.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\wxWndTreeGenerator.cpp"
 				>
 			</File>

@@ -56,3 +56,8 @@ void GeometryManager::OnResetDevice()
 		(*iter)->OnResetDevice();
 	}
 }
+
+std::list<Geometry*> GeometryManager::GetGeometryList()
+{
+	return geoList;
+}

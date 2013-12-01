@@ -177,35 +177,35 @@ void Gizmo::determinSelectType(Object* obj, Camera* camera)
 	switch(pickColor)
 	{
 	case COLOR_NONE:
-		mSelected = SELECT_NONE;
+		mSelectedAxis = SELECT_NONE;
 		break;
 
 	case COLOR_X:
-		mSelected = AXIS_X;
+		mSelectedAxis = AXIS_X;
 		break;
 
 	case COLOR_Y:
-		mSelected = AXIS_Y;
+		mSelectedAxis = AXIS_Y;
 		break;
 
 	case COLOR_Z:
-		mSelected = AXIS_Z;
+		mSelectedAxis = AXIS_Z;
 		break;
 
 	case COLOR_XY_PICK:
-		mSelected = PLANE_XY;
+		mSelectedAxis = PLANE_XY;
 		break;
 
 	case COLOR_XZ_PICK:
-		mSelected = PLANE_XZ;
+		mSelectedAxis = PLANE_XZ;
 		break;
 
 	case COLOR_YZ_PICK:
-		mSelected = PLANE_YZ;
+		mSelectedAxis = PLANE_YZ;
 		break;
 
 	default:
-		mSelected = SELECT_NONE;
+		mSelectedAxis = SELECT_NONE;
 		break;
 	}
 }
@@ -221,6 +221,16 @@ void Gizmo::Draw(Object* obj, Camera* camera)
 
 	determinSelectType(obj, camera);
 	draw(obj, camera, false);
+}
+
+void Gizmo::applyTransform(Camera* camera)
+{
+	_Assert(NULL != camera);
+
+	if(!mSelectedNode || mActiveType == GIZMO_NONE)
+		return;
+
+	Input* input = gEngine->GetInput();
 
 	static Vector3 tangentX;
 	static Vector3 tangentY;
@@ -229,28 +239,28 @@ void Gizmo::Draw(Object* obj, Camera* camera)
 	if(mActiveType == GIZMO_TRANS)
 	{
 		if(input->GetLeftButtonDown())
-			calTransTangent(obj, camera, &tangentX, &tangentY, &tangentZ);
+			calTransTangent(mSelectedNode, camera, &tangentX, &tangentY, &tangentZ);
 
 		if(input->GetLeftButton())
-			applyTrans(obj, camera, tangentX, tangentY, tangentZ);
+			applyTrans(mSelectedNode, camera, tangentX, tangentY, tangentZ);
 	}
 
 	if(mActiveType == GIZMO_ROTATE)
 	{
 		if(input->GetLeftButtonDown())
-			calRotateTangent(obj, camera, &tangentX);
+			calRotateTangent(mSelectedNode, camera, &tangentX);
 
 		if(input->GetLeftButton())
-			applyRotate(obj, camera, tangentX);
+			applyRotate(mSelectedNode, camera, tangentX);
 	}
 
 	if(mActiveType == GIZMO_SCALE)
 	{
 		if(input->GetLeftButtonDown())
-			calTransTangent(obj, camera, &tangentX, &tangentY, &tangentZ);
+			calTransTangent(mSelectedNode, camera, &tangentX, &tangentY, &tangentZ);
 
 		if(input->GetLeftButton())
-			applyScale(obj, camera, tangentX, tangentY, tangentZ);
+			applyScale(mSelectedNode, camera, tangentX, tangentY, tangentZ);
 	}
 }
 
@@ -316,10 +326,10 @@ void Gizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 		elementColor[PLANE_XZ] = COLOR_XZ;
 		elementColor[PLANE_YZ] = COLOR_YZ;
 
-		if(mSelected != SELECT_NONE)
+		if(mSelectedAxis != SELECT_NONE)
 		{
-			elementColor[mSelected] = (D3DCOLOR)COLOR_SELECTED;
-			SETALPHA(elementColor[mSelected], 0x7f);
+			elementColor[mSelectedAxis] = (D3DCOLOR)COLOR_SELECTED;
+			SETALPHA(elementColor[mSelectedAxis], 0x7f);
 		}
 	}
 
@@ -549,13 +559,13 @@ void Gizmo::applyTrans(Object* obj, Camera* camera, const Vector3& tangentX, con
 	float dy = 0;
 	float dz = 0;
 
-	if(mSelected == AXIS_X || mSelected == PLANE_XY || mSelected == PLANE_XZ)
+	if(mSelectedAxis == AXIS_X || mSelectedAxis == PLANE_XY || mSelectedAxis == PLANE_XZ)
 		dx = screenMoveVector.Dot(tangentX);
 
-	if(mSelected == AXIS_Y || mSelected == PLANE_XY || mSelected == PLANE_YZ)
+	if(mSelectedAxis == AXIS_Y || mSelectedAxis == PLANE_XY || mSelectedAxis == PLANE_YZ)
 		dy = screenMoveVector.Dot(tangentY);
 
-	if(mSelected == AXIS_Z || mSelected == PLANE_XZ || mSelected == PLANE_YZ)
+	if(mSelectedAxis == AXIS_Z || mSelectedAxis == PLANE_XZ || mSelectedAxis == PLANE_YZ)
 		dz = screenMoveVector.Dot(tangentZ);
 
 	obj->TranslateLocal(dx, dy, dz);
@@ -578,13 +588,13 @@ void Gizmo::applyRotate(Object* obj, Camera* camera, const Vector3& tangent)
 
 	float delta = screenMoveVector.Dot(tangent);
 
-	if(mSelected == AXIS_X)
+	if(mSelectedAxis == AXIS_X)
 		obj->RotateLocal(signX * delta, 0, 0);
 
-	if(mSelected == AXIS_Y)
+	if(mSelectedAxis == AXIS_Y)
 		obj->RotateLocal(0, signY * delta, 0);
 
-	if(mSelected == AXIS_Z)
+	if(mSelectedAxis == AXIS_Z)
 		obj->RotateLocal(0, 0, signZ * delta);
 }
 
@@ -597,17 +607,43 @@ void Gizmo::applyScale(Object* obj, Camera* camera, const Vector3& tangentX, con
 	Vector3 screenMoveVector((float)mouseState.lX / 1000, -(float)mouseState.lY / 1000, 0);
 	screenMoveVector = SCALE_SPEED * scaleFactor * screenMoveVector;
 
-	if(mSelected == AXIS_X)
+	if(mSelectedAxis == AXIS_X)
 		obj->Scale(Vector3(1 + screenMoveVector.Dot(tangentX), 1.0f, 1.0f));
 
-	if(mSelected == AXIS_Y)
+	if(mSelectedAxis == AXIS_Y)
 		obj->Scale(Vector3(1.0f, 1 + screenMoveVector.Dot(tangentY), 1.0f));
 
-	if(mSelected == AXIS_Z)
+	if(mSelectedAxis == AXIS_Z)
 		obj->Scale(Vector3(1.0f, 1.0f, 1 + screenMoveVector.Dot(tangentZ)));
 }
 
 bool Gizmo::IsSelected()
 {
-	return mSelected !=  SELECT_NONE;
+	return mSelectedAxis !=  SELECT_NONE;
+}
+
+void Gizmo::FrameUpdate(Camera* camera)
+{
+	Input* input = gEngine->GetInput();
+
+	SceneManager* sceneMgr = gEngine->GetSceneManager();
+
+	Vector2 screenPos((float)input->GetCursorPos().x, (float)input->GetCursorPos().y);
+
+	Vector3 rayPos;
+	Vector3 rayDir;
+	camera->GetScreenRay(screenPos, &rayPos, &rayDir);
+
+	if(input->GetLeftButtonDown())
+	{
+		if(!IsSelected())
+			mSelectedNode = sceneMgr->RayIntersect(rayPos, rayDir, NULL, NULL);
+	}
+
+	applyTransform(camera);
+}
+
+SceneNode* Gizmo::GetSelectedNode()
+{
+	return mSelectedNode;
 }

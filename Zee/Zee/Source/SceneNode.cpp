@@ -130,3 +130,8 @@ bool SceneNode::GetDrawBBoxFlag()
 	return mAttribute.drawBBox;
 }
 
+wchar_t* SceneNode::GetName()
+{
+	return mName;
+}
+

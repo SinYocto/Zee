@@ -16,6 +16,8 @@ public:
 	void OnLostDevice();
 	void OnResetDevice();
 
+	std::list<Geometry*> GetGeometryList();
+
 private:
 	std::list<Geometry*> geoList;
 };

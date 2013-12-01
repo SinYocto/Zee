@@ -57,8 +57,8 @@ SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, co
 	createWxCtrls();
 
 	// canvas
-	wxSize clientSize = GetClientSize(); 
-	mCanvas = new SceneEditorCanvas(this, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
+	wxSize clientSize = mCanvasPanel->GetClientSize(); 
+	mCanvas = new SceneEditorCanvas(mCanvasPanel, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
 
 	D3DDeviceParams deviceParams;
 	deviceParams.hWnd = (HWND)mCanvas->GetHWND();
@@ -77,6 +77,8 @@ SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, co
 
 	// load/create scene
 	::CreateScene();
+
+	mEditorPanel->OnCreateScene();
 
 	//// treeGenerator
 	//mWndTreeGenerator = new TreeGeneratorFrame(this, L"Tree Generator", wxDefaultPosition, wxDefaultSize);
@@ -105,9 +107,25 @@ void SceneEditorFrame::createWxCtrls()
 	menuBar->Append(menuHelp, L"&Help");
 
 	SetMenuBar(menuBar);
-
+  
 	CreateStatusBar();
 	SetStatusText(L"Welcome To WanderLand!");
+
+	// panel & canvas
+	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxHORIZONTAL);
+
+	mEditorPanel = new SceneEditorPanel(this, -1);
+	mEditorPanel->SetMinSize(wxSize(200, 680));
+	boxSizer1->Add(mEditorPanel, 0, wxALL, 5);
+
+	// canvas
+	mCanvasPanel = new wxPanel(this, -1);
+	mCanvasPanel->SetMinSize(wxSize(1080, 680));	// TODO: ÔİÊ±Ğ´ËÀ
+	boxSizer1->Add(mCanvasPanel, 0, wxALL, 5);
+
+	this->SetSizer(boxSizer1);
+	this->Layout();
+	this->Fit();
 }
 
 void SceneEditorFrame::OnQuit(wxCommandEvent& event)
@@ -123,6 +141,9 @@ void SceneEditorFrame::OnClose(wxCloseEvent& event)
 void SceneEditorFrame::cleanupAndDestory()
 {
 	::AppDestroy();
+
+	if(mEditorPanel)
+		mEditorPanel->CleanupAndDestory();
 
 	if(mCanvas)
 		mCanvas->Destroy();
@@ -199,6 +220,7 @@ void CreateScene()
 
 	LightManager* lightMgr = gEngine->GetLightManager();
 	lightMgr->SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
+
 
 	lightMgr->AddDirectionalLight(dirLight1);
 	lightMgr->AddPointLight(pointLight1);
@@ -319,36 +341,32 @@ void SceneEditorCanvas::RenderLoop()
 			// update state
 			gEngine->FrameUpdate();
 
-			if(input->GetKeyUp(DIK_R))
-			{
-				terrain->createEffect();
-			}
-
 			GUIUpdate();
-
 
 			if(wxWindow::FindFocus() == this)
 				mainCamera->ApplyCameraController();
 
 			terrain->FrameUpdate(mainCamera);
 
+			gizmo->FrameUpdate(mainCamera);
+
 			// render
 			driver->RenderToSwapChain(PRIMARY_SWAPCHAIN);
 			driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
 			driver->BeginScene();
 
-			Vector2 screenPos(input->GetCursorPos().x, input->GetCursorPos().y);
+			//Vector2 screenPos(input->GetCursorPos().x, input->GetCursorPos().y);
 
-			Vector3 rayPos;
-			Vector3 rayDir;
-			mainCamera->GetScreenRay(screenPos, &rayPos, &rayDir);
+			//Vector3 rayPos;
+			//Vector3 rayDir;
+			//mainCamera->GetScreenRay(screenPos, &rayPos, &rayDir);
 
-			static SceneNode* hitNode = NULL;
-			if(input->GetLeftButtonDown())
-			{
-				if(!gizmo->IsSelected())
-					hitNode = sceneMgr->RayIntersect(rayPos, rayDir, NULL, NULL);
-			}
+			//static SceneNode* hitNode = NULL;
+			//if(input->GetLeftButtonDown())
+			//{
+			//	if(!gizmo->IsSelected())
+			//		hitNode = sceneMgr->RayIntersect(rayPos, rayDir, NULL, NULL);
+			//}
 
 			terrain->Draw(mainCamera, true);
 
@@ -358,15 +376,15 @@ void SceneEditorCanvas::RenderLoop()
 
 			gGUISystem.Draw();
 
-			gizmo->SetActiveType(Gizmo::GIZMO_SCALE);
-			gizmo->Draw(hitNode, mainCamera);
+			gizmo->SetActiveType(Gizmo::GIZMO_TRANS);
+			gizmo->Draw(gizmo->GetSelectedNode(), mainCamera);
 
-			if(hitNode && hitNode->GetNodeType() == SceneNode::SCENE_NODE_BILLBOARD)
-			{
-				PointLight* pointLight1 = NULL;
-				gEngine->GetLightManager()->GetPointLight(L"pointLight1", &pointLight1);
-				pointLight1->SetPosition(hitNode->GetWorldPosition());
-			}
+			//if(hitNode && hitNode->GetNodeType() == SceneNode::SCENE_NODE_BILLBOARD)
+			//{
+			//	PointLight* pointLight1 = NULL;
+			//	gEngine->GetLightManager()->GetPointLight(L"pointLight1", &pointLight1);
+			//	pointLight1->SetPosition(hitNode->GetWorldPosition());
+			//}
 
 			driver->EndScene();
 			driver->Present();

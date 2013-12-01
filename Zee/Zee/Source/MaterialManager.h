@@ -19,6 +19,8 @@ public:
 	void AddMaterial(Material* material);
 	void GetMaterial(const wchar_t* name, Material** material);
 
+	std::list<Material*> GetMaterialList();
+
 	Material* GetDefaultFlatMtl();
 	Material* GetDefaultViewMtl();
 	Material* GetDefaultDiffMtl();

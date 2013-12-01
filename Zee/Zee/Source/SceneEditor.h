@@ -3,6 +3,7 @@
 
 #include "wx/wx.h"
 #include "wxWndTreeGenerator.h"
+#include "SceneEditorPanel.h"
 
 class SceneEditorCanvas;
 
@@ -31,6 +32,8 @@ private:
 	void cleanupAndDestory();
 
 private:
+	SceneEditorPanel* mEditorPanel;
+	wxPanel* mCanvasPanel;
 	SceneEditorCanvas* mCanvas;
 	TreeGeneratorFrame* mWndTreeGenerator;
 };

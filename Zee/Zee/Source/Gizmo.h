@@ -6,6 +6,7 @@
 class Camera;
 
 class Object;
+class SceneNode;
 class MeshNode;
 class Material;
 
@@ -63,8 +64,9 @@ public:
 		,mCube(NULL)
 		,mRenderTarget(NULL)
 		,mDepthStencil(NULL)
-		,mSelected(SELECT_NONE)
+		,mSelectedAxis(SELECT_NONE)
 		,mActiveType(GIZMO_NONE)
+		,mSelectedNode(NULL)
 	{
 
 	}
@@ -75,8 +77,12 @@ public:
 	void OnLostDevice();
 	void OnResetDevice();
 
+	void FrameUpdate(Camera* camera);
+
 	void SetActiveType(GIZMO_TYPE type);
 	void Draw(Object* obj, Camera* camera);
+
+	SceneNode* GetSelectedNode();
 
 	bool IsSelected();
 
@@ -99,6 +105,8 @@ private:
 
 	void createRenderTargetDepthStencile();
 
+	void applyTransform(Camera* camera);
+
 private:
 	MeshNode* mCone;
 	MeshNode* mLine;
@@ -108,8 +116,10 @@ private:
 	IDirect3DSurface9* mRenderTarget;
 	IDirect3DSurface9* mDepthStencil;
 
-	SELECT_TYPE mSelected;
+	SELECT_TYPE mSelectedAxis;
 	GIZMO_TYPE mActiveType;
+
+	SceneNode* mSelectedNode;
 };
      
 #endif

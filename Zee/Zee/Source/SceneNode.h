@@ -60,6 +60,7 @@ public:
 	bool GetDrawBBoxFlag();
 
 	AABBox GetAABBox();
+	wchar_t* GetName();
 
 	SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
 
