@@ -1,29 +1,33 @@
-#include "BillboardNode.h"
+#include "DirectionalLightNode.h"
+#include "Billboard.h"
 #include "Engine.h"
 #include "Camera.h"
 
-BillboardNode::BillboardNode( const wchar_t* name, float width, float height, D3DCOLOR color ) :SceneNode(name)
+DirectionalLightNode::DirectionalLightNode(SceneNode* parent, DirectionalLight* dirLight)
+:SceneNode(dirLight->GetName(), parent)
+,mDirLight(dirLight)
 {
-	mType = SCENE_NODE_BILLBOARD;
-	mBillboard = new Billboard(width, height, color);
+	mType = SCENE_NODE_DIR_LIGHT;
+	mBillboard = new Billboard();
+
+	mBillboard->SetTexture(L"./Assets/Textures/DirLight.jpg");
+	mBillboard->SetColor(dirLight->GetFinalColor());
 
 	gEngine->GetResourceManager()->AddBillboard(mBillboard);
 	mBillboard->Grab();
+
+	Quaternion orient = Quaternion::VectorRotation(Vector3(0, 0, 1.0f), dirLight->GetDirection());
+	SetWorldOrientation(orient);
 }
 
-void BillboardNode::Draw(Camera* camera)
+DirectionalLightNode::~DirectionalLightNode()
 {
-	mBillboard->Draw(mWorldPos, camera);
+	SAFE_DROP(mBillboard);
 }
 
-Billboard* BillboardNode::GetBillboard()
+void DirectionalLightNode::updateAABBox()
 {
-	return mBillboard;
-}
-
-void BillboardNode::updateAABBox()
-{
-	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();		// TODO:这里直接使用了mainCamera
+	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();
 
 	Vector3 pos[4];
 	pos[0] = mWorldPos - 0.5f * mBillboard->GetWidth() * camera->GetWorldRight().Normalized()
@@ -58,4 +62,15 @@ void BillboardNode::updateAABBox()
 		if(pos[i].z < mAABBox.mMin.z)
 			mAABBox.mMin.z = pos[i].z;
 	}
+}
+
+void DirectionalLightNode::OnTransformChanged()
+{
+	Vector3 dir = Vector3(0, 0, 1.0f) * GetWorldOrient();
+	mDirLight->SetDirection(dir);
+}
+
+Billboard* DirectionalLightNode::GetBillboard()
+{
+	return mBillboard;
 }

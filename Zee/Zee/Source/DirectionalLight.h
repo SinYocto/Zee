@@ -41,7 +41,11 @@ public:
 	void SetID(DWORD id);
 	void SetValue(D3DXCOLOR color, Vector3 dir, float intensity);
 
+	void SetDirection(const Vector3& dir);
+
 	wchar_t* GetName();
+	Vector3 GetDirection();
+	D3DXCOLOR GetFinalColor();
 
 	void Enable(bool enable);
 	bool IsEnabled();

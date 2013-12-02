@@ -1,29 +1,32 @@
-#include "BillboardNode.h"
+#include "PointLightNode.h"
+#include "Billboard.h"
 #include "Engine.h"
 #include "Camera.h"
 
-BillboardNode::BillboardNode( const wchar_t* name, float width, float height, D3DCOLOR color ) :SceneNode(name)
+PointLightNode::PointLightNode(SceneNode* parent, PointLight* pointLight)
+:SceneNode(pointLight->GetName(), parent)
+,mPointLight(pointLight)
 {
-	mType = SCENE_NODE_BILLBOARD;
-	mBillboard = new Billboard(width, height, color);
+	mType = SCENE_NODE_POINT_LIGHT;
+	mBillboard = new Billboard();		// TODO:没必要每个light一个billboard
+
+	mBillboard->SetTexture(L"./Assets/Textures/pointLight.jpg");
+	mBillboard->SetColor(pointLight->GetFinalColor());
 
 	gEngine->GetResourceManager()->AddBillboard(mBillboard);
 	mBillboard->Grab();
+
+	SetWorldPosition(pointLight->GetPosition());
 }
 
-void BillboardNode::Draw(Camera* camera)
+PointLightNode::~PointLightNode()
 {
-	mBillboard->Draw(mWorldPos, camera);
+	SAFE_DROP(mBillboard);
 }
 
-Billboard* BillboardNode::GetBillboard()
+void PointLightNode::updateAABBox()
 {
-	return mBillboard;
-}
-
-void BillboardNode::updateAABBox()
-{
-	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();		// TODO:这里直接使用了mainCamera
+	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();
 
 	Vector3 pos[4];
 	pos[0] = mWorldPos - 0.5f * mBillboard->GetWidth() * camera->GetWorldRight().Normalized()
@@ -58,4 +61,14 @@ void BillboardNode::updateAABBox()
 		if(pos[i].z < mAABBox.mMin.z)
 			mAABBox.mMin.z = pos[i].z;
 	}
+}
+
+void PointLightNode::OnTransformChanged()
+{
+	mPointLight->SetPosition(GetWorldPosition());
+}
+
+Billboard* PointLightNode::GetBillboard()
+{
+	return mBillboard;
 }

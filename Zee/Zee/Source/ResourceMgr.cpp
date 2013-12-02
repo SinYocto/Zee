@@ -1,6 +1,5 @@
 #include "ResourceMgr.h"
-
-std::list<Billboard*> ResourceMgr::billboardList;
+#include "Billboard.h"
 
 void ResourceMgr::OnLostDevice()
 {
@@ -22,4 +21,15 @@ void ResourceMgr::AddBillboard(Billboard* billboard)
 {
 	_Assert(billboard);
 	billboardList.push_back(billboard);
+}
+
+void ResourceMgr::Destroy()
+{
+	for(std::list<Billboard*>::iterator iter = billboardList.begin(); iter != billboardList.end(); ++iter)
+	{
+		SAFE_DROP(*iter);
+	}
+
+	billboardList.clear();
+
 }

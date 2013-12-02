@@ -84,6 +84,8 @@ public:
 	void SetWorldOrientation(Quaternion orient);
 	void SetWorldOrientation(float eulerX, float eulerY, float eulerZ);
 
+	virtual void OnTransformChanged() {}
+
 private:
 	void updateWorldPosition();
 	void updateWorldOrientation();

@@ -20,7 +20,9 @@
 
 #include "Gizmo.h"
 #include "BillboardNode.h"
-#include "ResourceMgr.h"
+
+#include "DirectionalLightNode.h"
+#include "PointLightNode.h"
 
 #include <hash_map>
 
@@ -221,10 +223,15 @@ void CreateScene()
 	LightManager* lightMgr = gEngine->GetLightManager();
 	lightMgr->SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
 
-
 	lightMgr->AddDirectionalLight(dirLight1);
 	lightMgr->AddPointLight(pointLight1);
 	pointLight1->Enable(false);
+
+	DirectionalLightNode* dirLightNode1 = new DirectionalLightNode(NULL, dirLight1);
+	sceneMgr->AddSceneNode(dirLightNode1);
+
+	PointLightNode* pointLightNode1 = new PointLightNode(NULL, pointLight1);
+	sceneMgr->AddSceneNode(pointLightNode1);
 
 	// geo
 	GeometryManager* geometryMgr = gEngine->GetGeometryManager();
@@ -307,9 +314,9 @@ void CreateScene()
 	torus->Translate(0, 0, 2);
 
 	// billboard
-	BillboardNode* billboard = new BillboardNode(L"billboard", 1.0f, 1.0f, D3DXCOLOR_YELLOW);
-	sceneMgr->AddSceneNode(billboard);
-	billboard->GetBillboard()->SetTexture(L"./Assets/Textures/light.jpg");
+	//BillboardNode* billboard = new BillboardNode(L"billboard", 1.0f, 1.0f, D3DXCOLOR_YELLOW);
+	//sceneMgr->AddSceneNode(billboard);
+	//billboard->GetBillboard()->SetTexture(L"./Assets/Textures/light.jpg");
 
 	// terrain
 	PerformanceTimer::Begin(L"building 257 terrain");
@@ -355,28 +362,14 @@ void SceneEditorCanvas::RenderLoop()
 			driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
 			driver->BeginScene();
 
-			//Vector2 screenPos(input->GetCursorPos().x, input->GetCursorPos().y);
-
-			//Vector3 rayPos;
-			//Vector3 rayDir;
-			//mainCamera->GetScreenRay(screenPos, &rayPos, &rayDir);
-
-			//static SceneNode* hitNode = NULL;
-			//if(input->GetLeftButtonDown())
-			//{
-			//	if(!gizmo->IsSelected())
-			//		hitNode = sceneMgr->RayIntersect(rayPos, rayDir, NULL, NULL);
-			//}
-
 			terrain->Draw(mainCamera, true);
 
 			sceneMgr->GetRoot()->SetDrawBBoxFlag(true);
-			//sceneMgr->DrawAll();
 			sceneMgr->DrawAllUseRenderer();
 
 			gGUISystem.Draw();
 
-			gizmo->SetActiveType(Gizmo::GIZMO_TRANS);
+			gizmo->SetActiveType(Gizmo::GIZMO_ROTATE);
 			gizmo->Draw(gizmo->GetSelectedNode(), mainCamera);
 
 			//if(hitNode && hitNode->GetNodeType() == SceneNode::SCENE_NODE_BILLBOARD)
@@ -464,8 +457,6 @@ void OnLostDevice()
 	gDefaultLabelStyle.OnLostDevice();
 	gGUISystem.OnLostDevice();
 
-	ResourceMgr::OnLostDevice();
-
 	gEngine->OnLostDevice();
 }
 
@@ -481,8 +472,6 @@ void OnResetDevice()
 
 	gDefaultLabelStyle.OnResetDevice();
 	gGUISystem.OnResetDevice();
-
-	ResourceMgr::OnResetDevice();
 
 	gEngine->OnResetDevice();
 }

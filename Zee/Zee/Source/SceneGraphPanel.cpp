@@ -14,6 +14,7 @@ SceneGraphPanel::SceneGraphPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/,
 	mIconList->Add(wxIcon(L"./Assets/Icons/mesh.ico", wxBITMAP_TYPE_ICO));
 	mIconList->Add(wxIcon(L"./Assets/Icons/model.ico", wxBITMAP_TYPE_ICO));
 	mIconList->Add(wxIcon(L"./Assets/Icons/billboard.ico", wxBITMAP_TYPE_ICO));
+	mIconList->Add(wxIcon(L"./Assets/Icons/lightPage.ico", wxBITMAP_TYPE_ICO));
 
 	createWxCtrls();
 }
@@ -28,7 +29,9 @@ void SceneGraphPanel::createWxCtrls()
 
 	wxBoxSizer* boxSizer2 = new wxBoxSizer(wxVERTICAL);
 
-	mTreeCtrl = new wxTreeCtrl(mTreePanel, -1, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES);
+	mTreeCtrl = new wxTreeCtrl(mTreePanel, -1, wxDefaultPosition, wxDefaultSize, 
+		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES);
+
 	mTreeCtrl->SetMinSize(wxSize(180, 260));
 	mTreeCtrl->AssignImageList(mIconList);
 
@@ -95,6 +98,11 @@ void SceneGraphPanel::appendSceneNode(wxTreeItemId parentItemId, SceneNode* node
 
 	case SceneNode::SCENE_NODE_BILLBOARD:
 		sceneNodeIcon = 3;
+		break;
+
+	case SceneNode::SCENE_NODE_DIR_LIGHT:
+	case SceneNode::SCENE_NODE_POINT_LIGHT:
+		sceneNodeIcon = 4;
 		break;
 
 	default:

@@ -49,6 +49,9 @@ public:
 
 	void SetPosition(const Vector3& pos);
 
+	Vector3 GetPosition();
+	D3DXCOLOR GetFinalColor();
+
 	wchar_t* GetName();
 
 	void Enable(bool enable);

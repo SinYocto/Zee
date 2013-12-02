@@ -7,6 +7,8 @@
 class Camera;
 class MeshNode;
 class BillboardNode;
+class DirectionalLightNode;
+class PointLightNode;
 
 class SceneManager
 {
@@ -52,6 +54,9 @@ private:
 	ShadingMethodMeshNodeListMap mMeshNodeLists;		// ½ö°üº¬MeshNodeºÍModelNode
 	std::list<AABBox> mAABBoxes;
 	std::list<BillboardNode*> mBillboardNodeList;
+
+	std::list<DirectionalLightNode*> mDirLightNodes;
+	std::list<PointLightNode*> mPointLihgtNodes; 
 };
 
 #endif

@@ -56,3 +56,13 @@ void PointLight::SetPosition(const Vector3& pos)
 	mPosition = pos;
 	gEngine->GetLightManager()->SetPointLightDirtyFlag(true);
 }
+
+Vector3 PointLight::GetPosition()
+{
+	return mPosition;
+}
+
+D3DXCOLOR PointLight::GetFinalColor()
+{
+	return mIntensity * mColor;
+}

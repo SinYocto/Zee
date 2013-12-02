@@ -338,6 +338,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Source\DirectionalLightNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\DirectionalLightNode.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\Mesh.cpp"
 					>
 				</File>
@@ -375,6 +383,14 @@
 				</File>
 				<File
 					RelativePath=".\Source\Object.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\PointLightNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\PointLightNode.h"
 					>
 				</File>
 				<File

@@ -49,3 +49,20 @@ wchar_t* DirectionalLight::GetName()
 {
 	return mName;
 }
+
+Vector3 DirectionalLight::GetDirection()
+{
+	return mDirection;
+}
+
+void DirectionalLight::SetDirection(const Vector3& dir)
+{
+	mDirection = dir;
+
+	gEngine->GetLightManager()->SetDirectionalLightDirtyFlag(true);
+}
+
+D3DXCOLOR DirectionalLight::GetFinalColor()
+{
+	return mIntensity * mColor;
+}

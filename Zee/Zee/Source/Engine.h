@@ -7,6 +7,7 @@
 #include "GeometryManager.h"
 #include "MaterialManager.h"
 #include "LightManager.h"
+#include "ResourceMgr.h"
 #include "Input.h"
 #include "Time.h"
 #include "IDAllocator.h"
@@ -30,6 +31,7 @@ public:
 	GeometryManager* GetGeometryManager();
 	MaterialManager* GetMaterialManager();
 	LightManager* GetLightManager();
+	ResourceMgr* GetResourceManager();
 	Input* GetInput();
 	FrameTimer* GetFrameTimer();
 	IDAllocator* GetIDAllocator();
@@ -42,6 +44,7 @@ private:
 	GeometryManager* mGeometryMgr;
 	MaterialManager* mMaterialMgr;
 	LightManager* mLightMgr;
+	ResourceMgr* mResourceMgr;
 
 	IDAllocator* mIDAllocator;
 

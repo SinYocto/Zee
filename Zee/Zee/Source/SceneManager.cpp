@@ -2,6 +2,8 @@
 #include "Camera.h"
 #include "MeshNode.h"
 #include "BillboardNode.h"
+#include "DirectionalLightNode.h"
+#include "PointLightNode.h"
 #include "Engine.h"
 #include "Renderer.h"
 #include "DebugDrawer.h"
@@ -102,6 +104,28 @@ void SceneManager::DrawAllUseRenderer()
 		Renderer::End(method);
 	}
 
+	// light billboard
+	if(!mDirLightNodes.empty() || !mPointLihgtNodes.empty())
+	{
+		Renderer::Begin(BillboardMethod);
+
+		for(std::list<DirectionalLightNode*>::iterator iter = mDirLightNodes.begin(); iter != mDirLightNodes.end(); ++iter)
+		{
+			DirectionalLightNode* dirLightNode = *iter;
+
+			Renderer::DrawBillboard(dirLightNode->GetWorldPosition(), dirLightNode->GetBillboard(), mainCamera);
+		}
+
+		for(std::list<PointLightNode*>::iterator iter = mPointLihgtNodes.begin(); iter != mPointLihgtNodes.end(); ++iter)
+		{
+			PointLightNode* pointLightNode = *iter;
+
+			Renderer::DrawBillboard(pointLightNode->GetWorldPosition(), pointLightNode->GetBillboard(), mainCamera);
+		}
+
+		Renderer::End(BillboardMethod);
+	}
+
 	// billboard
 	if(!mBillboardNodeList.empty())
 	{
@@ -156,6 +180,9 @@ void SceneManager::collectSceneEntities()
 	mBillboardNodeList.clear();
 	mAABBoxes.clear();
 
+	mDirLightNodes.clear();
+	mPointLihgtNodes.clear();
+
 	collectSceneNode(root);
 }
 
@@ -208,6 +235,16 @@ void SceneManager::collectSceneNode(SceneNode* sceneNode)
 	{
 		BillboardNode* billboardNode = static_cast<BillboardNode*>(sceneNode);
 		mBillboardNodeList.push_back(billboardNode);
+	}
+	else if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_DIR_LIGHT)
+	{
+		DirectionalLightNode* dirLightNode = static_cast<DirectionalLightNode*>(sceneNode);
+		mDirLightNodes.push_back(dirLightNode);
+	}
+	else if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_POINT_LIGHT)
+	{
+		PointLightNode* pointLightNode = static_cast<PointLightNode*>(sceneNode);
+		mPointLihgtNodes.push_back(pointLightNode);
 	}
 
 	std::list<Object*> children = sceneNode->GetChildren();

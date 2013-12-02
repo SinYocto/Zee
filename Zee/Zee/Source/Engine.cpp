@@ -10,6 +10,7 @@ Engine::Engine()
 ,mGeometryMgr(NULL)
 ,mMaterialMgr(NULL)
 ,mLightMgr(NULL)
+,mResourceMgr(NULL)
 ,mInput(NULL)
 ,mTimer(NULL)
 {
@@ -39,6 +40,8 @@ void Engine::Init(D3DDeviceParams params)
 	mMaterialMgr = new MaterialManager();
 	mMaterialMgr->Init();
 
+	mResourceMgr = new ResourceMgr();
+
 	mSceneMgr = new SceneManager();
 	mSceneMgr->Init();
 }
@@ -65,6 +68,7 @@ void Engine::FrameUpdate()
 
 void Engine::Destroy()
 {
+	mResourceMgr->Destroy();
 	mLightMgr->Destroy();
 	mGeometryMgr->Destroy();
 	mMaterialMgr->Destroy();
@@ -76,6 +80,7 @@ void Engine::Destroy()
 
 	SAFE_DELETE(mDriver);
 	SAFE_DELETE(mInput);
+	SAFE_DELETE(mResourceMgr);
 	SAFE_DELETE(mLightMgr);
 	SAFE_DELETE(mGeometryMgr);
 	SAFE_DELETE(mMaterialMgr);
@@ -132,4 +137,9 @@ IDAllocator* Engine::GetIDAllocator()
 TextureManager* Engine::GetTextureManger()
 {
 	return mTextureMgr;
+}
+
+ResourceMgr* Engine::GetResourceManager()
+{
+	return mResourceMgr;
 }

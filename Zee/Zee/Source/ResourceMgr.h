@@ -1,18 +1,22 @@
 #ifndef RESOURCE_MGR_H
 #define RESOURCE_MGR_H
 
-#include "Billboard.h"
+#include "Common.h"
+
+class Billboard;
 
 class ResourceMgr
 {
 public:
-	static void OnLostDevice();
-	static void OnResetDevice();
+	void Destroy();
 
-	static void AddBillboard(Billboard* billboard);
+	void OnLostDevice();
+	void OnResetDevice();
+
+	void AddBillboard(Billboard* billboard);
 
 private:
-	static std::list<Billboard*> billboardList;
+	std::list<Billboard*> billboardList;
 };
 
 #endif
