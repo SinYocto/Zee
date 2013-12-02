@@ -1,5 +1,6 @@
 #include "SceneGraphPanel.h"
 #include "Engine.h"
+#include "Camera.h"
 
 BEGIN_EVENT_TABLE(SceneGraphPanel, wxPanel)
 EVT_CLOSE(SceneGraphPanel::OnClose)
@@ -29,7 +30,7 @@ void SceneGraphPanel::createWxCtrls()
 
 	wxBoxSizer* boxSizer2 = new wxBoxSizer(wxVERTICAL);
 
-	mTreeCtrl = new wxTreeCtrl(mTreePanel, -1, wxDefaultPosition, wxDefaultSize, 
+	mTreeCtrl = new SceneGraphTree(mTreePanel, ID_SCENE_GRAPH_TREE, wxDefaultPosition, wxDefaultSize, 
 		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES);
 
 	mTreeCtrl->SetMinSize(wxSize(180, 260));
@@ -60,7 +61,6 @@ void SceneGraphPanel::LoadDataFromScene()
 	
 	SceneNode* root = sceneMgr->GetRoot();
 	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, new SceneNodeTreeItemData(root));
-	//wxTreeItemId itemId1 = mTreeCtrl->AppendItem(rootId, L"item1", 0, 0, new SceneNodeTreeItemData(sceneMgr->GetRoot()));
 
 	std::list<Object*> children = root->GetChildren();
 	for(std::list<Object*>::iterator iter = children.begin(); iter != children.end(); ++iter)
@@ -68,6 +68,8 @@ void SceneGraphPanel::LoadDataFromScene()
 		SceneNode* node = static_cast<SceneNode*>(*iter);
 		appendSceneNode(rootId, node);
 	}
+
+	mTreeCtrl->Expand(rootId);
 }
 
 void SceneGraphPanel::OnClose(wxCloseEvent& event)
@@ -125,4 +127,31 @@ SceneNodeTreeItemData::SceneNodeTreeItemData(SceneNode* sceneNode)
 :mSceneNode(sceneNode)
 {
 	
+}
+
+SceneNode* SceneNodeTreeItemData::GetSceneNode()
+{
+	return mSceneNode;
+}
+
+
+BEGIN_EVENT_TABLE(SceneGraphTree, wxTreeCtrl)
+EVT_TREE_ITEM_ACTIVATED (ID_SCENE_GRAPH_TREE, SceneGraphTree::OnItemActivated)
+END_EVENT_TABLE()
+
+SceneGraphTree::SceneGraphTree( wxWindow* parent, wxWindowID id /*= wxID_ANY*/, const wxPoint& pos /*= wxDefaultPosition*/, 
+							   const wxSize&size /*= wxDefaultSize*/, long style /*= wxTR_DEFAULT_STYLE*/ )
+							   :wxTreeCtrl(parent, id, pos, size, style)
+{
+
+}
+
+void SceneGraphTree::OnItemActivated(wxTreeEvent& event)
+{
+	SceneNodeTreeItemData* itemData = (SceneNodeTreeItemData*)GetItemData(event.GetItem());
+
+	SceneNode* sceneNode = itemData->GetSceneNode();
+
+	Camera* mainCamera = gEngine->GetSceneManager()->GetMainCamera();
+	mainCamera->FocusAt(sceneNode);
 }

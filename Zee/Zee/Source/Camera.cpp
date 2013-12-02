@@ -125,3 +125,97 @@ void Camera::ApplyCameraController()
 	_Assert(NULL != mController);
 	mController->Apply(this, gEngine->GetFrameTimer()->GetDeltaTime());
 }
+
+void Camera::FrameUpdate()
+{
+	if(mIsParametersDirty)
+	{
+		recalculateProjMatrix();
+
+		SetParametersDirty(false);
+	}
+
+	if(mIsTranformDirty)
+	{
+		recalculateViewMatrix();
+		extractFrustumPlanes();
+
+		SetTransformDirty(false);
+	}
+
+	// damp
+	if(mDampContext.isDamping)
+	{
+		if(mDampContext.elapsedTime > mDampContext.totalTime)
+		{
+			mDampContext.Clear();
+			SetWorldPosition(mDampContext.targetPos);
+		}
+		else
+		{
+			float deltaTime = gEngine->GetFrameTimer()->GetDeltaTime();
+
+			mDampContext.dampVel += deltaTime * mDampContext.dampAcc;
+
+			Vector3 moveVector = deltaTime * mDampContext.dampVel;
+
+			if(moveVector != Vector3::Zero)
+			{
+				Translate(moveVector);
+			}
+
+			mDampContext.elapsedTime += deltaTime;
+		}
+	}
+}
+
+void Camera::SetParametersDirty( bool isDirty )
+{
+	mIsParametersDirty = isDirty;
+}
+
+void Camera::SetTransformDirty( bool isDirty )
+{
+	mIsTranformDirty = isDirty;
+}
+
+void Camera::SetAspect( float aspect )
+{
+	mAspect = aspect;
+	mIsParametersDirty = true;
+}
+
+D3DXMATRIX Camera::OrthoProjMatrix( float orthoWidth ) const
+{
+	D3DXMATRIX matProj;
+	D3DXMatrixOrthoLH(&matProj, orthoWidth, orthoWidth / mAspect, mNearZ, mFarZ);
+	return matProj;
+}
+
+D3DXMATRIX Camera::ProjMatrix() const
+{
+	return mMatProj;
+}
+
+D3DXMATRIX Camera::ViewMatrix() const
+{
+	return mMatView;
+}
+
+void Camera::DampMoveTo(const Vector3& targetPos, float time, float dampFactor)
+{
+	mDampContext = DampContext(GetWorldPosition(), targetPos, time, dampFactor);
+}
+
+void Camera::OnTransformChanged()
+{
+	SetTransformDirty(true);
+}
+
+void Camera::FocusAt(Object* obj)
+{
+	const float DIST = 4.0f;
+
+	Vector3 targetPos = obj->GetWorldPosition() - DIST * GetWorldForward().Normalized();
+	DampMoveTo(targetPos, 0.5f, 0);
+}

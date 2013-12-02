@@ -357,6 +357,11 @@ void SceneEditorCanvas::RenderLoop()
 
 			gizmo->FrameUpdate(mainCamera);
 
+			if(input->GetKeyDown(DIK_R))
+			{
+				mainCamera->DampMoveTo(Vector3::Zero, 0.5f, 0.01f);
+			}
+
 			// render
 			driver->RenderToSwapChain(PRIMARY_SWAPCHAIN);
 			driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);

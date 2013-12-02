@@ -83,7 +83,9 @@ void SceneManager::DrawAllUseRenderer()
 		MeshNode* meshNode = *iter;
 		Mesh* mesh = meshNode->GetMesh();
 
-		Renderer::DrawMesh(meshNode->LocalToWorldMatrix(), mesh->GetGeometry(), mesh->GetMaterial(), mainCamera);
+		MaterialManager* materialMgr = gEngine->GetMaterialManager();
+
+		Renderer::DrawMesh(meshNode->LocalToWorldMatrix(), mesh->GetGeometry(), materialMgr->GetDefaultFlatMtl(), mainCamera);
 	}
 	Renderer::End(WireFrame);
 

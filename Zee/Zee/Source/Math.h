@@ -33,7 +33,15 @@ int sign(T t)
 class Vector3
 {
 public:
-	Vector3(float _x = 0, float _y = 0, float _z = 0)
+	Vector3()
+		:x(0)
+		,y(0)
+		,z(0)
+	{
+
+	}
+
+	Vector3(float _x, float _y, float _z)
 		:x(_x)
 		,y(_y)
 		,z(_z)
