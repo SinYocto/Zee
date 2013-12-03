@@ -32,3 +32,8 @@ void Texture::CreateFromFile(const wchar_t* filePath)
 	YString::Copy(mFilePath, _countof(mFilePath), filePath);
 	YString::Copy(mName, _countof(mName), filePath);		// TODO: 获取路径中的文件名
 }
+
+wchar_t* Texture::GetName()
+{
+	return mName;
+}

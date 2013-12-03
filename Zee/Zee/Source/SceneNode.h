@@ -52,6 +52,7 @@ public:
 	}
 
 	void SetID(DWORD id);
+	void SetName(const wchar_t* name);
 	void Detach();
 
 	void SetDrawBBoxFlag(bool drawBBox);

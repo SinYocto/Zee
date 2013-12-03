@@ -208,6 +208,8 @@ void persPosToOrthoPos(const D3DXMATRIX& matView, const D3DXMATRIX& matProjPers,
 
 void GetClipSpacePos(const Vector3& posLocal, const D3DXMATRIX& matWVP, Vector3* posClip);
 
+Vector3 GetWorldPos(const Vector3& pos, const Quaternion& orient, const Vector3& moveVector);
+
 unsigned int BKDRHash(const wchar_t* str);
 
 

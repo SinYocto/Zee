@@ -50,6 +50,11 @@ EVT_MENU(ID_Quit, SceneEditorFrame::OnQuit)
 EVT_MENU(ID_TreeGenerator, SceneEditorFrame::OnTreeGenerator)
 EVT_MENU(ID_About, SceneEditorFrame::OnAbout)
 EVT_CLOSE(SceneEditorFrame::OnClose)
+EVT_TOOL(ID_TOOL_TRANS, SceneEditorFrame::OnToolTransClicked)
+EVT_TOOL(ID_TOOL_ROTATE, SceneEditorFrame::OnToolRotateClicked)
+EVT_TOOL(ID_TOOL_SCALE, SceneEditorFrame::OnToolScaleClicked)
+EVT_RADIOBUTTON(ID_RADIO_BUTTON_GLOBAL, SceneEditorFrame::OnToolRadioButtonGlobal)
+EVT_RADIOBUTTON(ID_RADIO_BUTTON_LOCAL, SceneEditorFrame::OnToolRadioButtonLocal)
 END_EVENT_TABLE()
 
 SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
@@ -76,6 +81,7 @@ SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, co
 	// gizmo
 	gizmo = new Gizmo;
 	gizmo->Init();
+	gizmo->SetActiveType(Gizmo::GIZMO_TRANS);
 
 	// load/create scene
 	::CreateScene();
@@ -86,7 +92,7 @@ SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, co
 	//mWndTreeGenerator = new TreeGeneratorFrame(this, L"Tree Generator", wxDefaultPosition, wxDefaultSize);
 	//mWndTreeGenerator->Centre();
 	//mWndTreeGenerator->Show(false);
-
+ 
 	//mWndTreeGenerator->Setup();
 }
 
@@ -109,6 +115,29 @@ void SceneEditorFrame::createWxCtrls()
 	menuBar->Append(menuHelp, L"&Help");
 
 	SetMenuBar(menuBar);
+
+	wxToolBar* toolBar = new wxToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL | wxNO_BORDER);
+
+	wxBitmap iconTrans(L"./Assets/Textures/Editor/trans.png", wxBITMAP_TYPE_PNG);
+	wxBitmap iconRotate(L"./Assets/Textures/Editor/rotate.png", wxBITMAP_TYPE_PNG);
+	wxBitmap iconScale(L"./Assets/Textures/Editor/scale.png", wxBITMAP_TYPE_PNG);
+
+	toolBar->AddTool(ID_TOOL_TRANS, iconTrans, L"translate");
+	toolBar->AddTool(ID_TOOL_ROTATE, iconRotate, L"rotate");
+	toolBar->AddTool(ID_TOOL_SCALE, iconScale, L"scale");
+
+	wxRadioButton* buttonGlobal = new wxRadioButton(toolBar, ID_RADIO_BUTTON_GLOBAL, wxT("Global"), 
+		wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+
+	wxRadioButton* buttonLocal = new wxRadioButton(toolBar, ID_RADIO_BUTTON_LOCAL, wxT("Local"));
+
+	toolBar->AddSeparator();
+	toolBar->AddControl(buttonGlobal);
+	toolBar->AddControl(buttonLocal);
+
+	toolBar->Realize();
+
+	SetToolBar(toolBar);
   
 	CreateStatusBar();
 	SetStatusText(L"Welcome To WanderLand!");
@@ -117,12 +146,12 @@ void SceneEditorFrame::createWxCtrls()
 	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 
 	mEditorPanel = new SceneEditorPanel(this, -1);
-	mEditorPanel->SetMinSize(wxSize(200, 680));
+	mEditorPanel->SetMinSize(wxSize(200, 620));
 	boxSizer1->Add(mEditorPanel, 0, wxALL, 5);
 
 	// canvas
 	mCanvasPanel = new wxPanel(this, -1);
-	mCanvasPanel->SetMinSize(wxSize(1080, 680));	// TODO: 暂时写死
+	mCanvasPanel->SetMinSize(wxSize(1080, 620));	// TODO: 暂时写死
 	boxSizer1->Add(mCanvasPanel, 0, wxALL, 5);
 
 	this->SetSizer(boxSizer1);
@@ -168,6 +197,31 @@ void SceneEditorFrame::OnTreeGenerator(wxCommandEvent& event)
 		mWndTreeGenerator->Show(true);
 		mWndTreeGenerator->Raise();
 	}
+}
+
+void SceneEditorFrame::OnToolTransClicked(wxCommandEvent& event)
+{
+	gizmo->SetActiveType(Gizmo::GIZMO_TRANS);		// TODO:使用了未被管理的全局变量gizmo
+}
+
+void SceneEditorFrame::OnToolRotateClicked( wxCommandEvent& event )
+{
+	gizmo->SetActiveType(Gizmo::GIZMO_ROTATE);
+}
+
+void SceneEditorFrame::OnToolScaleClicked( wxCommandEvent& event )
+{
+	gizmo->SetActiveType(Gizmo::GIZMO_SCALE);
+}
+
+void SceneEditorFrame::OnToolRadioButtonGlobal(wxCommandEvent& event)
+{
+	gizmo->SetCoordinateType(Gizmo::COORDINATE_GLOBAL);
+}
+
+void SceneEditorFrame::OnToolRadioButtonLocal(wxCommandEvent& event)
+{
+	gizmo->SetCoordinateType(Gizmo::COORDINATE_LOCAL);
 }
 
 BEGIN_EVENT_TABLE(SceneEditorCanvas, wxWindow)
@@ -374,7 +428,6 @@ void SceneEditorCanvas::RenderLoop()
 
 			gGUISystem.Draw();
 
-			gizmo->SetActiveType(Gizmo::GIZMO_ROTATE);
 			gizmo->Draw(gizmo->GetSelectedNode(), mainCamera);
 
 			//if(hitNode && hitNode->GetNodeType() == SceneNode::SCENE_NODE_BILLBOARD)

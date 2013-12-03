@@ -59,7 +59,13 @@ void SceneEditorPanel::OnCreateScene()
 	MaterialPanel* materialPanel = static_cast<MaterialPanel*>(materialPage);
 	materialPanel->LoadDataFromScene();
 
+	wxNotebookPage* modelPage = GetPage(4);
+	ModelPanel* modelPanel = static_cast<ModelPanel*>(modelPage);
+	modelPanel->LoadDataFromScene();
 
+	wxNotebookPage* texturePage = GetPage(3);
+	TexturePanel* texturePanel = static_cast<TexturePanel*>(texturePage);
+	texturePanel->LoadDataFromScene();
 }
 
 void SceneEditorPanel::CleanupAndDestory()

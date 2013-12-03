@@ -15,6 +15,11 @@ class SceneEditorFrame : public wxFrame
 		ID_About,
 		ID_TreeGenerator,
 		ID_OK,
+		ID_TOOL_TRANS,
+		ID_TOOL_ROTATE,
+		ID_TOOL_SCALE,
+		ID_RADIO_BUTTON_LOCAL,
+		ID_RADIO_BUTTON_GLOBAL,
 	};
 
 public:
@@ -24,6 +29,12 @@ public:
 	void OnAbout(wxCommandEvent& event);
 	void OnClose(wxCloseEvent& event);
 	void OnTreeGenerator(wxCommandEvent& event);
+
+	void OnToolTransClicked(wxCommandEvent& event);
+	void OnToolRotateClicked(wxCommandEvent& event);
+	void OnToolScaleClicked(wxCommandEvent& event);
+	void OnToolRadioButtonGlobal(wxCommandEvent& event);
+	void OnToolRadioButtonLocal(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 

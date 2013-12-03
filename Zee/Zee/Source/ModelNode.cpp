@@ -1,6 +1,7 @@
 #include "ModelNode.h"
 #include "MeshNode.h"
 #include "DebugDrawer.h"
+#include "Engine.h"
 
 ModelNode::ModelNode(const wchar_t* name, SceneNode* parent, Model* model) 
 :SceneNode(name, parent)
@@ -23,6 +24,8 @@ ModelNode::ModelNode(const wchar_t* name, SceneNode* parent, Geometry* geo, Mate
 {
 	mType = SCENE_NODE_MODEL;
 	mModel = new Model(name, geo, material);
+
+	gEngine->GetModelManager()->AddModel(mModel);
 
 	MeshNode* meshNode = new MeshNode(L"mesh", this, geo, material);
 }

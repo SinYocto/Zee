@@ -559,3 +559,17 @@ unsigned int BKDRHash(const wchar_t* str)
 	}  
 	return hash;
 }
+
+Vector3 GetWorldPos(const Vector3& pos, const Quaternion& orient, const Vector3& moveVector)
+{
+	Vector3 right = Vector3(1.0f, 0, 0) * orient;
+	Vector3 up = Vector3(0, 1.0f, 0) * orient;
+	Vector3 forward = Vector3(0, 0, 1.0f) * orient;
+
+	Vector3 resultPos = pos;
+	resultPos += moveVector.x * right;
+	resultPos += moveVector.y * up;
+	resultPos += moveVector.z * forward;
+
+	return resultPos;
+}

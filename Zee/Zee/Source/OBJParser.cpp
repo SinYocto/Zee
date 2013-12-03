@@ -208,6 +208,8 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 						mResultModel = new Model(L"model", NULL, NULL);
 					Assert(NULL != mResultModel);
 
+					gEngine->GetModelManager()->AddModel(mResultModel);
+
 					subMesh = new Mesh(L"mesh", (*curGeo), material);
 					mResultModel->AddSubMesh(subMesh);
 					SAFE_DROP(subMesh);

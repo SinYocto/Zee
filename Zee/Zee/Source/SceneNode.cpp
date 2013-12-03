@@ -71,12 +71,12 @@ void SceneNode::Draw(Camera* camera)
 }
 
 SceneNode* SceneNode::RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist)
-{
+ {
 	Vector3 hitP;
 	float d;
 
 	if(IntersectRayAABB(rayPos, rayDir, GetAABBox(), &hitP, &d))
-	{
+	{ 
 		if(mChildren.size() == 0)
 		{
 			if(hitPos)
@@ -133,5 +133,10 @@ bool SceneNode::GetDrawBBoxFlag()
 wchar_t* SceneNode::GetName()
 {
 	return mName;
+}
+
+void SceneNode::SetName(const wchar_t* name)
+{
+	YString::Copy(mName, _countof(mName), name);
 }
 

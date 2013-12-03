@@ -672,6 +672,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Source\ModelManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\ModelManager.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Source\Renderer.cpp"
 			>
 		</File>

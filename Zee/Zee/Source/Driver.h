@@ -52,7 +52,7 @@ public:
 
 public:
 	HWND hWnd;
-	IDirect3DDevice9* D3DDevice;
+	IDirect3DDevice9 * D3DDevice;
 	D3DVIEWPORT9 primaryViewPort;
 	D3DVIEWPORT9 secondaryViewPort;
 

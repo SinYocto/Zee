@@ -14,6 +14,8 @@ public:
 	}
 };
 
+typedef stdext::hash_map<const wchar_t*, Texture*, stdext::hash_compare<const wchar_t*, WCharLess>> TexHashMap;
+
 class TextureManager
 {
 public:
@@ -21,8 +23,9 @@ public:
 
 	void Destory();
 
+	TexHashMap GetTextureHashMap();
+
 private:
-	typedef stdext::hash_map<const wchar_t*, Texture*, stdext::hash_compare<const wchar_t*, WCharLess>> TexHashMap;
 	TexHashMap mTextures;
 };
 

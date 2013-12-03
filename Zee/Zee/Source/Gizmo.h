@@ -26,6 +26,12 @@ public:
 		GIZMO_SCALE
 	};
 
+	enum COORDINATE_TYPE
+	{
+		COORDINATE_GLOBAL,
+		COORDINATE_LOCAL,
+	};
+
 private:
 	enum SELECT_TYPE
 	{
@@ -35,6 +41,8 @@ private:
 		PLANE_XY = 3,
 		PLANE_XZ = 4,
 		PLANE_YZ = 5,
+		AXIS_XYZ = 6,
+		
 		SELECT_NONE
 	};
 
@@ -44,6 +52,7 @@ private:
 		COLOR_X = 0xffff0000,
 		COLOR_Y = 0xff00ff00,
 		COLOR_Z = 0xff0000ff,
+		COLOR_XYZ = 0xffffffff,
 
 		COLOR_XY_PICK = 0xff00007f,
 		COLOR_XZ_PICK = 0xff007f00,
@@ -66,6 +75,7 @@ public:
 		,mDepthStencil(NULL)
 		,mSelectedAxis(SELECT_NONE)
 		,mActiveType(GIZMO_NONE)
+		,mCoordinateType(COORDINATE_LOCAL)
 		,mSelectedNode(NULL)
 	{
 
@@ -80,6 +90,8 @@ public:
 	void FrameUpdate(Camera* camera);
 
 	void SetActiveType(GIZMO_TYPE type);
+	void SetCoordinateType(COORDINATE_TYPE type);
+
 	void Draw(Object* obj, Camera* camera);
 
 	SceneNode* GetSelectedNode();
@@ -118,6 +130,7 @@ private:
 
 	SELECT_TYPE mSelectedAxis;
 	GIZMO_TYPE mActiveType;
+	COORDINATE_TYPE mCoordinateType;
 
 	SceneNode* mSelectedNode;
 };

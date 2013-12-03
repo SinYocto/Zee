@@ -33,3 +33,8 @@ void TextureManager::Destory()
 	mTextures.clear();
 }
 
+TexHashMap TextureManager::GetTextureHashMap()
+{
+	return mTextures;
+}
+

@@ -27,6 +27,8 @@ public:
 
 	std::list<Mesh*> GetSubMeshList();
 
+	wchar_t* GetName();
+
 private:
 	wchar_t mName[MAX_STR_LEN];
 	std::list<Mesh*> mSubMeshes;

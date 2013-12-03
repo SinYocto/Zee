@@ -56,6 +56,7 @@ public:
 		const wxPoint& pos = wxDefaultPosition, const wxSize&size = wxDefaultSize, long style = wxTR_DEFAULT_STYLE);
 
 	void OnItemActivated(wxTreeEvent& event);
+	void OnEndLabelEdit(wxTreeEvent& event);
 
 	DECLARE_EVENT_TABLE()
 };

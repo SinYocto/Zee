@@ -31,7 +31,7 @@ void SceneGraphPanel::createWxCtrls()
 	wxBoxSizer* boxSizer2 = new wxBoxSizer(wxVERTICAL);
 
 	mTreeCtrl = new SceneGraphTree(mTreePanel, ID_SCENE_GRAPH_TREE, wxDefaultPosition, wxDefaultSize, 
-		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES);
+		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES | wxTR_EDIT_LABELS);
 
 	mTreeCtrl->SetMinSize(wxSize(180, 260));
 	mTreeCtrl->AssignImageList(mIconList);
@@ -137,6 +137,7 @@ SceneNode* SceneNodeTreeItemData::GetSceneNode()
 
 BEGIN_EVENT_TABLE(SceneGraphTree, wxTreeCtrl)
 EVT_TREE_ITEM_ACTIVATED (ID_SCENE_GRAPH_TREE, SceneGraphTree::OnItemActivated)
+EVT_TREE_END_LABEL_EDIT(ID_SCENE_GRAPH_TREE, SceneGraphTree::OnEndLabelEdit)
 END_EVENT_TABLE()
 
 SceneGraphTree::SceneGraphTree( wxWindow* parent, wxWindowID id /*= wxID_ANY*/, const wxPoint& pos /*= wxDefaultPosition*/, 
@@ -154,4 +155,12 @@ void SceneGraphTree::OnItemActivated(wxTreeEvent& event)
 
 	Camera* mainCamera = gEngine->GetSceneManager()->GetMainCamera();
 	mainCamera->FocusAt(sceneNode);
+}
+
+void SceneGraphTree::OnEndLabelEdit(wxTreeEvent& event)
+{
+	SceneNodeTreeItemData* itemData = (SceneNodeTreeItemData*)GetItemData(event.GetItem());
+	SceneNode* sceneNode = itemData->GetSceneNode();
+
+	sceneNode->SetName(event.GetLabel().wchar_str());
 }

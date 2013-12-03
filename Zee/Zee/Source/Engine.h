@@ -6,6 +6,7 @@
 #include "TextureManager.h"
 #include "GeometryManager.h"
 #include "MaterialManager.h"
+#include "ModelManager.h"
 #include "LightManager.h"
 #include "ResourceMgr.h"
 #include "Input.h"
@@ -30,6 +31,7 @@ public:
 	TextureManager* GetTextureManger();
 	GeometryManager* GetGeometryManager();
 	MaterialManager* GetMaterialManager();
+	ModelManager* GetModelManager();
 	LightManager* GetLightManager();
 	ResourceMgr* GetResourceManager();
 	Input* GetInput();
@@ -43,6 +45,7 @@ private:
 	TextureManager* mTextureMgr;
 	GeometryManager* mGeometryMgr;
 	MaterialManager* mMaterialMgr;
+	ModelManager* mModelMgr;
 	LightManager* mLightMgr;
 	ResourceMgr* mResourceMgr;
 

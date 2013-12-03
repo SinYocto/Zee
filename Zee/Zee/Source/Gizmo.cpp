@@ -192,6 +192,10 @@ void Gizmo::determinSelectType(Object* obj, Camera* camera)
 		mSelectedAxis = AXIS_Z;
 		break;
 
+	case COLOR_XYZ:
+		mSelectedAxis = AXIS_XYZ;
+		break;
+
 	case COLOR_XY_PICK:
 		mSelectedAxis = PLANE_XY;
 		break;
@@ -312,13 +316,14 @@ void Gizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 	// 这里清了zbuffer, 以使gizmo始终在屏幕上显示并内部有深度关系, 所以gizmo在渲染流程的最后
 	driver->Clear(D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);	
 
-	D3DCOLOR elementColor[6];
+	D3DCOLOR elementColor[7];
 	elementColor[AXIS_X] = COLOR_X;
 	elementColor[AXIS_Y] = COLOR_Y;
 	elementColor[AXIS_Z] = COLOR_Z;
 	elementColor[PLANE_XY] = COLOR_XY_PICK;
 	elementColor[PLANE_XZ] = COLOR_XZ_PICK;
 	elementColor[PLANE_YZ] = COLOR_YZ_PICK;
+	elementColor[AXIS_XYZ] = COLOR_XYZ;
 
 	if(!isColorPickPass)
 	{
@@ -365,17 +370,28 @@ void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
 	float scaleFactor = dist / SCALE_FACTOR;
 
+	Vector3 basePos = obj->GetWorldPosition();
+	Quaternion baseOrient;
+	if(mCoordinateType == COORDINATE_GLOBAL)
+	{
+		baseOrient = Quaternion(0, 0, 0);
+	}
+	else
+	{
+		baseOrient = obj->GetWorldOrient();
+	}
+
 	// y
 	Material* tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Y]);
 
-	mLine->SetWorldPosition(obj->GetWorldPosition());
-	mLine->SetWorldOrientation(obj->GetWorldOrient());
+	mLine->SetWorldPosition(basePos);
+	mLine->SetWorldOrientation(baseOrient);
 	mLine->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
 	mLine->GetMesh()->SetMaterial(tempMtl);
-	mCone->SetWorldPosition(obj->GetWorldPosition());
-	mCone->SetWorldOrientation(obj->GetWorldOrient());
+	mCone->SetWorldPosition(basePos);
+	mCone->SetWorldOrientation(baseOrient);
 	mCone->TranslateLocal(0, scaleFactor, 0);
 	mCone->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
@@ -384,8 +400,8 @@ void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	tempMtl->Render(mLine->LocalToWorldMatrix(), mLine->GetMesh()->GetGeometry(), camera, true);
 	tempMtl->Render(mCone->LocalToWorldMatrix(), mCone->GetMesh()->GetGeometry(), camera, true);
 
-	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(SQUARE_SIZE * 0.5f, 0, SQUARE_SIZE * 0.5f)), 
-		Vector3(0, 1.0f, 0), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_XZ], true, camera);
+	DebugDrawer::DrawSquare(GetWorldPos(basePos, baseOrient, scaleFactor * Vector3(SQUARE_SIZE * 0.5f, 0, SQUARE_SIZE * 0.5f)), 
+		baseOrient, 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_XZ], true, camera);
 
 	// x
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_X]);
@@ -401,8 +417,8 @@ void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 
 	tempMtl->Render(mLine->LocalToWorldMatrix(), mLine->GetMesh()->GetGeometry(), camera, true);
 	tempMtl->Render(mCone->LocalToWorldMatrix(), mCone->GetMesh()->GetGeometry(), camera, true);
-	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(0, SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f)), 
-		Vector3(1.0f, 0, 0), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_YZ], true, camera);
+	DebugDrawer::DrawSquare(GetWorldPos(basePos, baseOrient, scaleFactor * Vector3(0, SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f)), 
+		baseOrient * Quaternion(0, 0, PI/2.0f), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_YZ], true, camera);
 
 	// z
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Z]);
@@ -418,8 +434,8 @@ void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 
 	tempMtl->Render(mLine->LocalToWorldMatrix(), mLine->GetMesh()->GetGeometry(), camera, true);
 	tempMtl->Render(mCone->LocalToWorldMatrix(), mCone->GetMesh()->GetGeometry(), camera, true);
-	DebugDrawer::DrawSquare(obj->GetWorldPosition(scaleFactor * Vector3(SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f, 0)), 
-		Vector3(0, 0, 1.0f), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_XY], true, camera);
+	DebugDrawer::DrawSquare(GetWorldPos(basePos, baseOrient, scaleFactor * Vector3(SQUARE_SIZE * 0.5f, SQUARE_SIZE * 0.5f, 0)), 
+		baseOrient * Quaternion(PI/2.0f, 0, 0), 0.8f * scaleFactor * SQUARE_SIZE, elementsColor[PLANE_XY], true, camera);
 
 	tempMtl->Drop();
 }
@@ -429,12 +445,22 @@ void Gizmo::drawRotateGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR
 	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
 	float scaleFactor = dist / SCALE_FACTOR;
 
+	Quaternion baseOrient;
+	if(mCoordinateType == COORDINATE_GLOBAL)
+	{
+		baseOrient = Quaternion(0, 0, 0);
+	}
+	else
+	{
+		baseOrient = obj->GetWorldOrient();
+	}
+
 	// y
 	Material* tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Y]);
 
 	mTorus->SetWorldPosition(obj->GetWorldPosition());
-	mTorus->SetWorldOrientation(obj->GetWorldOrient());
+	mTorus->SetWorldOrientation(baseOrient);
 	mTorus->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
 	tempMtl->Render(mTorus->LocalToWorldMatrix(), mTorus->GetMesh()->GetGeometry(), camera, true);
@@ -457,16 +483,26 @@ void Gizmo::drawScaleGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
 	float scaleFactor = dist / SCALE_FACTOR;
 
+	Quaternion baseOrient;
+	if(mCoordinateType == COORDINATE_GLOBAL)
+	{
+		baseOrient = Quaternion(0, 0, 0);
+	}
+	else
+	{
+		baseOrient = obj->GetWorldOrient();
+	}
+
 	// y
 	Material* tempMtl = new Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Y]);
 
 	mLine->SetWorldPosition(obj->GetWorldPosition());
-	mLine->SetWorldOrientation(obj->GetWorldOrient());
+	mLine->SetWorldOrientation(baseOrient);
 	mLine->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
 	mCube->SetWorldPosition(obj->GetWorldPosition());
-	mCube->SetWorldOrientation(obj->GetWorldOrient());
+	mCube->SetWorldOrientation(baseOrient);
 	mCube->TranslateLocal(0, scaleFactor, 0);
 	mCube->SetScale(Vector3(scaleFactor, scaleFactor, scaleFactor));
 
@@ -491,12 +527,21 @@ void Gizmo::drawScaleGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	tempMtl->Render(mLine->LocalToWorldMatrix(), mLine->GetMesh()->GetGeometry(), camera, true);
 	tempMtl->Render(mCube->LocalToWorldMatrix(), mCube->GetMesh()->GetGeometry(), camera, true);
 
+	// xyz
+	tempMtl->SetDiffuseColor(elementsColor[AXIS_XYZ]);
+	mCube->TranslateLocal(0, 0, -scaleFactor);
+	tempMtl->Render(mCube->LocalToWorldMatrix(), mCube->GetMesh()->GetGeometry(), camera, true);
+
 	tempMtl->Drop();
 }
 
 void Gizmo::calTransTangent(Object* obj, Camera* camera, Vector3* tangentX, Vector3* tangentY, Vector3* tangentZ)
 {
-	D3DXMATRIX matWVP = obj->LocalToWorldMatrix() * camera->ViewMatrix() * camera->ProjMatrix();
+	D3DXMATRIX matWVP;
+	if(mCoordinateType == COORDINATE_GLOBAL)
+		matWVP = camera->ViewMatrix() * camera->ProjMatrix();
+	else
+		matWVP = obj->LocalToWorldMatrix() * camera->ViewMatrix() * camera->ProjMatrix();
 
 	Vector3 posClipO;
 	Vector3 posClipX;
@@ -523,7 +568,11 @@ void Gizmo::calTransTangent(Object* obj, Camera* camera, Vector3* tangentX, Vect
 
 void Gizmo::calRotateTangent(Object* obj, Camera* camera, Vector3* tangent)
 {
-	D3DXMATRIX matWVP = obj->LocalToWorldMatrix() * camera->ViewMatrix() * camera->ProjMatrix();
+	D3DXMATRIX matWVP;
+	if(mCoordinateType == COORDINATE_GLOBAL)
+		matWVP = camera->ViewMatrix() * camera->ProjMatrix();
+	else
+		matWVP = obj->LocalToWorldMatrix() * camera->ViewMatrix() * camera->ProjMatrix();
 
 	Vector3 posScreenO;
 	GetClipSpacePos(Vector3::Zero, matWVP, &posScreenO);
@@ -568,7 +617,14 @@ void Gizmo::applyTrans(Object* obj, Camera* camera, const Vector3& tangentX, con
 	if(mSelectedAxis == AXIS_Z || mSelectedAxis == PLANE_XZ || mSelectedAxis == PLANE_YZ)
 		dz = screenMoveVector.Dot(tangentZ);
 
-	obj->TranslateLocal(dx, dy, dz);
+	if(mCoordinateType == COORDINATE_GLOBAL)
+	{		
+		obj->Translate(dx, dy, dz);
+	}
+	else
+	{
+		obj->TranslateLocal(dx, dy, dz);
+	}
 }
 
 void Gizmo::applyRotate(Object* obj, Camera* camera, const Vector3& tangent)
@@ -589,13 +645,40 @@ void Gizmo::applyRotate(Object* obj, Camera* camera, const Vector3& tangent)
 	float delta = screenMoveVector.Dot(tangent);
 
 	if(mSelectedAxis == AXIS_X)
-		obj->RotateLocal(signX * delta, 0, 0);
+	{
+		if(mCoordinateType == COORDINATE_GLOBAL)
+		{		
+			obj->Rotate(signX * delta, 0, 0);
+		}
+		else
+		{
+			obj->RotateLocal(signX * delta, 0, 0);
+		}
+	}
 
 	if(mSelectedAxis == AXIS_Y)
-		obj->RotateLocal(0, signY * delta, 0);
+	{
+		if(mCoordinateType == COORDINATE_GLOBAL)
+		{		
+			obj->Rotate(0, signY * delta, 0);
+		}
+		else
+		{
+			obj->RotateLocal(0, signY * delta, 0);
+		}
+	}
 
 	if(mSelectedAxis == AXIS_Z)
-		obj->RotateLocal(0, 0, signZ * delta);
+	{
+		if(mCoordinateType == COORDINATE_GLOBAL)
+		{		
+			obj->Rotate(0, 0, signZ * delta);
+		}
+		else
+		{
+			obj->RotateLocal(0, 0, signZ * delta);
+		}
+	}
 }
 
 void Gizmo::applyScale(Object* obj, Camera* camera, const Vector3& tangentX, const Vector3& tangentY, const Vector3& tangentZ)
@@ -615,6 +698,14 @@ void Gizmo::applyScale(Object* obj, Camera* camera, const Vector3& tangentX, con
 
 	if(mSelectedAxis == AXIS_Z)
 		obj->Scale(Vector3(1.0f, 1.0f, 1 + screenMoveVector.Dot(tangentZ)));
+
+	if(mSelectedAxis == AXIS_XYZ)
+	{
+		Vector3 tangent = Vector3(1.0f, 1.0f, 0).Normalized();
+		float scaleValue = 1 + screenMoveVector.Dot(tangent);
+
+		obj->Scale(Vector3(scaleValue, scaleValue, scaleValue));
+	}
 }
 
 bool Gizmo::IsSelected()
@@ -640,10 +731,36 @@ void Gizmo::FrameUpdate(Camera* camera)
 			mSelectedNode = sceneMgr->RayIntersect(rayPos, rayDir, NULL, NULL);
 	}
 
+	if(input->GetKeyDown(DIK_1))		// TODO: 按键设置
+	{
+		SetActiveType(GIZMO_TRANS);
+	}
+	else if(input->GetKeyDown(DIK_2))
+	{
+		SetActiveType(GIZMO_ROTATE);
+	}
+	else if(input->GetKeyDown(DIK_3))
+	{
+		SetActiveType(GIZMO_SCALE);
+	}
+
+	if(input->GetKeyDown(DIK_G))
+	{
+		if(mCoordinateType == COORDINATE_GLOBAL)
+			mCoordinateType = COORDINATE_LOCAL;
+		else
+			mCoordinateType = COORDINATE_GLOBAL;
+	}
+
 	applyTransform(camera);
 }
 
 SceneNode* Gizmo::GetSelectedNode()
 {
 	return mSelectedNode;
+}
+
+void Gizmo::SetCoordinateType(COORDINATE_TYPE type)
+{
+	mCoordinateType = type;
 }

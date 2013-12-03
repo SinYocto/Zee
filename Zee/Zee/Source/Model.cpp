@@ -8,6 +8,7 @@ Model::Model(const wchar_t* name, Geometry* geo, Material* material)
 
 	Mesh* mesh = new Mesh(name, geo, material);
 	AddSubMesh(mesh);
+	SAFE_DROP(mesh);
 }
 
 Model::~Model()
@@ -33,6 +34,7 @@ void Model::AddSubMesh(Mesh* mesh)
 	}
 	else
 	{
+		mesh->Grab();
 		mSubMeshes.push_back(mesh);
 	}
 }
@@ -65,4 +67,9 @@ void Model::CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, AABB
 std::list<Mesh*> Model::GetSubMeshList()
 {
 	return mSubMeshes;
+}
+
+wchar_t* Model::GetName()
+{
+	return mName;
 }

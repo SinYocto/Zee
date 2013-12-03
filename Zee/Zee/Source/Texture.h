@@ -13,6 +13,7 @@ public:
 	void CreateFromFile(const wchar_t* filePath);
 
 	wchar_t* GetFilePath();
+	wchar_t* GetName();
 	IDirect3DTexture9* GetD3DTexture();
 
 private:
