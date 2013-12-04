@@ -5,6 +5,7 @@
 #include "Bound.h"
 
 class Camera;
+interface ISceneNodeEventHandler;
 
 class SceneNode : public Object
 {
@@ -84,6 +85,10 @@ public:
 
 	NODE_TYPE GetNodeType();
 
+	virtual void OnTransformChanged();
+	void RegisterEventHanlder(ISceneNodeEventHandler* eventHandler);
+	void UnRegisterEventHandler(ISceneNodeEventHandler* eventHandler);
+
 protected:
 	virtual void updateAABBox();
 
@@ -96,6 +101,15 @@ protected:
 	Attribute mAttribute;
 
 	NODE_TYPE mType;
+
+	std::list<ISceneNodeEventHandler*> mEventHandlerList;
+}; 
+
+interface ISceneNodeEventHandler
+{
+public:
+	virtual ~ISceneNodeEventHandler() {}
+	virtual void OnTransformChanged(SceneNode* sceneNode) {} 
 };
 
 #endif

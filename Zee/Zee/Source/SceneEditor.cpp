@@ -29,7 +29,6 @@
 #include "Terrain.h"
 
 // ------------------------------------------
-Gizmo* gizmo = NULL;
 Terrain* terrain = NULL;
 
 LabelStyle* leftAlignStyle;
@@ -50,11 +49,6 @@ EVT_MENU(ID_Quit, SceneEditorFrame::OnQuit)
 EVT_MENU(ID_TreeGenerator, SceneEditorFrame::OnTreeGenerator)
 EVT_MENU(ID_About, SceneEditorFrame::OnAbout)
 EVT_CLOSE(SceneEditorFrame::OnClose)
-EVT_TOOL(ID_TOOL_TRANS, SceneEditorFrame::OnToolTransClicked)
-EVT_TOOL(ID_TOOL_ROTATE, SceneEditorFrame::OnToolRotateClicked)
-EVT_TOOL(ID_TOOL_SCALE, SceneEditorFrame::OnToolScaleClicked)
-EVT_RADIOBUTTON(ID_RADIO_BUTTON_GLOBAL, SceneEditorFrame::OnToolRadioButtonGlobal)
-EVT_RADIOBUTTON(ID_RADIO_BUTTON_LOCAL, SceneEditorFrame::OnToolRadioButtonLocal)
 END_EVENT_TABLE()
 
 SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
@@ -75,13 +69,12 @@ SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, co
 	gEngine = new Engine();
 	gEngine->Init(deviceParams);
 
+	// toolbar 因为toolbar有个控件和gizmo关联, 所以需要engine初始化后才创建
+	SceneEditorToolBar* toolBar = new SceneEditorToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL | wxNO_BORDER);
+	SetToolBar(toolBar);
+
 	// gui
 	::SetupGUIStyle();
-
-	// gizmo
-	gizmo = new Gizmo;
-	gizmo->Init();
-	gizmo->SetActiveType(Gizmo::GIZMO_TRANS);
 
 	// load/create scene
 	::CreateScene();
@@ -115,29 +108,6 @@ void SceneEditorFrame::createWxCtrls()
 	menuBar->Append(menuHelp, L"&Help");
 
 	SetMenuBar(menuBar);
-
-	wxToolBar* toolBar = new wxToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL | wxNO_BORDER);
-
-	wxBitmap iconTrans(L"./Assets/Textures/Editor/trans.png", wxBITMAP_TYPE_PNG);
-	wxBitmap iconRotate(L"./Assets/Textures/Editor/rotate.png", wxBITMAP_TYPE_PNG);
-	wxBitmap iconScale(L"./Assets/Textures/Editor/scale.png", wxBITMAP_TYPE_PNG);
-
-	toolBar->AddTool(ID_TOOL_TRANS, iconTrans, L"translate");
-	toolBar->AddTool(ID_TOOL_ROTATE, iconRotate, L"rotate");
-	toolBar->AddTool(ID_TOOL_SCALE, iconScale, L"scale");
-
-	wxRadioButton* buttonGlobal = new wxRadioButton(toolBar, ID_RADIO_BUTTON_GLOBAL, wxT("Global"), 
-		wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-
-	wxRadioButton* buttonLocal = new wxRadioButton(toolBar, ID_RADIO_BUTTON_LOCAL, wxT("Local"));
-
-	toolBar->AddSeparator();
-	toolBar->AddControl(buttonGlobal);
-	toolBar->AddControl(buttonLocal);
-
-	toolBar->Realize();
-
-	SetToolBar(toolBar);
   
 	CreateStatusBar();
 	SetStatusText(L"Welcome To WanderLand!");
@@ -197,31 +167,6 @@ void SceneEditorFrame::OnTreeGenerator(wxCommandEvent& event)
 		mWndTreeGenerator->Show(true);
 		mWndTreeGenerator->Raise();
 	}
-}
-
-void SceneEditorFrame::OnToolTransClicked(wxCommandEvent& event)
-{
-	gizmo->SetActiveType(Gizmo::GIZMO_TRANS);		// TODO:使用了未被管理的全局变量gizmo
-}
-
-void SceneEditorFrame::OnToolRotateClicked( wxCommandEvent& event )
-{
-	gizmo->SetActiveType(Gizmo::GIZMO_ROTATE);
-}
-
-void SceneEditorFrame::OnToolScaleClicked( wxCommandEvent& event )
-{
-	gizmo->SetActiveType(Gizmo::GIZMO_SCALE);
-}
-
-void SceneEditorFrame::OnToolRadioButtonGlobal(wxCommandEvent& event)
-{
-	gizmo->SetCoordinateType(Gizmo::COORDINATE_GLOBAL);
-}
-
-void SceneEditorFrame::OnToolRadioButtonLocal(wxCommandEvent& event)
-{
-	gizmo->SetCoordinateType(Gizmo::COORDINATE_LOCAL);
 }
 
 BEGIN_EVENT_TABLE(SceneEditorCanvas, wxWindow)
@@ -367,11 +312,6 @@ void CreateScene()
 	sceneMgr->AddSceneNode(torus);
 	torus->Translate(0, 0, 2);
 
-	// billboard
-	//BillboardNode* billboard = new BillboardNode(L"billboard", 1.0f, 1.0f, D3DXCOLOR_YELLOW);
-	//sceneMgr->AddSceneNode(billboard);
-	//billboard->GetBillboard()->SetTexture(L"./Assets/Textures/light.jpg");
-
 	// terrain
 	PerformanceTimer::Begin(L"building 257 terrain");
 	terrain = new Terrain(257, 200.0f, 40.0f);
@@ -409,8 +349,6 @@ void SceneEditorCanvas::RenderLoop()
 
 			terrain->FrameUpdate(mainCamera);
 
-			gizmo->FrameUpdate(mainCamera);
-
 			if(input->GetKeyDown(DIK_R))
 			{
 				mainCamera->DampMoveTo(Vector3::Zero, 0.5f, 0.01f);
@@ -428,14 +366,7 @@ void SceneEditorCanvas::RenderLoop()
 
 			gGUISystem.Draw();
 
-			gizmo->Draw(gizmo->GetSelectedNode(), mainCamera);
-
-			//if(hitNode && hitNode->GetNodeType() == SceneNode::SCENE_NODE_BILLBOARD)
-			//{
-			//	PointLight* pointLight1 = NULL;
-			//	gEngine->GetLightManager()->GetPointLight(L"pointLight1", &pointLight1);
-			//	pointLight1->SetPosition(hitNode->GetWorldPosition());
-			//}
+			gEngine->GetGizmo()->Draw();
 
 			driver->EndScene();
 			driver->Present();
@@ -486,19 +417,17 @@ void GUIUpdate()
 	gGUISystem.GUILabel(text, Rect(10, 40, 300, 25), leftAlignStyle);
 
 
-	static bool enableDirLight1 = true;
-	// enableDirLight1 = gGUISystem.GUIToggle(Rect(10, 150, 20, 20), enableDirLight1);
+	//static bool enableDirLight1 = true;
+	//// enableDirLight1 = gGUISystem.GUIToggle(Rect(10, 150, 20, 20), enableDirLight1);
 
-	DirectionalLight* dirLight1 = NULL;
-	gEngine->GetLightManager()->GetDirLight(L"dirLight1", &dirLight1);
-	dirLight1->Enable(enableDirLight1);
+	//DirectionalLight* dirLight1 = NULL;
+	//gEngine->GetLightManager()->GetDirLight(L"dirLight1", &dirLight1);
+	//dirLight1->Enable(enableDirLight1);
 }
 
 void AppDestroy()
 {
 	SAFE_DELETE(leftAlignStyle);
-	gizmo->Destroy();
-	SAFE_DELETE(gizmo);
 
 	SAFE_DELETE(terrain);
 
@@ -509,7 +438,6 @@ void AppDestroy()
 void OnLostDevice()
 {
 	leftAlignStyle->OnLostDevice();
-	gizmo->OnLostDevice();
 	terrain->OnLostDevice();
 
 	gDefaultLabelStyle.OnLostDevice();
@@ -524,7 +452,6 @@ void OnResetDevice()
 		return;
 
 	leftAlignStyle->OnResetDevice();
-	gizmo->OnResetDevice();
 
 	terrain->OnResetDevice();
 
@@ -532,4 +459,80 @@ void OnResetDevice()
 	gGUISystem.OnResetDevice();
 
 	gEngine->OnResetDevice();
+}
+
+BEGIN_EVENT_TABLE(SceneEditorToolBar, wxToolBar)
+EVT_TOOL(ID_TOOL_TRANS, SceneEditorToolBar::OnToolTransClicked)
+EVT_TOOL(ID_TOOL_ROTATE, SceneEditorToolBar::OnToolRotateClicked)
+EVT_TOOL(ID_TOOL_SCALE, SceneEditorToolBar::OnToolScaleClicked)
+EVT_RADIOBUTTON(ID_RADIO_BUTTON_GLOBAL, SceneEditorToolBar::OnToolRadioButtonGlobal)
+EVT_RADIOBUTTON(ID_RADIO_BUTTON_LOCAL, SceneEditorToolBar::OnToolRadioButtonLocal)
+END_EVENT_TABLE()
+
+SceneEditorToolBar::SceneEditorToolBar(wxWindow* parent, wxWindowID id, const wxPoint& pos /*= wxDefaultPosition*/, 
+									   const wxSize& size /*= wxDefaultSize*/, long style /*= wxTB_HORIZONTAL*/)
+									   :wxToolBar(parent, id, pos, size, style)
+{
+	createWxCtrls();
+
+	gEngine->GetGizmo()->RegisterEventHanlder(this);		// TODO:析构时ungegister?
+}
+
+void SceneEditorToolBar::createWxCtrls()
+{
+	wxBitmap iconTrans(L"./Assets/Textures/Editor/trans.png", wxBITMAP_TYPE_PNG);
+	wxBitmap iconRotate(L"./Assets/Textures/Editor/rotate.png", wxBITMAP_TYPE_PNG);
+	wxBitmap iconScale(L"./Assets/Textures/Editor/scale.png", wxBITMAP_TYPE_PNG);
+
+	AddTool(ID_TOOL_TRANS, iconTrans, L"translate");
+	AddTool(ID_TOOL_ROTATE, iconRotate, L"rotate");
+	AddTool(ID_TOOL_SCALE, iconScale, L"scale");
+
+	mButtonGlobal = new wxRadioButton(this, ID_RADIO_BUTTON_GLOBAL, wxT("Global"), 
+		wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+
+	mButtonLocal = new wxRadioButton(this, ID_RADIO_BUTTON_LOCAL, wxT("Local"));
+
+	AddSeparator();
+	AddControl(mButtonGlobal);
+	AddControl(mButtonLocal);
+
+	Realize();
+}
+
+void SceneEditorToolBar::OnCoordTypeChanged(Gizmo* gizmo)
+{
+	if(gizmo->GetCoordinateType() == Gizmo::COORDINATE_GLOBAL)
+	{
+		mButtonGlobal->SetValue(true);
+	}
+	else
+	{
+		mButtonLocal->SetValue(true);
+	}
+}
+
+void SceneEditorToolBar::OnToolTransClicked(wxCommandEvent& event)
+{
+	gEngine->GetGizmo()->SetActiveType(Gizmo::GIZMO_TRANS);		// TODO:使用了未被管理的全局变量gizmo
+}
+
+void SceneEditorToolBar::OnToolRotateClicked( wxCommandEvent& event )
+{
+	gEngine->GetGizmo()->SetActiveType(Gizmo::GIZMO_ROTATE);
+}
+
+void SceneEditorToolBar::OnToolScaleClicked( wxCommandEvent& event )
+{
+	gEngine->GetGizmo()->SetActiveType(Gizmo::GIZMO_SCALE);
+}
+
+void SceneEditorToolBar::OnToolRadioButtonGlobal(wxCommandEvent& event)
+{
+	gEngine->GetGizmo()->SetCoordinateType(Gizmo::COORDINATE_GLOBAL);
+}
+
+void SceneEditorToolBar::OnToolRadioButtonLocal(wxCommandEvent& event)
+{
+	gEngine->GetGizmo()->SetCoordinateType(Gizmo::COORDINATE_LOCAL);
 }

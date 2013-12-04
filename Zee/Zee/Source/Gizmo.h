@@ -15,6 +15,8 @@ const float TRANS_SPEED = 8.0f;
 const float ROTATE_SPEED = 2.0f;
 const float SCALE_SPEED = 8.0f;
 
+interface IGizmoEventHandler;
+
 class Gizmo
 {
 public:
@@ -87,16 +89,23 @@ public:
 	void OnLostDevice();
 	void OnResetDevice();
 
-	void FrameUpdate(Camera* camera);
+	void FrameUpdate();
 
 	void SetActiveType(GIZMO_TYPE type);
 	void SetCoordinateType(COORDINATE_TYPE type);
 
-	void Draw(Object* obj, Camera* camera);
+	COORDINATE_TYPE GetCoordinateType();
 
+	void Draw();
+
+	void SelectSceneNode(SceneNode* sceneNode);
 	SceneNode* GetSelectedNode();
 
 	bool IsSelected();
+
+	void OnCoordTypeChanged();
+	void RegisterEventHanlder(IGizmoEventHandler* eventHandler);
+	void UnRegisterEventHandler(IGizmoEventHandler* eventHandler);
 
 private:
 	void draw(Object* obj, Camera* camera, bool isColorPickPass);
@@ -119,6 +128,8 @@ private:
 
 	void applyTransform(Camera* camera);
 
+	void toogleCoordType();
+
 private:
 	MeshNode* mCone;
 	MeshNode* mLine;
@@ -133,6 +144,15 @@ private:
 	COORDINATE_TYPE mCoordinateType;
 
 	SceneNode* mSelectedNode;
+
+	std::list<IGizmoEventHandler*> mEventHandlerList;
+};
+
+interface IGizmoEventHandler
+{
+public:
+	virtual ~IGizmoEventHandler() {}
+	virtual void OnCoordTypeChanged(Gizmo* gizmo) {} 
 };
      
 #endif

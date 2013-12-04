@@ -14,6 +14,7 @@ Engine::Engine()
 ,mResourceMgr(NULL)
 ,mInput(NULL)
 ,mTimer(NULL)
+,mGizmo(NULL)
 {
 	
 }
@@ -47,6 +48,10 @@ void Engine::Init(D3DDeviceParams params)
 
 	mSceneMgr = new SceneManager();
 	mSceneMgr->Init();
+
+	mGizmo = new Gizmo();
+	mGizmo->Init();
+	mGizmo->SetActiveType(Gizmo::GIZMO_TRANS);
 }
 
 Input* Engine::GetInput()
@@ -67,10 +72,12 @@ void Engine::FrameUpdate()
 	mSceneMgr->FrameUpdate();
 	mLightMgr->FrameUpdate();
 	mMaterialMgr->FrameUpdate();
+	mGizmo->FrameUpdate();
 }
 
 void Engine::Destroy()
 {
+	mGizmo->Destroy();
 	mModelMgr->Destroy();
 	mResourceMgr->Destroy();
 	mLightMgr->Destroy();
@@ -93,6 +100,7 @@ void Engine::Destroy()
 	SAFE_DELETE(mSceneMgr);
 	SAFE_DELETE(mTimer);
 	SAFE_DELETE(mIDAllocator);
+	SAFE_DELETE(mGizmo);
 }
 
 Driver* Engine::GetDriver()
@@ -120,6 +128,8 @@ void Engine::OnLostDevice()
 	mDriver->OnLostDevice();
 	mGeometryMgr->OnLostDevice();
 	mMaterialMgr->OnLostDevice();
+	mResourceMgr->OnLostDevice();
+	mGizmo->OnLostDevice();
 }
 
 void Engine::OnResetDevice()
@@ -127,6 +137,8 @@ void Engine::OnResetDevice()
 	mDriver->OnResetDevice();
 	mGeometryMgr->OnResetDevice();
 	mMaterialMgr->OnResetDevice();
+	mResourceMgr->OnResetDevice();
+	mGizmo->OnResetDevice();
 }
 
 SceneManager* Engine::GetSceneManager()
@@ -152,4 +164,9 @@ ResourceMgr* Engine::GetResourceManager()
 ModelManager* Engine::GetModelManager()
 {
 	return mModelMgr;
+}
+
+Gizmo* Engine::GetGizmo()
+{
+	return mGizmo;
 }

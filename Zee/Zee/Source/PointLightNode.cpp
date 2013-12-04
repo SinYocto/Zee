@@ -66,6 +66,8 @@ void PointLightNode::updateAABBox()
 void PointLightNode::OnTransformChanged()
 {
 	mPointLight->SetPosition(GetWorldPosition());
+
+	SceneNode::OnTransformChanged();
 }
 
 Billboard* PointLightNode::GetBillboard()

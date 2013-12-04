@@ -37,7 +37,7 @@ void MeshNode::Draw(Camera* camera)
 void MeshNode::updateAABBox()
 {
 	_Assert(mMesh && mMesh->GetGeometry())
-	mMesh->GetGeometry()->CalcDynamicAABBox(mWorldPos, mWorldOrient, &mAABBox);
+	mMesh->GetGeometry()->CalcDynamicAABBox(LocalToWorldMatrix(), &mAABBox);
 }
 
 Mesh* MeshNode::GetMesh()

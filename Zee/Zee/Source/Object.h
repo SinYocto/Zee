@@ -71,6 +71,7 @@ public:
 	Vector3 GetWorldPosition();
 
 	Vector3 GetWorldPosition(const Vector3& localMoveVector);
+	Vector3 GetScale();
 
 	Quaternion GetWorldOrient();
 
@@ -84,7 +85,7 @@ public:
 	void SetWorldOrientation(Quaternion orient);
 	void SetWorldOrientation(float eulerX, float eulerY, float eulerZ);
 
-	virtual void OnTransformChanged() {}
+	virtual void OnTransformChanged();
 
 private:
 	void updateWorldPosition();

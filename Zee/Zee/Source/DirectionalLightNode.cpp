@@ -68,6 +68,8 @@ void DirectionalLightNode::OnTransformChanged()
 {
 	Vector3 dir = Vector3(0, 0, 1.0f) * GetWorldOrient();
 	mDirLight->SetDirection(dir);
+
+	SceneNode::OnTransformChanged();
 }
 
 Billboard* DirectionalLightNode::GetBillboard()

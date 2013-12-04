@@ -140,3 +140,23 @@ void SceneNode::SetName(const wchar_t* name)
 	YString::Copy(mName, _countof(mName), name);
 }
 
+void SceneNode::RegisterEventHanlder(ISceneNodeEventHandler* eventHandler)
+{
+	mEventHandlerList.push_back(eventHandler);
+}
+
+void SceneNode::UnRegisterEventHandler(ISceneNodeEventHandler* eventHandler)
+{
+	mEventHandlerList.remove(eventHandler);
+}
+
+void SceneNode::OnTransformChanged()
+{
+	Object::OnTransformChanged();
+
+	for(std::list<ISceneNodeEventHandler*>::iterator iter = mEventHandlerList.begin(); iter !=mEventHandlerList.end(); ++iter)
+	{
+		(*iter)->OnTransformChanged(this);
+	}
+}
+

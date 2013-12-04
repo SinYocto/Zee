@@ -1136,7 +1136,7 @@ AABBox Geometry::GetAABBox()
 	return mAABBox;
 }
 
-void Geometry::CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, AABBox* box)
+void Geometry::CalcDynamicAABBox(const D3DXMATRIX& matWorld, AABBox* box)
 {
 	_Assert(NULL != box);
 
@@ -1145,9 +1145,8 @@ void Geometry::CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, A
 
 	for(size_t i = 0; i < mPositionData.size(); ++i)
 	{
-		Vector3 vertPos = mPositionData[i];
-		vertPos = vertPos * orient;
-		vertPos += pos;
+		D3DXVECTOR3 vertPos(mPositionData[i].x, mPositionData[i].y, mPositionData[i].z);
+		D3DXVec3TransformCoord(&vertPos, &vertPos, &matWorld);
 
 		if(vertPos.x > box->mMax.x)
 			box->mMax.x = vertPos.x;

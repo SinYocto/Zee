@@ -47,7 +47,7 @@ void Model::Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid)
 	}
 }
 
-void Model::CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, AABBox* box)
+void Model::CalcDynamicAABBox(const D3DXMATRIX& matWorld, AABBox* box)
 {
 	_Assert(NULL != box);
 	AABBox resultBox = AABBox::Invalid;
@@ -57,7 +57,7 @@ void Model::CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, AABB
 		Mesh* mesh = *iter;
 		AABBox subMeshBBox = AABBox::Invalid;
 
-		mesh->GetGeometry()->CalcDynamicAABBox(pos, orient, &subMeshBBox);
+		mesh->GetGeometry()->CalcDynamicAABBox(matWorld, &subMeshBBox);
 		resultBox = AABBox::CombineBBox(resultBox, subMeshBBox);
 	}
 

@@ -68,6 +68,8 @@
 				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;;&quot;D:\Program Files (x86)\wxMSW-2.8.12\lib\vc_lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				StackReserveSize="0"
+				StackCommitSize="0"
 				TargetMachine="1"
 				Profile="false"
 			/>

@@ -23,7 +23,7 @@ public:
 
 	void Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid);
 
-	void CalcDynamicAABBox(const Vector3& pos, const Quaternion& orient, AABBox* box);
+	void CalcDynamicAABBox(const D3DXMATRIX& matWorld, AABBox* box);
 
 	std::list<Mesh*> GetSubMeshList();
 

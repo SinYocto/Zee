@@ -214,17 +214,18 @@ void Gizmo::determinSelectType(Object* obj, Camera* camera)
 	}
 }
 
-void Gizmo::Draw(Object* obj, Camera* camera)
+void Gizmo::Draw()
 {
+	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();
 	_Assert(NULL != camera);
 
-	if(!obj || mActiveType == GIZMO_NONE)
+	if(!mSelectedNode || mActiveType == GIZMO_NONE)
 		return;
 
 	Input* input = gEngine->GetInput();
 
-	determinSelectType(obj, camera);
-	draw(obj, camera, false);
+	determinSelectType(mSelectedNode, camera);
+	draw(mSelectedNode, camera, false);
 }
 
 void Gizmo::applyTransform(Camera* camera)
@@ -713,11 +714,12 @@ bool Gizmo::IsSelected()
 	return mSelectedAxis !=  SELECT_NONE;
 }
 
-void Gizmo::FrameUpdate(Camera* camera)
+void Gizmo::FrameUpdate()
 {
 	Input* input = gEngine->GetInput();
 
 	SceneManager* sceneMgr = gEngine->GetSceneManager();
+	Camera* camera = sceneMgr->GetMainCamera();
 
 	Vector2 screenPos((float)input->GetCursorPos().x, (float)input->GetCursorPos().y);
 
@@ -746,10 +748,7 @@ void Gizmo::FrameUpdate(Camera* camera)
 
 	if(input->GetKeyDown(DIK_G))
 	{
-		if(mCoordinateType == COORDINATE_GLOBAL)
-			mCoordinateType = COORDINATE_LOCAL;
-		else
-			mCoordinateType = COORDINATE_GLOBAL;
+		toogleCoordType();
 	}
 
 	applyTransform(camera);
@@ -763,4 +762,42 @@ SceneNode* Gizmo::GetSelectedNode()
 void Gizmo::SetCoordinateType(COORDINATE_TYPE type)
 {
 	mCoordinateType = type;
+}
+
+void Gizmo::SelectSceneNode(SceneNode* sceneNode)
+{
+	mSelectedNode = sceneNode;
+}
+
+void Gizmo::RegisterEventHanlder(IGizmoEventHandler* eventHandler)
+{
+	mEventHandlerList.push_back(eventHandler);
+}
+
+void Gizmo::UnRegisterEventHandler(IGizmoEventHandler* eventHandler)
+{
+	mEventHandlerList.remove(eventHandler);
+}
+
+void Gizmo::OnCoordTypeChanged()
+{
+	for(std::list<IGizmoEventHandler*>::iterator iter = mEventHandlerList.begin(); iter !=mEventHandlerList.end(); ++iter)
+	{
+		(*iter)->OnCoordTypeChanged(this);
+	}
+}
+
+Gizmo::COORDINATE_TYPE Gizmo::GetCoordinateType()
+{
+	return mCoordinateType;
+}
+
+void Gizmo::toogleCoordType()
+{
+	if(mCoordinateType == COORDINATE_GLOBAL)
+		mCoordinateType = COORDINATE_LOCAL;
+	else
+		mCoordinateType = COORDINATE_GLOBAL;
+
+	OnCoordTypeChanged();
 }

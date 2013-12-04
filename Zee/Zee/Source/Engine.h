@@ -12,6 +12,7 @@
 #include "Input.h"
 #include "Time.h"
 #include "IDAllocator.h"
+#include "Gizmo.h"
 
 class Engine
 {
@@ -37,6 +38,7 @@ public:
 	Input* GetInput();
 	FrameTimer* GetFrameTimer();
 	IDAllocator* GetIDAllocator();
+	Gizmo* GetGizmo();
 
 private:
 	Driver* mDriver;
@@ -53,6 +55,8 @@ private:
 
 	Input* mInput;
 	FrameTimer* mTimer;
+
+	Gizmo* mGizmo;
 };
 
 extern Engine* gEngine;
