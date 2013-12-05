@@ -730,7 +730,9 @@ void Gizmo::FrameUpdate()
 	if(input->GetLeftButtonDown())
 	{
 		if(!IsSelected())
-			mSelectedNode = sceneMgr->RayIntersect(rayPos, rayDir, NULL, NULL);
+		{
+			SelectSceneNode(sceneMgr->RayIntersect(rayPos, rayDir, NULL, NULL));
+		}
 	}
 
 	if(input->GetKeyDown(DIK_1))		// TODO: °´¼üÉèÖÃ
@@ -748,7 +750,7 @@ void Gizmo::FrameUpdate()
 
 	if(input->GetKeyDown(DIK_G))
 	{
-		toogleCoordType();
+		toggleCoordType();
 	}
 
 	applyTransform(camera);
@@ -766,7 +768,11 @@ void Gizmo::SetCoordinateType(COORDINATE_TYPE type)
 
 void Gizmo::SelectSceneNode(SceneNode* sceneNode)
 {
-	mSelectedNode = sceneNode;
+	if(mSelectedNode != sceneNode)
+	{
+		mSelectedNode = sceneNode;
+		OnSelectNode();
+	}
 }
 
 void Gizmo::RegisterEventHanlder(IGizmoEventHandler* eventHandler)
@@ -787,12 +793,20 @@ void Gizmo::OnCoordTypeChanged()
 	}
 }
 
+void Gizmo::OnSelectNode()
+{
+	for(std::list<IGizmoEventHandler*>::iterator iter = mEventHandlerList.begin(); iter !=mEventHandlerList.end(); ++iter)
+	{
+		(*iter)->OnSelectNode(this);
+	}
+}
+
 Gizmo::COORDINATE_TYPE Gizmo::GetCoordinateType()
 {
 	return mCoordinateType;
 }
 
-void Gizmo::toogleCoordType()
+void Gizmo::toggleCoordType()
 {
 	if(mCoordinateType == COORDINATE_GLOBAL)
 		mCoordinateType = COORDINATE_LOCAL;

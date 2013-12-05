@@ -10,6 +10,11 @@ public:
 	~DirectionalLightNode();
 
 	Billboard* GetBillboard();
+	DirectionalLight* GetDirLight();
+
+	void SetLightDirection(const Vector3& dir);
+	void SetLightIntensity(float intensity);
+	void SetLightColor(D3DXCOLOR color);
 
 	virtual void OnTransformChanged();
 

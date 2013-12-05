@@ -12,6 +12,8 @@ public:
 
 	void OnCreateScene();
 
+	void CreateEditorPages();
+
 	void CleanupAndDestory();
 
 private:

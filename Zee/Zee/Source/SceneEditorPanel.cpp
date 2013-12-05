@@ -25,24 +25,6 @@ void SceneEditorPanel::createWxCtrls()
 	mIconList->Add(wxIcon(L"./Assets/Icons/lightPage.ico", wxBITMAP_TYPE_ICO));
 
 	SetImageList(mIconList); 
-
-	SceneGraphPanel* sceneGraphPanel = new SceneGraphPanel(this, -1);
-	AddPage(sceneGraphPanel, L"SceneGraph", true, 0);
-
-	GeometryPanel* geometryPanel = new GeometryPanel(this, -1);
-	AddPage(geometryPanel, L"Geometry", false, 1);
-
-	MaterialPanel* materialPanel = new MaterialPanel(this, -1);
-	AddPage(materialPanel, L"Material", false, 2);
-
-	TexturePanel* texturePanel = new TexturePanel(this, -1);
-	AddPage(texturePanel, L"Texture", false, 3);
-
-	ModelPanel* modelPanel = new ModelPanel(this, -1);
-	AddPage(modelPanel, L"Model", false, 4);
-
-	LightPanel* lightPanel = new LightPanel(this, -1);
-	AddPage(lightPanel, L"Light", false, 5);
 }
 
 void SceneEditorPanel::OnCreateScene()
@@ -72,6 +54,30 @@ void SceneEditorPanel::CleanupAndDestory()
 {
 	delete mIconList;
 	Destroy();
+}
+
+void SceneEditorPanel::CreateEditorPages()
+{
+	SceneGraphPanel* sceneGraphPanel = new SceneGraphPanel(this, -1);
+	AddPage(sceneGraphPanel, L"SceneGraph", true, 0);
+
+	GeometryPanel* geometryPanel = new GeometryPanel(this, -1);
+	AddPage(geometryPanel, L"Geometry", false, 1);
+
+	MaterialPanel* materialPanel = new MaterialPanel(this, -1);
+	AddPage(materialPanel, L"Material", false, 2);
+
+	TexturePanel* texturePanel = new TexturePanel(this, -1);
+	AddPage(texturePanel, L"Texture", false, 3);
+
+	ModelPanel* modelPanel = new ModelPanel(this, -1);
+	AddPage(modelPanel, L"Model", false, 4);
+
+	LightPanel* lightPanel = new LightPanel(this, -1);
+	AddPage(lightPanel, L"Light", false, 5);
+
+	this->Fit();
+	this->Layout();
 }
 
 

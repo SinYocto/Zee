@@ -64,5 +64,27 @@ Vector3 PointLight::GetPosition()
 
 D3DXCOLOR PointLight::GetFinalColor()
 {
-	return mIntensity * mColor;
+	return D3DXCOLOR(mIntensity * mColor.r, mIntensity * mColor.g, mIntensity * mColor.b, mColor.a); 
+}
+
+D3DXCOLOR PointLight::GetColor()
+{
+	return mColor;
+}
+
+float PointLight::GetIntensity()
+{
+	return mIntensity;
+}
+
+void PointLight::SetIntensity(float intensity)
+{
+	mIntensity = intensity;
+	gEngine->GetLightManager()->SetPointLightDirtyFlag(true);
+}	
+
+void PointLight::SetColor(D3DXCOLOR color)
+{
+	mColor = color;
+	gEngine->GetLightManager()->SetPointLightDirtyFlag(true);
 }

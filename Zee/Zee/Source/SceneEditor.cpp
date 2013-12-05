@@ -73,6 +73,8 @@ SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, co
 	SceneEditorToolBar* toolBar = new SceneEditorToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL | wxNO_BORDER);
 	SetToolBar(toolBar);
 
+	mEditorPanel->CreateEditorPages();	// 有个控件需要注册gizmo的eventhandler, 所以在engine初始化后创建
+
 	// gui
 	::SetupGUIStyle();
 
@@ -514,7 +516,7 @@ void SceneEditorToolBar::OnCoordTypeChanged(Gizmo* gizmo)
 
 void SceneEditorToolBar::OnToolTransClicked(wxCommandEvent& event)
 {
-	gEngine->GetGizmo()->SetActiveType(Gizmo::GIZMO_TRANS);		// TODO:使用了未被管理的全局变量gizmo
+	gEngine->GetGizmo()->SetActiveType(Gizmo::GIZMO_TRANS);
 }
 
 void SceneEditorToolBar::OnToolRotateClicked( wxCommandEvent& event )

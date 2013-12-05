@@ -10,6 +10,11 @@ public:
 	~PointLightNode();
 
 	Billboard* GetBillboard();
+	PointLight* GetPointLight();
+
+	void SetLightPosition(const Vector3& pos);
+	void SetLightIntensity(float intensity);
+	void SetLightColor(D3DXCOLOR color);
 
 	virtual void OnTransformChanged();
 

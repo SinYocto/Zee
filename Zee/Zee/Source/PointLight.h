@@ -48,9 +48,13 @@ public:
 	void SetValue(D3DXCOLOR color, Vector3 pos, Vector3 attenuation, float intensity);
 
 	void SetPosition(const Vector3& pos);
+	void SetIntensity(float intensity);
+	void SetColor(D3DXCOLOR color);
 
 	Vector3 GetPosition();
 	D3DXCOLOR GetFinalColor();
+	D3DXCOLOR GetColor();
+	float GetIntensity();
 
 	wchar_t* GetName();
 

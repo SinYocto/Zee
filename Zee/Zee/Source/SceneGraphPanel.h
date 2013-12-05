@@ -3,8 +3,10 @@
 
 #include "wx/wx.h"
 #include "wx/treectrl.h"
+#include "wx/clrpicker.h"
 
 #include "SceneNode.h"
+#include "Gizmo.h"
 
 enum 
 {
@@ -60,7 +62,7 @@ private:
 	wxImageList* mIconList;
 };
 
-class SceneGraphTree : public wxTreeCtrl
+class SceneGraphTree : public wxTreeCtrl , public IGizmoEventHandler
 {
 public:
 	SceneGraphTree(wxWindow* parent, wxWindowID id = wxID_ANY, 
@@ -72,20 +74,28 @@ public:
 
 	void AttachInspectorPanel(SceneNodeInspectorPanel* inspectorPanel);
 
+	virtual void OnSelectNode(Gizmo* gizmo);
+
 	DECLARE_EVENT_TABLE()
+
+private:
+	wxTreeItemId findItemBySceneNode(SceneNode* sceneNode);		// 在整个tree中搜索
+	wxTreeItemId findItemBySceneNode(SceneNode* sceneNode, wxTreeItemId item);	// 在item极其child中搜索
 
 private:
 	SceneNodeInspectorPanel* mInspectorPanel;
 };
 
 class TransformPanel;
-class SceneNodeInspectorPanel : public wxPanel, public ISceneNodeEventHandler
+class LightInfoPanel;
+class SceneNodeInspectorPanel : public wxScrolledWindow, public ISceneNodeEventHandler
 {
 public: 
 	SceneNodeInspectorPanel(wxWindow* parent, wxWindowID id = wxID_ANY, 
 		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 
 	TransformPanel* GetTransformPanel();
+	LightInfoPanel* GetLightInfoPanel();
 
 	void AttachSceneNode(SceneNode* sceneNode);
 	SceneNode* GetAttachedSceneNode();
@@ -98,6 +108,7 @@ private:
 private:
 	SceneNode* mSceneNode;
 	TransformPanel* mTransformPanel;
+	LightInfoPanel* mLightInfoPanel;
 };
 
 class TransformPanel : public wxPanel
@@ -125,6 +136,36 @@ private:
 	wxTextCtrl* mTextCtrlScaleX;
 	wxTextCtrl* mTextCtrlScaleY;
 	wxTextCtrl* mTextCtrlScaleZ;
+};
+
+class LightInfoPanel : public wxPanel
+{
+	enum
+	{
+		ID_CHECKBOX_ENABLE,
+		ID_SLIDER_INTENSITY,
+		ID_LIGHT_COLOR,
+	};
+
+public:
+	LightInfoPanel(wxWindow* parent, wxWindowID id = wxID_ANY, 
+		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+
+	void LoadDataFromSceneNode(SceneNode* sceneNode);
+
+	void OnCheckBoxEnable(wxCommandEvent& event);
+	void OnSliderIntensity(wxScrollEvent& event);
+	void OnColorPick(wxColourPickerEvent& event);
+
+	DECLARE_EVENT_TABLE()
+
+private:
+	void createWxCtrls();
+
+private:
+	wxCheckBox* mCheckBoxEnable;
+	wxSlider* mSliderIntensity;
+	wxColourPickerCtrl* mColorPicker;
 };
 
 

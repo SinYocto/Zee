@@ -104,6 +104,8 @@ public:
 	bool IsSelected();
 
 	void OnCoordTypeChanged();
+	void OnSelectNode();
+
 	void RegisterEventHanlder(IGizmoEventHandler* eventHandler);
 	void UnRegisterEventHandler(IGizmoEventHandler* eventHandler);
 
@@ -128,7 +130,7 @@ private:
 
 	void applyTransform(Camera* camera);
 
-	void toogleCoordType();
+	void toggleCoordType();
 
 private:
 	MeshNode* mCone;
@@ -153,6 +155,7 @@ interface IGizmoEventHandler
 public:
 	virtual ~IGizmoEventHandler() {}
 	virtual void OnCoordTypeChanged(Gizmo* gizmo) {} 
+	virtual void OnSelectNode(Gizmo* gizmo) {} 
 };
      
 #endif

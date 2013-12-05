@@ -64,5 +64,27 @@ void DirectionalLight::SetDirection(const Vector3& dir)
 
 D3DXCOLOR DirectionalLight::GetFinalColor()
 {
-	return mIntensity * mColor;
+	return D3DXCOLOR(mIntensity * mColor.r, mIntensity * mColor.g, mIntensity * mColor.b, mColor.a);
+}
+
+float DirectionalLight::GetIntensity()
+{
+	return mIntensity;
+}
+
+D3DXCOLOR DirectionalLight::GetColor()
+{
+	return mColor;
+}
+
+void DirectionalLight::SetIntensity(float intensity)
+{
+	mIntensity = intensity;
+	gEngine->GetLightManager()->SetDirectionalLightDirtyFlag(true);
+}
+
+void DirectionalLight::SetColor(D3DXCOLOR color)
+{
+	mColor = color;
+	gEngine->GetLightManager()->SetDirectionalLightDirtyFlag(true);
 }

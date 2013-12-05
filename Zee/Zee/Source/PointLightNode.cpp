@@ -74,3 +74,25 @@ Billboard* PointLightNode::GetBillboard()
 {
 	return mBillboard;
 }
+
+PointLight* PointLightNode::GetPointLight()
+{
+	return mPointLight;
+}
+
+void PointLightNode::SetLightPosition(const Vector3& pos)
+{
+	mPointLight->SetPosition(pos);
+}
+
+void PointLightNode::SetLightIntensity(float intensity)
+{
+	mPointLight->SetIntensity(intensity);
+	mBillboard->SetColor(mPointLight->GetFinalColor());
+}
+
+void PointLightNode::SetLightColor(D3DXCOLOR color)
+{
+	mPointLight->SetColor(color);
+	mBillboard->SetColor(mPointLight->GetFinalColor());
+}

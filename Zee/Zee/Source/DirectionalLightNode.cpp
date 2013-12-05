@@ -76,3 +76,25 @@ Billboard* DirectionalLightNode::GetBillboard()
 {
 	return mBillboard;
 }
+
+DirectionalLight* DirectionalLightNode::GetDirLight()
+{
+	return mDirLight;
+}
+
+void DirectionalLightNode::SetLightDirection(const Vector3& dir)
+{
+	mDirLight->SetDirection(dir);
+}
+
+void DirectionalLightNode::SetLightIntensity(float intensity)
+{
+	mDirLight->SetIntensity(intensity);
+	mBillboard->SetColor(mDirLight->GetFinalColor());
+}
+
+void DirectionalLightNode::SetLightColor(D3DXCOLOR color)
+{
+	mDirLight->SetColor(color);
+	mBillboard->SetColor(mDirLight->GetFinalColor());
+}

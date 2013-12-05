@@ -42,10 +42,14 @@ public:
 	void SetValue(D3DXCOLOR color, Vector3 dir, float intensity);
 
 	void SetDirection(const Vector3& dir);
+	void SetIntensity(float intensity);
+	void SetColor(D3DXCOLOR color);
 
 	wchar_t* GetName();
 	Vector3 GetDirection();
 	D3DXCOLOR GetFinalColor();
+	D3DXCOLOR GetColor();
+	float GetIntensity();
 
 	void Enable(bool enable);
 	bool IsEnabled();
