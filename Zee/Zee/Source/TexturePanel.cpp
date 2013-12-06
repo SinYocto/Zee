@@ -25,11 +25,12 @@ void TexturePanel::createWxCtrls()
 
 	wxBoxSizer* boxSizer2 = new wxBoxSizer(wxVERTICAL);
 
-	mTreeCtrl = new wxTreeCtrl(mTreePanel, -1, wxDefaultPosition, wxDefaultSize, 
+	mTreeCtrl = new TextureListTree(mTreePanel, ID_TEXTURELIST_TREE, wxDefaultPosition, wxDefaultSize, 
 		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES | wxTR_HIDE_ROOT);
 
 	mTreeCtrl->SetMinSize(wxSize(180, 260));
 	mTreeCtrl->AssignImageList(mIconList);
+
 
 	boxSizer2->Add(mTreeCtrl, 0, wxALL, 5);
 
@@ -40,8 +41,9 @@ void TexturePanel::createWxCtrls()
 	boxSizer1->Add(mTreePanel, 0, wxALL, 5);
 
 	// inspector
-	mInspectorPanel = new wxPanel(this, -1);
+	mInspectorPanel = new TextureInspectorPanel(this, -1);
 	mInspectorPanel->SetMinSize(wxSize(200, 300));
+	mTreeCtrl->AttachInspectorPanel(mInspectorPanel);
 
 	boxSizer1->Add(mInspectorPanel, 0, wxALL, 5);
 
@@ -79,3 +81,108 @@ TextureTreeItemData::TextureTreeItemData(Texture* texture)
 
 }
 
+Texture* TextureTreeItemData::GetTexture()
+{
+	return mTexture;
+}
+
+
+BEGIN_EVENT_TABLE(TextureListTree, wxTreeCtrl)
+EVT_TREE_ITEM_ACTIVATED (ID_TEXTURELIST_TREE, TextureListTree::OnItemActivated)
+EVT_TREE_SEL_CHANGED(ID_TEXTURELIST_TREE, TextureListTree::OnItemSelected)
+END_EVENT_TABLE()
+
+TextureListTree::TextureListTree( wxWindow* parent, wxWindowID id /*= wxID_ANY*/, const wxPoint& pos /*= wxDefaultPosition*/, 
+							   const wxSize&size /*= wxDefaultSize*/, long style /*= wxTR_DEFAULT_STYLE*/ )
+							   :wxTreeCtrl(parent, id, pos, size, style)
+{
+
+}
+
+void TextureListTree::OnItemActivated(wxTreeEvent& event)
+{
+	//TextureTreeItemData* itemData = (TextureTreeItemData*)GetItemData(event.GetItem());
+
+	//SceneNode* sceneNode = itemData->GetSceneNode();
+
+	//Camera* mainCamera = gEngine->GetSceneManager()->GetMainCamera();
+	//mainCamera->FocusAt(sceneNode);
+}
+
+void TextureListTree::OnItemSelected(wxTreeEvent& event)
+{
+	TextureTreeItemData* itemData = (TextureTreeItemData*)GetItemData(event.GetItem());
+	Texture* texture = itemData->GetTexture();
+
+	mInspectorPanel->AttachTexture(texture);
+	mInspectorPanel->GetTextureInfoPanel()->LoadDataFromTexture(texture);
+}
+
+void TextureListTree::AttachInspectorPanel(TextureInspectorPanel* inspectorPanel)
+{
+	mInspectorPanel = inspectorPanel;
+}
+
+
+TextureInspectorPanel::TextureInspectorPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
+											 const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
+											 :wxScrolledWindow(parent, id, pos, size, wxVSCROLL)
+											 ,mTexture(NULL)
+{
+	createWxCtrls();
+}
+
+void TextureInspectorPanel::createWxCtrls()
+{
+	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+
+	mTextureInfoPanel = new TextureInfoPanel(this, wxID_ANY);
+
+	boxSizer1->Add(mTextureInfoPanel, 0, wxALL, 5);
+
+	this->SetScrollRate(0, 5);
+	this->SetSizer(boxSizer1);
+	this->FitInside();
+	this->Layout();
+}
+
+TextureInfoPanel* TextureInspectorPanel::GetTextureInfoPanel()
+{
+	return mTextureInfoPanel;
+}
+
+void TextureInspectorPanel::AttachTexture(Texture* texture)
+{
+	mTexture = texture;
+}
+
+BEGIN_EVENT_TABLE(TextureInfoPanel, wxPanel)
+END_EVENT_TABLE()
+
+TextureInfoPanel::TextureInfoPanel( wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
+								   const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/ )
+								   :wxPanel(parent, id, pos, size)
+{
+	createWxCtrls();
+}
+
+void TextureInfoPanel::createWxCtrls()
+{
+	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+
+	mImage = new wxImagePanel(this, wxT("./Assets/Textures/cliff.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
+
+	boxSizer1->Add(mImage, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
+
+	this->SetSizer(boxSizer1);
+	this->Layout();
+	this->Fit();
+}
+
+void TextureInfoPanel::LoadDataFromTexture(Texture* texture)
+{
+	if(!texture)
+		return;
+
+	mImage->SetImage(texture->GetFilePath(), wxBITMAP_TYPE_JPEG);	// TODO: ¿‡–Õ
+}

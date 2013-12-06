@@ -657,6 +657,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\wxImagePanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\wxImagePanel.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\wxWndTreeGenerator.cpp"
 				>
 			</File>

@@ -753,6 +753,12 @@ void Gizmo::FrameUpdate()
 		toggleCoordType();
 	}
 
+	if(input->GetKeyDown(DIK_F))
+	{
+		if(mSelectedNode)
+			camera->FocusAt(mSelectedNode);
+	}
+
 	applyTransform(camera);
 }
 
