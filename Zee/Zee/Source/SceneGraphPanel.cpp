@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "DirectionalLightNode.h"
 #include "PointLightNode.h"
+#include "MeshNode.h"
 
 BEGIN_EVENT_TABLE(SceneGraphPanel, wxPanel)
 EVT_CLOSE(SceneGraphPanel::OnClose)
@@ -171,6 +172,8 @@ void SceneGraphTree::OnItemSelected(wxTreeEvent& event)
 	mInspectorPanel->AttachSceneNode(sceneNode);
 	mInspectorPanel->GetTransformPanel()->LoadDataFromSceneNode(sceneNode);
 	mInspectorPanel->GetLightInfoPanel()->LoadDataFromSceneNode(sceneNode);
+	mInspectorPanel->GetMeshNodeInfoPanel()->LoadDataFromSceneNode(sceneNode);
+	mInspectorPanel->GetAttributeInfoPanel()->LoadDataFromSceneNode(sceneNode);
 }
 
 void SceneGraphTree::OnEndLabelEdit(wxTreeEvent& event)
@@ -245,11 +248,15 @@ void SceneNodeInspectorPanel::createWxCtrls()
 	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
 
 	// transform
-	mTransformPanel = new TransformPanel(this, -1);
-	mLightInfoPanel = new LightInfoPanel(this, -1);
+	mTransformPanel = new TransformPanel(this, wxID_ANY);
+	mMeshNodeInfoPanel = new MeshNodeInfoPanel(this, wxID_ANY);
+	mLightInfoPanel = new LightInfoPanel(this, wxID_ANY);
+	mAttributeInfoPanel = new AttributeInfoPanel(this, wxID_ANY);
 
 	boxSizer1->Add(mTransformPanel, 0, wxALL, 5);
+	boxSizer1->Add(mMeshNodeInfoPanel, 0, wxALL, 5);
 	boxSizer1->Add(mLightInfoPanel, 0, wxALL, 5);
+	boxSizer1->Add(mAttributeInfoPanel, 0, wxALL, 5);
 
 	this->SetScrollRate(0, 5);
 	this->SetSizer(boxSizer1);
@@ -275,7 +282,9 @@ void SceneNodeInspectorPanel::AttachSceneNode(SceneNode* sceneNode)
 	mSceneNode = sceneNode;
 	mSceneNode->RegisterEventHanlder(this);
 
+	mMeshNodeInfoPanel->Hide();
 	mLightInfoPanel->Hide();
+	mAttributeInfoPanel->Hide();
 
 	SceneNode::NODE_TYPE type = sceneNode->GetNodeType();
 	switch(type)
@@ -285,9 +294,21 @@ void SceneNodeInspectorPanel::AttachSceneNode(SceneNode* sceneNode)
 		mLightInfoPanel->Show();
 		break;
 
+	case SceneNode::SCENE_NODE_MESH:
+		mMeshNodeInfoPanel->Show();
+		mAttributeInfoPanel->Show();
+		break;
+
+	case SceneNode::SCENE_NODE_MODEL:
+		mAttributeInfoPanel->Show();
+		break;
+
 	default:
 		break;
 	}
+
+	this->Layout();
+	this->Fit();
 }
 
 SceneNode* SceneNodeInspectorPanel::GetAttachedSceneNode()
@@ -298,6 +319,16 @@ SceneNode* SceneNodeInspectorPanel::GetAttachedSceneNode()
 LightInfoPanel* SceneNodeInspectorPanel::GetLightInfoPanel()
 {
 	return mLightInfoPanel;
+}
+
+MeshNodeInfoPanel* SceneNodeInspectorPanel::GetMeshNodeInfoPanel()
+{
+	return mMeshNodeInfoPanel;
+}
+
+AttributeInfoPanel* SceneNodeInspectorPanel::GetAttributeInfoPanel()
+{
+	return mAttributeInfoPanel;
 }
 
 BEGIN_EVENT_TABLE(TransformPanel, wxPanel)
@@ -316,39 +347,39 @@ void TransformPanel::createWxCtrls()
 	wxFlexGridSizer* fgSizer1 = new wxFlexGridSizer(2, 2, 0, 0); 
 
 	wxStaticText* textPosX = new wxStaticText(this, -1, L"X");
-	mTextCtrlPosX = new wxTextCtrl(this, -1, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	mTextCtrlPosX = new wxTextCtrl(this, ID_TEXT_POSX, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	wxStaticText* textPosY = new wxStaticText(this, -1, L"Y");
-	mTextCtrlPosY = new wxTextCtrl(this, -1, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	mTextCtrlPosY = new wxTextCtrl(this, ID_TEXT_POSY, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	wxStaticText* textPosZ = new wxStaticText(this, -1, L"Z");
-	mTextCtrlPosZ = new wxTextCtrl(this, -1, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	mTextCtrlPosZ = new wxTextCtrl(this, ID_TEXT_POSZ, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	wxStaticText* textEulerX = new wxStaticText(this, -1, L"EulerX");
-	mTextCtrlEulerX = new wxTextCtrl(this, -1, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	mTextCtrlEulerX = new wxTextCtrl(this, ID_TEXT_EULERX, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	wxStaticText* textEulerY = new wxStaticText(this, -1, L"EulerY");
-	mTextCtrlEulerY = new wxTextCtrl(this, -1, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	mTextCtrlEulerY = new wxTextCtrl(this, ID_TEXT_EULERY, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	wxStaticText* textEulerZ = new wxStaticText(this, -1, L"EulerZ");
-	mTextCtrlEulerZ = new wxTextCtrl(this, -1, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	mTextCtrlEulerZ = new wxTextCtrl(this, ID_TEXT_EULERZ, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	wxStaticText* textScaleX = new wxStaticText(this, -1, L"ScaleX");
-	mTextCtrlScaleX = new wxTextCtrl(this, -1, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	mTextCtrlScaleX = new wxTextCtrl(this, ID_TEXT_SCALEX, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	wxStaticText* textScaleY = new wxStaticText(this, -1, L"ScaleY");
-	mTextCtrlScaleY = new wxTextCtrl(this, -1, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	mTextCtrlScaleY = new wxTextCtrl(this, ID_TEXT_SCALEY, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	wxStaticText* textScaleZ = new wxStaticText(this, -1, L"ScaleZ");
-	mTextCtrlScaleZ = new wxTextCtrl(this, -1, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	mTextCtrlScaleZ = new wxTextCtrl(this, ID_TEXT_SCALEZ, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	fgSizer1->Add(textPosX, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
@@ -430,50 +461,73 @@ void TransformPanel::OnTextEnter(wxCommandEvent& event)
 	if(!sceneNode)
 		return;
 
-	if(textCtrl == mTextCtrlPosX)
+	switch(textCtrl->GetId())
 	{
-		Vector3 pos = sceneNode->GetWorldPosition();
-		sceneNode->SetWorldPosition(val, pos.y, pos.z);
-	}
-	else if(textCtrl == mTextCtrlPosY)
-	{
-		Vector3 pos = sceneNode->GetWorldPosition();
-		sceneNode->SetWorldPosition(pos.x, val, pos.z);
-	}
-	else if(textCtrl == mTextCtrlPosZ)
-	{
-		Vector3 pos = sceneNode->GetWorldPosition();
-		sceneNode->SetWorldPosition(pos.x, pos.y, val);
-	}
-	else if(textCtrl == mTextCtrlEulerX)
-	{
-		Vector3 eulerAngle = sceneNode->GetWorldOrient().EulerAngle();
-		sceneNode->SetWorldOrientation(DEGREE_TO_RAD(val), eulerAngle.y, eulerAngle.z);
-	}
-	else if(textCtrl == mTextCtrlEulerY)
-	{
-		Vector3 eulerAngle = sceneNode->GetWorldOrient().EulerAngle();
-		sceneNode->SetWorldOrientation(eulerAngle.x, DEGREE_TO_RAD(val), eulerAngle.z);
-	}
-	else if(textCtrl == mTextCtrlEulerZ)
-	{
-		Vector3 eulerAngle = sceneNode->GetWorldOrient().EulerAngle();
-		sceneNode->SetWorldOrientation(eulerAngle.x, eulerAngle.y, DEGREE_TO_RAD(val));
-	}
-	else if(textCtrl == mTextCtrlScaleX)
-	{
-		Vector3 scale = sceneNode->GetScale();
-		sceneNode->SetWorldOrientation(val, scale.y, scale.z);
-	} 
-	else if(textCtrl == mTextCtrlScaleY)
-	{
-		Vector3 scale = sceneNode->GetScale();
-		sceneNode->SetWorldOrientation(scale.x, val, scale.z);
-	}
-	else if(textCtrl == mTextCtrlScaleZ)
-	{
-		Vector3 scale = sceneNode->GetScale();
-		sceneNode->SetWorldOrientation(scale.x, scale.y, val);
+	case ID_TEXT_POSX:
+		{
+			Vector3 pos = sceneNode->GetWorldPosition();
+			sceneNode->SetWorldPosition(val, pos.y, pos.z);
+			break;
+		}
+
+	case ID_TEXT_POSY:
+		{
+			Vector3 pos = sceneNode->GetWorldPosition();
+			sceneNode->SetWorldPosition(pos.x, val, pos.z);
+			break;
+		}
+
+	case ID_TEXT_POSZ:
+		{
+			Vector3 pos = sceneNode->GetWorldPosition();
+			sceneNode->SetWorldPosition(pos.x, pos.y, val);
+			break;
+		}
+
+	case ID_TEXT_EULERX:
+		{
+			Vector3 eulerAngle = sceneNode->GetWorldOrient().EulerAngle();
+			sceneNode->SetWorldOrientation(DEGREE_TO_RAD(val), eulerAngle.y, eulerAngle.z);
+			break;
+		}
+
+	case ID_TEXT_EULERY:		
+		{
+			Vector3 eulerAngle = sceneNode->GetWorldOrient().EulerAngle();
+			sceneNode->SetWorldOrientation(eulerAngle.x, DEGREE_TO_RAD(val), eulerAngle.z);
+			break;
+		}
+
+	case ID_TEXT_EULERZ:		
+		{
+			Vector3 eulerAngle = sceneNode->GetWorldOrient().EulerAngle();
+			sceneNode->SetWorldOrientation(eulerAngle.x, eulerAngle.y, DEGREE_TO_RAD(val));
+			break;
+		}
+
+	case ID_TEXT_SCALEX:		
+		{
+			Vector3 scale = sceneNode->GetScale();
+			sceneNode->SetScale(val, scale.y, scale.z);
+			break;
+		}
+
+	case ID_TEXT_SCALEY:	
+		{
+			Vector3 scale = sceneNode->GetScale();
+			sceneNode->SetScale(scale.x, val, scale.z);
+			break;
+		}
+
+	case ID_TEXT_SCALEZ:		
+		{
+			Vector3 scale = sceneNode->GetScale();
+			sceneNode->SetScale(scale.x, scale.y, val);
+			break;
+		}
+
+	default:
+		break;
 	}
 }
 
@@ -600,5 +654,134 @@ void LightInfoPanel::OnColorPick(wxColourPickerEvent& event)
 	{
 		PointLightNode* lightNode = static_cast<PointLightNode*>(sceneNode);
 		lightNode->SetLightColor(d3dColor);
+	}
+}
+
+BEGIN_EVENT_TABLE(MeshNodeInfoPanel, wxPanel)
+END_EVENT_TABLE()
+MeshNodeInfoPanel::MeshNodeInfoPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
+									 const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
+									 :wxPanel(parent, id, pos, size)
+{
+	createWxCtrls();
+}
+
+void MeshNodeInfoPanel::createWxCtrls()
+{
+	wxFlexGridSizer* fgSizer1 = new wxFlexGridSizer(4, 4, 0, 0); 
+
+	// geo
+	wxStaticText* textGeo = new wxStaticText(this, wxID_ANY, L"Geometry");
+	wxStaticBitmap* bitmapGeo = new wxStaticBitmap(this, wxID_ANY, 
+		wxBitmap(L"./Assets/Icons/geometry8x8.ico", wxBITMAP_TYPE_ICO));
+
+	mTextGeoName = new wxStaticText(this, wxID_ANY, L"geoName");
+	mBitmapBtnGeo = new wxBitmapButton(this, ID_BITMAP_BTN_GEO, wxBitmap(L"./Assets/Icons/settings8x8.ico", wxBITMAP_TYPE_ICO));
+
+	// mtl
+	wxStaticText* textMtl = new wxStaticText(this, wxID_ANY, L"Material");
+	wxStaticBitmap* bitmapMtl = new wxStaticBitmap(this, wxID_ANY, 
+		wxBitmap(L"./Assets/Icons/material8x8.ico", wxBITMAP_TYPE_ICO));
+
+	mTextMtlName = new wxStaticText(this, wxID_ANY, L"mtlName");
+	mBitmapBtnMtl = new wxBitmapButton(this, ID_BITMAP_BTN_MTL, wxBitmap(L"./Assets/Icons/settings8x8.ico", wxBITMAP_TYPE_ICO));
+
+	fgSizer1->Add(textGeo, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
+	fgSizer1->Add(bitmapGeo, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
+
+	fgSizer1->Add(mTextGeoName, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
+	fgSizer1->Add(mBitmapBtnGeo, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
+
+	fgSizer1->Add(textMtl, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
+	fgSizer1->Add(bitmapMtl, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
+
+	fgSizer1->Add(mTextMtlName, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
+	fgSizer1->Add(mBitmapBtnMtl, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
+
+	this->SetSizer(fgSizer1);
+	this->Layout();
+	this->Fit();
+}
+
+void MeshNodeInfoPanel::LoadDataFromSceneNode(SceneNode* sceneNode)
+{
+	SceneNode::NODE_TYPE type = sceneNode->GetNodeType();
+
+	if(type == SceneNode::SCENE_NODE_MESH)
+	{
+		MeshNode* meshNode = static_cast<MeshNode*>(sceneNode);
+		Mesh* mesh = meshNode->GetMesh();
+
+		mTextGeoName->SetLabel(mesh->GetGeometry()->GetName());
+		mTextMtlName->SetLabel(mesh->GetMaterial()->GetName());
+	}
+}
+
+BEGIN_EVENT_TABLE(AttributeInfoPanel, wxPanel)
+EVT_CHECKBOX(wxID_ANY, AttributeInfoPanel::OnCheckBox)
+END_EVENT_TABLE()
+AttributeInfoPanel::AttributeInfoPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
+									   const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
+									   :wxPanel(parent, id, pos, size)
+{
+	createWxCtrls();
+}
+
+void AttributeInfoPanel::createWxCtrls()
+{
+	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+
+	mCheckBoxWireFrame = new wxCheckBox(this, ID_CHECKBOX_WIREFRAME, wxT("WireFrame"));
+	mCheckBoxDrawBBox = new wxCheckBox(this, ID_CHECKBOX_DRAW_BBOX, wxT("DrawBBox"));
+
+	boxSizer1->Add(mCheckBoxWireFrame, 0, wxALL, 5);
+	boxSizer1->Add(mCheckBoxDrawBBox, 0, wxALL, 5);
+
+	this->SetSizer(boxSizer1);
+	this->Layout();
+	this->Fit();
+}
+
+void AttributeInfoPanel::LoadDataFromSceneNode(SceneNode* sceneNode)
+{
+	if(!sceneNode)
+		return;
+
+	if(sceneNode->GetDisplayMode() == SceneNode::WIRE_FRAME)
+	{
+		mCheckBoxWireFrame->SetValue(true);
+	}
+	else
+	{
+		mCheckBoxWireFrame->SetValue(false);
+	}
+
+	mCheckBoxDrawBBox->SetValue(sceneNode->GetDrawBBoxFlag());
+}
+
+void AttributeInfoPanel::OnCheckBox(wxCommandEvent& event)
+{
+	SceneNodeInspectorPanel* inspectorPanel = (SceneNodeInspectorPanel*)GetParent();
+	SceneNode* sceneNode = inspectorPanel->GetAttachedSceneNode();
+
+	wxCheckBox* checkBox = (wxCheckBox*)event.GetEventObject();
+	bool val = checkBox->GetValue();
+
+	switch(checkBox->GetId())
+	{
+	case ID_CHECKBOX_WIREFRAME:
+		if(val)
+			sceneNode->SetDisplayMode(SceneNode::WIRE_FRAME);
+		else
+			sceneNode->SetDisplayMode(SceneNode::SOLID);
+
+		break;
+
+	case ID_CHECKBOX_DRAW_BBOX:
+		sceneNode->SetDrawBBoxFlag(val);
+		break;
+
+	default:
+		break;
 	}
 }

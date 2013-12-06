@@ -88,6 +88,8 @@ private:
 
 class TransformPanel;
 class LightInfoPanel;
+class MeshNodeInfoPanel;
+class AttributeInfoPanel;
 class SceneNodeInspectorPanel : public wxScrolledWindow, public ISceneNodeEventHandler
 {
 public: 
@@ -96,6 +98,8 @@ public:
 
 	TransformPanel* GetTransformPanel();
 	LightInfoPanel* GetLightInfoPanel();
+	MeshNodeInfoPanel* GetMeshNodeInfoPanel();
+	AttributeInfoPanel* GetAttributeInfoPanel();
 
 	void AttachSceneNode(SceneNode* sceneNode);
 	SceneNode* GetAttachedSceneNode();
@@ -109,10 +113,25 @@ private:
 	SceneNode* mSceneNode;
 	TransformPanel* mTransformPanel;
 	LightInfoPanel* mLightInfoPanel;
+	MeshNodeInfoPanel* mMeshNodeInfoPanel;
+	AttributeInfoPanel* mAttributeInfoPanel;
 };
 
 class TransformPanel : public wxPanel
 {
+	enum
+	{
+		ID_TEXT_POSX,
+		ID_TEXT_POSY,
+		ID_TEXT_POSZ,
+		ID_TEXT_EULERX,
+		ID_TEXT_EULERY,
+		ID_TEXT_EULERZ,
+		ID_TEXT_SCALEX,
+		ID_TEXT_SCALEY,
+		ID_TEXT_SCALEZ,
+	};
+
 public: 
 	TransformPanel(wxWindow* parent, wxWindowID id = wxID_ANY, 
 		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
@@ -166,6 +185,57 @@ private:
 	wxCheckBox* mCheckBoxEnable;
 	wxSlider* mSliderIntensity;
 	wxColourPickerCtrl* mColorPicker;
+};
+
+class MeshNodeInfoPanel : public wxPanel
+{
+	enum
+	{
+		ID_BITMAP_BTN_GEO,
+		ID_BITMAP_BTN_MTL,
+	};
+
+public:
+	MeshNodeInfoPanel(wxWindow* parent, wxWindowID id = wxID_ANY, 
+		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+
+	void LoadDataFromSceneNode(SceneNode* sceneNode);
+
+	DECLARE_EVENT_TABLE()
+
+private:
+	void createWxCtrls();
+
+private:
+	wxStaticText* mTextGeoName;
+	wxStaticText* mTextMtlName;
+	wxBitmapButton* mBitmapBtnGeo;
+	wxBitmapButton* mBitmapBtnMtl;
+};
+
+class AttributeInfoPanel : public wxPanel
+{
+	enum 
+	{
+		ID_CHECKBOX_WIREFRAME,
+		ID_CHECKBOX_DRAW_BBOX,
+	};
+
+public:
+	AttributeInfoPanel(wxWindow* parent, wxWindowID id = wxID_ANY, 
+		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+
+	void LoadDataFromSceneNode(SceneNode* sceneNode);
+
+	void OnCheckBox(wxCommandEvent& event);
+
+	DECLARE_EVENT_TABLE()
+
+private:
+	void createWxCtrls();
+private:
+	wxCheckBox* mCheckBoxWireFrame;
+	wxCheckBox* mCheckBoxDrawBBox;
 };
 
 

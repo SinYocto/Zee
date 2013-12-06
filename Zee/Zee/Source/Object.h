@@ -52,7 +52,9 @@ public:
 	void TranslateLocal(float x, float y, float z);
 
 	void SetScale(const Vector3& scale);
-	void Scale(const Vector3& scale);
+	void SetScale(float x, float y, float z);
+	void Scale(const Vector3& scale);				// Scale是在当前大小下scale多少, SetScale是总的scale
+	void Scale(float x, float y, float z);
 
 	Vector3 LocalVectorToWorld(const Vector3& localVec);
 	Vector3 WorldVectorToLocal(const Vector3& worldVec);
