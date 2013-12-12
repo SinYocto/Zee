@@ -84,6 +84,8 @@ void Material::SetShader(ShadingMethod shadingMethod)
 	case BumpSpecular:
 		SAFE_DROP(mShader);
 		mShader = new BumpSpecularShader(this);
+		mShader->SetColorTex(L"./Assets/Textures/white_128x128.jpg");
+		mShader->SetNormalTex(L"./Assets/Textures/default_normal_128x128.jpg");
 		break;
 
 	default:
@@ -185,3 +187,70 @@ ShadingMethod Material::GetShadingMethod()
 {
 	return mShadingMethod;
 }
+
+float Material::GetTilesU()
+{
+	return mTilesU;
+}
+
+float Material::GetTilesV()
+{
+	return mTilesV;
+}
+
+float Material::GetOffsetU()
+{
+	return mOffsetU;
+}
+
+float Material::GetOffsetV()
+{
+	return mOffsetV;
+}
+
+int Material::GetTextureLayerCounts()
+{
+	int counts = 0;
+
+	for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
+	{
+		if(mTextureLayer[layerIx])
+			counts++;
+		else
+			break;
+	}
+
+	return counts;
+}
+
+void Material::SetTilesU(float tilesU)
+{
+	mTilesU = tilesU;
+}
+
+void Material::SetTilesV(float tilesV)
+{
+	mTilesV = tilesV;
+}
+
+void Material::SetOffsetU(float offsetU)
+{
+	mOffsetU = offsetU;
+}
+
+void Material::SetOffsetV(float offsetV)
+{
+	mOffsetV = offsetV;
+}
+
+//bool Material::AcceptGeometry(Geometry* geo)
+//{
+//	bool accept = true;
+//
+//	VertexType vertexType = geo->GetVertexType();
+//
+//	if(vertexType == XYZ_N)
+//	{
+//		if(mShadingMethod == )
+//	}
+//}

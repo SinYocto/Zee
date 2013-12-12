@@ -6,7 +6,7 @@
 
 enum ShadingMethod 
 { 
-	Flat,
+	Flat = 0,
 	View,
 	Diffuse, 
 	Specular, 

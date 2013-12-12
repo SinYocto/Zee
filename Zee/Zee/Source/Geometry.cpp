@@ -1164,3 +1164,8 @@ void Geometry::CalcDynamicAABBox(const D3DXMATRIX& matWorld, AABBox* box)
 			box->mMin.z = vertPos.z;
 	}
 }
+
+VertexType Geometry::GetVertexType()
+{
+	return mVertexType;
+}

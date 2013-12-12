@@ -268,15 +268,15 @@ void CreateScene()
 	materialMgr->AddMaterial(mtlBump);
 
 	mtlBump->SetShader(BumpSpecular);
-	mtlBump->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
-	mtlBump->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
+	//mtlBump->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
+	//mtlBump->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
 	mtlBump->mShader->SetSpecShiness(0.4f);
 
 	Material* mtlDiff = new Material(L"mtlDiff");
 	materialMgr->AddMaterial(mtlDiff);
 
 	mtlDiff->SetShader(Diffuse);
-	//mtl2->shader->SetColorTex(L"./Assets/Textures/6133.jpg");
+	mtlDiff->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
 
 	Material* mtlSpec = new Material(L"mtlSpec");
 	materialMgr->AddMaterial(mtlSpec);
@@ -302,7 +302,7 @@ void CreateScene()
 	sceneMgr->AddSceneNode(cube);
 	cube->Translate(2, 0, 0);
 
-	ModelNode* cylinder = new ModelNode(L"cylinder", NULL, cylinderGeo, mtlDiff);
+	ModelNode* cylinder = new ModelNode(L"cylinder", NULL, cylinderGeo, mtlBump);
 	sceneMgr->AddSceneNode(cylinder);
 	cylinder->Translate(-2, 0, 0);
 

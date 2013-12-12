@@ -10,6 +10,7 @@
 
 class Object;
 class Texture;
+class Geometry;
 
 class Material : public IReferenceCounted
 {
@@ -69,6 +70,7 @@ public:
 	ShadingMethod GetShadingMethod();
 
 	Texture* GetTexture(int layerIx);
+	int GetTextureLayerCounts();
 
 	D3DXCOLOR GetAmbientColor();
 	D3DXCOLOR GetDiffuseColor();
@@ -77,8 +79,20 @@ public:
 	float GetSpecShiness();
 	float GetSpecGloss();
 
+	float GetTilesU();
+	float GetTilesV();
+	float GetOffsetU();
+	float GetOffsetV();
+
+	void SetTilesU(float tilesU);
+	void SetTilesV(float tilesV);
+	void SetOffsetU(float offsetU);
+	void SetOffsetV(float offsetV);
+
 	void SetUVTiles(float _tilesU, float _tilesV);
 	void SetUVOffset(float _offsetU, float _offsetV);
+
+	//bool AcceptGeometry(Geometry* geo);
 
 	D3DXMATRIX UVTransformMatrix();
 

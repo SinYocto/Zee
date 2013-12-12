@@ -101,6 +101,8 @@ public:
 	void SetVertexDeclaration();
 	void SetVertexStream();
 
+	VertexType GetVertexType();
+
 	AABBox GetAABBox();
 	void CalcDynamicAABBox(const D3DXMATRIX& matWorld, AABBox* box);
 
