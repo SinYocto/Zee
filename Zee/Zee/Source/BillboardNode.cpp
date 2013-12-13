@@ -5,7 +5,7 @@
 BillboardNode::BillboardNode( const wchar_t* name, float width, float height, D3DCOLOR color ) :SceneNode(name)
 {
 	mType = SCENE_NODE_BILLBOARD;
-	mBillboard = new Billboard(width, height, color);
+	mBillboard = New Billboard(width, height, color);
 
 	gEngine->GetResourceManager()->AddBillboard(mBillboard);
 	mBillboard->Grab();

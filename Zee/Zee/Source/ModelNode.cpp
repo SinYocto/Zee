@@ -15,7 +15,7 @@ ModelNode::ModelNode(const wchar_t* name, SceneNode* parent, Model* model)
 	for(std::list<Mesh*>::iterator iter = meshList.begin(); iter != meshList.end(); ++iter)
 	{
 		Mesh* mesh = *iter;
-		MeshNode* meshNode = new MeshNode(L"mesh", this, mesh);
+		MeshNode* meshNode = New MeshNode(L"mesh", this, mesh);
 	}
 }
 
@@ -23,11 +23,11 @@ ModelNode::ModelNode(const wchar_t* name, SceneNode* parent, Geometry* geo, Mate
 :SceneNode(name, parent)
 {
 	mType = SCENE_NODE_MODEL;
-	mModel = new Model(name, geo, material);
+	mModel = New Model(name, geo, material);
 
 	gEngine->GetModelManager()->AddModel(mModel);
 
-	MeshNode* meshNode = new MeshNode(L"mesh", this, geo, material);
+	MeshNode* meshNode = New MeshNode(L"mesh", this, geo, material);
 }
 
 //void ModelNode::updateAABBox()

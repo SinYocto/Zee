@@ -91,19 +91,19 @@ void MaterialManager::createDefaultMtls()
 {
 	IDAllocator* idAllocator = gEngine->GetIDAllocator();
 
-	flatMtl = new Material(L"defaultFlatMtl");
+	flatMtl = New Material(L"defaultFlatMtl");
 	flatMtl->SetShader(Flat);
 	idAllocator->AllocateMaterialID(flatMtl);
 
-	viewMtl = new Material(L"defaultViewMtl");
+	viewMtl = New Material(L"defaultViewMtl");
 	viewMtl->SetShader(View);
 	idAllocator->AllocateMaterialID(viewMtl);
 
-	diffMtl = new Material(L"defaultDiffMtl");
+	diffMtl = New Material(L"defaultDiffMtl");
 	diffMtl->SetShader(Diffuse);
 	idAllocator->AllocateMaterialID(diffMtl);
 
-	specMtl = new Material(L"defaultSpecMtl");
+	specMtl = New Material(L"defaultSpecMtl");
 	specMtl->SetShader(Specular);
 	idAllocator->AllocateMaterialID(specMtl);
 }

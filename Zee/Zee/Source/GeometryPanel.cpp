@@ -2,14 +2,13 @@
 #include "Engine.h"
 
 BEGIN_EVENT_TABLE(GeometryPanel, wxPanel)
-EVT_CLOSE(GeometryPanel::OnClose)
 END_EVENT_TABLE()
 
 GeometryPanel::GeometryPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
 								 const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
 								 :wxPanel(parent, id, pos, size)
 {
-	mIconList = new wxImageList(16, 16, true);
+	mIconList = New wxImageList(16, 16, true);
 	mIconList->Add(wxIcon(L"./Assets/Icons/geometryPage.ico", wxBITMAP_TYPE_ICO));
 
 	createWxCtrls();
@@ -17,15 +16,15 @@ GeometryPanel::GeometryPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/,
 
 void GeometryPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
 	// listCtrl
-	mTreePanel = new wxPanel(this, -1);
+	mTreePanel = New wxPanel(this, -1);
 	mTreePanel->SetMinSize(wxSize(200, 300));
 
-	wxBoxSizer* boxSizer2 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer2 = New wxBoxSizer(wxVERTICAL);
 
-	mTreeCtrl = new wxTreeCtrl(mTreePanel, -1, wxDefaultPosition, wxDefaultSize, 
+	mTreeCtrl = New wxTreeCtrl(mTreePanel, -1, wxDefaultPosition, wxDefaultSize, 
 		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES | wxTR_HIDE_ROOT);
 
 	mTreeCtrl->SetMinSize(wxSize(180, 260));
@@ -40,7 +39,7 @@ void GeometryPanel::createWxCtrls()
 	boxSizer1->Add(mTreePanel, 0, wxALL, 5);
 
 	// inspector
-	mInspectorPanel = new wxPanel(this, -1);
+	mInspectorPanel = New wxPanel(this, -1);
 	mInspectorPanel->SetMinSize(wxSize(200, 300));
 
 	boxSizer1->Add(mInspectorPanel, 0, wxALL, 5);
@@ -50,17 +49,12 @@ void GeometryPanel::createWxCtrls()
 	this->Fit();
 }
 
-void GeometryPanel::OnClose(wxCloseEvent& event)
-{
-	delete mIconList;
-}
-
 void GeometryPanel::LoadDataFromScene()
 {
 	GeometryManager* geoMgr = gEngine->GetGeometryManager();
 	std::list<Geometry*> geoList = geoMgr->GetGeometryList();
 
-	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, new GeometryTreeItemData(NULL));
+	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, New GeometryTreeItemData(NULL));
 
 	for(std::list<Geometry*>::iterator iter = geoList.begin(); iter != geoList.end(); ++iter)
 	{
@@ -71,7 +65,7 @@ void GeometryPanel::LoadDataFromScene()
 
 void GeometryPanel::appendGeometry(wxTreeItemId parentItemId, Geometry* geo)
 {
-	mTreeCtrl->AppendItem(parentItemId, geo->GetName(), 0, 0, new GeometryTreeItemData(geo));
+	mTreeCtrl->AppendItem(parentItemId, geo->GetName(), 0, 0, New GeometryTreeItemData(geo));
 }
 
 GeometryTreeItemData::GeometryTreeItemData(Geometry* geo)

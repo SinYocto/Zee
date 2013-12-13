@@ -21,35 +21,35 @@ Engine::Engine()
 
 void Engine::Init(D3DDeviceParams params)
 {
-	mDriver = new Driver();
+	mDriver = New Driver();
 	mDriver->CreateD3DDevice(params);
 
-	mIDAllocator = new IDAllocator();
+	mIDAllocator = New IDAllocator();
 
-	mInput = new Input();
+	mInput = New Input();
 	mInput->Init(GetModuleHandle(0), mDriver->GetHWnd());
 
-	mLightMgr = new LightManager();
+	mLightMgr = New LightManager();
 	mLightMgr->Init();
 
-	mTimer = new FrameTimer();
+	mTimer = New FrameTimer();
 	mTimer->Start();
 
-	mGeometryMgr = new GeometryManager();
+	mGeometryMgr = New GeometryManager();
 
-	mTextureMgr = new TextureManager();
+	mTextureMgr = New TextureManager();
 
-	mMaterialMgr = new MaterialManager();
+	mMaterialMgr = New MaterialManager();
 	mMaterialMgr->Init();
 
-	mModelMgr = new ModelManager();
+	mModelMgr = New ModelManager();
 
-	mResourceMgr = new ResourceMgr();
+	mResourceMgr = New ResourceMgr();
 
-	mSceneMgr = new SceneManager();
+	mSceneMgr = New SceneManager();
 	mSceneMgr->Init();
 
-	mGizmo = new Gizmo();
+	mGizmo = New Gizmo();
 	mGizmo->Init();
 	mGizmo->SetActiveType(Gizmo::GIZMO_TRANS);
 }

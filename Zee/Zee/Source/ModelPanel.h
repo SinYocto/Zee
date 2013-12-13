@@ -32,7 +32,7 @@ public:
 
 	void LoadDataFromScene();
 
-	void OnClose(wxCloseEvent& event);
+	void CleanUp();
 
 	DECLARE_EVENT_TABLE() 
 
@@ -75,7 +75,9 @@ public:
 	ModelPreviewCanvas* GetModelPreviewCanvas();
 
 	void AttachModel(Model* model);
+	void CleanUp();
 
+	DECLARE_EVENT_TABLE()
 private:
 	void createWxCtrls();
 
@@ -96,11 +98,11 @@ public:
 
 	void SetPreviewModel(Model* model);
 
-	DECLARE_EVENT_TABLE()
+	void CleanUp();
 
-protected:
 	void OnIdle(wxIdleEvent& event);
-	void OnClose(wxCloseEvent& event);
+
+	DECLARE_EVENT_TABLE()
 
 private:
 	Camera* mCamera;

@@ -5,7 +5,7 @@ MeshNode::MeshNode(const wchar_t* name, SceneNode* parent, Geometry* geo, Materi
 :SceneNode(name, parent)
 {
 	mType = SCENE_NODE_MESH;
-	mMesh = new Mesh(name, geo, material);
+	mMesh = New Mesh(name, geo, material);
 }
 
 MeshNode::MeshNode(const wchar_t* name, SceneNode* parent, Mesh* mesh)

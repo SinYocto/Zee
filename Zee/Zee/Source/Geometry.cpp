@@ -22,7 +22,7 @@ void Geometry::createIndexBuffer()
 {
 	int numIndices = 3 * mTriangles.size();
 
-	DWORD* indexData = new DWORD[numIndices];
+	DWORD* indexData = New DWORD[numIndices];
 	for(size_t triIndex = 0; triIndex < mTriangles.size(); ++triIndex)
 	{
 		indexData[3*triIndex + 0] = mTriangles[triIndex].vertexIndex[0];
@@ -52,7 +52,7 @@ void Geometry::BuildGeometry(VertexType type)
 	{
 		case XYZ:
 			{
-				vertexData = new Vertex[numVertices];
+				vertexData = New Vertex[numVertices];
 				needToDeleteVertexData = true;
 
 				for(int i = 0; i < numVertices; ++i)
@@ -67,7 +67,7 @@ void Geometry::BuildGeometry(VertexType type)
 			}
 		case XYZ_UV:
 			{
-				vertexData = new VertexUV[numVertices];
+				vertexData = New VertexUV[numVertices];
 				needToDeleteVertexData = true;
 
 				for(int i = 0; i < numVertices; ++i)
@@ -84,7 +84,7 @@ void Geometry::BuildGeometry(VertexType type)
 			}
 		case XYZ_N:
 			{
-				vertexData = new VertexN[numVertices];
+				vertexData = New VertexN[numVertices];
 				needToDeleteVertexData = true;
 
 				for(int i = 0; i < numVertices; ++i)
@@ -102,7 +102,7 @@ void Geometry::BuildGeometry(VertexType type)
 			}
 		case XYZ_UV_N:
 			{
-				vertexData = new VertexUVN[numVertices];
+				vertexData = New VertexUVN[numVertices];
 				needToDeleteVertexData = true;
 
 				for(int i = 0; i < numVertices; ++i)
@@ -122,7 +122,7 @@ void Geometry::BuildGeometry(VertexType type)
 			}
 		case XYZ_UV_TBN:
 			{
-				vertexData = new VertexUVTBN[numVertices];
+				vertexData = New VertexUVTBN[numVertices];
 				needToDeleteVertexData = true;
 
 				for(int i = 0; i < numVertices; ++i)

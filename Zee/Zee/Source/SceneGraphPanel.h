@@ -45,8 +45,6 @@ public:
 
 	void LoadDataFromScene();
 
-	void OnClose(wxCloseEvent& event);
-
 	DECLARE_EVENT_TABLE()
 
 private:

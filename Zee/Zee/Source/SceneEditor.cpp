@@ -59,18 +59,18 @@ SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, co
 
 	// canvas
 	wxSize clientSize = mCanvasPanel->GetClientSize(); 
-	mCanvas = new SceneEditorCanvas(mCanvasPanel, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
+	mCanvas = New SceneEditorCanvas(mCanvasPanel, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
 
 	D3DDeviceParams deviceParams;
 	deviceParams.hWnd = (HWND)mCanvas->GetHWND();
 	deviceParams.multisampleType = D3DMULTISAMPLE_4_SAMPLES;
 
 	// init engine
-	gEngine = new Engine();
+	gEngine = New Engine();
 	gEngine->Init(deviceParams);
 
 	// toolbar 因为toolbar有个控件和gizmo关联, 所以需要engine初始化后才创建
-	SceneEditorToolBar* toolBar = new SceneEditorToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL | wxNO_BORDER);
+	SceneEditorToolBar* toolBar = New SceneEditorToolBar(this, -1, wxDefaultPosition, wxDefaultSize, wxTB_HORIZONTAL | wxNO_BORDER);
 	SetToolBar(toolBar);
 
 	mEditorPanel->CreateEditorPages();	// 有个控件需要注册gizmo的eventhandler, 所以在engine初始化后创建
@@ -95,16 +95,16 @@ void SceneEditorFrame::createWxCtrls()
 {
 	SetIcon(wxIcon(L"./Assets/Icons/Zee.xpm", wxBITMAP_TYPE_XPM));
 
-	wxMenu* menuFile = new wxMenu;
+	wxMenu* menuFile = New wxMenu;
 	menuFile->Append(ID_Quit, L"&Quit");
 
-	wxMenu* menuTerrain = new wxMenu;
+	wxMenu* menuTerrain = New wxMenu;
 	menuTerrain->Append(ID_TreeGenerator, L"&Tree Generator");
 
-	wxMenu* menuHelp = new wxMenu;
+	wxMenu* menuHelp = New wxMenu;
 	menuHelp->Append(ID_About, L"&About\tF1");
 
-	wxMenuBar* menuBar = new wxMenuBar;
+	wxMenuBar* menuBar = New wxMenuBar;
 	menuBar->Append(menuFile, L"&File");
 	menuBar->Append(menuTerrain, L"&Terrain");
 	menuBar->Append(menuHelp, L"&Help");
@@ -115,14 +115,14 @@ void SceneEditorFrame::createWxCtrls()
 	SetStatusText(L"Welcome To WanderLand!");
 
 	// panel & canvas
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxHORIZONTAL);
 
-	mEditorPanel = new SceneEditorPanel(this, -1);
+	mEditorPanel = New SceneEditorPanel(this, -1);
 	mEditorPanel->SetMinSize(wxSize(200, 620));
 	boxSizer1->Add(mEditorPanel, 0, wxALL, 5);
 
 	// canvas
-	mCanvasPanel = new wxPanel(this, -1);
+	mCanvasPanel = New wxPanel(this, -1);
 	mCanvasPanel->SetMinSize(wxSize(1080, 620));	// TODO: 暂时写死
 	boxSizer1->Add(mCanvasPanel, 0, wxALL, 5);
 
@@ -138,22 +138,13 @@ void SceneEditorFrame::OnQuit(wxCommandEvent& event)
 
 void SceneEditorFrame::OnClose(wxCloseEvent& event)
 {
-	cleanupAndDestory();
-}
-
-void SceneEditorFrame::cleanupAndDestory()
-{
-	::AppDestroy();
-
 	if(mEditorPanel)
-		mEditorPanel->CleanupAndDestory();
-
-	if(mCanvas)
-		mCanvas->Destroy();
-
+		mEditorPanel->Close(true);
+	
 	if(mWndTreeGenerator)
 		mWndTreeGenerator->CleanupAndDestory();
 
+	::AppDestroy();
 	Destroy();
 }
 
@@ -213,13 +204,13 @@ void CreateScene()
 
 	Camera* mainCamera = sceneMgr->GetMainCamera();
 
-	FPCameraController* fpCameraController = new FPCameraController(6.0f, 2.0f, 4.0f);
+	FPCameraController* fpCameraController = New FPCameraController(6.0f, 2.0f, 4.0f);
 	//HoverCameraController* hoverCameraController = new HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
 	mainCamera->SetCameraController(fpCameraController);
 
 	// lights
-	DirectionalLight* dirLight1 = new DirectionalLight(L"dirLight1", D3DXCOLOR_WHITE, Vector3(1.0f, -1.0f, 1.0f));
-	PointLight* pointLight1 = new PointLight(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(0, 0, 0), Vector3(1.0f, 0.05f, 0));
+	DirectionalLight* dirLight1 = New DirectionalLight(L"dirLight1", D3DXCOLOR_WHITE, Vector3(1.0f, -1.0f, 1.0f));
+	PointLight* pointLight1 = New PointLight(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(0, 0, 0), Vector3(1.0f, 0.05f, 0));
 
 	LightManager* lightMgr = gEngine->GetLightManager();
 	lightMgr->SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
@@ -228,34 +219,34 @@ void CreateScene()
 	lightMgr->AddPointLight(pointLight1);
 	pointLight1->Enable(false);
 
-	DirectionalLightNode* dirLightNode1 = new DirectionalLightNode(NULL, dirLight1);
+	DirectionalLightNode* dirLightNode1 = New DirectionalLightNode(NULL, dirLight1);
 	sceneMgr->AddSceneNode(dirLightNode1);
 
-	PointLightNode* pointLightNode1 = new PointLightNode(NULL, pointLight1);
+	PointLightNode* pointLightNode1 = New PointLightNode(NULL, pointLight1);
 	sceneMgr->AddSceneNode(pointLightNode1);
 
 	// geo
 	GeometryManager* geometryMgr = gEngine->GetGeometryManager();
 
-	Cube* cubeGeo = new Cube(L"cubeGeo");
+	Cube* cubeGeo = New Cube(L"cubeGeo");
 	geometryMgr->AddGeometry(cubeGeo);
 
 	cubeGeo->CalculateTBN();
 	cubeGeo->BuildGeometry(XYZ_UV_TBN);
 
-	Cylinder* coneGeo = new Cylinder(L"coneGeo", 0, 0.5f, 2.0f);
+	Cylinder* coneGeo = New Cylinder(L"coneGeo", 0, 0.5f, 2.0f);
 	geometryMgr->AddGeometry(coneGeo);
 
 	coneGeo->CalculateNormals();
 	coneGeo->BuildGeometry(XYZ_N);
 
-	Cylinder* cylinderGeo = new Cylinder(L"cylinderGeo", 0.5f, 0.5f, 2.0f);
+	Cylinder* cylinderGeo = New Cylinder(L"cylinderGeo", 0.5f, 0.5f, 2.0f);
 	geometryMgr->AddGeometry(cylinderGeo);
 
 	cylinderGeo->CalculateNormals();
 	cylinderGeo->BuildGeometry(XYZ_N);
 
-	Torus* torusGeo = new Torus(L"torusGeo", 1.0f, 0.025f, 32, 8);
+	Torus* torusGeo = New Torus(L"torusGeo", 1.0f, 0.025f, 32, 8);
 	geometryMgr->AddGeometry(torusGeo);
 
 	torusGeo->CalculateNormals();
@@ -264,7 +255,7 @@ void CreateScene()
 	// material
 	MaterialManager* materialMgr = gEngine->GetMaterialManager();
 
-	Material* mtlBump = new Material(L"mtl1");
+	Material* mtlBump = New Material(L"mtl1");
 	materialMgr->AddMaterial(mtlBump);
 
 	mtlBump->SetShader(BumpSpecular);
@@ -272,51 +263,51 @@ void CreateScene()
 	//mtlBump->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
 	mtlBump->mShader->SetSpecShiness(0.4f);
 
-	Material* mtlDiff = new Material(L"mtlDiff");
+	Material* mtlDiff = New Material(L"mtlDiff");
 	materialMgr->AddMaterial(mtlDiff);
 
 	mtlDiff->SetShader(Diffuse);
 	mtlDiff->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
 
-	Material* mtlSpec = new Material(L"mtlSpec");
+	Material* mtlSpec = New Material(L"mtlSpec");
 	materialMgr->AddMaterial(mtlSpec);
 
 	mtlSpec->SetShader(Specular);
 	mtlSpec->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
 	mtlSpec->mShader->SetSpecShiness(0.4f);
 
-	Material* mtlView = new Material(L"mtlView");
+	Material* mtlView = New Material(L"mtlView");
 	materialMgr->AddMaterial(mtlView);
 
 	mtlView->SetShader(View);
 	mtlView->SetDiffuseColor(D3DXCOLOR_RED);
 
-	Material* mtlFlat = new Material(L"mtlFlat");
+	Material* mtlFlat = New Material(L"mtlFlat");
 	materialMgr->AddMaterial(mtlFlat);
 
 	mtlFlat->SetShader(Flat);
 	mtlFlat->SetDiffuseColor(D3DXCOLOR_GREEN);
 
 	// model
-	ModelNode* cube = new ModelNode(L"cube", NULL, cubeGeo, mtlBump);
+	ModelNode* cube = New ModelNode(L"cube", NULL, cubeGeo, mtlBump);
 	sceneMgr->AddSceneNode(cube);
 	cube->Translate(2, 0, 0);
 
-	ModelNode* cylinder = new ModelNode(L"cylinder", NULL, cylinderGeo, mtlBump);
+	ModelNode* cylinder = New ModelNode(L"cylinder", NULL, cylinderGeo, mtlBump);
 	sceneMgr->AddSceneNode(cylinder);
 	cylinder->Translate(-2, 0, 0);
 
-	ModelNode* cone = new ModelNode(L"cone", NULL, coneGeo, mtlView);
+	ModelNode* cone = New ModelNode(L"cone", NULL, coneGeo, mtlView);
 	sceneMgr->AddSceneNode(cone);
 	cone->Translate(0, 0, -2);
 
-	ModelNode* torus = new ModelNode(L"torus", NULL, torusGeo, mtlFlat);
+	ModelNode* torus = New ModelNode(L"torus", NULL, torusGeo, mtlFlat);
 	sceneMgr->AddSceneNode(torus);
 	torus->Translate(0, 0, 2);
 
 	// terrain
 	PerformanceTimer::Begin(L"building 257 terrain");
-	terrain = new Terrain(257, 200.0f, 40.0f);
+	terrain = New Terrain(257, 200.0f, 40.0f);
 	terrain->LoadFromHeightMap(L"./Assets/Textures/heightMap257_bit16.raw", 257);
 	terrain->BuildTerrain(4);
 	terrain->CalcChunkLODDist(mainCamera, 1.0f);
@@ -392,7 +383,7 @@ void SceneEditorCanvas::RenderLoop()
 void SetupGUIStyle()
 {
 	gDefaultLabelStyle.CreateFont();
-	leftAlignStyle = new LabelStyle(TEXT("Consolas"), 7, 15, 0, 0xffe3b706, DT_LEFT | DT_VCENTER);
+	leftAlignStyle = New LabelStyle(TEXT("Consolas"), 7, 15, 0, 0xffe3b706, DT_LEFT | DT_VCENTER);
 	leftAlignStyle->CreateFont();
 
 	gDefaultButtonStyle.CreateTextures();
@@ -490,10 +481,10 @@ void SceneEditorToolBar::createWxCtrls()
 	AddTool(ID_TOOL_ROTATE, iconRotate, L"rotate");
 	AddTool(ID_TOOL_SCALE, iconScale, L"scale");
 
-	mButtonGlobal = new wxRadioButton(this, ID_RADIO_BUTTON_GLOBAL, wxT("Global"), 
+	mButtonGlobal = New wxRadioButton(this, ID_RADIO_BUTTON_GLOBAL, wxT("Global"), 
 		wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 
-	mButtonLocal = new wxRadioButton(this, ID_RADIO_BUTTON_LOCAL, wxT("Local"));
+	mButtonLocal = New wxRadioButton(this, ID_RADIO_BUTTON_LOCAL, wxT("Local"));
 
 	AddSeparator();
 	AddControl(mButtonGlobal);

@@ -2,14 +2,13 @@
 #include "Engine.h"
 
 BEGIN_EVENT_TABLE(MaterialPanel, wxPanel)
-EVT_CLOSE(MaterialPanel::OnClose)
 END_EVENT_TABLE()
 
 MaterialPanel::MaterialPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
 					   const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
 					   :wxPanel(parent, id, pos, size)
 {
-	mIconList = new wxImageList(16, 16, true);
+	mIconList = New wxImageList(16, 16, true);
 	mIconList->Add(wxIcon(L"./Assets/Icons/billboard.ico", wxBITMAP_TYPE_ICO));
 
 	createWxCtrls();
@@ -17,15 +16,15 @@ MaterialPanel::MaterialPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/,
 
 void MaterialPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
 	// listCtrl
-	mTreePanel = new wxPanel(this, -1);
+	mTreePanel = New wxPanel(this, -1);
 	mTreePanel->SetMinSize(wxSize(200, 250));
 
-	wxBoxSizer* boxSizer2 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer2 = New wxBoxSizer(wxVERTICAL);
 
-	mTreeCtrl = new MaterialListTree(mTreePanel, ID_MATERIALLIST_TREE, wxDefaultPosition, wxDefaultSize, 
+	mTreeCtrl = New MaterialListTree(mTreePanel, ID_MATERIALLIST_TREE, wxDefaultPosition, wxDefaultSize, 
 		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES | wxTR_HIDE_ROOT);
 
 	mTreeCtrl->SetMinSize(wxSize(170, 240));
@@ -40,7 +39,7 @@ void MaterialPanel::createWxCtrls()
 	boxSizer1->Add(mTreePanel, 0, wxALL, 5);
 
 	// inspector
-	mInspectorPanel = new MaterialInspectorPanel(this, wxID_ANY);
+	mInspectorPanel = New MaterialInspectorPanel(this, wxID_ANY);
 	mInspectorPanel->SetMinSize(wxSize(180, 240));
 	mTreeCtrl->AttachInspectorPanel(mInspectorPanel);
 
@@ -51,17 +50,12 @@ void MaterialPanel::createWxCtrls()
 	this->Fit();
 }
 
-void MaterialPanel::OnClose(wxCloseEvent& event)
-{
-	delete mIconList;
-}
-
 void MaterialPanel::LoadDataFromScene()
 {
 	MaterialManager* materialMgr = gEngine->GetMaterialManager();
 	std::list<Material*> materialList = materialMgr->GetMaterialList();
 
-	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, new MaterialTreeItemData(NULL));
+	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, New MaterialTreeItemData(NULL));
 
 	for(std::list<Material*>::iterator iter = materialList.begin(); iter != materialList.end(); ++iter)
 	{
@@ -72,7 +66,7 @@ void MaterialPanel::LoadDataFromScene()
 
 void MaterialPanel::appendMaterial(wxTreeItemId parentItemId, Material* material)
 {
-	mTreeCtrl->AppendItem(parentItemId, material->GetName(), 0, 0, new MaterialTreeItemData(material));
+	mTreeCtrl->AppendItem(parentItemId, material->GetName(), 0, 0, New MaterialTreeItemData(material));
 }
 
 MaterialTreeItemData::MaterialTreeItemData(Material* material)
@@ -128,9 +122,9 @@ MaterialInspectorPanel::MaterialInspectorPanel(wxWindow* parent, wxWindowID id /
 
 void MaterialInspectorPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
-	mMaterialInfoPanel = new MaterialInfoPanel(this, wxID_ANY);
+	mMaterialInfoPanel = New MaterialInfoPanel(this, wxID_ANY);
 
 	boxSizer1->Add(mMaterialInfoPanel, 0, wxALL, 5);
 
@@ -169,11 +163,11 @@ MaterialInfoPanel::MaterialInfoPanel( wxWindow* parent, wxWindowID id /*= wxID_A
 
 void MaterialInfoPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
-	wxFlexGridSizer* fgSizer1 = new wxFlexGridSizer(2, 2, 0, 0); 
+	wxFlexGridSizer* fgSizer1 = New wxFlexGridSizer(2, 2, 0, 0); 
 
-	wxStaticText* textShderType = new wxStaticText(this, wxID_ANY, L"Shader");
+	wxStaticText* textShderType = New wxStaticText(this, wxID_ANY, L"Shader");
 
 	wxArrayString shaderNameStrs;
 	shaderNameStrs.Add(L"Flat");
@@ -182,39 +176,39 @@ void MaterialInfoPanel::createWxCtrls()
 	shaderNameStrs.Add(L"Specular");
 	shaderNameStrs.Add(L"BumpSpecular");
 
-	mChoiceShader = new wxChoice(this, ID_CHOICE_SHADER, wxDefaultPosition, wxDefaultSize, shaderNameStrs);
+	mChoiceShader = New wxChoice(this, ID_CHOICE_SHADER, wxDefaultPosition, wxDefaultSize, shaderNameStrs);
 
-	wxStaticText* textAmbientColor = new wxStaticText(this, wxID_ANY, L"Ambient");
-	mColorPickerAmbient = new wxColourPickerCtrl(this, ID_AMBIENT_COLOR, *wxWHITE);
+	wxStaticText* textAmbientColor = New wxStaticText(this, wxID_ANY, L"Ambient");
+	mColorPickerAmbient = New wxColourPickerCtrl(this, ID_AMBIENT_COLOR, *wxWHITE);
 
-	wxStaticText* textDifffuseColor = new wxStaticText(this, wxID_ANY, L"Diffuse");
-	mColorPickerDiff = new wxColourPickerCtrl(this, ID_DIFFUSE_COLOR, *wxWHITE);
+	wxStaticText* textDifffuseColor = New wxStaticText(this, wxID_ANY, L"Diffuse");
+	mColorPickerDiff = New wxColourPickerCtrl(this, ID_DIFFUSE_COLOR, *wxWHITE);
 
-	wxStaticText* textSpecularColor = new wxStaticText(this, wxID_ANY, L"Specular");
-	mColorPickerSpec = new wxColourPickerCtrl(this, ID_SPECULAR_COLOR, *wxWHITE);
+	wxStaticText* textSpecularColor = New wxStaticText(this, wxID_ANY, L"Specular");
+	mColorPickerSpec = New wxColourPickerCtrl(this, ID_SPECULAR_COLOR, *wxWHITE);
 
-	wxStaticText* textShiness = new wxStaticText(this, wxID_ANY, L"Shiness");
-	mTextShiness = new wxTextCtrl(this, ID_TEXT_SHINESS, L"1", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textShiness = New wxStaticText(this, wxID_ANY, L"Shiness");
+	mTextShiness = New wxTextCtrl(this, ID_TEXT_SHINESS, L"1", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textGloss = new wxStaticText(this, wxID_ANY, L"Gloss");
-	mTextGloss= new wxTextCtrl(this, ID_TEXT_GLOSS, L"50", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textGloss = New wxStaticText(this, wxID_ANY, L"Gloss");
+	mTextGloss= New wxTextCtrl(this, ID_TEXT_GLOSS, L"50", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textTilesU = new wxStaticText(this, wxID_ANY, L"TilesU");
-	mTextTilesU= new wxTextCtrl(this, ID_TEXT_TILES_U, L"1", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textTilesU = New wxStaticText(this, wxID_ANY, L"TilesU");
+	mTextTilesU= New wxTextCtrl(this, ID_TEXT_TILES_U, L"1", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textTilesV = new wxStaticText(this, wxID_ANY, L"TilesV");
-	mTextTilesV= new wxTextCtrl(this, ID_TEXT_TILES_V, L"1", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textTilesV = New wxStaticText(this, wxID_ANY, L"TilesV");
+	mTextTilesV= New wxTextCtrl(this, ID_TEXT_TILES_V, L"1", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textOffsetU = new wxStaticText(this, wxID_ANY, L"OffsetU");
-	mTextOffsetU= new wxTextCtrl(this, ID_TEXT_OFFSET_U, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textOffsetU = New wxStaticText(this, wxID_ANY, L"OffsetU");
+	mTextOffsetU= New wxTextCtrl(this, ID_TEXT_OFFSET_U, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textOffsetV = new wxStaticText(this, wxID_ANY, L"OffsetV");
-	mTextOffsetV= new wxTextCtrl(this, ID_TEXT_OFFSET_V, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textOffsetV = New wxStaticText(this, wxID_ANY, L"OffsetV");
+	mTextOffsetV= New wxTextCtrl(this, ID_TEXT_OFFSET_V, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	fgSizer1->Add(textShderType, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
@@ -247,24 +241,24 @@ void MaterialInfoPanel::createWxCtrls()
 	fgSizer1->Add(textOffsetV, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 	fgSizer1->Add(mTextOffsetV, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
 
-	wxFlexGridSizer* fgSizer2 = new wxFlexGridSizer(2, 2, 0, 0); 
+	wxFlexGridSizer* fgSizer2 = New wxFlexGridSizer(2, 2, 0, 0); 
 
-	wxStaticText* textTex0 = new wxStaticText(this, wxID_ANY, L"Tex0");
-	mBitmapBtnTex0 = new wxBitmapButton(this, ID_BITMAP_BTN_TEX0, wxBitmap(L"./Assets/Icons/settings8x8.ico", wxBITMAP_TYPE_ICO));
+	wxStaticText* textTex0 = New wxStaticText(this, wxID_ANY, L"Tex0");
+	mBitmapBtnTex0 = New wxBitmapButton(this, ID_BITMAP_BTN_TEX0, wxBitmap(L"./Assets/Icons/settings8x8.ico", wxBITMAP_TYPE_ICO));
 
 	fgSizer2->Add(textTex0, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 	fgSizer2->Add(mBitmapBtnTex0, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
 
-	wxFlexGridSizer* fgSizer3 = new wxFlexGridSizer(2, 2, 0, 0); 
+	wxFlexGridSizer* fgSizer3 = New wxFlexGridSizer(2, 2, 0, 0); 
 
-	wxStaticText* textTex1 = new wxStaticText(this, wxID_ANY, L"Tex1");
-	mBitmapBtnTex1 = new wxBitmapButton(this, ID_BITMAP_BTN_TEX1, wxBitmap(L"./Assets/Icons/settings8x8.ico", wxBITMAP_TYPE_ICO));
+	wxStaticText* textTex1 = New wxStaticText(this, wxID_ANY, L"Tex1");
+	mBitmapBtnTex1 = New wxBitmapButton(this, ID_BITMAP_BTN_TEX1, wxBitmap(L"./Assets/Icons/settings8x8.ico", wxBITMAP_TYPE_ICO));
 
 	fgSizer3->Add(textTex1, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 	fgSizer3->Add(mBitmapBtnTex1, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
 
-	mTex0 = new wxImagePanel(this, wxT("./Assets/Textures/cliff.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
-	mTex1 = new wxImagePanel(this, wxT("./Assets/Textures/cliff.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
+	mTex0 = New wxImagePanel(this, wxT("./Assets/Textures/cliff.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
+	mTex1 = New wxImagePanel(this, wxT("./Assets/Textures/cliff.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
 
 
 	boxSizer1->Add(fgSizer1, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);

@@ -7,7 +7,7 @@ YFile* YFile::Open(const wchar_t* filePath, OPEN_MODE mode)
 	bool isSucceed = false;
 
 	YFile* file = NULL;
-	file = new YFile();
+	file = New YFile();
 	Assert(NULL != file);
 
 	switch(mode)

@@ -15,7 +15,7 @@ bool ZeeApp::OnInit()
 
 	wxInitAllImageHandlers();
 
-	SceneEditorFrame* frame = new SceneEditorFrame(L"Zee", wxPoint(0, 0), wxSize(WND_WIDTH, WND_HEIGHT));
+	SceneEditorFrame* frame = New SceneEditorFrame(L"Zee", wxPoint(0, 0), wxSize(WND_WIDTH, WND_HEIGHT));
 	frame->Show(true);
 	SetTopWindow(frame);
 

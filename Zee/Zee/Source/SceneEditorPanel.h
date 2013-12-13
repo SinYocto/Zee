@@ -15,16 +15,21 @@ public:
 		TEXTURE_PAGE,
 		MODEL_PAGE,
 		LIGHT_PAGE,
+		PAGE_COUNTS,
 	};
 
 	SceneEditorPanel(wxWindow* parent, wxWindowID id = wxID_ANY, 
 		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
+
+	void OnClose(wxCloseEvent& event);
 
 	void OnCreateScene();
 
 	void CreateEditorPages();
 
 	void CleanupAndDestory();
+
+	DECLARE_EVENT_TABLE()
 
 private:
 	void createWxCtrls();

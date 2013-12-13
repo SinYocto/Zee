@@ -30,7 +30,6 @@ public:
 
 private:
 	void createWxCtrls();
-	void cleanupAndDestory();
 
 private:
 	SceneEditorPanel* mEditorPanel;

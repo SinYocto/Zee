@@ -6,14 +6,13 @@
 #include "MeshNode.h"
 
 BEGIN_EVENT_TABLE(SceneGraphPanel, wxPanel)
-EVT_CLOSE(SceneGraphPanel::OnClose)
 END_EVENT_TABLE()
 
 SceneGraphPanel::SceneGraphPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
 								 const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
 								 :wxPanel(parent, id, pos, size)
 {
-	mIconList = new wxImageList(16, 16, true);
+	mIconList = New wxImageList(16, 16, true);
 	mIconList->Add(wxIcon(L"./Assets/Icons/empty.ico", wxBITMAP_TYPE_ICO));
 	mIconList->Add(wxIcon(L"./Assets/Icons/mesh.ico", wxBITMAP_TYPE_ICO));
 	mIconList->Add(wxIcon(L"./Assets/Icons/model.ico", wxBITMAP_TYPE_ICO));
@@ -25,15 +24,15 @@ SceneGraphPanel::SceneGraphPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/,
 
 void SceneGraphPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
 	// treeList
-	mTreePanel = new wxPanel(this, -1);
+	mTreePanel = New wxPanel(this, -1);
 	mTreePanel->SetMinSize(wxSize(200, 250));
 
-	wxBoxSizer* boxSizer2 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer2 = New wxBoxSizer(wxVERTICAL);
 
-	mTreeCtrl = new SceneGraphTree(mTreePanel, ID_SCENE_GRAPH_TREE, wxDefaultPosition, wxDefaultSize, 
+	mTreeCtrl = New SceneGraphTree(mTreePanel, ID_SCENE_GRAPH_TREE, wxDefaultPosition, wxDefaultSize, 
 		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES | wxTR_EDIT_LABELS);
 
 	mTreeCtrl->SetMinSize(wxSize(170, 240));
@@ -48,7 +47,7 @@ void SceneGraphPanel::createWxCtrls()
 	boxSizer1->Add(mTreePanel, 0, wxALL, 5);
 
 	// inspector
-	mInspectorPanel = new SceneNodeInspectorPanel(this, -1);
+	mInspectorPanel = New SceneNodeInspectorPanel(this, -1);
 	mInspectorPanel->SetMinSize(wxSize(180, 240));	// TODO: ÔÝÊ±Ð´ËÀ
 	mTreeCtrl->AttachInspectorPanel(mInspectorPanel);
  
@@ -64,7 +63,7 @@ void SceneGraphPanel::LoadDataFromScene()
 	SceneManager* sceneMgr = gEngine->GetSceneManager();
 	
 	SceneNode* root = sceneMgr->GetRoot();
-	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, new SceneNodeTreeItemData(root));
+	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, New SceneNodeTreeItemData(root));
 
 	std::list<Object*> children = root->GetChildren();
 	for(std::list<Object*>::iterator iter = children.begin(); iter != children.end(); ++iter)
@@ -76,14 +75,9 @@ void SceneGraphPanel::LoadDataFromScene()
 	mTreeCtrl->Expand(rootId);
 }
 
-void SceneGraphPanel::OnClose(wxCloseEvent& event)
-{
-	delete mIconList;
-}
-
 void SceneGraphPanel::appendSceneNode(wxTreeItemId parentItemId, SceneNode* node)
 {
-	SceneNodeTreeItemData* itemData = new SceneNodeTreeItemData(node);
+	SceneNodeTreeItemData* itemData = New SceneNodeTreeItemData(node);
 
 	int sceneNodeIcon = 0;
 
@@ -245,13 +239,13 @@ SceneNodeInspectorPanel::SceneNodeInspectorPanel(wxWindow* parent, wxWindowID id
 
 void SceneNodeInspectorPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
 	// transform
-	mTransformPanel = new TransformPanel(this, wxID_ANY);
-	mMeshNodeInfoPanel = new MeshNodeInfoPanel(this, wxID_ANY);
-	mLightInfoPanel = new LightInfoPanel(this, wxID_ANY);
-	mAttributeInfoPanel = new AttributeInfoPanel(this, wxID_ANY);
+	mTransformPanel = New TransformPanel(this, wxID_ANY);
+	mMeshNodeInfoPanel = New MeshNodeInfoPanel(this, wxID_ANY);
+	mLightInfoPanel = New LightInfoPanel(this, wxID_ANY);
+	mAttributeInfoPanel = New AttributeInfoPanel(this, wxID_ANY);
 
 	boxSizer1->Add(mTransformPanel, 0, wxALL, 5);
 	boxSizer1->Add(mMeshNodeInfoPanel, 0, wxALL, 5);
@@ -344,42 +338,42 @@ TransformPanel::TransformPanel( wxWindow* parent, wxWindowID id /*= wxID_ANY*/,
 
 void TransformPanel::createWxCtrls()
 {
-	wxFlexGridSizer* fgSizer1 = new wxFlexGridSizer(2, 2, 0, 0); 
+	wxFlexGridSizer* fgSizer1 = New wxFlexGridSizer(2, 2, 0, 0); 
 
-	wxStaticText* textPosX = new wxStaticText(this, -1, L"X");
-	mTextCtrlPosX = new wxTextCtrl(this, ID_TEXT_POSX, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textPosX = New wxStaticText(this, -1, L"X");
+	mTextCtrlPosX = New wxTextCtrl(this, ID_TEXT_POSX, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textPosY = new wxStaticText(this, -1, L"Y");
-	mTextCtrlPosY = new wxTextCtrl(this, ID_TEXT_POSY, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textPosY = New wxStaticText(this, -1, L"Y");
+	mTextCtrlPosY = New wxTextCtrl(this, ID_TEXT_POSY, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textPosZ = new wxStaticText(this, -1, L"Z");
-	mTextCtrlPosZ = new wxTextCtrl(this, ID_TEXT_POSZ, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textPosZ = New wxStaticText(this, -1, L"Z");
+	mTextCtrlPosZ = New wxTextCtrl(this, ID_TEXT_POSZ, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textEulerX = new wxStaticText(this, -1, L"EulerX");
-	mTextCtrlEulerX = new wxTextCtrl(this, ID_TEXT_EULERX, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textEulerX = New wxStaticText(this, -1, L"EulerX");
+	mTextCtrlEulerX = New wxTextCtrl(this, ID_TEXT_EULERX, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textEulerY = new wxStaticText(this, -1, L"EulerY");
-	mTextCtrlEulerY = new wxTextCtrl(this, ID_TEXT_EULERY, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textEulerY = New wxStaticText(this, -1, L"EulerY");
+	mTextCtrlEulerY = New wxTextCtrl(this, ID_TEXT_EULERY, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textEulerZ = new wxStaticText(this, -1, L"EulerZ");
-	mTextCtrlEulerZ = new wxTextCtrl(this, ID_TEXT_EULERZ, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textEulerZ = New wxStaticText(this, -1, L"EulerZ");
+	mTextCtrlEulerZ = New wxTextCtrl(this, ID_TEXT_EULERZ, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textScaleX = new wxStaticText(this, -1, L"ScaleX");
-	mTextCtrlScaleX = new wxTextCtrl(this, ID_TEXT_SCALEX, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textScaleX = New wxStaticText(this, -1, L"ScaleX");
+	mTextCtrlScaleX = New wxTextCtrl(this, ID_TEXT_SCALEX, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textScaleY = new wxStaticText(this, -1, L"ScaleY");
-	mTextCtrlScaleY = new wxTextCtrl(this, ID_TEXT_SCALEY, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textScaleY = New wxStaticText(this, -1, L"ScaleY");
+	mTextCtrlScaleY = New wxTextCtrl(this, ID_TEXT_SCALEY, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textScaleZ = new wxStaticText(this, -1, L"ScaleZ");
-	mTextCtrlScaleZ = new wxTextCtrl(this, ID_TEXT_SCALEZ, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
+	wxStaticText* textScaleZ = New wxStaticText(this, -1, L"ScaleZ");
+	mTextCtrlScaleZ = New wxTextCtrl(this, ID_TEXT_SCALEZ, L"0", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 	fgSizer1->Add(textPosX, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
@@ -545,17 +539,17 @@ LightInfoPanel::LightInfoPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/,
 
 void LightInfoPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
-	mCheckBoxEnable = new wxCheckBox(this, ID_CHECKBOX_ENABLE, wxT("Enable"));
+	mCheckBoxEnable = New wxCheckBox(this, ID_CHECKBOX_ENABLE, wxT("Enable"));
 
-	wxFlexGridSizer* fgSizer1 = new wxFlexGridSizer(2, 2, 0, 0); 
+	wxFlexGridSizer* fgSizer1 = New wxFlexGridSizer(2, 2, 0, 0); 
 
-	wxStaticText* textIntensity = new wxStaticText(this, -1, L"Intensity");
-	mSliderIntensity = new wxSlider(this, ID_SLIDER_INTENSITY, 100, 0, 200, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);
+	wxStaticText* textIntensity = New wxStaticText(this, -1, L"Intensity");
+	mSliderIntensity = New wxSlider(this, ID_SLIDER_INTENSITY, 100, 0, 200, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL);
 
-	wxStaticText* textColor = new wxStaticText(this, -1, L"Color");
-	mColorPicker = new wxColourPickerCtrl(this, ID_LIGHT_COLOR, *wxWHITE);
+	wxStaticText* textColor = New wxStaticText(this, -1, L"Color");
+	mColorPicker = New wxColourPickerCtrl(this, ID_LIGHT_COLOR, *wxWHITE);
 
 	fgSizer1->Add(textIntensity, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 	fgSizer1->Add(mSliderIntensity, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
@@ -668,23 +662,23 @@ MeshNodeInfoPanel::MeshNodeInfoPanel(wxWindow* parent, wxWindowID id /*= wxID_AN
 
 void MeshNodeInfoPanel::createWxCtrls()
 {
-	wxFlexGridSizer* fgSizer1 = new wxFlexGridSizer(4, 4, 0, 0); 
+	wxFlexGridSizer* fgSizer1 = New wxFlexGridSizer(4, 4, 0, 0); 
 
 	// geo
-	wxStaticText* textGeo = new wxStaticText(this, wxID_ANY, L"Geometry");
-	wxStaticBitmap* bitmapGeo = new wxStaticBitmap(this, wxID_ANY, 
+	wxStaticText* textGeo = New wxStaticText(this, wxID_ANY, L"Geometry");
+	wxStaticBitmap* bitmapGeo = New wxStaticBitmap(this, wxID_ANY, 
 		wxBitmap(L"./Assets/Icons/geometry8x8.ico", wxBITMAP_TYPE_ICO));
 
-	mTextGeoName = new wxStaticText(this, wxID_ANY, L"geoName");
-	mBitmapBtnGeo = new wxBitmapButton(this, ID_BITMAP_BTN_GEO, wxBitmap(L"./Assets/Icons/settings8x8.ico", wxBITMAP_TYPE_ICO));
+	mTextGeoName = New wxStaticText(this, wxID_ANY, L"geoName");
+	mBitmapBtnGeo = New wxBitmapButton(this, ID_BITMAP_BTN_GEO, wxBitmap(L"./Assets/Icons/settings8x8.ico", wxBITMAP_TYPE_ICO));
 
 	// mtl
-	wxStaticText* textMtl = new wxStaticText(this, wxID_ANY, L"Material");
-	wxStaticBitmap* bitmapMtl = new wxStaticBitmap(this, wxID_ANY, 
+	wxStaticText* textMtl = New wxStaticText(this, wxID_ANY, L"Material");
+	wxStaticBitmap* bitmapMtl = New wxStaticBitmap(this, wxID_ANY, 
 		wxBitmap(L"./Assets/Icons/material8x8.ico", wxBITMAP_TYPE_ICO));
 
-	mTextMtlName = new wxStaticText(this, wxID_ANY, L"mtlName");
-	mBitmapBtnMtl = new wxBitmapButton(this, ID_BITMAP_BTN_MTL, wxBitmap(L"./Assets/Icons/settings8x8.ico", wxBITMAP_TYPE_ICO));
+	mTextMtlName = New wxStaticText(this, wxID_ANY, L"mtlName");
+	mBitmapBtnMtl = New wxBitmapButton(this, ID_BITMAP_BTN_MTL, wxBitmap(L"./Assets/Icons/settings8x8.ico", wxBITMAP_TYPE_ICO));
 
 	fgSizer1->Add(textGeo, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 	fgSizer1->Add(bitmapGeo, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
@@ -729,10 +723,10 @@ AttributeInfoPanel::AttributeInfoPanel(wxWindow* parent, wxWindowID id /*= wxID_
 
 void AttributeInfoPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
-	mCheckBoxWireFrame = new wxCheckBox(this, ID_CHECKBOX_WIREFRAME, wxT("WireFrame"));
-	mCheckBoxDrawBBox = new wxCheckBox(this, ID_CHECKBOX_DRAW_BBOX, wxT("DrawBBox"));
+	mCheckBoxWireFrame = New wxCheckBox(this, ID_CHECKBOX_WIREFRAME, wxT("WireFrame"));
+	mCheckBoxDrawBBox = New wxCheckBox(this, ID_CHECKBOX_DRAW_BBOX, wxT("DrawBBox"));
 
 	boxSizer1->Add(mCheckBoxWireFrame, 0, wxALL, 5);
 	boxSizer1->Add(mCheckBoxDrawBBox, 0, wxALL, 5);

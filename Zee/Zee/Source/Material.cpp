@@ -63,27 +63,27 @@ void Material::SetShader(ShadingMethod shadingMethod)
 
 	case Flat:
 		SAFE_DROP(mShader);
-		mShader = new FlatShader(this);
+		mShader = New FlatShader(this);
 		break;
 
 	case View:
 		SAFE_DROP(mShader);
-		mShader = new ViewShader(this);
+		mShader = New ViewShader(this);
 		break;
 
 	case Diffuse:
 		SAFE_DROP(mShader);
-		mShader = new DiffuseShader(this);
+		mShader = New DiffuseShader(this);
 		break;
 
 	case Specular:
 		SAFE_DROP(mShader);
-		mShader = new SpecularShader(this);
+		mShader = New SpecularShader(this);
 		break;
 
 	case BumpSpecular:
 		SAFE_DROP(mShader);
-		mShader = new BumpSpecularShader(this);
+		mShader = New BumpSpecularShader(this);
 		mShader->SetColorTex(L"./Assets/Textures/white_128x128.jpg");
 		mShader->SetNormalTex(L"./Assets/Textures/default_normal_128x128.jpg");
 		break;

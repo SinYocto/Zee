@@ -85,7 +85,7 @@ void Driver::CreateD3DDevice(D3DDeviceParams params)
 	primaryViewPort.MinZ = 0;
 	primaryViewPort.MaxZ = 1.0f;
 
-	SwapChain* primarySwapChain = new SwapChain();
+	SwapChain* primarySwapChain = New SwapChain();
 	primarySwapChain->d3dSwapChain = swapChain;
 	primarySwapChain->presentParams = presentParams;
 	primarySwapChain->viewPort = primaryViewPort;
@@ -235,7 +235,7 @@ void Driver::OnResetDevice()
 
 int Driver::CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS params)
 {
-	SwapChain* swapChain = new SwapChain();
+	SwapChain* swapChain = New SwapChain();
 
 	D3DDevice->CreateAdditionalSwapChain(&params, &swapChain->d3dSwapChain);
 

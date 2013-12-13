@@ -8,7 +8,7 @@ DirectionalLightNode::DirectionalLightNode(SceneNode* parent, DirectionalLight* 
 ,mDirLight(dirLight)
 {
 	mType = SCENE_NODE_DIR_LIGHT;
-	mBillboard = new Billboard();
+	mBillboard = New Billboard();
 
 	mBillboard->SetTexture(L"./Assets/Textures/DirLight.jpg");
 	mBillboard->SetColor(dirLight->GetFinalColor());

@@ -24,7 +24,7 @@ TreeGeneratorFrame::TreeGeneratorFrame(wxWindow* parent, const wxString& title, 
 	createWxCtrls();
 
 	wxSize clientSize = mCanvasPanel->GetClientSize();
-	mCanvas = new TreeGeneratorCanvas(mCanvasPanel, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
+	mCanvas = New TreeGeneratorCanvas(mCanvasPanel, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
 
 	D3DPRESENT_PARAMETERS presentParams = gEngine->GetDriver()->GetPresentParameters(0);
 	presentParams.BackBufferWidth = clientSize.x;
@@ -39,62 +39,62 @@ void TreeGeneratorFrame::createWxCtrls()
 	// menu
 	SetIcon(wxIcon(L"./Assets/Icons/Zee.xpm", wxBITMAP_TYPE_XPM));
 
-	wxMenu* menuFile = new wxMenu;
+	wxMenu* menuFile = New wxMenu;
 	menuFile->Append(ID_MENU_OPEN, L"&Open");
 	menuFile->Append(ID_MENU_SAVE, L"&Save");
 
-	wxMenuBar* menuBar = new wxMenuBar;
+	wxMenuBar* menuBar = New wxMenuBar;
 	menuBar->Append(menuFile, L"&File");
 
 	SetMenuBar(menuBar);
 
 	// wnd
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxHORIZONTAL);
 
 	// left
-	mCtrlsPanel = new wxScrolledWindow(this, -1, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
+	mCtrlsPanel = New wxScrolledWindow(this, -1, wxDefaultPosition, wxDefaultSize, wxVSCROLL);
 	mCtrlsPanel->SetScrollRate(0, 5);
 
-	wxBoxSizer* boxSizer2 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer2 = New wxBoxSizer(wxVERTICAL);
 
 	// -- generalParams
-	mPanelGeneralParams = new wxCollapsiblePane(mCtrlsPanel, ID_GENERAL_PARAMS, L"General Params");
+	mPanelGeneralParams = New wxCollapsiblePane(mCtrlsPanel, ID_GENERAL_PARAMS, L"General Params");
 	wxWindow* generalParamsWnd = mPanelGeneralParams->GetPane();
 
-	wxFlexGridSizer* fgSizer1 = new wxFlexGridSizer(2, 2, 0, 0);
+	wxFlexGridSizer* fgSizer1 = New wxFlexGridSizer(2, 2, 0, 0);
 	fgSizer1->SetFlexibleDirection(wxBOTH);
 	fgSizer1->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
-	wxStaticText* textLevels = new wxStaticText(generalParamsWnd, -1, L"Levels");
-	mSpinLevels = new wxSpinCtrl(generalParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+	wxStaticText* textLevels = New wxStaticText(generalParamsWnd, -1, L"Levels");
+	mSpinLevels = New wxSpinCtrl(generalParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
 		wxSP_ARROW_KEYS, 0, 5, 1);
 
-	wxStaticText* textScale = new wxStaticText(generalParamsWnd, -1, L"Scale");
-	mTextScale = new wxTextCtrl(generalParamsWnd, -1, L"10.0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textScale = New wxStaticText(generalParamsWnd, -1, L"Scale");
+	mTextScale = New wxTextCtrl(generalParamsWnd, -1, L"10.0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textScaleV = new wxStaticText(generalParamsWnd, -1, L"ScaleV");
-	mTextScaleV = new wxTextCtrl(generalParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textScaleV = New wxStaticText(generalParamsWnd, -1, L"ScaleV");
+	mTextScaleV = New wxTextCtrl(generalParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textBaseSize = new wxStaticText(generalParamsWnd, -1, L"BaseSize");
-	mTextBaseSize = new wxTextCtrl(generalParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textBaseSize = New wxStaticText(generalParamsWnd, -1, L"BaseSize");
+	mTextBaseSize = New wxTextCtrl(generalParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textRadiusRatio = new wxStaticText(generalParamsWnd, -1, L"RadiusRatio");
-	mTextRadiusRatio = new wxTextCtrl(generalParamsWnd, -1, L"0.02", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textRadiusRatio = New wxStaticText(generalParamsWnd, -1, L"RadiusRatio");
+	mTextRadiusRatio = New wxTextCtrl(generalParamsWnd, -1, L"0.02", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textRatioPower = new wxStaticText(generalParamsWnd, -1, L"RatioPower");
-	mTextRatioPower = new wxTextCtrl(generalParamsWnd, -1, L"1", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textRatioPower = New wxStaticText(generalParamsWnd, -1, L"RatioPower");
+	mTextRatioPower = New wxTextCtrl(generalParamsWnd, -1, L"1", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textShape = new wxStaticText(generalParamsWnd, -1, L"Shape");
-	mSpinShape = new wxSpinCtrl(generalParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+	wxStaticText* textShape = New wxStaticText(generalParamsWnd, -1, L"Shape");
+	mSpinShape = New wxSpinCtrl(generalParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
 		wxSP_ARROW_KEYS, 0, 10, 0);
 
-	wxStaticText* textBaseSplits = new wxStaticText(generalParamsWnd, -1, L"BaseSplits");
-	mSpinBaseSplits = new wxSpinCtrl(generalParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+	wxStaticText* textBaseSplits = New wxStaticText(generalParamsWnd, -1, L"BaseSplits");
+	mSpinBaseSplits = New wxSpinCtrl(generalParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
 		wxSP_ARROW_KEYS, 0, 10, 0);
 
 	fgSizer1->Add(textLevels, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
@@ -126,88 +126,88 @@ void TreeGeneratorFrame::createWxCtrls()
 	generalParamsWnd->Fit();
 
 	// -- LevelParams
-	mPanelLevelParmas0 = new wxCollapsiblePane(mCtrlsPanel, ID_GENERAL_PARAMS, L"Level Params");
+	mPanelLevelParmas0 = New wxCollapsiblePane(mCtrlsPanel, ID_GENERAL_PARAMS, L"Level Params");
 	wxWindow* levelParamsWnd = mPanelLevelParmas0->GetPane();
 
-	wxFlexGridSizer* fgSizer2 = new wxFlexGridSizer(2, 2, 0, 0);
+	wxFlexGridSizer* fgSizer2 = New wxFlexGridSizer(2, 2, 0, 0);
 	fgSizer2->SetFlexibleDirection(wxBOTH);
 	fgSizer2->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
 
-	wxStaticText* textLevel = new wxStaticText(levelParamsWnd, -1, L"Level");
+	wxStaticText* textLevel = New wxStaticText(levelParamsWnd, -1, L"Level");
 	//mSpinLevel = new wxSpinCtrl(levelParamsWnd0, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
 	//	wxSP_ARROW_KEYS, 0, 10, 0);
 	wxArrayString choices;
 	choices.Add(wxT("0"));
-	mChoiceLevel = new wxChoice(levelParamsWnd, -1, wxDefaultPosition, wxDefaultSize, choices);
+	mChoiceLevel = New wxChoice(levelParamsWnd, -1, wxDefaultPosition, wxDefaultSize, choices);
 	mChoiceLevel->SetSelection(0);
 	mSelectedLevel = 0;
 
-	wxStaticText* textSegSegsW = new wxStaticText(levelParamsWnd, -1, L"SegSegsW");
-	mSpinSegSegsW = new wxSpinCtrl(levelParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+	wxStaticText* textSegSegsW = New wxStaticText(levelParamsWnd, -1, L"SegSegsW");
+	mSpinSegSegsW = New wxSpinCtrl(levelParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
 		wxSP_ARROW_KEYS, 0, 100, 8);
 
-	wxStaticText* textSegSegsH = new wxStaticText(levelParamsWnd, -1, L"SegSegsH");
-	mSpinSegSegsH = new wxSpinCtrl(levelParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+	wxStaticText* textSegSegsH = New wxStaticText(levelParamsWnd, -1, L"SegSegsH");
+	mSpinSegSegsH = New wxSpinCtrl(levelParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
 		wxSP_ARROW_KEYS, 0, 100, 4);
 
-	wxStaticText* textLength = new wxStaticText(levelParamsWnd, -1, L"Length");
-	mTextLength = new wxTextCtrl(levelParamsWnd, -1, L"1.0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textLength = New wxStaticText(levelParamsWnd, -1, L"Length");
+	mTextLength = New wxTextCtrl(levelParamsWnd, -1, L"1.0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textLengthV = new wxStaticText(levelParamsWnd, -1, L"LengthV");
-	mTextLengthV = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textLengthV = New wxStaticText(levelParamsWnd, -1, L"LengthV");
+	mTextLengthV = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textTaper = new wxStaticText(levelParamsWnd, -1, L"Taper");
-	mTextTaper = new wxTextCtrl(levelParamsWnd, -1, L"1", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textTaper = New wxStaticText(levelParamsWnd, -1, L"Taper");
+	mTextTaper = New wxTextCtrl(levelParamsWnd, -1, L"1", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textCurveRes = new wxStaticText(levelParamsWnd, -1, L"CurveRes");
-	mSpinCurveRes = new wxSpinCtrl(levelParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+	wxStaticText* textCurveRes = New wxStaticText(levelParamsWnd, -1, L"CurveRes");
+	mSpinCurveRes = New wxSpinCtrl(levelParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
 		wxSP_ARROW_KEYS, 0, 100, 3);
 
-	wxStaticText* textCurve = new wxStaticText(levelParamsWnd, -1, L"Curve");
-	mTextCurve = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textCurve = New wxStaticText(levelParamsWnd, -1, L"Curve");
+	mTextCurve = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textCurveV = new wxStaticText(levelParamsWnd, -1, L"CurveV");
-	mTextCurveV = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textCurveV = New wxStaticText(levelParamsWnd, -1, L"CurveV");
+	mTextCurveV = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textCurveBack = new wxStaticText(levelParamsWnd, -1, L"CurveBack");
-	mTextCurveBack = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textCurveBack = New wxStaticText(levelParamsWnd, -1, L"CurveBack");
+	mTextCurveBack = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textSegSplits = new wxStaticText(levelParamsWnd, -1, L"SegSplits");
-	mTextSegSplits = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textSegSplits = New wxStaticText(levelParamsWnd, -1, L"SegSplits");
+	mTextSegSplits = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textSplitAngle = new wxStaticText(levelParamsWnd, -1, L"SplitAngle");
-	mTextSplitAngle = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textSplitAngle = New wxStaticText(levelParamsWnd, -1, L"SplitAngle");
+	mTextSplitAngle = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textSplitAngleV = new wxStaticText(levelParamsWnd, -1, L"SplitAngleV");
-	mTextSplitAngleV = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textSplitAngleV = New wxStaticText(levelParamsWnd, -1, L"SplitAngleV");
+	mTextSplitAngleV = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textBranches = new wxStaticText(levelParamsWnd, -1, L"Branches");
-	mSpinBranches = new wxSpinCtrl(levelParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
+	wxStaticText* textBranches = New wxStaticText(levelParamsWnd, -1, L"Branches");
+	mSpinBranches = New wxSpinCtrl(levelParamsWnd, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 
 		wxSP_ARROW_KEYS, 0, 100, 0);
 
-	wxStaticText* textDownAngle = new wxStaticText(levelParamsWnd, -1, L"DownAngle");
-	mTextDownAngle = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textDownAngle = New wxStaticText(levelParamsWnd, -1, L"DownAngle");
+	mTextDownAngle = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textDownAngleV = new wxStaticText(levelParamsWnd, -1, L"DownAngleV");
-	mTextDownAngleV = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textDownAngleV = New wxStaticText(levelParamsWnd, -1, L"DownAngleV");
+	mTextDownAngleV = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textRotateAngle = new wxStaticText(levelParamsWnd, -1, L"RotateAngle");
-	mTextRotateAngle = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textRotateAngle = New wxStaticText(levelParamsWnd, -1, L"RotateAngle");
+	mTextRotateAngle = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
-	wxStaticText* textRotateAngleV = new wxStaticText(levelParamsWnd, -1, L"RotateAngleV");
-	mTextRotateAngleV = new wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
+	wxStaticText* textRotateAngleV = New wxStaticText(levelParamsWnd, -1, L"RotateAngleV");
+	mTextRotateAngleV = New wxTextCtrl(levelParamsWnd, -1, L"0", wxDefaultPosition, wxDefaultSize, 0, 
 		wxTextValidator(wxFILTER_NUMERIC));
 
 
@@ -270,7 +270,7 @@ void TreeGeneratorFrame::createWxCtrls()
 	levelParamsWnd->Fit();
 
 	// button
-	mButtonGenerate = new wxButton(mCtrlsPanel, ID_BUTTON_GENERATE, L"Generate");
+	mButtonGenerate = New wxButton(mCtrlsPanel, ID_BUTTON_GENERATE, L"Generate");
 
 	boxSizer2->Add(mPanelGeneralParams, 0, wxALL, 5);
 	boxSizer2->Add(mPanelLevelParmas0, 0, wxALL, 5);
@@ -282,7 +282,7 @@ void TreeGeneratorFrame::createWxCtrls()
 	mCtrlsPanel->Layout();
 
 	// right
-	mCanvasPanel = new wxPanel(this, -1);
+	mCanvasPanel = New wxPanel(this, -1);
 	mCanvasPanel->SetMinSize(wxSize(480, 600));
 
 	boxSizer1->Add(mCtrlsPanel, 0, wxALL, 5);
@@ -664,18 +664,18 @@ void TreeGeneratorCanvas::Setup()
 
 	Camera* extraCamera = sceneMgr->GetExtraCamera();
 
-	HoverCameraController* hoverCameraController = new HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
+	HoverCameraController* hoverCameraController = New HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
 	extraCamera->SetCameraController(hoverCameraController);
 
-	Cube* cubeGeo = new Cube(L"cubeGeo1");
+	Cube* cubeGeo = New Cube(L"cubeGeo1");
 	gEngine->GetGeometryManager()->AddGeometry(cubeGeo);
 
 	cubeGeo->CalculateTBN();
 	cubeGeo->BuildGeometry(XYZ_UV_TBN);
 
-	mCube = new ModelNode(L"cube", NULL, cubeGeo, gEngine->GetMaterialManager()->GetDefaultFlatMtl());
+	mCube = New ModelNode(L"cube", NULL, cubeGeo, gEngine->GetMaterialManager()->GetDefaultFlatMtl());
 
-	mTree = new Tree();
+	mTree = New Tree();
 }
 
 void TreeGeneratorCanvas::OnLostDevice()

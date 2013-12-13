@@ -42,10 +42,10 @@ void Gizmo::Init()
 {
 	createRenderTargetDepthStencile();
 
-	Cylinder* coneGeo = new Cylinder(L"", 0, 0.06f, 0.18f);
-	Cylinder* lineGeo = new Cylinder(L"", 0.01f, 0.01f, 1.0f);
-	Torus* torusGeo = new Torus(L"", 1.0f, 0.01f, 32, 8);
-	Cube* cubeGeo = new Cube(L"", 0.1f);
+	Cylinder* coneGeo = New Cylinder(L"", 0, 0.06f, 0.18f);
+	Cylinder* lineGeo = New Cylinder(L"", 0.01f, 0.01f, 1.0f);
+	Torus* torusGeo = New Torus(L"", 1.0f, 0.01f, 32, 8);
+	Cube* cubeGeo = New Cube(L"", 0.1f);
 
 	coneGeo->CalculateNormals();
 	coneGeo->BuildGeometry(XYZ_N);
@@ -59,16 +59,16 @@ void Gizmo::Init()
 	cubeGeo->CalculateNormals();
 	cubeGeo->BuildGeometry(XYZ_N);
 
-	mCone = new MeshNode(L"", NULL, coneGeo, NULL);
+	mCone = New MeshNode(L"", NULL, coneGeo, NULL);
 	_Assert(mCone);
 
-	mLine = new MeshNode(L"", NULL, lineGeo, NULL);
+	mLine = New MeshNode(L"", NULL, lineGeo, NULL);
 	_Assert(mLine);
 
-	mTorus = new MeshNode(L"", NULL, torusGeo, NULL);
+	mTorus = New MeshNode(L"", NULL, torusGeo, NULL);
 	_Assert(mTorus);
 
-	mCube = new MeshNode(L"", NULL, cubeGeo, NULL);
+	mCube = New MeshNode(L"", NULL, cubeGeo, NULL);
 	_Assert(mCube);
 
 	SAFE_DROP(coneGeo);
@@ -383,7 +383,7 @@ void Gizmo::drawTransGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	}
 
 	// y
-	Material* tempMtl = new Material(*mtl);
+	Material* tempMtl = New Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Y]);
 
 	mLine->SetWorldPosition(basePos);
@@ -457,7 +457,7 @@ void Gizmo::drawRotateGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR
 	}
 
 	// y
-	Material* tempMtl = new Material(*mtl);
+	Material* tempMtl = New Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Y]);
 
 	mTorus->SetWorldPosition(obj->GetWorldPosition());
@@ -495,7 +495,7 @@ void Gizmo::drawScaleGizmo(Object* obj, Camera* camera, Material* mtl, D3DCOLOR 
 	}
 
 	// y
-	Material* tempMtl = new Material(*mtl);
+	Material* tempMtl = New Material(*mtl);
 	tempMtl->SetDiffuseColor(elementsColor[AXIS_Y]);
 
 	mLine->SetWorldPosition(obj->GetWorldPosition());

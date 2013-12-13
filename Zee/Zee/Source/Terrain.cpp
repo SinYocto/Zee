@@ -13,7 +13,7 @@ void TerrainChunk::CalculateChunkNormals()
 	int numVerts = mSize * mSize;
 	int numTris = (mSize - 1) * (mSize - 1) * 2;
 
-	DWORD* indices = new DWORD[3 * numTris];	// 只是用于计算normal, 没实际使用
+	DWORD* indices = New DWORD[3 * numTris];	// 只是用于计算normal, 没实际使用
 	for(int i = 0; i < mSize - 1; ++i)
 	{
 		for(int j = 0; j < mSize - 1; ++j)
@@ -64,7 +64,7 @@ void TerrainChunk::CreateVertexBuffer()
 	SAFE_RELEASE(mVertexBuffer);
 
 	int numVerts = mSize * mSize;
-	VertexUVN* vertexData = new VertexUVN[numVerts];
+	VertexUVN* vertexData = New VertexUVN[numVerts];
 
 	for(int i = 0; i < numVerts; ++i)
 	{
@@ -386,7 +386,7 @@ void Terrain::LoadFromHeightMap(const wchar_t* fileName, int heightMapSize)
 	_Assert(NULL != file);
 
 	mSize = heightMapSize;
-	mHeightMapData = new WORD[heightMapSize * heightMapSize];
+	mHeightMapData = New WORD[heightMapSize * heightMapSize];
 	file->Read(mHeightMapData, heightMapSize * heightMapSize * sizeof(WORD), sizeof(WORD), heightMapSize * heightMapSize);
 
 	file->Close();
@@ -394,7 +394,7 @@ void Terrain::LoadFromHeightMap(const wchar_t* fileName, int heightMapSize)
 
 void Terrain::BuildTerrain(int depth)
 {
-	mRootNode = new QuadTreeNode(0, 0, mLength / 2.0f, depth);
+	mRootNode = New QuadTreeNode(0, 0, mLength / 2.0f, depth);
 
 	mChunkCounts = (int)pow(2.0f, depth);
 	mChunks.resize(mChunkCounts * mChunkCounts, NULL);
@@ -420,7 +420,7 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 		int numChunkVerts = chunkSize * chunkSize;
 		int numChunkTris = (chunkSize - 1) * (chunkSize - 1) * 2;
 
-		TerrainChunk* chunk = new TerrainChunk(node, chunkSize);
+		TerrainChunk* chunk = New TerrainChunk(node, chunkSize);
 		chunk->mRow = chunkRow;
 		chunk->mColumn = chunkColumn;
 		chunk->mPosData.reserve(numChunkVerts);

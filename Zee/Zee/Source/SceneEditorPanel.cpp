@@ -7,6 +7,9 @@
 #include "ModelPanel.h"
 #include "LightPanel.h"
 
+BEGIN_EVENT_TABLE(SceneEditorPanel, wxNotebook)
+EVT_CLOSE(SceneEditorPanel::OnClose)
+END_EVENT_TABLE()
 SceneEditorPanel::SceneEditorPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
 								   const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
 								   :wxNotebook(parent, id, pos, size, wxNB_MULTILINE)
@@ -16,7 +19,7 @@ SceneEditorPanel::SceneEditorPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*
 
 void SceneEditorPanel::createWxCtrls()
 {
-	mIconList = new wxImageList(16, 16, true);
+	mIconList = New wxImageList(16, 16, true);
 	mIconList->Add(wxIcon(L"./Assets/Icons/scenegraphPage.ico", wxBITMAP_TYPE_ICO));
 	mIconList->Add(wxIcon(L"./Assets/Icons/geometryPage.ico", wxBITMAP_TYPE_ICO));
 	mIconList->Add(wxIcon(L"./Assets/Icons/materialPage.ico", wxBITMAP_TYPE_ICO));
@@ -58,26 +61,37 @@ void SceneEditorPanel::CleanupAndDestory()
 
 void SceneEditorPanel::CreateEditorPages()
 {
-	SceneGraphPanel* sceneGraphPanel = new SceneGraphPanel(this, -1);
+	SceneGraphPanel* sceneGraphPanel = New SceneGraphPanel(this, -1);
 	AddPage(sceneGraphPanel, L"SceneGraph", true, SCENE_GRAPH_PAGE);
 
-	GeometryPanel* geometryPanel = new GeometryPanel(this, -1);
+	GeometryPanel* geometryPanel = New GeometryPanel(this, -1);
 	AddPage(geometryPanel, L"Geometry", false, GEOMETRY_PAGE);
 
-	MaterialPanel* materialPanel = new MaterialPanel(this, -1);
+	MaterialPanel* materialPanel = New MaterialPanel(this, -1);
 	AddPage(materialPanel, L"Material", false, MATERIAL_PAGE);
 
-	TexturePanel* texturePanel = new TexturePanel(this, -1);
+	TexturePanel* texturePanel = New TexturePanel(this, -1);
 	AddPage(texturePanel, L"Texture", false, TEXTURE_PAGE);
 
-	ModelPanel* modelPanel = new ModelPanel(this, -1);
+	ModelPanel* modelPanel = New ModelPanel(this, -1);
 	AddPage(modelPanel, L"Model", false, MODEL_PAGE);
 
-	LightPanel* lightPanel = new LightPanel(this, -1);
+	LightPanel* lightPanel = New LightPanel(this, -1);
 	AddPage(lightPanel, L"Light", false, LIGHT_PAGE);
 
 	this->Fit();
 	this->Layout();
+}
+
+void SceneEditorPanel::OnClose(wxCloseEvent& event)
+{
+	delete mIconList;
+
+	wxNotebookPage* modelPage = GetPage(MODEL_PAGE);
+	ModelPanel* modelPanel = static_cast<ModelPanel*>(modelPage);
+	modelPanel->CleanUp();
+
+	Destroy();
 }
 
 

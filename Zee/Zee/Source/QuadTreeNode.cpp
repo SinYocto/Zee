@@ -14,10 +14,10 @@ QuadTreeNode::QuadTreeNode(float centerX, float centerZ, float halfSize, int dep
 	if(mDepth > 0)
 	{
 		mIsLeaf = false;
-		mLeftTop = new QuadTreeNode(mCenterX - mHalfSize / 2.0f, mCenterZ + mHalfSize / 2.0f, mHalfSize / 2.0f, mDepth - 1);
-		mRightTop = new QuadTreeNode(mCenterX + mHalfSize / 2.0f, mCenterZ + mHalfSize / 2.0f, mHalfSize / 2.0f, mDepth - 1);
-		mLeftBottom = new QuadTreeNode(mCenterX - mHalfSize / 2.0f, mCenterZ - mHalfSize / 2.0f, mHalfSize / 2.0f, mDepth - 1);
-		mRightBottom = new QuadTreeNode(mCenterX + mHalfSize / 2.0f, mCenterZ - mHalfSize / 2.0f, mHalfSize / 2.0f, mDepth - 1);
+		mLeftTop = New QuadTreeNode(mCenterX - mHalfSize / 2.0f, mCenterZ + mHalfSize / 2.0f, mHalfSize / 2.0f, mDepth - 1);
+		mRightTop = New QuadTreeNode(mCenterX + mHalfSize / 2.0f, mCenterZ + mHalfSize / 2.0f, mHalfSize / 2.0f, mDepth - 1);
+		mLeftBottom = New QuadTreeNode(mCenterX - mHalfSize / 2.0f, mCenterZ - mHalfSize / 2.0f, mHalfSize / 2.0f, mDepth - 1);
+		mRightBottom = New QuadTreeNode(mCenterX + mHalfSize / 2.0f, mCenterZ - mHalfSize / 2.0f, mHalfSize / 2.0f, mDepth - 1);
 	}
 	else
 	{

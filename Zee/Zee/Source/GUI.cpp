@@ -540,13 +540,13 @@ void GUI::clear()
 
 void GUI::GUILabel(wchar_t* label_text, Rect label_rect, LabelStyle* label_style)
 {
-	Label* label = new Label(label_text, label_rect, label_style);
+	Label* label = New Label(label_text, label_rect, label_style);
 	AddLabel(label);
 }
 
 bool GUI::GUIButton(wchar_t* button_text, Rect button_rect, ButtonStyle *button_style, LabelStyle *label_style)
 {
-	Button* button = new Button(button_text, button_rect, button_style, label_style);
+	Button* button = New Button(button_text, button_rect, button_style, label_style);
 	AddButton(button);
 
 	button->GetButtonState();
@@ -557,7 +557,7 @@ bool GUI::GUIButton(wchar_t* button_text, Rect button_rect, ButtonStyle *button_
 
 bool GUI::GUIToggle(Rect toggle_rect, bool _value, ToggleStyle *toggle_style)
 {
-	Toggle* toggle = new Toggle(toggle_rect, _value, toggle_style);
+	Toggle* toggle = New Toggle(toggle_rect, _value, toggle_style);
 	AddToggle(toggle);
 
 	toggle->GetButtonState();
@@ -569,7 +569,7 @@ bool GUI::GUIToggle(Rect toggle_rect, bool _value, ToggleStyle *toggle_style)
 
 float GUI::GUISlider(Rect slider_rect, float _minValue, float _maxValue, float _value, char* slider_id, SliderStyle* slider_style)
 { 
-	Slider* slider = new Slider(slider_rect, _minValue, _maxValue, _value, slider_id, slider_style);
+	Slider* slider = New Slider(slider_rect, _minValue, _maxValue, _value, slider_id, slider_style);
 	AddSlider(slider);
 
 	if(sliderState.count(slider_id))
@@ -597,7 +597,7 @@ float GUI::GUISlider(Rect slider_rect, float _minValue, float _maxValue, float _
 
 int GUI::GUIListBox(std::vector<LPWSTR> _texts, Rect _rect, int _ix, char* _id, ListBoxStyle* listBox_style)
 {
-	ListBox* listBox = new ListBox(_texts, _rect, _ix, _id, listBox_style);
+	ListBox* listBox = New ListBox(_texts, _rect, _ix, _id, listBox_style);
 	AddListBox(listBox);
 
 	if(listBoxState.count(_id))

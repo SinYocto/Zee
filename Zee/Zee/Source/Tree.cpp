@@ -245,7 +245,7 @@ void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSe
 	int numSegs = mLevelParams.curveRes;
 	float segLength = mLength / numSegs;
 
-	TreeSegment* seg = new TreeSegment;
+	TreeSegment* seg = New TreeSegment;
 
 	float curveDelta = 0;
 	if(segIndex != 0)
@@ -312,7 +312,7 @@ void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSe
 	//if(segIndex == numSegs - 1)
 	//	closeTop = true;
 
-	seg->mGeo = new TreeSegGeo(segLength, mLevelParams.segSegsW, mLevelParams.segSegsH, segRadius, 
+	seg->mGeo = New TreeSegGeo(segLength, mLevelParams.segSegsW, mLevelParams.segSegsH, segRadius, 
  		Quaternion(0, 0, DEGREE_TO_RAD(curveDelta + splitAngle)), closeTop, closeBottom);
 	seg->mGeo->CalculateNormals();
 	seg->mGeo->BuildGeometry(XYZ_N);
@@ -343,7 +343,7 @@ void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSe
 
 		while(offset < segLength - 0.0001f)
 		{
-			TreeStem* branch = new TreeStem(mTree, mLevelParams.level + 1);
+			TreeStem* branch = New TreeStem(mTree, mLevelParams.level + 1);
 			branch->Build(seg, offset, generalParams, mTree->GetLevelParams(mLevelParams.level + 1), context);
 			seg->mBranches.push_back(branch);
 
@@ -698,7 +698,7 @@ void Tree::Generate()
 {
 	SAFE_DELETE(mTrunk);
 
-	mTrunk = new TreeStem(this, 0);
+	mTrunk = New TreeStem(this, 0);
 	mTrunk->Build(NULL, 0, mGeneralParams, mLevelParams[0], LevelContext());
 }
 

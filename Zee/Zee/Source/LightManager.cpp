@@ -20,7 +20,7 @@ LightManager::~LightManager()
 
 void LightManager::Init()
 {
-	mAmbientLight = new AmbientLight();
+	mAmbientLight = New AmbientLight();
 }
 
 void LightManager::Destroy()
@@ -32,7 +32,7 @@ void LightManager::Destroy()
 
 	mDirlLights.clear();
 
-	for(std::list<DirectionalLight*>::iterator iter = mDirlLights.begin(); iter != mDirlLights.end(); ++iter)
+	for(std::list<PointLight*>::iterator iter = mPointLights.begin(); iter != mPointLights.end(); ++iter)
 	{
 		SAFE_DELETE(*iter);
 	}

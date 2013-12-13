@@ -8,7 +8,7 @@ PointLightNode::PointLightNode(SceneNode* parent, PointLight* pointLight)
 ,mPointLight(pointLight)
 {
 	mType = SCENE_NODE_POINT_LIGHT;
-	mBillboard = new Billboard();		// TODO:没必要每个light一个billboard
+	mBillboard = New Billboard();		// TODO:没必要每个light一个billboard
 
 	mBillboard->SetTexture(L"./Assets/Textures/pointLight.jpg");
 	mBillboard->SetColor(pointLight->GetFinalColor());

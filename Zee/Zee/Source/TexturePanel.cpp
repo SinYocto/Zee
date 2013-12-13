@@ -2,14 +2,13 @@
 #include "Engine.h"
 
 BEGIN_EVENT_TABLE(TexturePanel, wxPanel)
-EVT_CLOSE(TexturePanel::OnClose)
 END_EVENT_TABLE()
 
 TexturePanel::TexturePanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
 					   const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
 					   :wxPanel(parent, id, pos, size)
 {
-	mIconList = new wxImageList(16, 16, true);
+	mIconList = New wxImageList(16, 16, true);
 	mIconList->Add(wxIcon(L"./Assets/Icons/texturePage.ico", wxBITMAP_TYPE_ICO));
 
 	createWxCtrls();
@@ -17,15 +16,15 @@ TexturePanel::TexturePanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/,
 
 void TexturePanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
 	// listCtrl
-	mTreePanel = new wxPanel(this, -1);
+	mTreePanel = New wxPanel(this, -1);
 	mTreePanel->SetMinSize(wxSize(200, 300));
 
-	wxBoxSizer* boxSizer2 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer2 = New wxBoxSizer(wxVERTICAL);
 
-	mTreeCtrl = new TextureListTree(mTreePanel, ID_TEXTURELIST_TREE, wxDefaultPosition, wxDefaultSize, 
+	mTreeCtrl = New TextureListTree(mTreePanel, ID_TEXTURELIST_TREE, wxDefaultPosition, wxDefaultSize, 
 		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES | wxTR_HIDE_ROOT);
 
 	mTreeCtrl->SetMinSize(wxSize(180, 260));
@@ -41,7 +40,7 @@ void TexturePanel::createWxCtrls()
 	boxSizer1->Add(mTreePanel, 0, wxALL, 5);
 
 	// inspector
-	mInspectorPanel = new TextureInspectorPanel(this, -1);
+	mInspectorPanel = New TextureInspectorPanel(this, -1);
 	mInspectorPanel->SetMinSize(wxSize(200, 300));
 	mTreeCtrl->AttachInspectorPanel(mInspectorPanel);
 
@@ -52,17 +51,12 @@ void TexturePanel::createWxCtrls()
 	this->Fit();
 }
 
-void TexturePanel::OnClose(wxCloseEvent& event)
-{
-	delete mIconList;
-}
-
 void TexturePanel::LoadDataFromScene()
 {
 	TextureManager* textureMgr = gEngine->GetTextureManger();
 	TexHashMap texHashMap = textureMgr->GetTextureHashMap();
 
-	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, new TextureTreeItemData(NULL));
+	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, New TextureTreeItemData(NULL));
 
 	for(TexHashMap::iterator iter = texHashMap.begin(); iter != texHashMap.end(); ++iter)
 	{
@@ -72,7 +66,7 @@ void TexturePanel::LoadDataFromScene()
 
 void TexturePanel::appendTexture(wxTreeItemId parentItemId, Texture* texture)
 {
-	mTreeCtrl->AppendItem(parentItemId, texture->GetName(), 0, 0, new TextureTreeItemData(texture));
+	mTreeCtrl->AppendItem(parentItemId, texture->GetName(), 0, 0, New TextureTreeItemData(texture));
 }
 
 TextureTreeItemData::TextureTreeItemData(Texture* texture)
@@ -134,9 +128,9 @@ TextureInspectorPanel::TextureInspectorPanel(wxWindow* parent, wxWindowID id /*=
 
 void TextureInspectorPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
-	mTextureInfoPanel = new TextureInfoPanel(this, wxID_ANY);
+	mTextureInfoPanel = New TextureInfoPanel(this, wxID_ANY);
 
 	boxSizer1->Add(mTextureInfoPanel, 0, wxALL, 5);
 
@@ -168,9 +162,9 @@ TextureInfoPanel::TextureInfoPanel( wxWindow* parent, wxWindowID id /*= wxID_ANY
 
 void TextureInfoPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
-	mImage = new wxImagePanel(this, wxT("./Assets/Textures/cliff.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
+	mImage = New wxImagePanel(this, wxT("./Assets/Textures/cliff.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
 
 	boxSizer1->Add(mImage, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 

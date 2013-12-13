@@ -18,7 +18,7 @@ SceneManager::SceneManager()
 
 void SceneManager::Init()
 {
-	root = new SceneNode(L"root");
+	root = New SceneNode(L"root");
 
 	gEngine->GetIDAllocator()->AllocateSceneNodeID(root);
 }
@@ -51,14 +51,14 @@ void SceneManager::Destory()
 void SceneManager::CreateMainCamera( const Vector3 pos /*= Vector3(0, 0, -200)*/, const Vector3 target /*= Vector3::Zero*/, 
 								 float fov /*= PI/2*/, float aspect /*= 1.0f*/, float nZ /*= 1.0f*/, float fZ /*= 1000.0f*/ )
 {
-	mainCamera = new Camera(pos, target, fov, aspect, nZ, fZ);
+	mainCamera = New Camera(pos, target, fov, aspect, nZ, fZ);
 }
 
 void SceneManager::CreateExtraCamera( const Vector3 pos /*= Vector3(0, 0, -200)*/, const Vector3 target /*= Vector3::Zero*/, 
 									float fov /*= PI/2*/, float aspect /*= 1.0f*/, float nZ /*= 1.0f*/, float fZ /*= 1000.0f*/ )
 {
 	_Assert(extraCamera == NULL);
-	extraCamera = new Camera(pos, target, fov, aspect, nZ, fZ);
+	extraCamera = New Camera(pos, target, fov, aspect, nZ, fZ);
 }
 
 void SceneManager::DrawAll()

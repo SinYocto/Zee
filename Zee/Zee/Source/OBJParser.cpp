@@ -199,18 +199,18 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 				Mesh* subMesh = NULL;
 				{
 					Assert((*curGeo) == NULL);
-					(*curGeo) = new Geometry(L"geo");				// TODO:给个按序号增加的默认名?
+					(*curGeo) = New Geometry(L"geo");				// TODO:给个按序号增加的默认名?
 					gEngine->GetGeometryManager()->AddGeometry((*curGeo));
 
 					mGeoList.push_back((*curGeo));
 
 					if(mResultModel == NULL)
-						mResultModel = new Model(L"model", NULL, NULL);
+						mResultModel = New Model(L"model", NULL, NULL);
 					Assert(NULL != mResultModel);
 
 					gEngine->GetModelManager()->AddModel(mResultModel);
 
-					subMesh = new Mesh(L"mesh", (*curGeo), material);
+					subMesh = New Mesh(L"mesh", (*curGeo), material);
 					mResultModel->AddSubMesh(subMesh);
 					SAFE_DROP(subMesh);
 				}
@@ -444,7 +444,7 @@ void OBJParser::parseMtlLine(const wchar_t* lineContent, Material** curMaterial,
 
 			Assert(*curMaterial == NULL);
 
-			*curMaterial = new Material(mtlName);
+			*curMaterial = New Material(mtlName);
 			gEngine->GetMaterialManager()->AddMaterial(*curMaterial);			// TODO:改到Material的构造函数中	
 			SAFE_DROP(*curMaterial);
 			break;

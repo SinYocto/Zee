@@ -6,7 +6,7 @@ Model::Model(const wchar_t* name, Geometry* geo, Material* material)
 {
 	YString::Copy(mName, _countof(mName), name);
 
-	Mesh* mesh = new Mesh(name, geo, material);
+	Mesh* mesh = New Mesh(name, geo, material);
 	AddSubMesh(mesh);
 	SAFE_DROP(mesh);
 }

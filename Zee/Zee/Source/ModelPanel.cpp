@@ -4,14 +4,13 @@
 #include "CameraController.h"
 
 BEGIN_EVENT_TABLE(ModelPanel, wxPanel)
-EVT_CLOSE(ModelPanel::OnClose)
 END_EVENT_TABLE()
 
 ModelPanel::ModelPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
 								 const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
 								 :wxPanel(parent, id, pos, size)
 {
-	mIconList = new wxImageList(16, 16, true);
+	mIconList = New wxImageList(16, 16, true);
 	mIconList->Add(wxIcon(L"./Assets/Icons/model.ico", wxBITMAP_TYPE_ICO));
 
 	createWxCtrls();
@@ -19,15 +18,15 @@ ModelPanel::ModelPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/,
 
 void ModelPanel::createWxCtrls()
 {
-	wxBoxSizer* boxSizer1 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
 	// listCtrl
-	mTreePanel = new wxPanel(this, -1);
+	mTreePanel = New wxPanel(this, -1);
 	mTreePanel->SetMinSize(wxSize(200, 300));
 
-	wxBoxSizer* boxSizer2 = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* boxSizer2 = New wxBoxSizer(wxVERTICAL);
 
-	mTreeCtrl = new ModelListTree(mTreePanel, ID_MODELLIST_TREE, wxDefaultPosition, wxDefaultSize, 
+	mTreeCtrl = New ModelListTree(mTreePanel, ID_MODELLIST_TREE, wxDefaultPosition, wxDefaultSize, 
 		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES | wxTR_HIDE_ROOT);
 
 	mTreeCtrl->SetMinSize(wxSize(180, 260));
@@ -42,7 +41,7 @@ void ModelPanel::createWxCtrls()
 	boxSizer1->Add(mTreePanel, 0, wxALL, 5);
 
 	// inspector
-	mInspectorPanel = new ModelInspectorPanel(this, -1);
+	mInspectorPanel = New ModelInspectorPanel(this, -1);
 	mInspectorPanel->SetMinSize(wxSize(200, 300));
 	mTreeCtrl->AttachInspectorPanel(mInspectorPanel);
 
@@ -53,9 +52,10 @@ void ModelPanel::createWxCtrls()
 	this->Fit();
 }
 
-void ModelPanel::OnClose(wxCloseEvent& event)
+void ModelPanel::CleanUp()
 {
-	delete mIconList;
+	if(mInspectorPanel)
+		mInspectorPanel->CleanUp();
 }
 
 void ModelPanel::LoadDataFromScene()
@@ -63,7 +63,7 @@ void ModelPanel::LoadDataFromScene()
 	ModelManager* modelMgr = gEngine->GetModelManager();
 	std::list<Model*> modelList = modelMgr->GetModelList();
 
-	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, new ModelTreeItemData(NULL));
+	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, New ModelTreeItemData(NULL));
 
 	for(std::list<Model*>::iterator iter = modelList.begin(); iter != modelList.end(); ++iter)
 	{
@@ -74,7 +74,7 @@ void ModelPanel::LoadDataFromScene()
 
 void ModelPanel::appendModel(wxTreeItemId parentItemId, Model* model)
 {
-	mTreeCtrl->AppendItem(parentItemId, model->GetName(), 0, 0, new ModelTreeItemData(model));
+	mTreeCtrl->AppendItem(parentItemId, model->GetName(), 0, 0, New ModelTreeItemData(model));
 }
 
 ModelTreeItemData::ModelTreeItemData(Model* model)
@@ -112,6 +112,8 @@ void ModelListTree::OnItemSelected(wxTreeEvent& event)
 	mInspectorPanel->GetModelPreviewCanvas()->SetPreviewModel(model);
 }
 
+BEGIN_EVENT_TABLE(ModelInspectorPanel, wxScrolledWindow)
+END_EVENT_TABLE()
 ModelInspectorPanel::ModelInspectorPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
 											   const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
 											   :wxScrolledWindow(parent, id, pos, size, wxVSCROLL)
@@ -132,7 +134,7 @@ ModelPreviewCanvas* ModelInspectorPanel::GetModelPreviewCanvas()
 
 void ModelInspectorPanel::createWxCtrls()
 {
-	mModelPreviewCanvas = new ModelPreviewCanvas(this, wxID_ANY, wxDefaultPosition, wxSize(160, 180), wxSUNKEN_BORDER);
+	mModelPreviewCanvas = New ModelPreviewCanvas(this, wxID_ANY, wxDefaultPosition, wxSize(160, 180), wxSUNKEN_BORDER);
 	mModelPreviewCanvas->SetMinSize(wxSize(160, 180));
 
 	this->SetScrollRate(0, 5);
@@ -140,10 +142,15 @@ void ModelInspectorPanel::createWxCtrls()
 	this->Layout();
 }
 
+void ModelInspectorPanel::CleanUp()
+{
+	if(mModelPreviewCanvas)
+		mModelPreviewCanvas->CleanUp();
+}
+
 
 BEGIN_EVENT_TABLE(ModelPreviewCanvas, wxWindow)
 EVT_IDLE(ModelPreviewCanvas::OnIdle)
-EVT_CLOSE(ModelPreviewCanvas::OnClose)
 END_EVENT_TABLE()
 ModelPreviewCanvas::ModelPreviewCanvas(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, const wxPoint& pos /*= wxDefaultPosition*/, 
 									   const wxSize& size /*= wxDefaultSize*/, long style /*= 0*/)
@@ -159,10 +166,10 @@ ModelPreviewCanvas::ModelPreviewCanvas(wxWindow* parent, wxWindowID id /*= wxID_
 
 	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(mSwapChainIndex);
 
-	mCamera = new Camera(Vector3(0, 0, -10.0f), Vector3::Zero,
+	mCamera = New Camera(Vector3(0, 0, -10.0f), Vector3::Zero,
 		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 1000.0f);
 
-	HoverCameraController* hoverCameraController = new HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
+	HoverCameraController* hoverCameraController = New HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
 	mCamera->SetCameraController(hoverCameraController);
 }
 
@@ -218,7 +225,7 @@ void ModelPreviewCanvas::SetPreviewModel(Model* model)
 	mModel = model;
 }
 
-void ModelPreviewCanvas::OnClose(wxCloseEvent& event)
+void ModelPreviewCanvas::CleanUp()
 {
 	SAFE_DELETE(mCamera);
 }
