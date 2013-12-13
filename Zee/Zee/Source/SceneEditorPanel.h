@@ -7,6 +7,16 @@
 class SceneEditorPanel : public wxNotebook
 {
 public:
+	enum
+	{
+		SCENE_GRAPH_PAGE = 0,
+		GEOMETRY_PAGE,
+		MATERIAL_PAGE,
+		TEXTURE_PAGE,
+		MODEL_PAGE,
+		LIGHT_PAGE,
+	};
+
 	SceneEditorPanel(wxWindow* parent, wxWindowID id = wxID_ANY, 
 		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 

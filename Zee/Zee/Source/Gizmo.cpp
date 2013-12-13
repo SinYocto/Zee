@@ -89,7 +89,7 @@ void Gizmo::createRenderTargetDepthStencile()
 	IDirect3DDevice9* d3dDevice = driver->GetD3DDevice();
 
 	Vector2 vpSize;
-	driver->GetViewPort(NULL, &vpSize);
+	driver->GetViewPort(0, NULL, &vpSize);
 
 	d3dDevice->CreateRenderTarget((UINT)vpSize.x, (UINT)vpSize.y, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 
 		0, true, &mRenderTarget, NULL);
@@ -107,7 +107,7 @@ void Gizmo::getPickColor(D3DCOLOR* pickColor, const int pickPixelSize)
 	D3DLOCKED_RECT pickLockedRect;
 
 	Vector2 vpSize;
-	gEngine->GetDriver()->GetViewPort(NULL, &vpSize);
+	gEngine->GetDriver()->GetViewPort(0, NULL, &vpSize);
 
 	POINT cursorPos = gEngine->GetInput()->GetCursorPos();
 

@@ -34,6 +34,8 @@
 
 #define Log wprintf
 
+#define new new(_NORMAL_BLOCK, __FILE__, __LINE__)
+
 #define SAFE_RELEASE(p)	{ if(p) { (p)->Release(); (p)=NULL; } }
 #define SAFE_DELETE(p) { if(p) { delete (p); (p) = NULL; } }
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p); (p) = NULL; } }

@@ -58,7 +58,7 @@ Label::Label(wchar_t* label_text, Rect label_rect, LabelStyle* label_style)
 	rect = label_rect;
 	screenRect = rect;
 
-	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(0);
 	screenRect.TransLate(viewPort.X, viewPort.Y);
 
     wcscpy_s(text, _countof(text), label_text);
@@ -120,7 +120,7 @@ Button::Button(LPWSTR button_text, Rect button_rect, ButtonStyle *button_style, 
 	rect = button_rect;
 	screenRect = rect;
 
-	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(0);
 	screenRect.TransLate(viewPort.X, viewPort.Y);
 
 	CreateVertexBuffer();
@@ -189,7 +189,7 @@ Toggle::Toggle(Rect toggle_rect, bool _value, ToggleStyle *toggle_style)
 	rect = toggle_rect;
 	screenRect = rect;
 
-	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(0);
 	screenRect.TransLate(viewPort.X, viewPort.Y);
 
 	value = _value;
@@ -274,7 +274,7 @@ Slider::Slider(Rect slider_rect, float _minValue, float _maxValue, float _value,
 	rect = slider_rect;
 	screenRect = rect;
 
-	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(0);
 	screenRect.TransLate(viewPort.X, viewPort.Y);
 
 	minValue = _minValue;
@@ -426,7 +426,7 @@ ListBox::ListBox(std::vector<wchar_t*> _texts, Rect _rect, int _ix, char* _id, L
 	rect = _rect;
 	screenRect = rect;
 
-	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(0);
 	screenRect.TransLate(viewPort.X, viewPort.Y);
 
 	selectedIx = _ix;

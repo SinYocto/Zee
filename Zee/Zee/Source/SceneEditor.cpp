@@ -87,7 +87,7 @@ SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, co
 	//mWndTreeGenerator = new TreeGeneratorFrame(this, L"Tree Generator", wxDefaultPosition, wxDefaultSize);
 	//mWndTreeGenerator->Centre();
 	//mWndTreeGenerator->Show(false);
- 
+ //
 	//mWndTreeGenerator->Setup();
 }
 
@@ -207,7 +207,7 @@ void CreateScene()
 	// camera
 	SceneManager* sceneMgr = gEngine->GetSceneManager();
 
-	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetPrimaryViewPort();
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(0);
 	sceneMgr->CreateMainCamera(Vector3(0, 4.0f, -4.0f), Vector3::Zero,
 		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 1000.0f);
 
@@ -357,7 +357,7 @@ void SceneEditorCanvas::RenderLoop()
 			}
 
 			// render
-			driver->RenderToSwapChain(PRIMARY_SWAPCHAIN);
+			driver->RenderToSwapChain(0);
 			driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
 			driver->BeginScene();
 

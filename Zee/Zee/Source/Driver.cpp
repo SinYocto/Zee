@@ -1,13 +1,10 @@
 #include "Driver.h"
-#include "Common.h"
 
 Driver::Driver()
 :D3D(NULL)
 ,D3DDevice(NULL)
 ,hWnd(NULL)
-,primarySwapChain(NULL)
-,secondarySwapChain(NULL)
-,activeSwapChain(PRIMARY_SWAPCHAIN)
+,activeSwapChainIndex(0)
 {
 
 }
@@ -34,11 +31,17 @@ void Driver::CreateD3DDevice(D3DDeviceParams params)
 	else 
 		VPMode = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
+	// present parameters
+	D3DDISPLAYMODE displayMode;
+	hr = D3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode);
+	_Assert(SUCCEEDED(hr));
+
+	// check multiSampleType
 	multiSampleType = params.multisampleType;
 	DWORD multisampleQuality = 0;
 
-	if(SUCCEEDED(D3D->CheckDeviceMultiSampleType(d3dcaps.AdapterOrdinal, d3dcaps.DeviceType, D3DFMT_A8B8G8R8, 
-		FALSE, params.multisampleType, &multisampleQuality)))		// TODO: Ê§°Ü
+	if(SUCCEEDED(D3D->CheckDeviceMultiSampleType(d3dcaps.AdapterOrdinal, d3dcaps.DeviceType, displayMode.Format, 
+		TRUE, params.multisampleType, &multisampleQuality)))
 	{
 		multiSampleType = params.multisampleType;
 	}
@@ -47,12 +50,8 @@ void Driver::CreateD3DDevice(D3DDeviceParams params)
 		multiSampleType = D3DMULTISAMPLE_NONE;
 	}
 
-	// present parameters
-	D3DDISPLAYMODE displayMode;
-	hr = D3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &displayMode);
-	_Assert(SUCCEEDED(hr));
-
 	//D3DPRESENT_PARAMETERS presentParams;
+	D3DPRESENT_PARAMETERS presentParams;
 	ZeroMemory(&presentParams,sizeof(presentParams));
 
 	RECT clientRect;
@@ -75,19 +74,28 @@ void Driver::CreateD3DDevice(D3DDeviceParams params)
 	hr = D3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, VPMode, &presentParams, &D3DDevice);
 	_Assert(SUCCEEDED(hr));
 
-	D3DDevice->GetSwapChain(0, &primarySwapChain);
+	IDirect3DSwapChain9* swapChain = NULL;
+	D3DDevice->GetSwapChain(0, &swapChain);
 
+	D3DVIEWPORT9 primaryViewPort;
 	primaryViewPort.X = 0;
 	primaryViewPort.Y = 0;
 	primaryViewPort.Width = bufferWidth;
 	primaryViewPort.Height = bufferHeight;
 	primaryViewPort.MinZ = 0;
 	primaryViewPort.MaxZ = 1.0f;
+
+	SwapChain* primarySwapChain = new SwapChain();
+	primarySwapChain->d3dSwapChain = swapChain;
+	primarySwapChain->presentParams = presentParams;
+	primarySwapChain->viewPort = primaryViewPort;
+
+	swapChainList.push_back(primarySwapChain);
 }
 
 bool Driver::Reset()
 {
-	if(FAILED(D3DDevice->Reset(&presentParams)))
+	if(FAILED(D3DDevice->Reset(&swapChainList[0]->presentParams)))
 		return false;
 
 	return true;
@@ -108,21 +116,18 @@ void Driver::SetViewPort(int offsetX, int offsetY, int width, int height)
 	D3DDevice->SetViewport(&viewPort);
 }
 
-void Driver::SetViewPort(SWAPCHAIN_TYPE swapChainType)
+void Driver::SetViewPort(int swapChainIndex)
 {
-	_Assert(swapChainType == activeSwapChain)
-	if(activeSwapChain == PRIMARY_SWAPCHAIN)
-		D3DDevice->SetViewport(&primaryViewPort);
-	else
-		D3DDevice->SetViewport(&secondaryViewPort);
+	_Assert(swapChainIndex == activeSwapChainIndex);
+	D3DDevice->SetViewport(&swapChainList[activeSwapChainIndex]->viewPort);
 }
 
-void Driver::GetViewPort(Vector2* vpOrigin, Vector2* vpSize)
+void Driver::GetViewPort(int swapChainIndex, Vector2* vpOrigin, Vector2* vpSize)
 {
 	_Assert(NULL != D3DDevice);
+	_Assert(swapChainIndex < (int)swapChainList.size());
 
-	D3DVIEWPORT9 vp;
-	D3DDevice->GetViewport(&vp);
+	D3DVIEWPORT9 vp = GetViewPort(swapChainIndex);
 
 	Vector2 origin = Vector2((float)vp.X, (float)vp.Y);
 	Vector2 size = Vector2((float)vp.Width, (float)vp.Height);
@@ -137,8 +142,12 @@ void Driver::GetViewPort(Vector2* vpOrigin, Vector2* vpSize)
 
 void Driver::Destory()
 {
-	SAFE_RELEASE(primarySwapChain);
-	SAFE_RELEASE(secondarySwapChain);
+	for(std::vector<SwapChain*>::iterator iter = swapChainList.begin(); iter != swapChainList.end(); ++iter)
+	{
+		SAFE_DELETE(*iter);
+	}
+	swapChainList.clear();
+
 	SAFE_RELEASE(D3D);
 	SAFE_RELEASE(D3DDevice);
 }
@@ -160,14 +169,15 @@ HRESULT Driver::EndScene()
 
 HRESULT Driver::Present(HWND _hWnd /* = NULL */)
 {
-	if(activeSwapChain == PRIMARY_SWAPCHAIN)
+	_Assert(activeSwapChainIndex < (int)swapChainList.size());
+	if(activeSwapChainIndex == 0)
 	{
-		return primarySwapChain->Present(NULL, NULL, hWnd, NULL, 0);
+		return swapChainList[activeSwapChainIndex]->d3dSwapChain->Present(NULL, NULL, hWnd, NULL, 0);
 	}
 	else
 	{
 		_Assert(_hWnd != NULL);
-		return secondarySwapChain->Present(NULL, NULL, _hWnd, NULL, 0);
+		return swapChainList[activeSwapChainIndex]->d3dSwapChain->Present(NULL, NULL, _hWnd, NULL, 0);
 	}
 }
 
@@ -176,7 +186,7 @@ void Driver::GetScreenLocation(const Vector2& screenPos, Vector2* screenLocation
 	Vector2 vpOrigin;
 	Vector2 vpSize;
 
-	GetViewPort(&vpOrigin, &vpSize);
+	GetViewPort(0, &vpOrigin, &vpSize);
 	_Assert(vpSize.x != 0 && vpSize.y != 0);
 
 	Vector2 vpPos = screenPos - vpOrigin;
@@ -191,56 +201,65 @@ void Driver::GetScreenLocation(const Vector2& screenPos, Vector2* screenLocation
 	return;
 }
 
-void Driver::RenderToSwapChain(SWAPCHAIN_TYPE swapChain)
+void Driver::RenderToSwapChain(int swapChainIndex)
 {
-	activeSwapChain = swapChain;
+	_Assert(swapChainIndex < (int)swapChainList.size());
+	activeSwapChainIndex = swapChainIndex;
 
 	IDirect3DSurface9* backBuffer = NULL;
-	if(activeSwapChain == PRIMARY_SWAPCHAIN)
-	{
-		_Assert(primarySwapChain != NULL);
-		primarySwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
-	}
-	else
-	{
-		_Assert(secondarySwapChain != NULL);
-		secondarySwapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
-	}
 
+	IDirect3DSwapChain9* swapChain = swapChainList[swapChainIndex]->d3dSwapChain;
+	_Assert(swapChain != NULL);
+	swapChain->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &backBuffer);
 	D3DDevice->SetRenderTarget(0, backBuffer);
-	SetViewPort(activeSwapChain);
+	SetViewPort(activeSwapChainIndex);
 
 	SAFE_RELEASE(backBuffer);
 }
 
 void Driver::OnLostDevice()
 {
-	SAFE_RELEASE(secondarySwapChain);
+	for(size_t i = 1; i < swapChainList.size(); ++i)
+	{
+		SAFE_RELEASE(swapChainList[i]->d3dSwapChain);
+	}
 }
 
 void Driver::OnResetDevice()
 {
-	D3DDevice->CreateAdditionalSwapChain(&secondaryPresentParams, &secondarySwapChain);
+	for(size_t i = 1; i < swapChainList.size(); ++i)
+	{
+		D3DDevice->CreateAdditionalSwapChain(&swapChainList[i]->presentParams, &swapChainList[i]->d3dSwapChain);
+	}
 }
 
-void Driver::CreateSecondarySwapChain(D3DPRESENT_PARAMETERS params)
+int Driver::CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS params)
 {
-	SAFE_RELEASE(secondarySwapChain);
+	SwapChain* swapChain = new SwapChain();
 
-	secondaryPresentParams = params;
-	D3DDevice->CreateAdditionalSwapChain(&secondaryPresentParams, &secondarySwapChain);
+	D3DDevice->CreateAdditionalSwapChain(&params, &swapChain->d3dSwapChain);
 
-	secondaryViewPort.X = 0;
-	secondaryViewPort.Y = 0;
-	secondaryViewPort.Width = params.BackBufferWidth;
-	secondaryViewPort.Height = params.BackBufferHeight;
-	secondaryViewPort.MinZ = 0;
-	secondaryViewPort.MaxZ = 1.0f;
+	D3DVIEWPORT9 viewPort;
+	viewPort.X = 0;
+	viewPort.Y = 0;
+	viewPort.Width = params.BackBufferWidth;
+	viewPort.Height = params.BackBufferHeight;
+	viewPort.MinZ = 0;
+	viewPort.MaxZ = 1.0f;
+
+	swapChain->presentParams = params;
+	swapChain->viewPort = viewPort;
+
+	swapChainList.push_back(swapChain);
+
+	return swapChainList.size() - 1;
 }
 
-D3DPRESENT_PARAMETERS Driver::GetPresentParameters()
+D3DPRESENT_PARAMETERS Driver::GetPresentParameters(int swapChainIndex)
 {
-	return presentParams;
+	_Assert(swapChainIndex < (int)swapChainList.size());
+
+	return swapChainList[swapChainIndex]->presentParams;
 }
 
 IDirect3DDevice9* Driver::GetD3DDevice()
@@ -253,12 +272,8 @@ HWND Driver::GetHWnd()
 	return hWnd;
 }
 
-D3DVIEWPORT9 Driver::GetPrimaryViewPort()
+D3DVIEWPORT9 Driver::GetViewPort(int swapChainIndex)
 {
-	return primaryViewPort;
-}
-
-D3DVIEWPORT9 Driver::GetSecondaryViewPort()
-{
-	return secondaryViewPort;
+	_Assert(swapChainIndex < (int)swapChainList.size());
+	return swapChainList[swapChainIndex]->viewPort;
 }

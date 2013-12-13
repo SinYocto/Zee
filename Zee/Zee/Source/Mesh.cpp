@@ -34,7 +34,7 @@ void Mesh::Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid)
 	else
 		d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 
-	mMaterial->Render(matWorld, mGeo, camera);
+	mMaterial->Render(matWorld, mGeo, camera, true);
 
 	d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 }
@@ -57,4 +57,10 @@ Geometry* Mesh::GetGeometry()
 Material* Mesh::GetMaterial()
 {
 	return mMaterial;
+}
+
+void Mesh::DrawUseMtl(const D3DXMATRIX& matWorld, Camera* camera, Material* mtl)
+{
+	_Assert(NULL != mtl);
+	mtl->Render(matWorld, mGeo, camera, true);
 }

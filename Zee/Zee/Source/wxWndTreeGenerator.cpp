@@ -26,11 +26,12 @@ TreeGeneratorFrame::TreeGeneratorFrame(wxWindow* parent, const wxString& title, 
 	wxSize clientSize = mCanvasPanel->GetClientSize();
 	mCanvas = new TreeGeneratorCanvas(mCanvasPanel, wxID_ANY, wxDefaultPosition, clientSize, wxSUNKEN_BORDER);
 
-	D3DPRESENT_PARAMETERS presentParams = gEngine->GetDriver()->GetPresentParameters();
+	D3DPRESENT_PARAMETERS presentParams = gEngine->GetDriver()->GetPresentParameters(0);
 	presentParams.BackBufferWidth = clientSize.x;
 	presentParams.BackBufferHeight = clientSize.y;
 
-	gEngine->GetDriver()->CreateSecondarySwapChain(presentParams);
+	int swapChainIndex = gEngine->GetDriver()->CreateAdditionalSwapChain(presentParams);
+	mCanvas->SetSwapChainIndex(swapChainIndex);
 }
 
 void TreeGeneratorFrame::createWxCtrls()
@@ -612,7 +613,7 @@ void TreeGeneratorCanvas::RenderWindow()
 			if(wxWindow::FindFocus() == this)
 				extraCamera->ApplyCameraController();
 
-			driver->RenderToSwapChain(SECONDARY_SWAPCHAIN);
+			driver->RenderToSwapChain(swapChainIndex);
 			driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
 			driver->BeginScene();
 
@@ -657,7 +658,7 @@ void TreeGeneratorCanvas::Setup()
 {
 	SceneManager* sceneMgr = gEngine->GetSceneManager();
 
-	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetSecondaryViewPort();
+	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(swapChainIndex);
 	sceneMgr->CreateExtraCamera(Vector3(0, 0, -10.0f), Vector3::Zero,
 		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 1000.0f);
 
@@ -698,4 +699,9 @@ void TreeGeneratorCanvas::LoadParamsFromFile(const wchar_t* filePath)
 {
 	_Assert(mTree);
 	mTree->LoadParamsFromFile(filePath);
+}
+
+void TreeGeneratorCanvas::SetSwapChainIndex(int index)
+{
+	swapChainIndex = index;
 }

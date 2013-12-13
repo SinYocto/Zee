@@ -59,22 +59,22 @@ void SceneEditorPanel::CleanupAndDestory()
 void SceneEditorPanel::CreateEditorPages()
 {
 	SceneGraphPanel* sceneGraphPanel = new SceneGraphPanel(this, -1);
-	AddPage(sceneGraphPanel, L"SceneGraph", true, 0);
+	AddPage(sceneGraphPanel, L"SceneGraph", true, SCENE_GRAPH_PAGE);
 
 	GeometryPanel* geometryPanel = new GeometryPanel(this, -1);
-	AddPage(geometryPanel, L"Geometry", false, 1);
+	AddPage(geometryPanel, L"Geometry", false, GEOMETRY_PAGE);
 
 	MaterialPanel* materialPanel = new MaterialPanel(this, -1);
-	AddPage(materialPanel, L"Material", false, 2);
+	AddPage(materialPanel, L"Material", false, MATERIAL_PAGE);
 
 	TexturePanel* texturePanel = new TexturePanel(this, -1);
-	AddPage(texturePanel, L"Texture", false, 3);
+	AddPage(texturePanel, L"Texture", false, TEXTURE_PAGE);
 
 	ModelPanel* modelPanel = new ModelPanel(this, -1);
-	AddPage(modelPanel, L"Model", false, 4);
+	AddPage(modelPanel, L"Model", false, MODEL_PAGE);
 
 	LightPanel* lightPanel = new LightPanel(this, -1);
-	AddPage(lightPanel, L"Light", false, 5);
+	AddPage(lightPanel, L"Light", false, LIGHT_PAGE);
 
 	this->Fit();
 	this->Layout();

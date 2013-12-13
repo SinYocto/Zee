@@ -110,6 +110,7 @@ public:
 	void OnLostDevice();
 	void OnResetDevice();
 
+	void SetSwapChainIndex(int index);
 	void Setup();
 
 	void LoadParamsFromFile(const wchar_t* filePath);
@@ -127,6 +128,8 @@ private:
 
 	ModelNode* mCube;
 	Tree* mTree;
+
+	int swapChainIndex;
 };
 
 

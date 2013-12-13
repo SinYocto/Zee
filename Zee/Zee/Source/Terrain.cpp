@@ -260,7 +260,7 @@ void TerrainChunk::CalcChunkLODDist(Camera* camera, float pixelTolerance)
 		Vector2 res(0, 0);
 
 		camera->GetCameraParams(&nz, NULL, &fov, &aspect);
-		gEngine->GetDriver()->GetViewPort(NULL, &res);
+		gEngine->GetDriver()->GetViewPort(0, NULL, &res);
 
 		float top = tan(fov / 2.0f) * nz;
 		factor = nz * res.x / (top * 2 * pixelTolerance);

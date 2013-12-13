@@ -22,6 +22,7 @@ public:
 	void LoadModelDataFromFile(wchar_t* filename, ModelFileFormat format);
 
 	void Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid);
+	void DrawUseMtl(const D3DXMATRIX& matWorld, Camera* camera, Material* mtl);
 
 	void CalcDynamicAABBox(const D3DXMATRIX& matWorld, AABBox* box);
 

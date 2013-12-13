@@ -73,3 +73,11 @@ wchar_t* Model::GetName()
 {
 	return mName;
 }
+
+void Model::DrawUseMtl(const D3DXMATRIX& matWorld, Camera* camera, Material* mtl)
+{
+	for(std::list<Mesh*>::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter)
+	{
+		(*iter)->DrawUseMtl(matWorld, camera, mtl);
+	}
+}
