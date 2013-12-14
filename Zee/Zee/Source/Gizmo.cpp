@@ -311,9 +311,6 @@ void Gizmo::draw(Object* obj, Camera* camera, bool isColorPickPass)
 		driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);
 	}
 
-	float dist = VectorLength(camera->GetWorldPosition() - obj->GetWorldPosition());
-	float scaleFactor = dist / SCALE_FACTOR;
-
 	// 这里清了zbuffer, 以使gizmo始终在屏幕上显示并内部有深度关系, 所以gizmo在渲染流程的最后
 	driver->Clear(D3DCLEAR_ZBUFFER, 0xff000000, 1.0f);	
 
@@ -575,11 +572,69 @@ void Gizmo::calRotateTangent(Object* obj, Camera* camera, Vector3* tangent)
 	else
 		matWVP = obj->LocalToWorldMatrix() * camera->ViewMatrix() * camera->ProjMatrix();
 
+	float scaleFactor = mTorus->GetScale().x;
+
+	Vector3 posA1;
+	Vector3 posB1;
+	if(mSelectedAxis == AXIS_Y)
+	{
+		posA1 = Vector3(-scaleFactor, 0, 0);
+		posB1 = Vector3(0, 0, -scaleFactor);
+	}
+	else if(mSelectedAxis == AXIS_X)
+	{
+		posA1 = Vector3(0, 0, -scaleFactor);
+		posB1 = Vector3(0, -scaleFactor, 0);
+	}
+	else if(mSelectedAxis == AXIS_Z)
+	{
+		posA1 = Vector3(-scaleFactor, 0, 0);
+		posB1 = Vector3(0, -scaleFactor, 0);
+	}
+	else
+	{
+		_Assert(false);
+	}
+
+	// 下面计算椭圆切线的算法使用的是:椭圆上一点到两个焦点的直线的角平分线的垂线即为该点在椭圆上的切线
 	Vector3 posScreenO;
+	Vector3 posScreenA1;
+	Vector3 posScreenB1;
+
 	GetClipSpacePos(Vector3::Zero, matWVP, &posScreenO);
+	GetClipSpacePos(posA1, matWVP, &posScreenA1);
+	GetClipSpacePos(posB1, matWVP, &posScreenB1);
+
 	posScreenO.y *= -1.0f;		// 屏幕原点使用左上方
 	posScreenO = 0.5f * (posScreenO + Vector3(1.0f, 1.0f, 0));		// 转到0~1范围
 	posScreenO.z = 0;
+
+	posScreenA1.y *= -1.0f;
+	posScreenA1 = 0.5f * (posScreenA1 + Vector3(1.0f, 1.0f, 0));
+	posScreenA1.z = 0;
+
+	posScreenB1.y *= -1.0f;
+	posScreenB1 = 0.5f * (posScreenB1 + Vector3(1.0f, 1.0f, 0));
+	posScreenB1.z = 0;
+
+	float a = VectorLength(posScreenA1 - posScreenO);		// 椭圆长轴
+	float b = VectorLength(posScreenB1 - posScreenO);		// 椭圆短轴
+
+	if(a < b)
+	{
+		float temp = a;
+		a = b;
+		b = temp;
+
+		posScreenA1 = posScreenB1;
+	}
+
+	float c = sqrtf(a*a - b*b);		// 椭圆焦距
+	_Assert(c != 0);
+
+	Vector3 posScreenC1 = posScreenO + (c/a) * (posScreenA1 - posScreenO);
+	Vector3 posScreenC2 = posScreenO - (c/a) * (posScreenA1 - posScreenO);
+
 
 	POINT cursorPos = gEngine->GetInput()->GetCursorPos();
 
@@ -588,7 +643,7 @@ void Gizmo::calRotateTangent(Object* obj, Camera* camera, Vector3* tangent)
 
 	Vector3 posScreenCursor(cursorLocation.x, cursorLocation.y, 0);
 
-	*tangent = (Vector3(0, 0, 1.0f).Cross(posScreenCursor -posScreenO)).Normalized();
+	*tangent = ((posScreenC1 - posScreenCursor).Normalized() + (posScreenC2 - posScreenCursor).Normalized()).Cross(Vector3(0, 0, 1.0f)).Normalized();
 }
 
 void Gizmo::SetActiveType(GIZMO_TYPE type)

@@ -187,7 +187,7 @@ float VectorLength(const Vector3& vec)
 	return vec.Length();
 }
 
-float VectorLengthSqured(const Vector3& vec)
+float VectorLengthSquared(const Vector3& vec)
 {
 	return vec.SquredLength();
 }
