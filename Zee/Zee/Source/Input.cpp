@@ -140,3 +140,8 @@ POINT Input::GetCursorPos()
 {
 	return cursorPos;
 }
+
+POINT Input::GetLastCursorPos()
+{
+	return lastCursorPos;
+}

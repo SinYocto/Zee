@@ -164,3 +164,22 @@ bool IntersectRayAABB(const Vector3& rayPos, const Vector3& rayDir, const AABBox
 
 	return true;
 }
+
+bool IntersectRayPlane(const Vector3& rayPos, const Vector3& rayDir, const D3DXPLANE& plane, Vector3* hitPos, float* dist)
+{
+	Vector3 normal(plane.a, plane.b, plane.c);
+
+	if(rayDir.Dot(normal) == 0)
+		return false;
+
+	float t = -(rayPos.Dot(normal) + plane.d) / (rayDir.Dot(normal));
+	Vector3 hitP = rayPos + t * rayDir;
+
+	if(hitPos)
+		*hitPos = hitP;
+
+	if(dist)
+		*dist = VectorLength(rayPos - hitP);
+
+	return true;
+}

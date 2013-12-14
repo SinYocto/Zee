@@ -664,14 +664,75 @@ void Gizmo::applyTrans(Object* obj, Camera* camera, const Vector3& tangentX, con
 	float dy = 0;
 	float dz = 0;
 
-	if(mSelectedAxis == AXIS_X || mSelectedAxis == PLANE_XY || mSelectedAxis == PLANE_XZ)
+	if(mSelectedAxis == AXIS_X)
+	{
 		dx = screenMoveVector.Dot(tangentX);
-
-	if(mSelectedAxis == AXIS_Y || mSelectedAxis == PLANE_XY || mSelectedAxis == PLANE_YZ)
+	}
+	else if(mSelectedAxis == AXIS_Y)
+	{
 		dy = screenMoveVector.Dot(tangentY);
-
-	if(mSelectedAxis == AXIS_Z || mSelectedAxis == PLANE_XZ || mSelectedAxis == PLANE_YZ)
+	}
+	else if(mSelectedAxis == AXIS_Z)
+	{
 		dz = screenMoveVector.Dot(tangentZ);
+	}
+	else
+	{
+		// 求出选中的平面
+		D3DXPLANE plane;
+		{
+			D3DXMATRIX matWorld;
+			if(mCoordinateType == COORDINATE_GLOBAL)
+				matWorld = IDENTITY_MATRIX;
+			else
+				matWorld = obj->LocalToWorldMatrix();
+
+			D3DXVECTOR3 planeNormal;
+
+			if(mSelectedAxis == PLANE_XY)
+				D3DXVec3TransformNormal(&planeNormal, &(D3DXVECTOR3(0, 0, 1.0f)), &matWorld);
+			else if(mSelectedAxis == PLANE_XZ)
+				D3DXVec3TransformNormal(&planeNormal, &(D3DXVECTOR3(0, 1.0f, 0)), &matWorld);
+			else if(mSelectedAxis == PLANE_YZ)
+				D3DXVec3TransformNormal(&planeNormal, &(D3DXVECTOR3(1.0f, 0, 0)), &matWorld);
+			else
+				_Assert(false);
+
+			D3DXVec3Normalize(&planeNormal, &planeNormal);
+
+			Vector3 pos = obj->GetWorldPosition();
+			float d = -pos.Dot(Vector3(planeNormal.x, planeNormal.y, planeNormal.z));
+
+			plane = D3DXPLANE(planeNormal.x, planeNormal.y, planeNormal.z, d);
+		}
+
+		Input* input = gEngine->GetInput();
+
+		Vector3 lastHitPos;
+		{
+			Vector2 lastScreenPos((float)input->GetLastCursorPos().x, (float)input->GetLastCursorPos().y);
+
+			Vector3 rayPos;
+			Vector3 rayDir;
+			camera->GetScreenRay(lastScreenPos, &rayPos, &rayDir);
+
+			_Assert(IntersectRayPlane(rayPos, rayDir, plane, &lastHitPos, NULL) == true);
+		}
+
+		Vector3 hitPos;
+		{
+			Vector2 screenPos((float)input->GetCursorPos().x, (float)input->GetCursorPos().y);
+
+			Vector3 rayPos;
+			Vector3 rayDir;
+			camera->GetScreenRay(screenPos, &rayPos, &rayDir);
+
+			_Assert(IntersectRayPlane(rayPos, rayDir, plane, &hitPos, NULL) == true);
+		}
+
+		obj->Translate(hitPos - lastHitPos);
+		return;
+	}
 
 	if(mCoordinateType == COORDINATE_GLOBAL)
 	{		
@@ -814,7 +875,8 @@ void Gizmo::FrameUpdate()
 			camera->FocusAt(mSelectedNode);
 	}
 
-	applyTransform(camera);
+	if(mSelectedAxis != SELECT_NONE)
+		applyTransform(camera);
 }
 
 SceneNode* Gizmo::GetSelectedNode()

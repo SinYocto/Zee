@@ -187,6 +187,11 @@ float VectorLength(const Vector3& vec)
 	return vec.Length();
 }
 
+float VectorLength(const Vector2& vec)
+{
+	return vec.Length();
+}
+
 float VectorLengthSquared(const Vector3& vec)
 {
 	return vec.SquredLength();
@@ -572,4 +577,9 @@ Vector3 GetWorldPos(const Vector3& pos, const Quaternion& orient, const Vector3&
 	resultPos += moveVector.z * forward;
 
 	return resultPos;
+}
+
+float Vector2::Length() const
+{
+	return sqrt(x*x + y*y);
 }

@@ -116,6 +116,8 @@ public:
 
 	}
 
+	float Length() const;
+
 public:
 	float x;
 	float y;
@@ -125,6 +127,8 @@ Vector2 operator-(const Vector2& vec);
 Vector2 operator+(const Vector2& vec1, const Vector2& vec2);
 Vector2 operator-(const Vector2& vec1, const Vector2& vec2);
 Vector2 operator*(float value, const Vector2& vec);
+
+float VectorLength(const Vector2& vec);
 
 class Vector4
 {

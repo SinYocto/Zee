@@ -34,5 +34,6 @@ public:
 };
 
 bool IntersectRayAABB(const Vector3& rayPos, const Vector3& rayDir, const AABBox& box, Vector3* hitPos, float* dist);
+bool IntersectRayPlane(const Vector3& rayPos, const Vector3& rayDir, const D3DXPLANE& plane, Vector3* hitPos, float* dist);
 
 #endif

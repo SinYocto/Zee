@@ -25,6 +25,7 @@ public:
 
 	DIMOUSESTATE GetMouseState();
 	POINT GetCursorPos();
+	POINT GetLastCursorPos();
 
 private:
 	IDirectInputDevice8 *DIDKeyboard;
