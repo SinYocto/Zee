@@ -2,11 +2,13 @@
 #define UTILITY_H
 
 #include <stdio.h>
+#include <io.h>
 #include <vector>
 #include <list>
 #include <map>
 #include <algorithm>
 #include <string.h>
+#include <string>
 #include <malloc.h>
 #include <assert.h>
 #include <Windows.h>

@@ -777,7 +777,9 @@ void Gizmo::SelectSceneNode(SceneNode* sceneNode)
 	if(mSelectedNode != sceneNode)
 	{
 		mSelectedNode = sceneNode;
-		OnSelectNode();
+
+		if(mSelectedNode)
+			OnSelectNode();
 	}
 }
 

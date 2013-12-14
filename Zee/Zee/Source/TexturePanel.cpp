@@ -95,12 +95,13 @@ TextureListTree::TextureListTree( wxWindow* parent, wxWindowID id /*= wxID_ANY*/
 
 void TextureListTree::OnItemActivated(wxTreeEvent& event)
 {
-	//TextureTreeItemData* itemData = (TextureTreeItemData*)GetItemData(event.GetItem());
+	TextureTreeItemData* itemData = (TextureTreeItemData*)GetItemData(event.GetItem());
 
-	//SceneNode* sceneNode = itemData->GetSceneNode();
+	Texture* texture = itemData->GetTexture();
 
-	//Camera* mainCamera = gEngine->GetSceneManager()->GetMainCamera();
-	//mainCamera->FocusAt(sceneNode);
+	event.SetString(L"TexturePanel");
+	event.SetClientData((void*)texture);
+	event.Skip();
 }
 
 void TextureListTree::OnItemSelected(wxTreeEvent& event)
@@ -115,6 +116,42 @@ void TextureListTree::OnItemSelected(wxTreeEvent& event)
 void TextureListTree::AttachInspectorPanel(TextureInspectorPanel* inspectorPanel)
 {
 	mInspectorPanel = inspectorPanel;
+}
+
+wxTreeItemId TextureListTree::findItemByTexture(Texture* texture)
+{
+	return findItemByTexture(texture, GetRootItem());
+}
+
+wxTreeItemId TextureListTree::findItemByTexture(Texture* texture, wxTreeItemId itemId)
+{
+	wxTreeItemId rootId = GetRootItem();
+	wxTreeItemId resultItemId = rootId;
+	wxTreeItemId curItemId = itemId;
+
+	TextureTreeItemData* curItemData = (TextureTreeItemData*)GetItemData(curItemId);
+
+	if(curItemData->GetTexture() == texture)
+	{
+		resultItemId = curItemId;
+		return resultItemId;
+	}
+
+	wxTreeItemIdValue cookie;
+	curItemId = GetFirstChild(itemId, cookie);
+	while(curItemId.IsOk())
+	{
+		resultItemId = findItemByTexture(texture, curItemId);
+
+		if(resultItemId != rootId)
+		{
+			return resultItemId;
+		}
+
+		curItemId = GetNextChild(itemId, cookie);
+	}
+
+	return resultItemId;
 }
 
 
@@ -164,7 +201,7 @@ void TextureInfoPanel::createWxCtrls()
 {
 	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
-	mImage = New wxImagePanel(this, wxT("./Assets/Textures/cliff.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
+	mImage = New wxImagePanel(this, wxT("./Assets/Textures/black128x128.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
 
 	boxSizer1->Add(mImage, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 

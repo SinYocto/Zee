@@ -119,6 +119,12 @@ void SceneGraphPanel::appendSceneNode(wxTreeItemId parentItemId, SceneNode* node
 	}
 }
 
+void SceneGraphPanel::RefreshInspector()
+{
+	if(mInspectorPanel)
+		mInspectorPanel->RefreshInspector();
+}
+
 
 
 SceneNodeTreeItemData::SceneNodeTreeItemData(SceneNode* sceneNode)
@@ -323,6 +329,12 @@ MeshNodeInfoPanel* SceneNodeInspectorPanel::GetMeshNodeInfoPanel()
 AttributeInfoPanel* SceneNodeInspectorPanel::GetAttributeInfoPanel()
 {
 	return mAttributeInfoPanel;
+}
+
+void SceneNodeInspectorPanel::RefreshInspector()
+{
+	if(mMeshNodeInfoPanel && mSceneNode)
+		mMeshNodeInfoPanel->LoadDataFromSceneNode(mSceneNode);
 }
 
 BEGIN_EVENT_TABLE(TransformPanel, wxPanel)
@@ -652,6 +664,7 @@ void LightInfoPanel::OnColorPick(wxColourPickerEvent& event)
 }
 
 BEGIN_EVENT_TABLE(MeshNodeInfoPanel, wxPanel)
+EVT_BUTTON(wxID_ANY, MeshNodeInfoPanel::OnBitmapButton)
 END_EVENT_TABLE()
 MeshNodeInfoPanel::MeshNodeInfoPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
 									 const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
@@ -709,6 +722,34 @@ void MeshNodeInfoPanel::LoadDataFromSceneNode(SceneNode* sceneNode)
 		mTextGeoName->SetLabel(mesh->GetGeometry()->GetName());
 		mTextMtlName->SetLabel(mesh->GetMaterial()->GetName());
 	}
+}
+
+void MeshNodeInfoPanel::OnBitmapButton(wxCommandEvent& event)
+{
+	SceneNodeInspectorPanel* inspectorPanel = (SceneNodeInspectorPanel*)GetParent();
+	SceneNode* sceneNode = inspectorPanel->GetAttachedSceneNode();
+
+	if(!sceneNode)
+		return;
+
+	wxBitmapButton* btnCtrl = (wxBitmapButton*)event.GetEventObject();
+
+	switch(btnCtrl->GetId())
+	{
+	case ID_BITMAP_BTN_GEO:
+		event.SetString(L"SceneGraphPanel_Mesh_Geo");
+		break;
+
+	case ID_BITMAP_BTN_MTL:
+		event.SetString(L"SceneGraphPanel_Mesh_Mtl");
+		break;
+
+	default:
+		_Assert(false);
+	}
+
+	event.SetClientData((void*)sceneNode);
+	event.Skip();
 }
 
 BEGIN_EVENT_TABLE(AttributeInfoPanel, wxPanel)

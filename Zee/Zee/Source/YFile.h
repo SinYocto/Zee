@@ -31,6 +31,8 @@ public:
 
 	int WriteLine(const wchar_t* format, ...);
 
+	static bool Exist(const wchar_t* filePath);
+
 	bool Close();
 
 private:

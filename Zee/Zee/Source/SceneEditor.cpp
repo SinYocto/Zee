@@ -117,7 +117,7 @@ void SceneEditorFrame::createWxCtrls()
 	// panel & canvas
 	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxHORIZONTAL);
 
-	mEditorPanel = New SceneEditorPanel(this, -1);
+	mEditorPanel = New SceneEditorPanel(this, ID_EDITOR_NOTEBOOK);
 	mEditorPanel->SetMinSize(wxSize(200, 620));
 	boxSizer1->Add(mEditorPanel, 0, wxALL, 5);
 
@@ -252,6 +252,17 @@ void CreateScene()
 	torusGeo->CalculateNormals();
 	torusGeo->BuildGeometry(XYZ_N);
 
+	// textures
+	TextureManager* textureMgr = gEngine->GetTextureManger();
+
+	std::vector<std::wstring> filesVec;
+	YString::GetDirFiles(L"./Assets/Textures", L"jpg", filesVec);
+
+	for(std::vector<std::wstring>::iterator iter = filesVec.begin(); iter != filesVec.end(); ++iter)
+	{
+		textureMgr->GetOrCreateD3DTexture((*iter).c_str());
+	}
+
 	// material
 	MaterialManager* materialMgr = gEngine->GetMaterialManager();
 
@@ -308,14 +319,14 @@ void CreateScene()
 	// terrain
 	PerformanceTimer::Begin(L"building 257 terrain");
 	terrain = New Terrain(257, 200.0f, 40.0f);
-	terrain->LoadFromHeightMap(L"./Assets/Textures/heightMap257_bit16.raw", 257);
+	terrain->LoadFromHeightMap(L"./Assets/Textures/Terrain/heightMap257_bit16.raw", 257);
 	terrain->BuildTerrain(4);
 	terrain->CalcChunkLODDist(mainCamera, 1.0f);
 
-	terrain->SetColorTexes(L"./Assets/Textures/Cliff.jpg", L"./Assets/Textures/Grass_Hill.jpg", 
-		L"./Assets/Textures/DirtGrass.jpg", L"./Assets/Textures/Pebbles.jpg");
+	terrain->SetColorTexes(L"./Assets/Textures/Terrain/Cliff.jpg", L"./Assets/Textures/Terrain/Grass_Hill.jpg", 
+		L"./Assets/Textures/Terrain/DirtGrass.jpg", L"./Assets/Textures/Terrain/Pebbles.jpg");
 
-	terrain->SetSplatMapTex(L"./Assets/Textures/splat.tga");
+	terrain->SetSplatMapTex(L"./Assets/Textures/Terrain/splat.tga");
 	terrain->SetMtlParameters(30.0f, 30.0f, D3DXCOLOR_WHITE, D3DXCOLOR_WHITE);
 	PerformanceTimer::End();
 }

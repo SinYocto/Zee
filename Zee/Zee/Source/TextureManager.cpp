@@ -14,8 +14,10 @@ Texture* TextureManager::GetOrCreateD3DTexture(const wchar_t* filePath)
 	}
 	else
 	{
+		_Assert(YFile::Exist(filePath));
+
 		resultTexture = New Texture();
-		resultTexture->CreateFromFile(filePath);	// TODO:文件不存在, 创建失败时
+		resultTexture->CreateFromFile(filePath);
 
 		mTextures[filePath] = resultTexture;
 	}

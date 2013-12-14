@@ -3,8 +3,12 @@
 
 #include "wx/wx.h"
 #include "wx/notebook.h"
+#include "wx/treectrl.h"
+#include "Gizmo.h"
 
-class SceneEditorPanel : public wxNotebook
+class Material;
+class SceneNode;
+class SceneEditorPanel : public wxNotebook , public IGizmoEventHandler
 {
 public:
 	enum
@@ -21,9 +25,13 @@ public:
 	SceneEditorPanel(wxWindow* parent, wxWindowID id = wxID_ANY, 
 		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 
-	void OnClose(wxCloseEvent& event);
-
 	void OnCreateScene();
+	void OnClose(wxCloseEvent& event);
+	void OnPageChanged(wxNotebookEvent& event);
+	void OnBitmapButton(wxCommandEvent& event);
+	void OnItemActivated(wxTreeEvent& event);
+
+	virtual void OnSelectNode(Gizmo* gizmo);
 
 	void CreateEditorPages();
 
@@ -36,6 +44,11 @@ private:
 
 private:
 	wxImageList* mIconList;
+
+	Material* mMtlEditoring;
+	int mMtlTexLayer;
+
+	SceneNode* mSceneNodeEditoring;
 };
 
 #endif

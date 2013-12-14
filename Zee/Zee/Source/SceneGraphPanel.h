@@ -44,6 +44,7 @@ public:
 		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 
 	void LoadDataFromScene();
+	void RefreshInspector();
 
 	DECLARE_EVENT_TABLE()
 
@@ -101,6 +102,8 @@ public:
 
 	void AttachSceneNode(SceneNode* sceneNode);
 	SceneNode* GetAttachedSceneNode();
+
+	void RefreshInspector();
 
 	virtual void OnTransformChanged(SceneNode* sceneNode);
 
@@ -198,6 +201,7 @@ public:
 		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 
 	void LoadDataFromSceneNode(SceneNode* sceneNode);
+	void OnBitmapButton(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 

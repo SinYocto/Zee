@@ -10,7 +10,7 @@ DirectionalLightNode::DirectionalLightNode(SceneNode* parent, DirectionalLight* 
 	mType = SCENE_NODE_DIR_LIGHT;
 	mBillboard = New Billboard();
 
-	mBillboard->SetTexture(L"./Assets/Textures/DirLight.jpg");
+	mBillboard->SetTexture(L"./Assets/Textures/Editor/DirLight.jpg");
 	mBillboard->SetColor(dirLight->GetFinalColor());
 
 	gEngine->GetResourceManager()->AddBillboard(mBillboard);

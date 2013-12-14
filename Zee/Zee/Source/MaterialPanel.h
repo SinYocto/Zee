@@ -33,6 +33,7 @@ public:
 		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 
 	void LoadDataFromScene();
+	void RefreshInspector();
 
 	DECLARE_EVENT_TABLE()
 
@@ -78,6 +79,8 @@ public:
 	void AttachMaterial(Material* mtl);
 	Material* GetAttachedMaterial();
 
+	void RefreshInspector();
+
 private:
 	void createWxCtrls();
 
@@ -113,6 +116,7 @@ public:
 	void OnChoice(wxCommandEvent& event);
 	void OnColorPick(wxColourPickerEvent& event);
 	void OnTextEnter(wxCommandEvent& event);
+	void OnBitmapButton(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 

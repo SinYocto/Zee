@@ -62,6 +62,10 @@ public:
 	DECLARE_EVENT_TABLE()
 
 private:
+	wxTreeItemId findItemByTexture(Texture* texture);		// 在整个tree中搜索
+	wxTreeItemId findItemByTexture(Texture* texture, wxTreeItemId item);	// 在item极其child中搜索
+
+private:
 	TextureInspectorPanel* mInspectorPanel;
 };
 

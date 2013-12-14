@@ -69,6 +69,12 @@ void MaterialPanel::appendMaterial(wxTreeItemId parentItemId, Material* material
 	mTreeCtrl->AppendItem(parentItemId, material->GetName(), 0, 0, New MaterialTreeItemData(material));
 }
 
+void MaterialPanel::RefreshInspector()
+{
+	if(mInspectorPanel)
+		mInspectorPanel->RefreshInspector();
+}
+
 MaterialTreeItemData::MaterialTreeItemData(Material* material)
 :mMaterial(material)
 {
@@ -100,7 +106,13 @@ void MaterialListTree::AttachInspectorPanel(MaterialInspectorPanel* inspectorPan
 
 void MaterialListTree::OnItemActivated(wxTreeEvent& event)
 {
+	MaterialTreeItemData* itemData = (MaterialTreeItemData*)GetItemData(event.GetItem());
 
+	Material* mtl = itemData->GetMaterial();
+
+	event.SetString(L"MaterialPanel");
+	event.SetClientData((void*)mtl);
+	event.Skip();
 }
 
 void MaterialListTree::OnItemSelected(wxTreeEvent& event)
@@ -149,10 +161,17 @@ Material* MaterialInspectorPanel::GetAttachedMaterial()
 	return mMaterial;
 }
 
+void MaterialInspectorPanel::RefreshInspector()
+{	
+	if(mMaterial)
+		mMaterialInfoPanel->LoadDataFromMaterial(mMaterial);
+}
+
 BEGIN_EVENT_TABLE(MaterialInfoPanel, wxPanel)
 EVT_CHOICE(wxID_ANY, MaterialInfoPanel::OnChoice)
 EVT_COLOURPICKER_CHANGED(wxID_ANY, MaterialInfoPanel::OnColorPick)
 EVT_TEXT_ENTER(wxID_ANY, MaterialInfoPanel::OnTextEnter)
+EVT_BUTTON(wxID_ANY, MaterialInfoPanel::OnBitmapButton)
 END_EVENT_TABLE()
 MaterialInfoPanel::MaterialInfoPanel( wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
 								   const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/ )
@@ -257,8 +276,8 @@ void MaterialInfoPanel::createWxCtrls()
 	fgSizer3->Add(textTex1, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 	fgSizer3->Add(mBitmapBtnTex1, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
 
-	mTex0 = New wxImagePanel(this, wxT("./Assets/Textures/cliff.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
-	mTex1 = New wxImagePanel(this, wxT("./Assets/Textures/cliff.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
+	mTex0 = New wxImagePanel(this, wxT("./Assets/Textures/black128x128.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
+	mTex1 = New wxImagePanel(this, wxT("./Assets/Textures/black128x128.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
 
 
 	boxSizer1->Add(fgSizer1, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
@@ -438,4 +457,33 @@ void MaterialInfoPanel::OnTextEnter( wxCommandEvent& event )
 	default:
 		_Assert(false);
 	}
+}
+
+void MaterialInfoPanel::OnBitmapButton(wxCommandEvent& event)
+{
+	MaterialInspectorPanel* inspectorPanel = (MaterialInspectorPanel*)GetParent();
+	Material* mtl = inspectorPanel->GetAttachedMaterial();
+
+	if(!mtl)
+		return;
+
+	wxBitmapButton* btnCtrl = (wxBitmapButton*)event.GetEventObject();
+
+	switch(btnCtrl->GetId())
+	{
+	case ID_BITMAP_BTN_TEX0:
+		event.SetInt(0);		// ´«texture layerË÷Òý
+		break;
+
+	case ID_BITMAP_BTN_TEX1:
+		event.SetInt(1);
+		break;
+
+	default:
+		_Assert(false);
+	}
+
+	event.SetString(L"MaterialPanel");
+	event.SetClientData((void*)mtl);
+	event.Skip();
 }

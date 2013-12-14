@@ -16,6 +16,7 @@ class SceneEditorFrame : public wxFrame
 		ID_About,
 		ID_TreeGenerator,
 		ID_OK,
+		ID_EDITOR_NOTEBOOK,
 	};
 
 public:

@@ -33,6 +33,10 @@ public:
 	static bool GetCurrentDirPath(wchar_t* curDirPath, int strSize);
 	static bool GetFullPath(wchar_t* fullPath, int fullPathSize, const wchar_t* relativePath = NULL);
 	static bool NormalizePath(wchar_t* path);
+	static void GetFileName(wchar_t* resultName, int size, const wchar_t* path, bool withSuffix = true);
+	static void GetFileNameWithoutSuffix(wchar_t* resultName, int size, const wchar_t* fileFullName);
+	static void GetFileSuffix(wchar_t* resultSuffix, int size, const wchar_t* path);
+	static void GetDirFiles(const wchar_t* path, const wchar_t* suffix, std::vector<std::wstring>& filesPathVec);
 
 private:
 	static int vsscanf(const char* str, const char* format, va_list argPtr);

@@ -155,4 +155,9 @@ Exit:
 	
 }
 
+bool YFile::Exist(const wchar_t* filePath)
+{
+	return (_waccess(filePath, 0) == 0);
+}
+
 

@@ -10,7 +10,7 @@ PointLightNode::PointLightNode(SceneNode* parent, PointLight* pointLight)
 	mType = SCENE_NODE_POINT_LIGHT;
 	mBillboard = New Billboard();		// TODO:没必要每个light一个billboard
 
-	mBillboard->SetTexture(L"./Assets/Textures/pointLight.jpg");
+	mBillboard->SetTexture(L"./Assets/Textures/Editor/pointLight.jpg");
 	mBillboard->SetColor(pointLight->GetFinalColor());
 
 	gEngine->GetResourceManager()->AddBillboard(mBillboard);

@@ -1,10 +1,4 @@
 #include "YString.h"
-#include "Utility.h"
-
-#include <stdio.h>
-#include <malloc.h>
-#include <string.h>
-#include <Windows.h>
 
 bool YString::isEmpty(wchar_t* str)
 {
@@ -269,4 +263,130 @@ bool YString::NormalizePath(wchar_t* path)
 	isSucceed = true;
 Exit:
 	return isSucceed;
+}
+
+// 得到一个路径对应的文件名
+// a/b.xx -> b或者b.xx
+void YString::GetFileName(wchar_t* resultName, int size, const wchar_t* path, bool withSuffix /*= true*/)
+{
+	wchar_t resultStr[MAX_STR_LEN];
+
+	wchar_t pathStr[MAX_PATH_LEN];
+	Copy(pathStr, _countof(pathStr), path);
+
+	NormalizePath(pathStr);
+
+	int resultPtrPos = 0;
+	int pathPtrPos = 0;
+	while(pathStr[pathPtrPos] != 0)
+	{
+		if(pathStr[pathPtrPos] != '/')
+		{
+			resultStr[resultPtrPos] = pathStr[pathPtrPos];
+			resultPtrPos++;
+		}
+		else
+		{
+			resultPtrPos = 0;
+		}
+
+		pathPtrPos++;
+	}
+
+	resultStr[resultPtrPos] = 0;
+
+	if(withSuffix)
+		YString::Copy(resultName, size, resultStr);
+	else
+		GetFileNameWithoutSuffix(resultName, size, resultStr);
+}
+
+// 得到一个文件的不包含后缀的文件名
+// a.xx -> a
+// a/b.xx -> a/b
+void YString::GetFileNameWithoutSuffix(wchar_t* resultName, int size, const wchar_t* fileFullName)
+{
+	wchar_t resultStr[MAX_STR_LEN];
+
+	int dotPos = 0;
+
+	int ptrPos = 0;
+	while(fileFullName[ptrPos] != 0)
+	{
+		if(fileFullName[ptrPos] == '.')
+			dotPos = ptrPos;
+
+		++ptrPos;
+	}
+
+	for(int i = 0; i < dotPos; ++i)
+	{
+		resultStr[i] = fileFullName[i];
+	}
+
+	resultStr[dotPos] = 0;
+
+	YString::Copy(resultName, size, resultStr);
+}
+
+void YString::GetFileSuffix(wchar_t* resultSuffix, int size, const wchar_t* path)
+{
+	wchar_t resultStr[MAX_STR_LEN];
+
+	int dotPos = 0;
+
+	int ptrPos = 0;
+	while(path[ptrPos] != 0)
+	{
+		if(path[ptrPos] == '.')
+			dotPos = ptrPos;
+
+		++ptrPos;
+	}
+
+	int i = dotPos + 1;
+	while(path[i] != 0)
+	{
+		resultStr[i - dotPos - 1] = path[i];
+		++i;
+	}
+
+	resultStr[i - dotPos - 1] = 0;
+
+	YString::Copy(resultSuffix, size, resultStr);
+}
+
+void YString::GetDirFiles(const wchar_t* dirPath, const wchar_t* suffix, std::vector<std::wstring>& filesPathVec)
+{
+	_wfinddata_t file;
+
+	wchar_t dir[MAX_PATH_LEN];
+	YString::Copy(dir, _countof(dir), dirPath);
+	YString::Concat(dir, _countof(dir), L"/*.*");
+
+	long handle = _wfindfirst(dir, &file);
+	int k = handle;
+
+	_wfindnext(handle, &file);
+	_wfindnext(handle, &file);
+
+	while(k != -1)
+	{
+		wchar_t fileSuffix[MAX_STR_LEN];
+		YString::GetFileSuffix(fileSuffix, _countof(fileSuffix), file.name);
+
+		if(YString::Compare(fileSuffix, suffix, true) == 0)
+		{
+			wchar_t filePath[MAX_PATH_LEN];
+			YString::Copy(filePath, _countof(filePath), dirPath);
+			YString::Concat(filePath, _countof(filePath), L"/");
+			YString::Concat(filePath, _countof(filePath), file.name);
+
+			filesPathVec.push_back(filePath);
+		}
+
+		k = _wfindnext(handle, &file);
+	}
+
+	_findclose(handle);
 }
