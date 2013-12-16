@@ -562,8 +562,8 @@ void TreeSegGeo::constructGeometryData(Quaternion orient, bool topPlane, bool bo
 	int numVerts = mSegmentsW * (mSegmentsH + 1) + 2;
 
 	// positionData
-	mPositionData.push_back(Vector3::Zero);
-	mPositionData.push_back(Vector3(0, mLength, 0));
+	mGeoData.posData.push_back(Vector3::Zero);
+	mGeoData.posData.push_back(Vector3(0, mLength, 0));
 
 	float heightDelta = mLength / mSegmentsH;
 	float deltaTheta = 2*PI / mSegmentsW;
@@ -581,15 +581,15 @@ void TreeSegGeo::constructGeometryData(Quaternion orient, bool topPlane, bool bo
 			if(i == 0)
 				vertPos = vertPos * orient.Conjugate();
 
-			mPositionData.push_back(vertPos);
+			mGeoData.posData.push_back(vertPos);
 		}
 	}
 
 	// verts
-	for(size_t i = 0; i < mPositionData.size(); ++i)
+	for(size_t i = 0; i < mGeoData.posData.size(); ++i)
 	{
-		Geometry::Vert vert(i);
-		mVerts.push_back(vert);
+		Vert vert(i);
+		mGeoData.verts.push_back(vert);
 	}
 
 	// triangles
@@ -598,8 +598,8 @@ void TreeSegGeo::constructGeometryData(Quaternion orient, bool topPlane, bool bo
 		for(int i = 0; i < mSegmentsW; ++i)		// 底圆面
 		{
 			// 顶点索引为2 ~ sw+1
-			Geometry::Triangle triangle(0, 2+i, 2 + (i + 1) % mSegmentsW);
-			mTriangles.push_back(triangle);
+			Triangle triangle(0, 2+i, 2 + (i + 1) % mSegmentsW);
+			mGeoData.tris.push_back(triangle);
 		}
 	}
 
@@ -608,8 +608,8 @@ void TreeSegGeo::constructGeometryData(Quaternion orient, bool topPlane, bool bo
 		for(int i = 0; i < mSegmentsW; ++i)		// 顶圆面
 		{
 			// 顶点索引为sw*sh + 2 ~ sw*(sh + 1) + 1
-			Geometry::Triangle triangle(1, mSegmentsW*mSegmentsH + 2 + (i + 1) % mSegmentsW, mSegmentsW*mSegmentsH + 2 + i);
-			mTriangles.push_back(triangle);
+			Triangle triangle(1, mSegmentsW*mSegmentsH + 2 + (i + 1) % mSegmentsW, mSegmentsW*mSegmentsH + 2 + i);
+			mGeoData.tris.push_back(triangle);
 		}
 	}
 
@@ -617,8 +617,8 @@ void TreeSegGeo::constructGeometryData(Quaternion orient, bool topPlane, bool bo
 	{
 		for(int j = 0; j < mSegmentsW; ++j)		
 		{
-			Geometry::Triangle tri1;
-			Geometry::Triangle tri2;
+			Triangle tri1;
+			Triangle tri2;
 
 			tri1.vertexIndex[0] = mSegmentsW * i + j + 2;
 			tri1.vertexIndex[1] = mSegmentsW * (i + 1) + j + 2;
@@ -636,8 +636,8 @@ void TreeSegGeo::constructGeometryData(Quaternion orient, bool topPlane, bool bo
 			_Assert(tri2.vertexIndex[1] < mSegmentsW * (mSegmentsH + 1) + 2);
 			_Assert(tri2.vertexIndex[2] < mSegmentsW * (mSegmentsH + 1) + 2);
 
-			mTriangles.push_back(tri1);
-			mTriangles.push_back(tri2);
+			mGeoData.tris.push_back(tri1);
+			mGeoData.tris.push_back(tri2);
 		}
 	}
 }

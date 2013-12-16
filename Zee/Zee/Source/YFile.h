@@ -12,6 +12,7 @@ public:
 		READ,
 		READ_BINARY,
 		WRITE,
+		WRITE_BINARY,
 		APPEND,
 	};
 
@@ -30,6 +31,7 @@ public:
 		const wchar_t* endSpecifier = NULL, const wchar_t* firstLineContent = NULL);
 
 	int WriteLine(const wchar_t* format, ...);
+	int Write(const void* ptr, int size, int count);
 
 	static bool Exist(const wchar_t* filePath);
 

@@ -46,4 +46,10 @@
 #define MAX_STR_LEN 1024
 #define MAX_PATH_LEN 1024
 
+template<class _Type>
+void ZeroStruct(_Type& refObj)
+{
+	::memset((void*)&refObj, 0, sizeof(_Type));
+}
+
 #endif

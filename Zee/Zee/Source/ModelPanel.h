@@ -56,6 +56,8 @@ public:
 		const wxPoint& pos = wxDefaultPosition, const wxSize&size = wxDefaultSize, long style = wxTR_DEFAULT_STYLE);
 
 	void OnItemSelected(wxTreeEvent& event);
+	void OnBeginDrag(wxTreeEvent& event);
+	void OnEndDrag(wxTreeEvent& event);
 
 	void AttachInspectorPanel(ModelInspectorPanel* inspectorPanel);
 

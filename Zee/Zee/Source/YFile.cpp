@@ -21,6 +21,9 @@ YFile* YFile::Open(const wchar_t* filePath, OPEN_MODE mode)
 	case WRITE:
 		_wfopen_s(&file->pFile, filePath, L"w");
 		break;
+	case WRITE_BINARY:
+		_wfopen_s(&file->pFile, filePath, L"wb");
+		break;
 	case APPEND:
 		_wfopen_s(&file->pFile, filePath, L"a");
 		break;
@@ -158,6 +161,11 @@ Exit:
 bool YFile::Exist(const wchar_t* filePath)
 {
 	return (_waccess(filePath, 0) == 0);
+}
+
+int YFile::Write(const void* ptr, int size, int count)
+{
+	return fwrite(ptr, size, count, pFile);
 }
 
 

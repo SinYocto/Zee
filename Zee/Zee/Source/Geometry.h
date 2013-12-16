@@ -17,58 +17,90 @@
 // 这样对于任意一个面, 独立使用各项数据的index来构建总的顶点数据, 优点是节省了单个data数组的空间, 
 // 但增加了最终构建的顶点数据占用的空间大小(最终构建的顶点数为3*numTrianges, 无需indexData, index为0, 1, 2, 3, 4, 5, ...)
 
+enum
+{
+	INVALID_INDEX = -1,
+	NO_GROUP = -1,
+};
+
+struct Vert			// Vert结构保存的是各个数据项的在相应data中的索引
+{
+	Vert(int _posIndex = INVALID_INDEX, int _uvIndex = INVALID_INDEX, int _normalIndex = INVALID_INDEX, 
+		int _tangentIndex = INVALID_INDEX, int _bitangentIndex = INVALID_INDEX)
+		:posIndex(_posIndex)
+		,uvIndex(_uvIndex)
+		,normalIndex(_normalIndex)
+		,tangentIndex(_tangentIndex)
+		,bitangentIndex(_bitangentIndex)
+	{
+
+	}
+
+	int posIndex;
+	int uvIndex;
+	int normalIndex;
+	int tangentIndex;
+	int bitangentIndex;
+};
+
+struct Triangle		// Triangle保存三个顶点在Verts中的索引
+{
+	Triangle(int vertIndex0 = 0, int vertIndex1 = 0, int vertIndex2 = 0)
+	{
+		vertexIndex[0] = vertIndex0;
+		vertexIndex[1] = vertIndex1;
+		vertexIndex[2] = vertIndex2;
+	}
+
+	int vertexIndex[3];
+};
+typedef std::vector<Triangle> TriangleList;
+
+struct DataTest
+{
+	int ival;
+	std::vector<int> iarray;
+};
+
+struct GeometryDataHeader
+{	
+	int posDataSize;
+	int uvDataSize;
+	int normalDataSize;
+	int tangentDataSize;
+	int bitangentDataSize;
+
+	int numVerts;
+	int numTris;
+
+	int reserved[9];
+};
+
+struct GeometryData
+{
+	std::vector<Vector3> posData;
+	std::vector<Vector2> uvData;
+	std::vector<Vector3> normalData;
+	std::vector<Vector3> tangentData; 
+	std::vector<Vector3> bitangentData;
+
+	std::vector<Vert> verts;
+	std::vector<Triangle> tris;
+};
+
+
 class AABBox;
 
 class Geometry : public IReferenceCounted
 {
-public:
-	struct Vert			// Vert结构保存的是各个数据项的在相应data中的索引
-	{
-		Vert(int _posIndex = INVALID_INDEX, int _uvIndex = INVALID_INDEX, int _normalIndex = INVALID_INDEX, 
-			int _tangentIndex = INVALID_INDEX, int _bitangentIndex = INVALID_INDEX)
-			:posIndex(_posIndex)
-			,uvIndex(_uvIndex)
-			,normalIndex(_normalIndex)
-			,tangentIndex(_tangentIndex)
-			,bitangentIndex(_bitangentIndex)
-		{
-
-		}
-
-		int posIndex;
-		int uvIndex;
-		int normalIndex;
-		int tangentIndex;
-		int bitangentIndex;
-	};
-
-	struct Triangle		// Triangle保存三个顶点在Verts中的索引
-	{
-		Triangle(int vertIndex0 = 0, int vertIndex1 = 0, int vertIndex2 = 0)
-		{
-			vertexIndex[0] = vertIndex0;
-			vertexIndex[1] = vertIndex1;
-			vertexIndex[2] = vertIndex2;
-		}
-
-		int vertexIndex[3];
-	};
-	typedef std::vector<Triangle> TriangleList;
-
 private:
-	enum
-	{
-		INVALID_INDEX = -1,
-		NO_GROUP = -1,
-	};
-
 	typedef std::map<Vector3, std::vector<int>, Vector3::Comparer> VertexTrianglesMap;		// vertPos -> triListByID
 
 	typedef std::map<int, int> TriangleSmoothGroupMap;		// triID -> sgID
 	typedef std::vector<int> TriIDList;
 
 public:
-	Geometry(const wchar_t* name);
+	Geometry(const wchar_t* name, const wchar_t* filePath = NULL);
 
 	~Geometry()
 	{
@@ -107,6 +139,9 @@ public:
 	void CalcDynamicAABBox(const D3DXMATRIX& matWorld, AABBox* box);
 
 	void Draw();
+
+	void SaveToFile(const wchar_t* dirPath);
+	void LoadDataFromFile(const wchar_t* filePath);
 
 protected:
 	virtual void constructGeometryData() {}
@@ -148,16 +183,13 @@ private:
 
 	void calculateAABBox();
 
+	bool hasUVData();
+	bool hasNormalData();
+	bool hasTBNData();
+
 public:
 	// TODO:OBJParser要更改这些数据, 暂时设为public
-	std::vector<Vector3> mPositionData;
-	std::vector<Vector2> mUVData;
-	std::vector<Vector3> mNormalData;
-	std::vector<Vector3> mTangentData; 
-	std::vector<Vector3> mBitangentData;
-
-	std::vector<Vert> mVerts;
-	TriangleList mTriangles;
+	GeometryData mGeoData;
 
 protected:
 	DWORD mID;
@@ -172,6 +204,5 @@ private:
 
 	AABBox mAABBox;
 };
-
 
 #endif

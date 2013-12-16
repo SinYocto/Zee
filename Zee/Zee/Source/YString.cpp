@@ -113,6 +113,16 @@ Exit:
 	return false;
 }
 
+bool YString::Concat(wchar_t* destStr, int destStrSize, const wchar_t* srcStr1, const wchar_t* srcStr2)
+{
+	Assert(Concat(destStr, destStrSize, srcStr1));
+	Assert(Concat(destStr, destStrSize, srcStr2));
+
+	return true;
+Exit:
+	return false;
+}
+
 bool YString::GetSpecifier(char* specifier, int specifierSize, const char* str)
 {
 	Assert(NULL != str);

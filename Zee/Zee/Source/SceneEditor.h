@@ -92,4 +92,17 @@ private:
 	DECLARE_EVENT_TABLE()
 };
 
+//class ModelDropTarget : public wxDropTarget
+//{
+//public:
+//	ModelDropTarget(SceneEditorCanvas* canvas);
+//
+//	virtual wxDragResult OnEnter(wxCoord x, wxCoord y, wxDragResult def);
+//	virtual void OnLeave();
+//	virtual wxDragResult OnData(wxCoord x, wxCoord y, wxDragResult def);
+//
+//private:
+//	SceneEditorCanvas* mCanvas;
+//};
+
 #endif

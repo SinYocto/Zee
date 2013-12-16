@@ -276,8 +276,8 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 					}
 					else
 					{
-						curGeoPosIndex = (*curGeo)->mPositionData.size();
-						(*curGeo)->mPositionData.push_back(mPosData[posIndex[i]]);
+						curGeoPosIndex = (*curGeo)->mGeoData.posData.size();
+						(*curGeo)->mGeoData.posData.push_back(mPosData[posIndex[i]]);
 						posIndexMap[posIndex[i]] = curGeoPosIndex;
 					}
 
@@ -293,8 +293,8 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 						}
 						else
 						{
-							curGeoUVIndex = (*curGeo)->mUVData.size();
-							(*curGeo)->mUVData.push_back(uvData[uvIndex[i]]);
+							curGeoUVIndex = (*curGeo)->mGeoData.uvData.size();
+							(*curGeo)->mGeoData.uvData.push_back(uvData[uvIndex[i]]);
 							uvIndexMap[uvIndex[i]] = curGeoUVIndex;
 						}
 					}
@@ -311,17 +311,17 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 						}
 						else
 						{
-							curGeoNormalIndex = (*curGeo)->mNormalData.size();
-							(*curGeo)->mNormalData.push_back(normalData[normalIndex[i]]);
+							curGeoNormalIndex = (*curGeo)->mGeoData.normalData.size();
+							(*curGeo)->mGeoData.normalData.push_back(normalData[normalIndex[i]]);
 							normalIndexMap[normalIndex[i]] = curGeoNormalIndex;
 						}
 					}
 
 					// 查找tri的vert是否是已经加入到verts中的重复vert
 					bool isVertExist = false;
-					for(size_t k = 0; k < (*curGeo)->mVerts.size(); ++k)
+					for(size_t k = 0; k < (*curGeo)->mGeoData.verts.size(); ++k)
 					{
-						Geometry::Vert& vert = (*curGeo)->mVerts[k];
+						Vert& vert = (*curGeo)->mGeoData.verts[k];
 
 						if(vert.posIndex != curGeoPosIndex)
 							continue;
@@ -339,26 +339,26 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 
 					if(!isVertExist)
 					{
-						curVertIndex = (*curGeo)->mVerts.size();
+						curVertIndex = (*curGeo)->mGeoData.verts.size();
 
-						Geometry::Vert vert(curGeoPosIndex, curGeoUVIndex, curGeoNormalIndex);
-						(*curGeo)->mVerts.push_back(vert);
+						Vert vert(curGeoPosIndex, curGeoUVIndex, curGeoNormalIndex);
+						(*curGeo)->mGeoData.verts.push_back(vert);
 					}
 				}
 
-				Geometry::Triangle tri1;
+				Triangle tri1;
 				tri1.vertexIndex[0] = vertIndex[0];
 				tri1.vertexIndex[1] = vertIndex[1];
 				tri1.vertexIndex[2] = vertIndex[2];
-				(*curGeo)->mTriangles.push_back(tri1);
+				(*curGeo)->mGeoData.tris.push_back(tri1);
 
 				if(vertIndex[3] != -1)
 				{
-					Geometry::Triangle tri2;
+					Triangle tri2;
 					tri2.vertexIndex[0] = vertIndex[0];
 					tri2.vertexIndex[1] = vertIndex[2];
 					tri2.vertexIndex[2] = vertIndex[3];
-					(*curGeo)->mTriangles.push_back(tri2);
+					(*curGeo)->mGeoData.tris.push_back(tri2);
 				}
 
 				break;

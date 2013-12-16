@@ -17,7 +17,7 @@ void Cube::constructGeometryData()
 	pos[7] = Vector3( halfSize, -halfSize, -halfSize);
 
 	for(int i = 0; i < 8; ++i)
-		mPositionData.push_back(pos[i]);
+		mGeoData.posData.push_back(pos[i]);
 
 	// uvData
 	Vector2 uv[4];
@@ -27,10 +27,10 @@ void Cube::constructGeometryData()
 	uv[3] = Vector2(1, 1);
 
 	for(int i = 0; i < 4; ++i)
-		mUVData.push_back(uv[i]);
+		mGeoData.uvData.push_back(uv[i]);
 
 	// verts
-	Geometry::Vert geoVerts[24];
+	Vert geoVerts[24];
 	geoVerts[0] = Vert(0, 0);
 	geoVerts[1] = Vert(1, 1);
 	geoVerts[2] = Vert(2, 2);
@@ -62,10 +62,10 @@ void Cube::constructGeometryData()
 	geoVerts[23] = Vert(5, 3);
 
 	for(int i = 0; i < 24; ++i)
-		mVerts.push_back(geoVerts[i]);
+		mGeoData.verts.push_back(geoVerts[i]);
 
 	// triangles
-	Geometry::Triangle triangles[12];
+	Triangle triangles[12];
 	triangles[0] = Triangle(0, 1, 2);
 	triangles[1] = Triangle(2, 1, 3);
 
@@ -85,7 +85,7 @@ void Cube::constructGeometryData()
 	triangles[11] = Triangle(22, 21, 23);
 
 	for(int i = 0; i < 12; ++i)
-		mTriangles.push_back(triangles[i]);
+		mGeoData.tris.push_back(triangles[i]);
 }
 
 void Cylinder::constructGeometryData()
@@ -93,8 +93,8 @@ void Cylinder::constructGeometryData()
 	int numVerts = segmentsW * (segmentsH + 1) + 2;
 
 	// positionData
-	mPositionData.push_back(Vector3::Zero);
-	mPositionData.push_back(Vector3(0, height, 0));
+	mGeoData.posData.push_back(Vector3::Zero);
+	mGeoData.posData.push_back(Vector3(0, height, 0));
 
 	float heightDelta = height / segmentsH;
 	float radiusDelta = (topRadius - bottomRadius) / segmentsH;
@@ -109,38 +109,38 @@ void Cylinder::constructGeometryData()
 			float x = circleRadius * cos(j*deltaTheta);
 			float z = circleRadius * sin(j*deltaTheta);
 
-			mPositionData.push_back(Vector3(x, circleHeight, z));
+			mGeoData.posData.push_back(Vector3(x, circleHeight, z));
 		}
 	}
 
 	// verts
-	for(size_t i = 0; i < mPositionData.size(); ++i)
+	for(size_t i = 0; i < mGeoData.posData.size(); ++i)
 	{
-		Geometry::Vert vert(i);
-		mVerts.push_back(vert);
+		Vert vert(i);
+		mGeoData.verts.push_back(vert);
 	}
 
 	// triangles
 	for(int i = 0; i < segmentsW; ++i)		// 底圆面
 	{
 		// 顶点索引为2 ~ sw+1
-		Geometry::Triangle triangle(0, 2+i, 2 + (i + 1) % segmentsW);
-		mTriangles.push_back(triangle);
+		Triangle triangle(0, 2+i, 2 + (i + 1) % segmentsW);
+		mGeoData.tris.push_back(triangle);
 	}
 
 	for(int i = 0; i < segmentsW; ++i)		// 顶圆面
 	{
 		// 顶点索引为sw*sh + 2 ~ sw*(sh + 1) + 1
-		Geometry::Triangle triangle(1, segmentsW*segmentsH + 2 + (i + 1) % segmentsW, segmentsW*segmentsH + 2 + i);
-		mTriangles.push_back(triangle);
+		Triangle triangle(1, segmentsW*segmentsH + 2 + (i + 1) % segmentsW, segmentsW*segmentsH + 2 + i);
+		mGeoData.tris.push_back(triangle);
 	}
 
 	for(int i = 0; i < segmentsH; ++i)		// 柱面
 	{
 		for(int j = 0; j < segmentsW; ++j)		
 		{
-			Geometry::Triangle tri1;
-			Geometry::Triangle tri2;
+			Triangle tri1;
+			Triangle tri2;
 
 			tri1.vertexIndex[0] = segmentsW * i + j + 2;
 			tri1.vertexIndex[1] = segmentsW * (i + 1) + j + 2;
@@ -158,8 +158,8 @@ void Cylinder::constructGeometryData()
 			_Assert(tri2.vertexIndex[1] < segmentsW * (segmentsH + 1) + 2);
 			_Assert(tri2.vertexIndex[2] < segmentsW * (segmentsH + 1) + 2);
 
-			mTriangles.push_back(tri1);
-			mTriangles.push_back(tri2);
+			mGeoData.tris.push_back(tri1);
+			mGeoData.tris.push_back(tri2);
 		}
 	}
 }
@@ -235,15 +235,15 @@ void Torus::constructGeometryData()
 			float y = mTubeRadius * sin(thetaT);
 			float z = (mRadius + mTubeRadius * cos(thetaT)) * sin(thetaR);
 
-			mPositionData.push_back(Vector3(x, y, z));
+			mGeoData.posData.push_back(Vector3(x, y, z));
 		}
 	}
 
 	// verts
-	for(size_t i = 0; i < mPositionData.size(); ++i)
+	for(size_t i = 0; i < mGeoData.posData.size(); ++i)
 	{
-		Geometry::Vert vert(i);
-		mVerts.push_back(vert);
+		Vert vert(i);
+		mGeoData.verts.push_back(vert);
 	}
 
 	// triangles
@@ -251,8 +251,8 @@ void Torus::constructGeometryData()
 	{
 		for(int j = 0; j < mSegmentsT; ++j)		
 		{
-			Geometry::Triangle tri1;
-			Geometry::Triangle tri2;
+			Triangle tri1;
+			Triangle tri2;
 
 			tri1.vertexIndex[0] = mSegmentsT * i + j;
 			tri1.vertexIndex[1] = mSegmentsT * i + (j + 1) % mSegmentsT;
@@ -270,8 +270,8 @@ void Torus::constructGeometryData()
 			_Assert(tri2.vertexIndex[1] < mSegmentsR * mSegmentsT);
 			_Assert(tri2.vertexIndex[2] < mSegmentsR * mSegmentsT);
 
-			mTriangles.push_back(tri1);
-			mTriangles.push_back(tri2);
+			mGeoData.tris.push_back(tri1);
+			mGeoData.tris.push_back(tri2);
 		}
 	}
 }

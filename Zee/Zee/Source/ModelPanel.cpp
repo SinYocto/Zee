@@ -90,6 +90,8 @@ Model* ModelTreeItemData::GetModel()
 
 BEGIN_EVENT_TABLE(ModelListTree, wxTreeCtrl)
 EVT_TREE_SEL_CHANGED(ID_MODELLIST_TREE, ModelListTree::OnItemSelected)
+EVT_TREE_BEGIN_DRAG(ID_MODELLIST_TREE, ModelListTree::OnBeginDrag)
+EVT_TREE_END_DRAG(ID_MODELLIST_TREE, ModelListTree::OnEndDrag)
 END_EVENT_TABLE()
 ModelListTree::ModelListTree( wxWindow* parent, wxWindowID id /*= wxID_ANY*/, const wxPoint& pos /*= wxDefaultPosition*/, 
 							 const wxSize&size /*= wxDefaultSize*/, long style /*= wxTR_DEFAULT_STYLE*/ )
@@ -110,6 +112,21 @@ void ModelListTree::OnItemSelected(wxTreeEvent& event)
 
 	mInspectorPanel->AttachModel(model);
 	mInspectorPanel->GetModelPreviewCanvas()->SetPreviewModel(model);
+}
+
+void ModelListTree::OnBeginDrag(wxTreeEvent& event)
+{
+	ModelTreeItemData* itemData = (ModelTreeItemData*)GetItemData(event.GetItem());
+	Model* model = itemData->GetModel();
+
+	//event.Allow();
+
+}
+
+void ModelListTree::OnEndDrag( wxTreeEvent& event )
+{
+	mInspectorPanel;
+
 }
 
 BEGIN_EVENT_TABLE(ModelInspectorPanel, wxScrolledWindow)

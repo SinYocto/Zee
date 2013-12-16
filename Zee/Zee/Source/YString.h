@@ -17,6 +17,7 @@ public:
 
 	static bool Concat(char* destStr, int destStrSize, const char* srcStr);
 	static bool Concat(wchar_t* destStr, int destStrSize, const wchar_t* srcStr);
+	static bool Concat(wchar_t* destStr, int destStrSize, const wchar_t* srcStr1, const wchar_t* srcStr2);
 
 	static bool GetSpecifier(char* specifier, int specifierSize, const char* str);
 	static bool GetSpecifier(wchar_t* specifier, int specifierSize, const wchar_t* str);

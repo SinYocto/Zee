@@ -228,29 +228,15 @@ void CreateScene()
 	// geo
 	GeometryManager* geometryMgr = gEngine->GetGeometryManager();
 
-	Cube* cubeGeo = New Cube(L"cubeGeo");
+	Geometry* cubeGeo = New Geometry(L"cubeGeo", L"Assets/Geometries/defaultCube.geo");
+	Geometry* coneGeo = New Geometry(L"coneGeo", L"Assets/Geometries/defaultCone.geo");
+	Geometry* cylinderGeo = New Geometry(L"cylinderGeo", L"Assets/Geometries/defaultCylinder.geo");
+	Geometry* torusGeo = New Geometry(L"torusGeo", L"Assets/Geometries/defaultTorus.geo");
+
 	geometryMgr->AddGeometry(cubeGeo);
-
-	cubeGeo->CalculateTBN();
-	cubeGeo->BuildGeometry(XYZ_UV_TBN);
-
-	Cylinder* coneGeo = New Cylinder(L"coneGeo", 0, 0.5f, 2.0f);
 	geometryMgr->AddGeometry(coneGeo);
-
-	coneGeo->CalculateNormals();
-	coneGeo->BuildGeometry(XYZ_N);
-
-	Cylinder* cylinderGeo = New Cylinder(L"cylinderGeo", 0.5f, 0.5f, 2.0f);
 	geometryMgr->AddGeometry(cylinderGeo);
-
-	cylinderGeo->CalculateNormals();
-	cylinderGeo->BuildGeometry(XYZ_N);
-
-	Torus* torusGeo = New Torus(L"torusGeo", 1.0f, 0.025f, 32, 8);
 	geometryMgr->AddGeometry(torusGeo);
-
-	torusGeo->CalculateNormals();
-	torusGeo->BuildGeometry(XYZ_N);
 
 	// textures
 	TextureManager* textureMgr = gEngine->GetTextureManger();
@@ -529,7 +515,7 @@ void SceneEditorToolBar::OnToolRotateClicked( wxCommandEvent& event )
 void SceneEditorToolBar::OnToolScaleClicked( wxCommandEvent& event )
 {
 	gEngine->GetGizmo()->SetActiveType(Gizmo::GIZMO_SCALE);
-}
+} 
 
 void SceneEditorToolBar::OnToolRadioButtonGlobal(wxCommandEvent& event)
 {
@@ -540,3 +526,9 @@ void SceneEditorToolBar::OnToolRadioButtonLocal(wxCommandEvent& event)
 {
 	gEngine->GetGizmo()->SetCoordinateType(Gizmo::COORDINATE_LOCAL);
 }
+
+//ModelDropTarget::ModelDropTarget( SceneEditorCanvas* canvas )
+//:wxDropTarget()
+//{
+//	
+//}
