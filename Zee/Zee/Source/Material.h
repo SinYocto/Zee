@@ -12,48 +12,51 @@ class Object;
 class Texture;
 class Geometry;
 
+struct MaterialData
+{
+	MaterialData()
+		:shadingMethod(InvalidMethod)
+		,ambientColor(D3DXCOLOR_WHITE)
+		,diffColor(D3DXCOLOR_WHITE)
+		,specColor(D3DXCOLOR_WHITE)
+		,shiness(1.0f)
+		,gloss(50.0f)
+		,tilesU(1.0f)
+		,tilesV(1.0f)
+		,offsetU(0)
+		,offsetV(0)
+	{
+		for(int i = 0; i < MAX_MATERIAL_TEXTURE_LAYERS; ++i)
+		{
+			YString::Empty(texFilesPath[i]);
+		}
+	}
+
+	ShadingMethod shadingMethod;
+
+	D3DXCOLOR ambientColor;
+	D3DXCOLOR diffColor;
+	D3DXCOLOR specColor;
+
+	float gloss;
+	float shiness;
+
+	float tilesU;
+	float tilesV;
+
+	float offsetU;
+	float offsetV;
+
+	wchar_t texFilesPath[MAX_MATERIAL_TEXTURE_LAYERS][MAX_PATH_LEN];
+};
+
 class Material : public IReferenceCounted
 {
 public:
-	Material(const wchar_t* name);
+	Material(const wchar_t* name, const wchar_t* filePath = NULL);
+	Material(const Material& mtl);		// 用于复制一个临时使用的mtl, 不纳入manager管理, 不关心id和name
 
-	Material(const Material& mtl)		// 用于复制一个临时使用的mtl, 不纳入manager管理, 不关心id和name
-		:mAmbientColor(mtl.mAmbientColor)
-		,mDiffuseColor(mtl.mDiffuseColor)
-		,mSpecularColor(mtl.mSpecularColor)
-		,mShiness(mtl.mShiness)
-		,mGloss(mtl.mGloss)
-		,mTilesU(mtl.mTilesU)
-		,mTilesV(mtl.mTilesV)
-		,mOffsetU(mtl.mOffsetU)
-		,mOffsetV(mtl.mOffsetV)
-		,mParamsVec1(mtl.mParamsVec1)
-		,mParamsVec2(mtl.mParamsVec2)
-		,mShader(NULL)
-		,mShadingMethod(mtl.mShadingMethod)
-	{
-		YString::Copy(mName, _countof(mName), L"clone");
-
-		SetShader(mShadingMethod);
-
-		for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
-		{
-			mTextureLayer[layerIx] = mtl.mTextureLayer[layerIx];
-
-			if(mTextureLayer[layerIx])
-				mTextureLayer[layerIx]->Grab();
-		}
-	}
-
-	~Material()
-	{
-		for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
-		{
-			SAFE_DROP(mTextureLayer[layerIx]);
-		}
-
-		SAFE_DROP(mShader);
-	}
+	~Material();
 
 	wchar_t* GetName();
 	void SetID(DWORD id);
@@ -98,6 +101,9 @@ public:
 
 	void Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera, bool isStandAlone = false);
 
+	void SaveToFile(const wchar_t* dirPath);
+	void LoadDataFromFile(const wchar_t* filePath);
+
 public:
 	IShader* mShader;
 
@@ -105,24 +111,12 @@ private:
 	DWORD mID;
 	wchar_t mName[MAX_STR_LEN];
 
-	D3DXCOLOR mAmbientColor;
-	D3DXCOLOR mDiffuseColor;
-	D3DXCOLOR mSpecularColor;
-	float mGloss;
-	float mShiness;
-	
-	float mTilesU;
-	float mTilesV;
-
-	float mOffsetU;
-	float mOffsetV;
+	MaterialData mMtlData;
 
 	Vector4 mParamsVec1;
 	Vector4 mParamsVec2;
 	
 	Texture* mTextureLayer[MAX_MATERIAL_TEXTURE_LAYERS];
-
-	ShadingMethod mShadingMethod;
 };
 
 #endif

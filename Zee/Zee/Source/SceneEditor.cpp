@@ -252,13 +252,15 @@ void CreateScene()
 	// material
 	MaterialManager* materialMgr = gEngine->GetMaterialManager();
 
-	Material* mtlBump = New Material(L"mtl1");
+	Material* mtlBump = New Material(L"mtlBump", L"Assets/Materials/bump.material");
 	materialMgr->AddMaterial(mtlBump);
 
-	mtlBump->SetShader(BumpSpecular);
-	//mtlBump->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
-	//mtlBump->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
-	mtlBump->mShader->SetSpecShiness(0.4f);
+	//mtlBump->SetShader(BumpSpecular);
+	////mtlBump->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
+	////mtlBump->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
+	//mtlBump->mShader->SetSpecShiness(0.4f);
+
+	//mtlBump->SaveToFile(L"Assets/Materials");
 
 	Material* mtlDiff = New Material(L"mtlDiff");
 	materialMgr->AddMaterial(mtlDiff);
