@@ -53,14 +53,13 @@ void MaterialPanel::createWxCtrls()
 void MaterialPanel::LoadDataFromScene()
 {
 	MaterialManager* materialMgr = gEngine->GetMaterialManager();
-	std::list<Material*> materialList = materialMgr->GetMaterialList();
+	MtlHashMap materials = materialMgr->GetMtlHashMap();
 
 	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, New MaterialTreeItemData(NULL));
 
-	for(std::list<Material*>::iterator iter = materialList.begin(); iter != materialList.end(); ++iter)
+	for(MtlHashMap::iterator iter = materials.begin(); iter != materials.end(); ++iter)
 	{
-		Material* mtl = *iter;
-		appendMaterial(rootId, mtl);
+		appendMaterial(rootId, iter->second);
 	}
 }
 

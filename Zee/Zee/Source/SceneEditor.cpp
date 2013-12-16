@@ -246,62 +246,38 @@ void CreateScene()
 
 	for(std::vector<std::wstring>::iterator iter = filesVec.begin(); iter != filesVec.end(); ++iter)
 	{
-		textureMgr->GetOrCreateD3DTexture((*iter).c_str());
+		textureMgr->GetOrCreateTexture((*iter).c_str());
 	}
 
 	// material
 	MaterialManager* materialMgr = gEngine->GetMaterialManager();
 
+	Material* mtlFlat = New Material(L"mtlFlat", L"Assets/Materials/flat.material");
+	Material* mtlView = New Material(L"mtlView", L"Assets/Materials/view.material");
+	Material* mtlDiff = New Material(L"mtlDiff", L"Assets/Materials/diff.material");
+	Material* mtlSpec = New Material(L"mtlSpec", L"Assets/Materials/spec.material");
 	Material* mtlBump = New Material(L"mtlBump", L"Assets/Materials/bump.material");
+
+	materialMgr->AddMaterial(mtlFlat);
+	materialMgr->AddMaterial(mtlView);
+	materialMgr->AddMaterial(mtlDiff);
+	materialMgr->AddMaterial(mtlSpec);
 	materialMgr->AddMaterial(mtlBump);
 
-	//mtlBump->SetShader(BumpSpecular);
-	////mtlBump->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
-	////mtlBump->mShader->SetNormalTex(L"./Assets/Textures/6133Normal.jpg");
-	//mtlBump->mShader->SetSpecShiness(0.4f);
-
-	//mtlBump->SaveToFile(L"Assets/Materials");
-
-	Material* mtlDiff = New Material(L"mtlDiff");
-	materialMgr->AddMaterial(mtlDiff);
-
-	mtlDiff->SetShader(Diffuse);
-	mtlDiff->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
-
-	Material* mtlSpec = New Material(L"mtlSpec");
-	materialMgr->AddMaterial(mtlSpec);
-
-	mtlSpec->SetShader(Specular);
-	mtlSpec->mShader->SetColorTex(L"./Assets/Textures/6133.jpg");
-	mtlSpec->mShader->SetSpecShiness(0.4f);
-
-	Material* mtlView = New Material(L"mtlView");
-	materialMgr->AddMaterial(mtlView);
-
-	mtlView->SetShader(View);
-	mtlView->SetDiffuseColor(D3DXCOLOR_RED);
-
-	Material* mtlFlat = New Material(L"mtlFlat");
-	materialMgr->AddMaterial(mtlFlat);
-
-	mtlFlat->SetShader(Flat);
-	mtlFlat->SetDiffuseColor(D3DXCOLOR_GREEN);
-
 	// model
-	ModelNode* cube = New ModelNode(L"cube", NULL, cubeGeo, mtlBump);
+	ModelNode* cube = New ModelNode(L"cube", NULL, new Model(L"cube", L"Assets/Models/cube.model"));	
+	ModelNode* cylinder = New ModelNode(L"cylinder", NULL, new Model(L"cylinder", L"Assets/Models/cylinder.model"));	
+	ModelNode* cone = New ModelNode(L"cone", NULL, new Model(L"cone", L"Assets/Models/cone.model"));	
+	ModelNode* torus = New ModelNode(L"torus", NULL, new Model(L"torus", L"Assets/Models/torus.model"));	
+
 	sceneMgr->AddSceneNode(cube);
-	cube->Translate(2, 0, 0);
-
-	ModelNode* cylinder = New ModelNode(L"cylinder", NULL, cylinderGeo, mtlBump);
 	sceneMgr->AddSceneNode(cylinder);
-	cylinder->Translate(-2, 0, 0);
-
-	ModelNode* cone = New ModelNode(L"cone", NULL, coneGeo, mtlView);
 	sceneMgr->AddSceneNode(cone);
-	cone->Translate(0, 0, -2);
-
-	ModelNode* torus = New ModelNode(L"torus", NULL, torusGeo, mtlFlat);
 	sceneMgr->AddSceneNode(torus);
+
+	cube->Translate(2, 0, 0);
+	cylinder->Translate(-2, 0, 0);
+	cone->Translate(0, 0, -2);
 	torus->Translate(0, 0, 2);
 
 	// terrain

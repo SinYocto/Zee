@@ -7,6 +7,7 @@ Material::Material(const wchar_t* name, const wchar_t* filePath /*= NULL*/)
 ,mShader(NULL)
 ,mMtlData()
 {
+	YString::Empty(mFilePath);
 	YString::Copy(mName, _countof(mName), name);
 
 	for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
@@ -17,6 +18,7 @@ Material::Material(const wchar_t* name, const wchar_t* filePath /*= NULL*/)
 	if(NULL != filePath)
 	{
 		LoadDataFromFile(filePath);
+		YString::Copy(mFilePath, _countof(mFilePath), filePath);
 	}
 }
 
@@ -72,7 +74,7 @@ void Material::SetTexture(int layerIx, wchar_t* texFileName)	// TODO:²»Ó¦¸ÃÖ±½Ó´
 	if(mTextureLayer[layerIx])
 		SAFE_DROP(mTextureLayer[layerIx]);
 
-	mTextureLayer[layerIx] = gEngine->GetTextureManger()->GetOrCreateD3DTexture(texFileName);
+	mTextureLayer[layerIx] = gEngine->GetTextureManger()->GetOrCreateTexture(texFileName);
 	mTextureLayer[layerIx]->Grab();	
 
 	YString::Copy(mMtlData.texFilesPath[layerIx], MAX_PATH_LEN, mTextureLayer[layerIx]->GetFilePath());
@@ -420,6 +422,11 @@ void Material::LoadDataFromFile(const wchar_t* filePath)
 	}
 
 	file->Close();
+}
+
+wchar_t* Material::GetFilePath()
+{	
+	return mFilePath;
 }
 
 //bool Material::AcceptGeometry(Geometry* geo)

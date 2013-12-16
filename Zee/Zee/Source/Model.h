@@ -14,6 +14,7 @@ class AABBox;
 class Model : public IReferenceCounted
 {
 public:
+	Model(const wchar_t* name, const wchar_t* filePath);
 	Model(const wchar_t* name, Geometry* geo, Material* material);
 
 	~Model();
@@ -29,6 +30,11 @@ public:
 	std::list<Mesh*> GetSubMeshList();
 
 	wchar_t* GetName();
+
+	void SaveToFile(const wchar_t* dirPath);
+
+private:
+	void buildFromFile(const wchar_t* filePath);
 
 private:
 	wchar_t mName[MAX_STR_LEN];

@@ -10,54 +10,73 @@ void GeometryManager::AddGeometry(Geometry* geo)
 {
 	_Assert(NULL != geo);
 
-	gEngine->GetIDAllocator()->AllocateGeometryID(geo);
-	geoList.push_back(geo);
+	_Assert(!YString::isEmpty(geo->GetFilePath()));
+	GeoHashMap::iterator iter = mGeometries.find(geo->GetFilePath());
+	if(iter != mGeometries.end())
+	{
+		Log(L"warning: GeometryManage::AddGeometry() geo already exists!\n");
+		return;
+	}
+	else
+	{
+		mGeometries[geo->GetFilePath()] = geo;
+	}
 }
 
 void GeometryManager::Destroy()
 {
-	for(std::list<Geometry*>::iterator iter = geoList.begin(); iter != geoList.end(); ++iter)
+	for(GeoHashMap::iterator iter = mGeometries.begin(); iter != mGeometries.end(); ++iter)
 	{
-		SAFE_DROP(*iter);		// 这里使用了drop方法而不是delete, 当有Model持有geo对象时, 虽然geo对象不在GeometryManager中管理了
-								// 但Model中仍能正常持有
+		SAFE_DROP(iter->second);
 	}
 
-	geoList.clear();
-}
-
-void GeometryManager::GetGeometry(const wchar_t* name, Geometry** geo)
-{
-	_Assert(NULL != geo);
-
-	*geo = NULL;
-	for(std::list<Geometry*>::iterator iter = geoList.begin(); iter != geoList.end(); ++iter)
-	{
-		Geometry* curGeo = *iter;
-		if(YString::Compare(curGeo->GetName(), name) == 0)
-		{
-			*geo = curGeo;
-			break;
-		}
-	}
+	mGeometries.clear();
 }
 
 void GeometryManager::OnLostDevice()
 {
-	for(std::list<Geometry*>::iterator iter = geoList.begin(); iter != geoList.end(); ++iter)
+	for(GeoHashMap::iterator iter = mGeometries.begin(); iter != mGeometries.end(); ++iter)
 	{
-		(*iter)->OnLostDevice();
+		Geometry* geo = iter->second;
+		geo->OnLostDevice();
 	}
 }
 
 void GeometryManager::OnResetDevice()
 {
-	for(std::list<Geometry*>::iterator iter = geoList.begin(); iter != geoList.end(); ++iter)
+	for(GeoHashMap::iterator iter = mGeometries.begin(); iter != mGeometries.end(); ++iter)
 	{
-		(*iter)->OnResetDevice();
+		Geometry* geo = iter->second;
+		geo->OnResetDevice();
 	}
 }
 
-std::list<Geometry*> GeometryManager::GetGeometryList()
+Geometry* GeometryManager::GetOrCreateGeometry(const wchar_t* filePath)
 {
-	return geoList;
+	Geometry* resultGeo = NULL;
+
+	GeoHashMap::iterator iter = mGeometries.find(filePath);
+	if(iter != mGeometries.end())
+	{
+		resultGeo = iter->second;
+		_Assert(NULL != resultGeo);
+	}
+	else
+	{
+		_Assert(YFile::Exist(filePath));
+
+		wchar_t fileName[MAX_STR_LEN];
+		YString::GetFileName(fileName, _countof(fileName), filePath, false);
+
+		resultGeo = New Geometry(fileName, filePath);
+
+		mGeometries[filePath] = resultGeo;
+	}
+
+	return resultGeo;
+}
+
+GeoHashMap GeometryManager::GetGeoHashMap()
+{
+	return mGeometries;
 }

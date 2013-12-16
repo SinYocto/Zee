@@ -21,6 +21,8 @@ public:
 	void Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid);
 	void DrawUseMtl(const D3DXMATRIX& matWorld, Camera* camera, Material* mtl);
 
+	wchar_t* GetName();
+
 private:
 	wchar_t mName[MAX_STR_LEN];
 

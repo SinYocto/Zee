@@ -2,7 +2,7 @@
 #include "Math.h"
 #include "Engine.h"
 
-Texture* TextureManager::GetOrCreateD3DTexture(const wchar_t* filePath)
+Texture* TextureManager::GetOrCreateTexture(const wchar_t* filePath)
 {
 	Texture* resultTexture = NULL;
 

@@ -64,3 +64,8 @@ void Mesh::DrawUseMtl(const D3DXMATRIX& matWorld, Camera* camera, Material* mtl)
 	_Assert(NULL != mtl);
 	mtl->Render(matWorld, mGeo, camera, true);
 }
+
+wchar_t* Mesh::GetName()
+{
+	return mName;
+}

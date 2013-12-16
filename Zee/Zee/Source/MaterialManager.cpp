@@ -2,10 +2,6 @@
 #include "Engine.h"
 
 MaterialManager::MaterialManager()
-:flatMtl(NULL)
-,viewMtl(NULL)
-,diffMtl(NULL)
-,specMtl(NULL)
 {
 
 }
@@ -14,37 +10,27 @@ void MaterialManager::AddMaterial(Material* material)
 {
 	_Assert(NULL != material);
 
-	gEngine->GetIDAllocator()->AllocateMaterialID(material);
-	materialList.push_back(material);
+	_Assert(!YString::isEmpty(material->GetFilePath()));
+	MtlHashMap::iterator iter = mMaterials.find(material->GetFilePath());
+	if(iter != mMaterials.end())
+	{
+		Log(L"warning: MaterialManager::AddMaterial() mtl already exists!\n");
+		return;
+	}
+	else
+	{
+		mMaterials[material->GetFilePath()] = material;
+	}
 }
 
 void MaterialManager::Destroy()
 {
-	for(std::list<Material*>::iterator iter = materialList.begin(); iter != materialList.end(); ++iter)
+	for(MtlHashMap::iterator iter = mMaterials.begin(); iter != mMaterials.end(); ++iter)
 	{
-		SAFE_DROP(*iter);		// 这里使用了drop方法而不是delete, 当有Model持有material对象时, 虽然material对象不在GeometryManager中管理了
-								// 但Model中仍能正常持有 
+		SAFE_DROP(iter->second);
 	}
 
-	materialList.clear();
-
-	deleteDefaultMtls();
-}
-
-void MaterialManager::GetMaterial(const wchar_t* name, Material** material)
-{
-	_Assert(NULL != material);
-
-	*material = NULL;
-	for(std::list<Material*>::iterator iter = materialList.begin(); iter != materialList.end(); ++iter)
-	{
-		Material* curMaterial = *iter;
-		if(YString::Compare(curMaterial->GetName(), name) == 0)
-		{
-			*material = curMaterial;
-			break;
-		}
-	}
+	mMaterials.clear();
 }
 
 void MaterialManager::Init()
@@ -58,8 +44,6 @@ void MaterialManager::Init()
 	DiffuseShader::CreateEffectFromFile(TEXT("./Source/Shaders/Diffuse.fx"));	// time used: 124ms
 	SpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/Specular.fx"));		// time used: 230ms
 	BumpSpecularShader::CreateEffectFromFile(TEXT("./Source/Shaders/BumpSpecular.fx"));		// time used: 248ms
-
-	createDefaultMtls();
 }
 
 void MaterialManager::OnLostDevice()
@@ -87,60 +71,52 @@ void MaterialManager::FrameUpdate()
 	UtilityShader::SetupSharedParams();
 }
 
-void MaterialManager::createDefaultMtls()
-{
-	IDAllocator* idAllocator = gEngine->GetIDAllocator();
-
-	flatMtl = New Material(L"defaultFlatMtl");
-	flatMtl->SetShader(Flat);
-	idAllocator->AllocateMaterialID(flatMtl);
-
-	viewMtl = New Material(L"defaultViewMtl");
-	viewMtl->SetShader(View);
-	idAllocator->AllocateMaterialID(viewMtl);
-
-	diffMtl = New Material(L"defaultDiffMtl");
-	diffMtl->SetShader(Diffuse);
-	idAllocator->AllocateMaterialID(diffMtl);
-
-	specMtl = New Material(L"defaultSpecMtl");
-	specMtl->SetShader(Specular);
-	idAllocator->AllocateMaterialID(specMtl);
-}
-
-void MaterialManager::deleteDefaultMtls()
-{
-	SAFE_DROP(flatMtl);
-	SAFE_DROP(viewMtl);
-	SAFE_DROP(diffMtl);
-	SAFE_DROP(specMtl);
-}
-
 Material* MaterialManager::GetDefaultFlatMtl()
 {
-	_Assert(NULL != flatMtl);
-	return flatMtl;
+	return GetOrCreateMaterial(L"Assets/Materials/defaultFlat.material");
 }
 
 Material* MaterialManager::GetDefaultViewMtl()
 {
-	_Assert(NULL != viewMtl);
-	return viewMtl;
+	return GetOrCreateMaterial(L"Assets/Materials/defaultView.material");
 }
 
 Material* MaterialManager::GetDefaultDiffMtl()
 {
-	_Assert(NULL != diffMtl);
-	return diffMtl;
+	return GetOrCreateMaterial(L"Assets/Materials/defaultDiff.material");
 }
 
 Material* MaterialManager::GetDefaultSpecMtl()
 {
-	_Assert(NULL != specMtl);
-	return specMtl;
+	return GetOrCreateMaterial(L"Assets/Materials/defaultSpec.material");
 }
 
-std::list<Material*> MaterialManager::GetMaterialList()
+MtlHashMap MaterialManager::GetMtlHashMap()
 {
-	return materialList;
+	return mMaterials;
+}
+
+Material* MaterialManager::GetOrCreateMaterial(const wchar_t* filePath)
+{
+	Material* resultMtl = NULL;
+
+	MtlHashMap::iterator iter = mMaterials.find(filePath);
+	if(iter != mMaterials.end())
+	{
+		resultMtl = iter->second;
+		_Assert(NULL != resultMtl);
+	}
+	else
+	{
+		_Assert(YFile::Exist(filePath));
+
+		wchar_t fileName[MAX_STR_LEN];
+		YString::GetFileName(fileName, _countof(fileName), filePath, false);
+
+		resultMtl = New Material(fileName, filePath);
+
+		mMaterials[filePath] = resultMtl;
+	}
+
+	return resultMtl;
 }

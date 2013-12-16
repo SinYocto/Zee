@@ -25,8 +25,6 @@ ModelNode::ModelNode(const wchar_t* name, SceneNode* parent, Geometry* geo, Mate
 	mType = SCENE_NODE_MODEL;
 	mModel = New Model(name, geo, material);
 
-	gEngine->GetModelManager()->AddModel(mModel);
-
 	MeshNode* meshNode = New MeshNode(L"mesh", this, geo, material);
 }
 
@@ -50,4 +48,9 @@ void ModelNode::Draw(Camera* camera)
 	{
 		DebugDrawer::DrawAABBox(mAABBox, 0xffff0000, camera);
 	}
+}
+
+Model* ModelNode::GetModel()
+{
+	return mModel;
 }

@@ -17,6 +17,8 @@ public:
 
 	virtual void Draw(Camera* camera);
 
+	Model* GetModel();
+
 private:
 	//virtual void updateAABBox();
 

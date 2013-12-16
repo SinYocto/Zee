@@ -10,11 +10,13 @@ Geometry::Geometry(const wchar_t* name, const wchar_t* filePath /*= NULL*/)
 ,mVertexType(VERTEX_TYPE_INVALID)
 ,mID(IDAllocator::ID_ANY)
 {
+	YString::Empty(mFilePath);
 	YString::Copy(mName, _countof(mName), name);
 
 	if(NULL != filePath)
 	{
 		LoadDataFromFile(filePath);
+		YString::Copy(mFilePath, _countof(mFilePath), filePath);
 
 		if(hasUVData())
 		{
@@ -1307,4 +1309,9 @@ bool Geometry::hasTBNData()
 	return mGeoData.normalData.size() != 0 &&
 		mGeoData.tangentData.size() != 0 &&
 		mGeoData.bitangentData.size() != 0;
+}
+
+wchar_t* Geometry::GetFilePath()
+{
+	return mFilePath;
 }

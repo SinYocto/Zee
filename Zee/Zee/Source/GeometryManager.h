@@ -2,24 +2,28 @@
 #define GEOMETRYMANAGER_H
 
 #include "Geometry.h"
+#include "ResourceHashMap.h"
+
+typedef stdext::hash_map<const wchar_t*, Geometry*, stdext::hash_compare<const wchar_t*, WCharLess>> GeoHashMap;
 
 class GeometryManager
 {
 public:
 	GeometryManager();
 
-	void Destroy();
-
-	void AddGeometry(Geometry* geo);
-	void GetGeometry(const wchar_t* name, Geometry** geo);
-
 	void OnLostDevice();
 	void OnResetDevice();
 
-	std::list<Geometry*> GetGeometryList();
+	void Destroy();
+
+	Geometry* GetOrCreateGeometry(const wchar_t* filePath);
+	void AddGeometry(Geometry* geo);
+
+	GeoHashMap GetGeoHashMap();
 
 private:
 	std::list<Geometry*> geoList;
+	GeoHashMap mGeometries;
 };
 
 

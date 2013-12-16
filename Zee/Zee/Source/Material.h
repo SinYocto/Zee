@@ -104,12 +104,16 @@ public:
 	void SaveToFile(const wchar_t* dirPath);
 	void LoadDataFromFile(const wchar_t* filePath);
 
+	wchar_t* GetFilePath();
+
 public:
 	IShader* mShader;
 
 private:
 	DWORD mID;
 	wchar_t mName[MAX_STR_LEN];
+
+	wchar_t mFilePath[MAX_PATH_LEN];
 
 	MaterialData mMtlData;
 

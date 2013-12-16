@@ -698,6 +698,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Source\ResourceHashMap.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Source\SceneEditor.cpp"
 			>
 		</File>
