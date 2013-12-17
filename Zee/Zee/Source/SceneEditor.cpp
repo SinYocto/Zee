@@ -193,6 +193,37 @@ void SceneEditorCanvas::OnSize(wxSizeEvent& event)
 
 void CreateScene()
 {
+
+	//PerformanceTimer::Begin(L"read line test(fgets)");
+	//YFile* file = YFile::Open(L"Assets/Models_Extra/test1.obj", YFile::READ);
+
+	//wchar_t lineContent[MAX_STR_LEN];
+	//while(file->ReadLine(lineContent, MAX_STR_LEN) != NULL)
+	//{
+	//	// do nothing
+	//}
+	//file->Close();
+	//PerformanceTimer::End();
+
+	//PerformanceTimer::Begin(L"parse line test(fgets + scanf(1c,3d) + atoi)");
+	//file = YFile::Open(L"Assets/Models_Extra/test1.obj", YFile::READ);
+
+	//while(file->ReadLine(lineContent, MAX_STR_LEN) != NULL)
+	//{
+	//	int a,b,c;
+	//	Vector3 pos;
+	//	wchar_t strs[3][MAX_STR_LEN];
+	//	YString::Scan(lineContent, L"%*c %d %d %d", &a, &b, &c);
+
+	//	//int x = _wtoi(strs[0]);
+	//	//int y = _wtoi(strs[1]);
+	//	//int z = _wtoi(strs[2]);
+	//}
+	//file->Close();
+	//PerformanceTimer::End();
+
+
+
 	Driver* driver = gEngine->GetDriver();
 
 	// camera
@@ -279,6 +310,20 @@ void CreateScene()
 	cylinder->Translate(-2, 0, 0);
 	cone->Translate(0, 0, -2);
 	torus->Translate(0, 0, 2);
+
+	Model* bunnyModel = NULL;
+	OBJParser::Parse(L"Assets/Models_Extra/teapot.obj", &bunnyModel);
+
+	bunnyModel->SaveToFile(L"Assets/Models");
+
+	ModelNode* bunny = New ModelNode(L"bunny", NULL, bunnyModel);
+
+	sceneMgr->AddSceneNode(bunny);
+	bunny->Translate(4, 0, 0);
+	bunny->Scale(0.1f, 0.1f, 0.1f);
+
+	
+
 
 	// terrain
 	PerformanceTimer::Begin(L"building 257 terrain");

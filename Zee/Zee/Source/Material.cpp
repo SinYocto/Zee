@@ -294,6 +294,11 @@ void Material::SaveToFile(const wchar_t* dirPath)
 	YString::Concat(filePath, _countof(filePath), L"/");
 	YString::Concat(filePath, _countof(filePath), mName, L".material");
 
+	if(YString::isEmpty(mFilePath))
+	{
+		YString::Copy(mFilePath, _countof(mFilePath), filePath);
+	}
+
 	if(YFile::Exist(filePath))
 	{
 		Log(L"warning: file already exists. Material::SaveToFile(%s)\n", filePath);

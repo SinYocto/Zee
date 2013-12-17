@@ -14,6 +14,10 @@ std::vector<Material*> OBJParser::mMtlList;
 
 Model* OBJParser::mResultModel = NULL;
 
+wchar_t OBJParser::mObjName[MAX_STR_LEN];
+wchar_t OBJParser::mCurSpecifierStr[MAX_STR_LEN];
+OBJParser::OBJ_SPECIFIER OBJParser::mCurSpecifier = OBJParser::OBJ_OTEHR;
+
 void OBJParser::clear()
 {
 	mPosData.clear();
@@ -23,6 +27,8 @@ void OBJParser::clear()
 	mGeoList.clear();
 	mMtlList.clear();
 	mResultModel = NULL;
+
+	YString::Empty(mCurSpecifierStr);
 }
 
 bool OBJParser::Parse(const wchar_t* filePath, Model** result)
@@ -34,6 +40,8 @@ bool OBJParser::Parse(const wchar_t* filePath, Model** result)
 		Assert(NULL != result);
 		Assert(*result == NULL);
 
+		YString::GetFileName(mObjName, _countof(mObjName), filePath, false);
+
 		PerformanceTimer::Begin(L"parsing OBJ file");
 
 		clear();
@@ -43,9 +51,14 @@ bool OBJParser::Parse(const wchar_t* filePath, Model** result)
 
 		wchar_t lineContent[MAX_STR_LEN];
 		while(file->ReadLine(lineContent, MAX_STR_LEN) != NULL)
-			parseLine(file, lineContent);
+		{
+			if(parseLine(file, lineContent))
+				break;
+		}
 
 		file->Close();
+
+
 
 		PerformanceTimer::End();
 
@@ -66,6 +79,9 @@ bool OBJParser::Parse(const wchar_t* filePath, Model** result)
 				geo->CalculateTBN();
 				geo->BuildGeometry(XYZ_UV_TBN);
 			}
+
+			geo->SaveToFile(L"Assets/Geometries");
+			gEngine->GetGeometryManager()->AddGeometry(geo);
 		}
 
 		PerformanceTimer::End();
@@ -79,7 +95,7 @@ Exit:
 	return isSucceed;
 }
 
-void OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
+bool OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
 {
 	Assert(NULL != file);
 	Assert(NULL != lineContent);
@@ -103,26 +119,23 @@ void OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
 		}
 	case VERT_POS:
 		{
-			Vector3 pos;
-			YString::Scan(lineContent, L"%*c %f %f %f", &pos.x, &pos.y, &pos.z);
-
-			mPosData.push_back(pos);
+			wchar_t lineStrs[3][MAX_STR_LEN];
+			YString::Scan(lineContent, L"%*c %s %s %s", &lineStrs[0], &lineStrs[1], &lineStrs[2]);
+			mPosData.push_back(Vector3(_wtof(lineStrs[0]), _wtof(lineStrs[1]), _wtof(lineStrs[2])));
 			break;
 		}
 	case VERT_UV:
 		{
-			Vector2 uv;
-			YString::Scan(lineContent, L"%*s %f %f", &uv.x, &uv.y);
-
-			uvData.push_back(uv);
+			wchar_t lineStrs[2][MAX_STR_LEN];
+			YString::Scan(lineContent, L"%*c %s %s", &lineStrs[0], &lineStrs[1]);
+			uvData.push_back(Vector2(_wtof(lineStrs[0]), _wtof(lineStrs[1])));
 			break;
 		}
-	case VERT_NORMAL:
+	case VERT_NORMAL: 
 		{
-			Vector3 normal;
-			YString::Scan(lineContent, L"%*s %f %f %f", &normal.x, &normal.y, &normal.z);
-
-			normalData.push_back(normal);
+			wchar_t lineStrs[3][MAX_STR_LEN];
+			YString::Scan(lineContent, L"%*c %s %s %s", &lineStrs[0], &lineStrs[1], &lineStrs[2]);
+			normalData.push_back(Vector3(_wtof(lineStrs[0]), _wtof(lineStrs[1]), _wtof(lineStrs[2])));
 			break;
 		}
 	case GROUP:
@@ -131,6 +144,7 @@ void OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
 		}
 	case MESH_MTL:
 		{
+			//return true;
 			determineDataContentType();
 
 			std::vector<std::wstring> blockContent;
@@ -151,22 +165,23 @@ void OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
 	}
 
 Exit:
-	return;
+	return false;
 }
 
 void OBJParser::parseTrianglesBlock(const std::vector<std::wstring>& blockContent)
 {
 	Geometry* geo = NULL;
 
-	std::map<int, int> posIndexMap;
+	std::map<int, int> posIndexMap;		// obj文件中face的pos索引值对应geo中posdata的索引值
 	std::map<int, int> uvIndexMap;
 	std::map<int, int> normalIndexMap;
+	std::map<Vector3, int, Vector3::Comparer> vertIndexMap;
 
 	Assert((mDataContentType & POS_DATA) != 0);
 
 	for(size_t i = 0; i < blockContent.size(); ++i)
 	{
-		parseTrianglesBlockLine(blockContent[i].c_str(), &geo, posIndexMap, uvIndexMap, normalIndexMap);
+		parseTrianglesBlockLine(blockContent[i].c_str(), &geo, posIndexMap, uvIndexMap, normalIndexMap, vertIndexMap);
 	}
 
 Exit:
@@ -175,7 +190,8 @@ Exit:
 
 
 void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** curGeo, std::map<int, int>& posIndexMap,
-								std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap)
+								std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap, 
+								std::map<Vector3, int, Vector3::Comparer>& vertIndexMap)
 {
 	Assert(NULL != lineContent);
 	{
@@ -199,20 +215,25 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 				Mesh* subMesh = NULL;
 				{
 					Assert((*curGeo) == NULL);
-					(*curGeo) = New Geometry(L"geo");				// TODO:给个按序号增加的默认名?
-					gEngine->GetGeometryManager()->AddGeometry((*curGeo));
 
+					wchar_t geoName[MAX_STR_LEN];
+					wchar_t meshName[MAX_STR_LEN];
+					YString::Format(geoName, L"%s_geo_%d", mObjName, mGeoList.size());
+					YString::Format(meshName, L"%s_mesh_%d", mObjName, mGeoList.size());
+
+					(*curGeo) = New Geometry(geoName);
 					mGeoList.push_back((*curGeo));
 
 					if(mResultModel == NULL)
-						mResultModel = New Model(L"model", NULL, NULL);
-					Assert(NULL != mResultModel);
-
-					gEngine->GetModelManager()->AddModel(mResultModel);
-
-					subMesh = New Mesh(L"mesh", (*curGeo), material);
-					mResultModel->AddSubMesh(subMesh);
-					SAFE_DROP(subMesh);
+					{
+						mResultModel = New Model(mObjName, (*curGeo), material);
+					}
+					else
+					{
+						subMesh = New Mesh(L"mesh", (*curGeo), material);
+						mResultModel->AddSubMesh(subMesh);
+						SAFE_DROP(subMesh);
+					}
 				}
 
 				break;
@@ -254,6 +275,12 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 				}
 
 				int vertIndex[4] = { -1, -1, -1, -1 };
+				Vector3 vert[4];
+				vert[0] = Vector3(posIndex[0] - 1, uvIndex[0] - 1, normalIndex[0] - 1);
+				vert[1] = Vector3(posIndex[1] - 1, uvIndex[1] - 1, normalIndex[1] - 1);
+				vert[2] = Vector3(posIndex[2] - 1, uvIndex[2] - 1, normalIndex[2] - 1);
+				vert[3] = Vector3(posIndex[3] - 1, uvIndex[3] - 1, normalIndex[3] - 1);
+
 				for(int i = 0; i < 4; ++i)
 				{			
 					if(i == 3 && posIndex[i] == -1)		// 三角面
@@ -317,32 +344,18 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 						}
 					}
 
-					// 查找tri的vert是否是已经加入到verts中的重复vert
-					bool isVertExist = false;
-					for(size_t k = 0; k < (*curGeo)->mGeoData.verts.size(); ++k)
+					bool isVertExist = vertIndexMap.find(vert[i]) != vertIndexMap.end();
+					if(isVertExist)
 					{
-						Vert& vert = (*curGeo)->mGeoData.verts[k];
-
-						if(vert.posIndex != curGeoPosIndex)
-							continue;
-
-						if((mDataContentType & UV_DATA) != 0 && vert.uvIndex != curGeoUVIndex)
-							continue;
-
-						if((mDataContentType & NORMAL_DATA) != 0 && vert.normalIndex != curGeoNormalIndex)
-							continue;
-
-						isVertExist = true;
-						curVertIndex = k;
-						break;
+						curVertIndex = vertIndexMap[vert[i]];
 					}
-
-					if(!isVertExist)
-					{
+					else
+					{					
 						curVertIndex = (*curGeo)->mGeoData.verts.size();
 
-						Vert vert(curGeoPosIndex, curGeoUVIndex, curGeoNormalIndex);
-						(*curGeo)->mGeoData.verts.push_back(vert);
+						Vert newVert(curGeoPosIndex, curGeoUVIndex, curGeoNormalIndex);
+						(*curGeo)->mGeoData.verts.push_back(newVert);
+						vertIndexMap[vert[i]] = curVertIndex;
 					}
 				}
 
@@ -421,6 +434,9 @@ void OBJParser::parseMtlBlock(const std::vector<std::wstring>& blockContent)
 	if(!YString::isEmpty(materialContent.diffuseTexFilePath))		// TODO:考虑没有diffuse贴图的情况
 		material->mShader->SetColorTex(materialContent.diffuseTexFilePath);
 
+	material->SaveToFile(L"Assets/Materials");
+	gEngine->GetMaterialManager()->AddMaterial(material);
+
 	mMtlList.push_back(material);
 }
 
@@ -445,8 +461,8 @@ void OBJParser::parseMtlLine(const wchar_t* lineContent, Material** curMaterial,
 			Assert(*curMaterial == NULL);
 
 			*curMaterial = New Material(mtlName);
-			gEngine->GetMaterialManager()->AddMaterial(*curMaterial);			// TODO:改到Material的构造函数中	
-			SAFE_DROP(*curMaterial);
+			//gEngine->GetMaterialManager()->AddMaterial(*curMaterial);			// TODO:改到Material的构造函数中	
+			//SAFE_DROP(*curMaterial);
 			break;
 		}
 	case AMBIENT_COLOR:
@@ -539,41 +555,65 @@ bool OBJParser::getOBJSpecifier(const wchar_t* lineContent, OBJ_SPECIFIER* speci
 	wchar_t lineSpecifier[MAX_STR_LEN];
 	YString::GetSpecifier(lineSpecifier, _countof(lineSpecifier), lineContent);
 
+	if(YString::Compare(lineSpecifier, mCurSpecifierStr) == 0)
+	{
+		*specifier = mCurSpecifier;
+		return true;
+	}
+
 	if(YString::Compare(lineSpecifier, L"#") == 0)
 	{
 		*specifier = OBJ_COMMENT;
+		mCurSpecifier = *specifier;
+		YString::Copy(mCurSpecifierStr, _countof(mCurSpecifierStr), L"#");
 	}
 	else if(YString::Compare(lineSpecifier, L"mtllib") == 0)
 	{
 		*specifier = MTLLIB;
+		mCurSpecifier = *specifier;
+		YString::Copy(mCurSpecifierStr, _countof(mCurSpecifierStr), L"mtllib");
 	}
 	else if(YString::Compare(lineSpecifier, L"v") == 0)
 	{
 		*specifier = VERT_POS;
+		mCurSpecifier = *specifier;
+		YString::Copy(mCurSpecifierStr, _countof(mCurSpecifierStr), L"v");
 	}
 	else if(YString::Compare(lineSpecifier, L"vt") == 0)
 	{
 		*specifier = VERT_UV;
+		mCurSpecifier = *specifier;
+		YString::Copy(mCurSpecifierStr, _countof(mCurSpecifierStr), L"vt");
 	}
 	else if(YString::Compare(lineSpecifier, L"vn") == 0)
 	{
 		*specifier = VERT_NORMAL;
+		mCurSpecifier = *specifier;
+		YString::Copy(mCurSpecifierStr, _countof(mCurSpecifierStr), L"vn");
 	}
 	else if(YString::Compare(lineSpecifier, L"g") == 0)
 	{
 		*specifier = GROUP;
+		mCurSpecifier = *specifier;
+		YString::Copy(mCurSpecifierStr, _countof(mCurSpecifierStr), L"g");
 	}
 	else if(YString::Compare(lineSpecifier, L"usemtl") == 0)
 	{
 		*specifier = MESH_MTL;
+		mCurSpecifier = *specifier;
+		YString::Copy(mCurSpecifierStr, _countof(mCurSpecifierStr), L"usemtl");
 	}
 	else if(YString::Compare(lineSpecifier, L"f") == 0)
 	{
 		*specifier = FACE;
+		mCurSpecifier = *specifier;
+		YString::Copy(mCurSpecifierStr, _countof(mCurSpecifierStr), L"f");
 	}
 	else
 	{
 		*specifier = OBJ_OTEHR;
+		mCurSpecifier = *specifier;
+		YString::Empty(mCurSpecifierStr);
 	}
 
 	isSucceed = true;

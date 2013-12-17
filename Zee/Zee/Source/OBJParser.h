@@ -76,11 +76,11 @@ public:
 
 private:
 	static void clear();
-	static void parseLine(YFile* file, const wchar_t* lineContent);
+	static bool parseLine(YFile* file, const wchar_t* lineContent);
 
 	static void parseTrianglesBlock(const std::vector<std::wstring>& blockContent);
 	static void parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** curGeo, std::map<int, int>& posIndexMap,
-		std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap);
+		std::map<int, int>& uvIndexMap, std::map<int, int>& normalIndexMap, std::map<Vector3, int, Vector3::Comparer>& vertIndexMap);
 
 	static void parseMtl(const wchar_t* mtlFilePath);
 	static void parseMtlBlock(const std::vector<std::wstring>& blockContent);
@@ -105,6 +105,10 @@ private:
 
 	static Model* mResultModel;
 
+	static wchar_t mObjName[MAX_STR_LEN];
+
+	static wchar_t mCurSpecifierStr[MAX_STR_LEN];
+	static OBJ_SPECIFIER mCurSpecifier;
 };
 
 

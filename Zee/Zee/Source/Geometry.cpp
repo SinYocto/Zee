@@ -1202,6 +1202,11 @@ void Geometry::SaveToFile(const wchar_t* dirPath)
 	YString::Concat(filePath, _countof(filePath), L"/");
 	YString::Concat(filePath, _countof(filePath), mName, L".geo");
 
+	if(YString::isEmpty(mFilePath))
+	{
+		YString::Copy(mFilePath, _countof(mFilePath), filePath);
+	}
+
 	if(YFile::Exist(filePath))
 	{
 		Log(L"warning: file already exists. Geometry::SaveToFile(%s)\n", filePath);

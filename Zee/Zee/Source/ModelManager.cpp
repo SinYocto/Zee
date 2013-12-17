@@ -11,7 +11,6 @@ void ModelManager::AddModel(Model* model)
 	_Assert(NULL != model);
 
 	modelList.push_back(model);
-	model->Grab();
 }
 
 void ModelManager::Destroy()

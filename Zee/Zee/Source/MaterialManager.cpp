@@ -6,7 +6,7 @@ MaterialManager::MaterialManager()
 
 }
 
-void MaterialManager::AddMaterial(Material* material)
+void MaterialManager::AddMaterial(Material* material)	// 注意没有grab, 每增加mtl的引用计数(是否不妥?)
 {
 	_Assert(NULL != material);
 
