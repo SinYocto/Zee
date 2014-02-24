@@ -8,12 +8,14 @@
 #include "LightPanel.h"
 #include "Engine.h"
 #include "MeshNode.h"
+#include "ModelNode.h"
 
 BEGIN_EVENT_TABLE(SceneEditorPanel, wxNotebook)
-EVT_CLOSE(SceneEditorPanel::OnClose)
-EVT_BUTTON(wxID_ANY, SceneEditorPanel::OnBitmapButton)
-EVT_TREE_ITEM_ACTIVATED (wxID_ANY, SceneEditorPanel::OnItemActivated)
-EVT_NOTEBOOK_PAGE_CHANGED(wxID_ANY, SceneEditorPanel::OnPageChanged)
+	EVT_CLOSE(SceneEditorPanel::OnClose)
+	EVT_BUTTON(wxID_ANY, SceneEditorPanel::OnBitmapButton)
+	EVT_TREE_ITEM_ACTIVATED (wxID_ANY, SceneEditorPanel::OnItemActivated)
+	EVT_NOTEBOOK_PAGE_CHANGED(wxID_ANY, SceneEditorPanel::OnPageChanged)
+	EVT_MENU(ID_MODEL_PANEL_ITEM_MENU_ADD_TO_SCENE, SceneEditorPanel::OnAddModelNode)
 END_EVENT_TABLE()
 SceneEditorPanel::SceneEditorPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 
 								   const wxPoint& pos /*= wxDefaultPosition*/, const wxSize& size /*= wxDefaultSize*/)
@@ -113,14 +115,14 @@ void SceneEditorPanel::OnBitmapButton(wxCommandEvent& event)
 {
 	wxString eventInfo = event.GetString();
 
-	if(eventInfo.Cmp(L"MaterialPanel") == 0)
+	if(eventInfo.Cmp(L"MaterialPanel_Tex") == 0)
 	{
 		ChangeSelection(TEXTURE_PAGE);
 
 		mMtlEditoring = (Material*)event.GetClientData();
 		mMtlTexLayer = event.GetInt();
 	}
-	else if(eventInfo.Cmp(L"SceneGraphPanel_Mtl"))
+	else if(eventInfo.Cmp(L"SceneGraphPanel_Mesh_Mtl") == 0)
 	{
 		ChangeSelection(MATERIAL_PAGE);
 
@@ -183,6 +185,38 @@ void SceneEditorPanel::OnPageChanged(wxNotebookEvent& event)
 	}
 
 	event.Skip();
+}
+
+// 在ModelPanel中将model加入场景时, 需要更新SceneGraphPanel, MaterialPanel, GeometryPanel
+void SceneEditorPanel::OnAddModelNode(wxCommandEvent& event)
+{
+	Model* model = (Model*)event.GetClientData();
+	ModelNode* modelNode = New ModelNode(model->GetName(), NULL, model);
+
+	SceneManager* sceneMgr = gEngine->GetSceneManager();
+	sceneMgr->AddSceneNode(modelNode);
+	modelNode->OnTransformChanged();
+
+	// 更新SceneGraphPanel
+	wxNotebookPage* sceneGraphPage = GetPage(SCENE_GRAPH_PAGE);
+	SceneGraphPanel* sceneGraphPanel = static_cast<SceneGraphPanel*>(sceneGraphPage);
+
+	sceneGraphPanel->AppendSceneNode(modelNode);
+
+	// 更新MaterialPanel
+	wxNotebookPage* materialPage = GetPage(MATERIAL_PAGE);
+	MaterialPanel* materialPanel = static_cast<MaterialPanel*>(materialPage);
+
+	std::list<Mesh*> meshList = model->GetSubMeshList();
+
+	for(std::list<Mesh*>::iterator iter = meshList.begin(); iter != meshList.end(); ++iter)
+	{
+		Mesh* mesh = *iter;
+		AABBox subMeshBBox = AABBox::Invalid;
+
+		Material* mtl = mesh->GetMaterial();
+		materialPanel->AppendMaterial(mtl);
+	}
 }
 
 

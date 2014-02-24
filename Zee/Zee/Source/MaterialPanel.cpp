@@ -59,13 +59,18 @@ void MaterialPanel::LoadDataFromScene()
 
 	for(MtlHashMap::iterator iter = materials.begin(); iter != materials.end(); ++iter)
 	{
-		appendMaterial(rootId, iter->second);
+		AppendMaterial(rootId, iter->second);
 	}
 }
 
-void MaterialPanel::appendMaterial(wxTreeItemId parentItemId, Material* material)
+void MaterialPanel::AppendMaterial(wxTreeItemId parentItemId, Material* material)
 {
 	mTreeCtrl->AppendItem(parentItemId, material->GetName(), 0, 0, New MaterialTreeItemData(material));
+}
+
+void MaterialPanel::AppendMaterial(Material* material)
+{
+	mTreeCtrl->AppendItem(mTreeCtrl->GetRootItem(), material->GetName(), 0, 0, New MaterialTreeItemData(material));
 }
 
 void MaterialPanel::RefreshInspector()
@@ -482,7 +487,7 @@ void MaterialInfoPanel::OnBitmapButton(wxCommandEvent& event)
 		_Assert(false);
 	}
 
-	event.SetString(L"MaterialPanel");
+	event.SetString(L"MaterialPanel_Tex");
 	event.SetClientData((void*)mtl);
 	event.Skip();
 }

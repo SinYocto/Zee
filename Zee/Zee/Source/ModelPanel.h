@@ -9,6 +9,8 @@
 enum
 {
 	ID_MODELLIST_TREE,
+	ID_MODEL_PANEL_ITEM_MENU_ADD_TO_SCENE,
+	ID_MODEL_PANEL_CONTEXT_MENU_IMPORT,
 };
 
 class ModelTreeItemData : public wxTreeItemData
@@ -58,6 +60,12 @@ public:
 	void OnItemSelected(wxTreeEvent& event);
 	void OnBeginDrag(wxTreeEvent& event);
 	void OnEndDrag(wxTreeEvent& event);
+
+	void OnContextMenu(wxContextMenuEvent& event);
+	void OnItemMenu(wxTreeEvent& event);
+
+	void OnContextMenuImport(wxCommandEvent& event);
+	void OnItemMenuAddToScene(wxCommandEvent& event);
 
 	void AttachInspectorPanel(ModelInspectorPanel* inspectorPanel);
 

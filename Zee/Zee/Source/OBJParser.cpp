@@ -116,7 +116,7 @@ bool OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
 			YString::GetParentDirPath(mtlFilePath, _countof(mtlFilePath), mFilePath);
 			YString::Concat(mtlFilePath, _countof(mtlFilePath), L"/", pathStr);
 
-			YString::GetFullPath(mtlFilePath, _countof(mtlFilePath));
+			//YString::GetFullPath(mtlFilePath, _countof(mtlFilePath));
 			parseMtl(mtlFilePath);
 
 			break;
@@ -132,7 +132,8 @@ bool OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
 		{
 			wchar_t lineStrs[2][MAX_STR_LEN];
 			YString::Scan(lineContent, L"%*s %s %s", &lineStrs[0], &lineStrs[1]);
-			uvData.push_back(Vector2(1.0f - (float)_wtof(lineStrs[0]), 1.0f - (float)_wtof(lineStrs[1])));
+			//uvData.push_back(Vector2(1.0f - (float)_wtof(lineStrs[0]), 1.0f - (float)_wtof(lineStrs[1])));
+			uvData.push_back(Vector2((float)_wtof(lineStrs[0]), 1.0f - (float)_wtof(lineStrs[1])));
 			break;
 		}
 	case VERT_NORMAL: 
@@ -764,6 +765,8 @@ Exit:
 
 void OBJParser::determineDataContentType()
 {
+	mDataContentType = 0;
+
 	if(!(mPosData.empty()))
 		mDataContentType |= POS_DATA;
 

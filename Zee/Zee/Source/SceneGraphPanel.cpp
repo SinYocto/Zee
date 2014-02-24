@@ -69,13 +69,13 @@ void SceneGraphPanel::LoadDataFromScene()
 	for(std::list<Object*>::iterator iter = children.begin(); iter != children.end(); ++iter)
 	{
 		SceneNode* node = static_cast<SceneNode*>(*iter);
-		appendSceneNode(rootId, node);
+		AppendSceneNode(rootId, node);
 	}
 
 	mTreeCtrl->Expand(rootId);
 }
 
-void SceneGraphPanel::appendSceneNode(wxTreeItemId parentItemId, SceneNode* node)
+void SceneGraphPanel::AppendSceneNode(wxTreeItemId parentItemId, SceneNode* node)
 {
 	SceneNodeTreeItemData* itemData = New SceneNodeTreeItemData(node);
 
@@ -115,7 +115,51 @@ void SceneGraphPanel::appendSceneNode(wxTreeItemId parentItemId, SceneNode* node
 	for(std::list<Object*>::iterator iter = children.begin(); iter != children.end(); ++iter)
 	{
 		SceneNode* node = static_cast<SceneNode*>(*iter);
-		appendSceneNode(itemId, node);
+		AppendSceneNode(itemId, node);
+	}
+}
+
+void SceneGraphPanel::AppendSceneNode(SceneNode* node)
+{
+	SceneNodeTreeItemData* itemData = New SceneNodeTreeItemData(node);
+
+	int sceneNodeIcon = 0;
+
+	SceneNode::NODE_TYPE nodeType = node->GetNodeType();
+	switch(nodeType)
+	{
+	case SceneNode::SCENE_NODE_NULL:
+		sceneNodeIcon = 0;
+		break;
+
+	case SceneNode::SCENE_NODE_MESH:
+		sceneNodeIcon = 1;
+		break;
+
+	case SceneNode::SCENE_NODE_MODEL:
+		sceneNodeIcon = 2;
+		break;
+
+	case SceneNode::SCENE_NODE_BILLBOARD:
+		sceneNodeIcon = 3;
+		break;
+
+	case SceneNode::SCENE_NODE_DIR_LIGHT:
+	case SceneNode::SCENE_NODE_POINT_LIGHT:
+		sceneNodeIcon = 4;
+		break;
+
+	default:
+		_Assert(false);
+	}
+
+	wxTreeItemId itemId = mTreeCtrl->AppendItem(mTreeCtrl->GetRootItem(), node->GetName(), sceneNodeIcon, sceneNodeIcon, itemData);
+
+	std::list<Object*> children = node->GetChildren();
+	for(std::list<Object*>::iterator iter = children.begin(); iter != children.end(); ++iter)
+	{
+		SceneNode* node = static_cast<SceneNode*>(*iter);
+		AppendSceneNode(itemId, node);
 	}
 }
 

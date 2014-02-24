@@ -31,6 +31,8 @@ public:
 	void OnBitmapButton(wxCommandEvent& event);
 	void OnItemActivated(wxTreeEvent& event);
 
+	void OnAddModelNode(wxCommandEvent& event);
+
 	virtual void OnSelectNode(Gizmo* gizmo);
 
 	void CreateEditorPages();

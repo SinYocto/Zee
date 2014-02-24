@@ -46,11 +46,13 @@ public:
 	void LoadDataFromScene();
 	void RefreshInspector();
 
+	void AppendSceneNode(wxTreeItemId parentItemId, SceneNode* node);
+	void AppendSceneNode(SceneNode* node);
+
 	DECLARE_EVENT_TABLE()
 
 private:
 	void createWxCtrls();
-	void appendSceneNode(wxTreeItemId parentItemId, SceneNode* node);
 
 private:
 	wxPanel* mTreePanel;

@@ -310,16 +310,16 @@ void CreateScene()
 	cone->Translate(0, 0, -2);
 	torus->Translate(0, 0, 2);
 
-	Model* barrelModel = NULL;
-	OBJParser::Parse(L"Assets/Models_Extra/barrel01.obj", &barrelModel);
+	//Model* barrelModel = NULL;
+	//OBJParser::Parse(L"Assets/Models_Extra/barrel01.obj", &barrelModel);
 
-	//barrelModel->SaveToFile(L"Assets/Models");
+	////barrelModel->SaveToFile(L"Assets/Models");
 
-	ModelNode* barrel = New ModelNode(L"barrel", NULL, barrelModel);
+	//ModelNode* barrel = New ModelNode(L"barrel", NULL, barrelModel);
 
-	sceneMgr->AddSceneNode(barrel);
-	barrel->Translate(0, 0, -4);
-	barrel->Scale(0.01f, 0.01f, 0.01f);
+	//sceneMgr->AddSceneNode(barrel);
+	//barrel->Translate(0, 0, -4);
+	//barrel->Scale(0.01f, 0.01f, 0.01f);
 
 	Model* crateModel = NULL;
 	OBJParser::Parse(L"Assets/Models_Extra/crate.obj", &crateModel);

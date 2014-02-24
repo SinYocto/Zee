@@ -2,6 +2,8 @@
 #include "Engine.h"
 #include "Camera.h"
 #include "CameraController.h"
+#include "OBJParser.h"
+#include "ModelNode.h"
 
 BEGIN_EVENT_TABLE(ModelPanel, wxPanel)
 END_EVENT_TABLE()
@@ -92,6 +94,10 @@ BEGIN_EVENT_TABLE(ModelListTree, wxTreeCtrl)
 EVT_TREE_SEL_CHANGED(ID_MODELLIST_TREE, ModelListTree::OnItemSelected)
 EVT_TREE_BEGIN_DRAG(ID_MODELLIST_TREE, ModelListTree::OnBeginDrag)
 EVT_TREE_END_DRAG(ID_MODELLIST_TREE, ModelListTree::OnEndDrag)
+EVT_CONTEXT_MENU(ModelListTree::OnContextMenu)
+EVT_TREE_ITEM_MENU(ID_MODELLIST_TREE, ModelListTree::OnItemMenu)
+EVT_MENU(ID_MODEL_PANEL_CONTEXT_MENU_IMPORT, ModelListTree::OnContextMenuImport)
+EVT_MENU(ID_MODEL_PANEL_ITEM_MENU_ADD_TO_SCENE, ModelListTree::OnItemMenuAddToScene)
 END_EVENT_TABLE()
 ModelListTree::ModelListTree( wxWindow* parent, wxWindowID id /*= wxID_ANY*/, const wxPoint& pos /*= wxDefaultPosition*/, 
 							 const wxSize&size /*= wxDefaultSize*/, long style /*= wxTR_DEFAULT_STYLE*/ )
@@ -127,6 +133,52 @@ void ModelListTree::OnEndDrag( wxTreeEvent& event )
 {
 	mInspectorPanel;
 
+}
+
+void ModelListTree::OnContextMenu(wxContextMenuEvent& event)
+{
+	wxPoint pt = event.GetPosition();
+	wxPoint clientPt = ScreenToClient(pt);
+
+	wxMenu menu;  
+	menu.Append(ID_MODEL_PANEL_CONTEXT_MENU_IMPORT, wxT("&import"));
+
+	PopupMenu(&menu, clientPt);
+}
+
+void ModelListTree::OnItemMenu(wxTreeEvent& event)
+{
+	ModelTreeItemData* itemData = (ModelTreeItemData*)GetItemData(event.GetItem());
+	Model* model = itemData->GetModel();
+
+	wxPoint pt = event.GetPoint();
+
+	wxMenu menu;
+	menu.Append(ID_MODEL_PANEL_ITEM_MENU_ADD_TO_SCENE, wxT("&add to scene"));
+
+	PopupMenu(&menu, pt);
+}
+
+void ModelListTree::OnContextMenuImport(wxCommandEvent& event)
+{
+	wxFileDialog dialog(this, L"Import", wxEmptyString, wxEmptyString, _T("OBJ files (*.obj*)|*.obj*"), wxFD_MULTIPLE);
+	if (dialog.ShowModal() == wxID_OK)
+	{
+		Model* model = NULL;
+		OBJParser::Parse(dialog.GetPath().wchar_str(), &model);
+
+		_Assert(NULL != model);
+		AppendItem(GetRootItem(), model->GetName(), 0, 0, New ModelTreeItemData(model));
+	}
+}
+
+void ModelListTree::OnItemMenuAddToScene(wxCommandEvent& event)
+{
+	ModelTreeItemData* itemData = (ModelTreeItemData*)GetItemData(GetSelection());
+	Model* model = itemData->GetModel();
+
+	event.SetClientData((void*)model);
+	event.Skip();
 }
 
 BEGIN_EVENT_TABLE(ModelInspectorPanel, wxScrolledWindow)

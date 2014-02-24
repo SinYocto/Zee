@@ -735,7 +735,7 @@ void Gizmo::applyTrans(Object* obj, Camera* camera, const Vector3& tangentX, con
 	}
 
 	if(mCoordinateType == COORDINATE_GLOBAL)
-	{		
+	{ 
 		obj->Translate(dx, dy, dz);
 	}
 	else

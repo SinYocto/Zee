@@ -35,11 +35,13 @@ public:
 	void LoadDataFromScene();
 	void RefreshInspector();
 
+	void AppendMaterial(wxTreeItemId parentItemId, Material* material);
+	void AppendMaterial(Material* material);
+
 	DECLARE_EVENT_TABLE()
 
 private:
 	void createWxCtrls();
-	void appendMaterial(wxTreeItemId parentItemId, Material* material);
 
 private:
 	wxPanel* mTreePanel;
