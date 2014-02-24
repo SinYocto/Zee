@@ -3,7 +3,7 @@
 
 #include "D3DUtility.h"
 
-#define MAX_NUM_POINT_LIGHTS 8
+#define MAX_NUM_POINT_LIGHTS 1
 
 struct PointLightData
 {

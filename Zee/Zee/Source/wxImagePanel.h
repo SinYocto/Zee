@@ -6,15 +6,17 @@
 class wxImagePanel : public wxPanel
 {
 public:
-	wxImagePanel(wxWindow* parent, wxString file, wxBitmapType format, wxSize size);
+	wxImagePanel(wxWindow* parent, wxString file, wxSize size);
 
-	void SetImage(wxString file, wxBitmapType format);
+	void SetImage(wxString file);
 
 private:
 	void paintEvent(wxPaintEvent & evt);
 	void paintNow();
 
 	void render(wxDC& dc);
+
+	static wxBitmapType determinBitmapType(wxString imageFilePath);
 
 	DECLARE_EVENT_TABLE()
 

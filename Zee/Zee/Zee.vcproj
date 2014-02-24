@@ -690,6 +690,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\Source\Profiler.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\Profiler.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Source\Renderer.cpp"
 			>
 		</File>

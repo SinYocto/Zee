@@ -276,6 +276,10 @@ void Geometry::SetVertexDeclaration()
 void Geometry::Draw()
 {
 	gEngine->GetDriver()->GetD3DDevice()->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, mGeoData.verts.size(), 0, mGeoData.tris.size());
+
+	Profiler::AddDrawCalls();
+	Profiler::AddNumVerts((int)mGeoData.verts.size());
+	Profiler::AddNumTris((int)mGeoData.tris.size());
 }
 
 void Geometry::SetVertexStream()

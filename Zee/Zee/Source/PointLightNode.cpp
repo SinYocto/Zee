@@ -24,7 +24,7 @@ PointLightNode::~PointLightNode()
 	SAFE_DROP(mBillboard);
 }
 
-void PointLightNode::updateAABBox()
+void PointLightNode::updateAABBoxSelf()
 {
 	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();
 

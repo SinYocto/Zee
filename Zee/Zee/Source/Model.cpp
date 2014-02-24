@@ -22,6 +22,13 @@ Model::Model(const wchar_t* name, const wchar_t* filePath)
 	gEngine->GetModelManager()->AddModel(this);
 }
 
+Model::Model(const wchar_t* name)
+{
+	YString::Copy(mName, _countof(mName), name);
+
+	gEngine->GetModelManager()->AddModel(this);
+}
+
 Model::~Model()
 {
 	for(std::list<Mesh*>::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter)

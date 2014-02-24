@@ -14,7 +14,7 @@ std::vector<Material*> OBJParser::mMtlList;
 
 Model* OBJParser::mResultModel = NULL;
 
-wchar_t OBJParser::mObjName[MAX_STR_LEN];
+wchar_t OBJParser::mFilePath[MAX_STR_LEN];
 wchar_t OBJParser::mCurSpecifierStr[MAX_STR_LEN];
 OBJParser::OBJ_SPECIFIER OBJParser::mCurSpecifier = OBJParser::OBJ_OTEHR;
 
@@ -40,7 +40,7 @@ bool OBJParser::Parse(const wchar_t* filePath, Model** result)
 		Assert(NULL != result);
 		Assert(*result == NULL);
 
-		YString::GetFileName(mObjName, _countof(mObjName), filePath, false);
+		YString::Copy(mFilePath, _countof(mFilePath), filePath);
 
 		PerformanceTimer::Begin(L"parsing OBJ file");
 
@@ -109,10 +109,14 @@ bool OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
 		break;
 	case MTLLIB:
 		{
-			wchar_t mtlFilePath[MAX_STR_LEN];
-			YString::Scan(lineContent, L"%*s %s", mtlFilePath);
+			wchar_t pathStr[MAX_PATH_LEN];
+			YString::Scan(lineContent, L"%*s %s", pathStr);
 
-			YString::GetFullPath(mtlFilePath, _countof(mtlFilePath));		// TODO:改成相对obj文件的路径
+			wchar_t mtlFilePath[MAX_PATH_LEN];
+			YString::GetParentDirPath(mtlFilePath, _countof(mtlFilePath), mFilePath);
+			YString::Concat(mtlFilePath, _countof(mtlFilePath), L"/", pathStr);
+
+			YString::GetFullPath(mtlFilePath, _countof(mtlFilePath));
 			parseMtl(mtlFilePath);
 
 			break;
@@ -121,21 +125,21 @@ bool OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
 		{
 			wchar_t lineStrs[3][MAX_STR_LEN];
 			YString::Scan(lineContent, L"%*c %s %s %s", &lineStrs[0], &lineStrs[1], &lineStrs[2]);
-			mPosData.push_back(Vector3(_wtof(lineStrs[0]), _wtof(lineStrs[1]), _wtof(lineStrs[2])));
+			mPosData.push_back(Vector3((float)_wtof(lineStrs[0]), (float)_wtof(lineStrs[1]), (float)_wtof(lineStrs[2])));
 			break;
 		}
 	case VERT_UV:
 		{
 			wchar_t lineStrs[2][MAX_STR_LEN];
-			YString::Scan(lineContent, L"%*c %s %s", &lineStrs[0], &lineStrs[1]);
-			uvData.push_back(Vector2(_wtof(lineStrs[0]), _wtof(lineStrs[1])));
+			YString::Scan(lineContent, L"%*s %s %s", &lineStrs[0], &lineStrs[1]);
+			uvData.push_back(Vector2(1.0f - (float)_wtof(lineStrs[0]), 1.0f - (float)_wtof(lineStrs[1])));
 			break;
 		}
 	case VERT_NORMAL: 
 		{
 			wchar_t lineStrs[3][MAX_STR_LEN];
 			YString::Scan(lineContent, L"%*c %s %s %s", &lineStrs[0], &lineStrs[1], &lineStrs[2]);
-			normalData.push_back(Vector3(_wtof(lineStrs[0]), _wtof(lineStrs[1]), _wtof(lineStrs[2])));
+			normalData.push_back(Vector3((float)_wtof(lineStrs[0]), (float)_wtof(lineStrs[1]), (float)_wtof(lineStrs[2])));
 			break;
 		}
 	case GROUP:
@@ -144,17 +148,27 @@ bool OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
 		}
 	case MESH_MTL:
 		{
-			//return true;
 			determineDataContentType();
 
 			std::vector<std::wstring> blockContent;
-			if(file->ReadBlock(&blockContent, L"usemtl", NULL, lineContent) != 0)
-				parseTrianglesBlock(blockContent);
+			blockContent.push_back(lineContent);
 
-			while(file->ReadBlock(&blockContent, L"usemtl") != 0)
+			wchar_t blockLineContent[MAX_STR_LEN];
+			while(file->ReadLine(blockLineContent, _countof(blockLineContent)) != NULL)
 			{
-				parseTrianglesBlock(blockContent);
+				OBJ_SPECIFIER specifier = OBJ_OTEHR;
+				getOBJSpecifier(blockLineContent, &specifier);
+
+				if(specifier == MESH_MTL || specifier == VERT_POS || specifier == VERT_UV || specifier == VERT_NORMAL)
+					break;
+
+				blockContent.push_back(blockLineContent);
 			}
+
+			parseTrianglesBlock(blockContent);
+
+			if(!file->ReachEnd())
+				parseLine(file, blockLineContent);
 
 			break;
 		}
@@ -162,6 +176,8 @@ bool OBJParser::parseLine(YFile* file, const wchar_t* lineContent)
 		{
 			break;
 		}
+	default:
+		_Assert(false);
 	}
 
 Exit:
@@ -216,24 +232,24 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 				{
 					Assert((*curGeo) == NULL);
 
+					wchar_t fileName[MAX_STR_LEN];
 					wchar_t geoName[MAX_STR_LEN];
 					wchar_t meshName[MAX_STR_LEN];
-					YString::Format(geoName, L"%s_geo_%d", mObjName, mGeoList.size());
-					YString::Format(meshName, L"%s_mesh_%d", mObjName, mGeoList.size());
+					YString::GetFileName(fileName, _countof(fileName), mFilePath, false);
+					YString::Format(geoName, L"%s_geo_%d", fileName, mGeoList.size());
+					YString::Format(meshName, L"%s_mesh_%d", fileName, mGeoList.size());
 
 					(*curGeo) = New Geometry(geoName);
 					mGeoList.push_back((*curGeo));
 
 					if(mResultModel == NULL)
 					{
-						mResultModel = New Model(mObjName, (*curGeo), material);
+						mResultModel = New Model(fileName);
 					}
-					else
-					{
-						subMesh = New Mesh(L"mesh", (*curGeo), material);
-						mResultModel->AddSubMesh(subMesh);
-						SAFE_DROP(subMesh);
-					}
+
+					subMesh = New Mesh(meshName, (*curGeo), material);
+					mResultModel->AddSubMesh(subMesh);
+					SAFE_DROP(subMesh);
 				}
 
 				break;
@@ -276,10 +292,10 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 
 				int vertIndex[4] = { -1, -1, -1, -1 };
 				Vector3 vert[4];
-				vert[0] = Vector3(posIndex[0] - 1, uvIndex[0] - 1, normalIndex[0] - 1);
-				vert[1] = Vector3(posIndex[1] - 1, uvIndex[1] - 1, normalIndex[1] - 1);
-				vert[2] = Vector3(posIndex[2] - 1, uvIndex[2] - 1, normalIndex[2] - 1);
-				vert[3] = Vector3(posIndex[3] - 1, uvIndex[3] - 1, normalIndex[3] - 1);
+				vert[0] = Vector3((float)posIndex[0] - 1, (float)uvIndex[0] - 1, (float)normalIndex[0] - 1);
+				vert[1] = Vector3((float)posIndex[1] - 1, (float)uvIndex[1] - 1, (float)normalIndex[1] - 1);
+				vert[2] = Vector3((float)posIndex[2] - 1, (float)uvIndex[2] - 1, (float)normalIndex[2] - 1);
+				vert[3] = Vector3((float)posIndex[3] - 1, (float)uvIndex[3] - 1, (float)normalIndex[3] - 1);
 
 				for(int i = 0; i < 4; ++i)
 				{			
@@ -393,11 +409,33 @@ void OBJParser::parseMtl(const wchar_t* mtlFilePath)
 	Assert(NULL != file);
 
 	{
+		bool isBlockStart = false;
 		std::vector<std::wstring> blockContent;
-		while(file->ReadBlock(&blockContent, L"newmtl") != 0)
+
+		wchar_t lineContent[MAX_STR_LEN];
+		while(file->ReadLine(lineContent, _countof(lineContent)) != NULL)
 		{
-			parseMtlBlock(blockContent);
+			MTL_SPECIFIER specifier = MTL_OTHER;
+			getMTLSpecifier(lineContent, &specifier);
+
+			if(specifier == NEW_MTL)
+			{
+				if(!isBlockStart)
+				{
+					isBlockStart = true;
+				}
+				else
+				{
+					parseMtlBlock(blockContent);
+					blockContent.clear();
+				}
+			}
+
+			if(isBlockStart)
+				blockContent.push_back(lineContent);
 		}
+
+		parseMtlBlock(blockContent);
 
 		file->Close();
 	}
@@ -496,22 +534,66 @@ void OBJParser::parseMtlLine(const wchar_t* lineContent, Material** curMaterial,
 		}
 	case AMBIENT_TEX:
 		{
-			YString::Scan(lineContent, L"%*s %s", materialContent->ambientTexFilePath);		// TODO:如果map_Ka后面没内容, 会读到什么?
+			wchar_t pathStr[MAX_PATH_LEN];
+			YString::Empty(pathStr);
+			YString::Scan(lineContent, L"%*s %s", pathStr);
+
+			if(!YString::isEmpty(pathStr))
+			{
+				wchar_t mtlFilePath[MAX_PATH_LEN];
+				YString::Copy(mtlFilePath, _countof(mtlFilePath), L"Assets/Textures/");
+				YString::Concat(mtlFilePath, _countof(mtlFilePath), pathStr);
+
+				YString::Copy(materialContent->ambientTexFilePath, _countof(materialContent->ambientTexFilePath), mtlFilePath);
+			}
 			break;
 		}
 	case DIFFUSE_TEX:
 		{
-			YString::Scan(lineContent, L"%*s %s", materialContent->diffuseTexFilePath);
+			wchar_t pathStr[MAX_PATH_LEN];
+			YString::Empty(pathStr);
+			YString::Scan(lineContent, L"%*s %s", pathStr);
+
+			if(!YString::isEmpty(pathStr))
+			{
+				wchar_t mtlFilePath[MAX_PATH_LEN];
+				YString::Copy(mtlFilePath, _countof(mtlFilePath), L"Assets/Textures/");
+				YString::Concat(mtlFilePath, _countof(mtlFilePath), pathStr);
+
+				YString::Copy(materialContent->diffuseTexFilePath, _countof(materialContent->diffuseTexFilePath), mtlFilePath);
+			}
 			break;
 		}
 	case SPEC_TEX:
 		{
-			YString::Scan(lineContent, L"%*s %s", materialContent->specTexFilePath);
+			wchar_t pathStr[MAX_PATH_LEN];
+			YString::Empty(pathStr);
+			YString::Scan(lineContent, L"%*s %s", pathStr);
+
+			if(!YString::isEmpty(pathStr))
+			{
+				wchar_t mtlFilePath[MAX_PATH_LEN];
+				YString::Copy(mtlFilePath, _countof(mtlFilePath), L"Assets/Textures/");
+				YString::Concat(mtlFilePath, _countof(mtlFilePath), pathStr);
+
+				YString::Copy(materialContent->specTexFilePath, _countof(materialContent->specTexFilePath), mtlFilePath);
+			}
 			break;
 		}
 	case BUMP_TEX:
 		{
-			YString::Scan(lineContent, L"%*s %s", materialContent->bumpTexFilePath);
+			wchar_t pathStr[MAX_PATH_LEN];
+			YString::Empty(pathStr);
+			YString::Scan(lineContent, L"%*s %s", pathStr);
+
+			if(!YString::isEmpty(pathStr))
+			{
+				wchar_t mtlFilePath[MAX_PATH_LEN];
+				YString::Copy(mtlFilePath, _countof(mtlFilePath), L"Assets/Textures/");
+				YString::Concat(mtlFilePath, _countof(mtlFilePath), pathStr);
+
+				YString::Copy(materialContent->bumpTexFilePath, _countof(materialContent->bumpTexFilePath), mtlFilePath);
+			}
 			break;
 		}
 	case MTL_OTHER:

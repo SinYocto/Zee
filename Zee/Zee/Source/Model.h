@@ -14,6 +14,7 @@ class AABBox;
 class Model : public IReferenceCounted
 {
 public:
+	Model(const wchar_t* name);
 	Model(const wchar_t* name, const wchar_t* filePath);
 	Model(const wchar_t* name, Geometry* geo, Material* material);
 

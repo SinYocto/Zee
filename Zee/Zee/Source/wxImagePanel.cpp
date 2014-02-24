@@ -1,14 +1,15 @@
 #include "wxImagePanel.h"
+#include "Common.h"
 
 BEGIN_EVENT_TABLE(wxImagePanel, wxPanel)
 EVT_PAINT(wxImagePanel::paintEvent)
 END_EVENT_TABLE()
 
-wxImagePanel::wxImagePanel(wxWindow* parent, wxString file, wxBitmapType format, wxSize size) 
+wxImagePanel::wxImagePanel(wxWindow* parent, wxString file, wxSize size) 
 :wxPanel(parent, wxID_ANY, wxDefaultPosition, size)
 {
 	mSize = size;
-	SetImage(file, format);
+	SetImage(file);
 }
 
 void wxImagePanel::paintEvent(wxPaintEvent & evt)
@@ -28,10 +29,11 @@ void wxImagePanel::render(wxDC&  dc)
 	dc.DrawBitmap(mImage, 0, 0, false);
 }
 
-void wxImagePanel::SetImage(wxString file, wxBitmapType format)
+void wxImagePanel::SetImage(wxString file)
 {
+	wxBitmapType imageType = determinBitmapType(file);
 	wxImage originImage;
-	originImage.LoadFile(file, format);
+	originImage.LoadFile(file, imageType);
 
 	int imageW = originImage.GetWidth();
 	int imageH = originImage.GetHeight();
@@ -52,4 +54,28 @@ void wxImagePanel::SetImage(wxString file, wxBitmapType format)
 	mImage = wxBitmap(originImage);
 
 	Refresh();
+}
+
+wxBitmapType wxImagePanel::determinBitmapType(wxString imageFilePath)
+{
+	wchar_t suffix[MAX_STR_LEN];
+	YString::GetFileSuffix(suffix, _countof(suffix), imageFilePath.wc_str());
+
+	if(YString::Compare(suffix, L"jpg", true) == 0)
+	{
+		return wxBITMAP_TYPE_JPEG;
+	}
+	else if(YString::Compare(suffix, L"tga", true) == 0)
+	{
+		return wxBITMAP_TYPE_TGA;
+	}
+	else if(YString::Compare(suffix, L"png", true) == 0)
+	{
+		return wxBITMAP_TYPE_PNG;
+	}
+	else
+	{
+		_Assert(false);
+		return wxBITMAP_TYPE_JPEG;
+	}
 }

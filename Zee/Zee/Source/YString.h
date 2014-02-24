@@ -38,6 +38,7 @@ public:
 	static void GetFileNameWithoutSuffix(wchar_t* resultName, int size, const wchar_t* fileFullName);
 	static void GetFileSuffix(wchar_t* resultSuffix, int size, const wchar_t* path);
 	static void GetDirFiles(const wchar_t* path, const wchar_t* suffix, std::vector<std::wstring>& filesPathVec);
+	static void GetParentDirPath(wchar_t* resultPath, int size, const wchar_t* path);
 
 private:
 	static int vsscanf(const char* str, const char* format, va_list argPtr);

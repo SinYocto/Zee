@@ -78,6 +78,9 @@ public:
 	Quaternion GetWorldOrient();
 
 	ObjectList GetChildren();
+	Object* GetParent();
+
+	void GetChildrenV2(ObjectList* &children);
 
 	Vector3 GetWorldRight();
 	Vector3 GetWorldUp();

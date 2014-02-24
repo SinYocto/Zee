@@ -10,7 +10,7 @@ void GeometryManager::AddGeometry(Geometry* geo)
 {
 	_Assert(NULL != geo);
 
-	_Assert(!YString::isEmpty(geo->GetFilePath()));
+	//_Assert(!YString::isEmpty(geo->GetFilePath()));
 	GeoHashMap::iterator iter = mGeometries.find(geo->GetFilePath());
 	if(iter != mGeometries.end())
 	{

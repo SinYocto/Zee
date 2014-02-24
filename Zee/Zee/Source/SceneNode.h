@@ -68,7 +68,7 @@ public:
 
 	SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
 
-	void FrameUpdate();
+	//virtual void FrameUpdate();
 
 	virtual void Draw(Camera* camera);
 
@@ -91,6 +91,7 @@ public:
 
 protected:
 	virtual void updateAABBox();
+	virtual void updateAABBoxSelf();
 
 protected:
 	DWORD mID;

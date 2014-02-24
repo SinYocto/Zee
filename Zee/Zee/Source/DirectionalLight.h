@@ -3,7 +3,7 @@
 
 #include "D3DUtility.h"
 
-#define MAX_NUM_DIRECTIONAL_LIGHTS 2
+#define MAX_NUM_DIRECTIONAL_LIGHTS 1
 
 struct DirectionalLightData
 {

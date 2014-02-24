@@ -20,7 +20,7 @@ public:
 	Mesh* GetMesh();
 
 private:
-	virtual void updateAABBox();
+	virtual void updateAABBoxSelf();
 
 private:
 	Mesh* mMesh;

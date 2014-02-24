@@ -94,7 +94,9 @@ private:
 	static void determineDataContentType();
 
 private:
-	// 解析过程中存的数据和状态
+	static Model* mResultModel;
+	static wchar_t mFilePath[MAX_STR_LEN];
+
 	static DWORD mDataContentType;
 	static std::vector<Vector3> mPosData;
 	static std::vector<Vector2> uvData;
@@ -102,10 +104,6 @@ private:
 
 	static std::vector<Geometry*> mGeoList;
 	static std::vector<Material*> mMtlList;
-
-	static Model* mResultModel;
-
-	static wchar_t mObjName[MAX_STR_LEN];
 
 	static wchar_t mCurSpecifierStr[MAX_STR_LEN];
 	static OBJ_SPECIFIER mCurSpecifier;

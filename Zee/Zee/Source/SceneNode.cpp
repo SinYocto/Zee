@@ -40,19 +40,8 @@ void SceneNode::SetStaticFlag(bool isStatic)
 	mAttribute.isStatic = isStatic;
 }
 
-void SceneNode::FrameUpdate()
+void SceneNode::updateAABBoxSelf()
 {
-	updateAABBox();		// TODO:当前没管sceneNode的isStatic标志, 通通都更新计算AABB
-
-	for(std::list<Object*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
-	{
-		SceneNode* node = static_cast<SceneNode*>(*iter);
-		node->FrameUpdate();
-	}
-}
-
-void SceneNode::updateAABBox()
- {
 	mAABBox = AABBox::Invalid;
 
 	for(std::list<Object*>::iterator iter = mChildren.begin(); iter != mChildren.end(); ++iter)
@@ -60,6 +49,18 @@ void SceneNode::updateAABBox()
 		SceneNode* node = static_cast<SceneNode*>(*iter);
 		mAABBox = AABBox::CombineBBox(mAABBox, node->GetAABBox());
 	}
+}
+
+void SceneNode::updateAABBox()
+ {
+	 updateAABBoxSelf();
+
+	 SceneNode* parent = static_cast<SceneNode*>(GetParent());
+	 while(parent != NULL)
+	 {
+		 parent->updateAABBox();
+		 parent = static_cast<SceneNode*>(parent->GetParent());
+	 }
 }
 
 void SceneNode::Draw(Camera* camera)
@@ -153,6 +154,7 @@ void SceneNode::UnRegisterEventHandler(ISceneNodeEventHandler* eventHandler)
 void SceneNode::OnTransformChanged()
 {
 	Object::OnTransformChanged();
+	updateAABBox();
 
 	for(std::list<ISceneNodeEventHandler*>::iterator iter = mEventHandlerList.begin(); iter !=mEventHandlerList.end(); ++iter)
 	{

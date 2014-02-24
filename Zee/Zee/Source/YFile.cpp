@@ -41,7 +41,7 @@ Exit:
 	return file;
 }
 
-bool YFile::reachEnd()
+bool YFile::ReachEnd()
 {
 	return feof(pFile) != 0;
 }

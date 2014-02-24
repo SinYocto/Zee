@@ -40,6 +40,7 @@ void OnResetDevice();
 
 void SetupGUIStyle();
 void GUIUpdate();
+void GUIUpdateAfterEngineUpdate();
 
 void CreateScene();
 // -------------------------------------------
@@ -63,7 +64,8 @@ SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, co
 
 	D3DDeviceParams deviceParams;
 	deviceParams.hWnd = (HWND)mCanvas->GetHWND();
-	deviceParams.multisampleType = D3DMULTISAMPLE_4_SAMPLES;
+	//deviceParams.multisampleType = D3DMULTISAMPLE_4_SAMPLES;
+	deviceParams.multisampleType = D3DMULTISAMPLE_NONE;
 
 	// init engine
 	gEngine = New Engine();
@@ -87,7 +89,7 @@ SceneEditorFrame::SceneEditorFrame(const wxString& title, const wxPoint& pos, co
 	//mWndTreeGenerator = new TreeGeneratorFrame(this, L"Tree Generator", wxDefaultPosition, wxDefaultSize);
 	//mWndTreeGenerator->Centre();
 	//mWndTreeGenerator->Show(false);
- //
+	//
 	//mWndTreeGenerator->Setup();
 }
 
@@ -193,44 +195,13 @@ void SceneEditorCanvas::OnSize(wxSizeEvent& event)
 
 void CreateScene()
 {
-
-	//PerformanceTimer::Begin(L"read line test(fgets)");
-	//YFile* file = YFile::Open(L"Assets/Models_Extra/test1.obj", YFile::READ);
-
-	//wchar_t lineContent[MAX_STR_LEN];
-	//while(file->ReadLine(lineContent, MAX_STR_LEN) != NULL)
-	//{
-	//	// do nothing
-	//}
-	//file->Close();
-	//PerformanceTimer::End();
-
-	//PerformanceTimer::Begin(L"parse line test(fgets + scanf(1c,3d) + atoi)");
-	//file = YFile::Open(L"Assets/Models_Extra/test1.obj", YFile::READ);
-
-	//while(file->ReadLine(lineContent, MAX_STR_LEN) != NULL)
-	//{
-	//	int a,b,c;
-	//	Vector3 pos;
-	//	wchar_t strs[3][MAX_STR_LEN];
-	//	YString::Scan(lineContent, L"%*c %d %d %d", &a, &b, &c);
-
-	//	//int x = _wtoi(strs[0]);
-	//	//int y = _wtoi(strs[1]);
-	//	//int z = _wtoi(strs[2]);
-	//}
-	//file->Close();
-	//PerformanceTimer::End();
-
-
-
 	Driver* driver = gEngine->GetDriver();
 
 	// camera
 	SceneManager* sceneMgr = gEngine->GetSceneManager();
 
 	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(0);
-	sceneMgr->CreateMainCamera(Vector3(0, 4.0f, -4.0f), Vector3::Zero,
+	sceneMgr->CreateMainCamera(Vector3(0, 4.0f, -14.0f), Vector3::Zero,
 		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 1000.0f);
 
 	Camera* mainCamera = sceneMgr->GetMainCamera();
@@ -263,7 +234,7 @@ void CreateScene()
 	Geometry* coneGeo = New Geometry(L"coneGeo", L"Assets/Geometries/defaultCone.geo");
 	Geometry* cylinderGeo = New Geometry(L"cylinderGeo", L"Assets/Geometries/defaultCylinder.geo");
 	Geometry* torusGeo = New Geometry(L"torusGeo", L"Assets/Geometries/defaultTorus.geo");
-
+ 
 	geometryMgr->AddGeometry(cubeGeo);
 	geometryMgr->AddGeometry(coneGeo);
 	geometryMgr->AddGeometry(cylinderGeo);
@@ -296,6 +267,34 @@ void CreateScene()
 	materialMgr->AddMaterial(mtlBump);
 
 	// model
+	//Model* coneModel = new Model(L"cone", L"Assets/Models/cone.model");
+
+	//const int COUNTS = 10;
+	//const float INTERVAL = 2.0f;
+
+	//for(int i = 0; i < COUNTS; ++i)
+	//{
+	//	float z = - (COUNTS - 1) * INTERVAL / 2.0f + i * INTERVAL;
+	//	for(int j = 0; j < COUNTS; ++j)
+	//	{
+	//		float x = - (COUNTS - 1) * INTERVAL / 2.0f + j * INTERVAL;
+
+	//		for(int k = 0; k < COUNTS; ++k)
+	//		{
+	//			float y = - (COUNTS - 1) * INTERVAL / 2.0f + k * INTERVAL;
+
+	//			wchar_t name[MAX_STR_LEN];
+	//			YString::Format(name, L"cone[%d][%d][%d]", i, j, k);
+
+	//			ModelNode* instance = New ModelNode(name, NULL, new Model(name, L"Assets/Models/cone.model"));	
+	//			sceneMgr->AddSceneNode(instance);
+
+	//			instance->Translate(x, y, z);
+	//		}
+	//	}
+	//}
+
+
 	ModelNode* cube = New ModelNode(L"cube", NULL, new Model(L"cube", L"Assets/Models/cube.model"));	
 	ModelNode* cylinder = New ModelNode(L"cylinder", NULL, new Model(L"cylinder", L"Assets/Models/cylinder.model"));	
 	ModelNode* cone = New ModelNode(L"cone", NULL, new Model(L"cone", L"Assets/Models/cone.model"));	
@@ -311,17 +310,27 @@ void CreateScene()
 	cone->Translate(0, 0, -2);
 	torus->Translate(0, 0, 2);
 
-	Model* bunnyModel = NULL;
-	OBJParser::Parse(L"Assets/Models_Extra/teapot.obj", &bunnyModel);
+	Model* barrelModel = NULL;
+	OBJParser::Parse(L"Assets/Models_Extra/barrel01.obj", &barrelModel);
 
-	bunnyModel->SaveToFile(L"Assets/Models");
+	//barrelModel->SaveToFile(L"Assets/Models");
 
-	ModelNode* bunny = New ModelNode(L"bunny", NULL, bunnyModel);
+	ModelNode* barrel = New ModelNode(L"barrel", NULL, barrelModel);
 
-	sceneMgr->AddSceneNode(bunny);
-	bunny->Translate(4, 0, 0);
-	bunny->Scale(0.1f, 0.1f, 0.1f);
+	sceneMgr->AddSceneNode(barrel);
+	barrel->Translate(0, 0, -4);
+	barrel->Scale(0.01f, 0.01f, 0.01f);
 
+	Model* crateModel = NULL;
+	OBJParser::Parse(L"Assets/Models_Extra/crate.obj", &crateModel);
+
+	//bunnyModel->SaveToFile(L"Assets/Models");
+
+	ModelNode* crate = New ModelNode(L"crate", NULL, crateModel);
+
+	sceneMgr->AddSceneNode(crate);
+	crate->Translate(0, 0, -6);
+	crate->Scale(0.01f, 0.01f, 0.01f);
 	
 
 
@@ -353,9 +362,10 @@ void SceneEditorCanvas::RenderLoop()
 	case D3D_OK:
 		{
 			// update state
-			gEngine->FrameUpdate();
-
 			GUIUpdate();
+			gEngine->FrameUpdate();
+			GUIUpdateAfterEngineUpdate();
+
 
 			if(wxWindow::FindFocus() == this)
 				mainCamera->ApplyCameraController();
@@ -422,12 +432,18 @@ void GUIUpdate()
 	gEngine->GetDriver()->GetScreenLocation(screenPos, &screenLocation);
 
 	wchar_t text[MAX_STR_LEN];
-	YString::Format(text, TEXT("fps:%d"), gEngine->GetFrameTimer()->GetFPS());
-	gGUISystem.GUILabel(text, Rect(10, 10, 300, 25), leftAlignStyle);
+	YString::Format(text, TEXT("drawcalls:%d"), Profiler::GetNumDrawCalls());
+	gGUISystem.GUILabel(text, Rect(10, 40, 300, 25), leftAlignStyle);
+
+	YString::Format(text, TEXT("verts:%d"), Profiler::GetNumVerts());
+	gGUISystem.GUILabel(text, Rect(10, 70, 300, 25), leftAlignStyle);
+
+	YString::Format(text, TEXT("tris:%d"), Profiler::GetNumTris());
+	gGUISystem.GUILabel(text, Rect(10, 100, 300, 25), leftAlignStyle);
 
 	YString::Format(text, L"screenPos:%d, %d(%f, %f)", cursorPos.x, cursorPos.y, 
 		screenLocation.x, screenLocation.y);
-	gGUISystem.GUILabel(text, Rect(10, 40, 300, 25), leftAlignStyle);
+	gGUISystem.GUILabel(text, Rect(10, 130, 300, 25), leftAlignStyle);
 
 
 	//static bool enableDirLight1 = true;
@@ -436,6 +452,13 @@ void GUIUpdate()
 	//DirectionalLight* dirLight1 = NULL;
 	//gEngine->GetLightManager()->GetDirLight(L"dirLight1", &dirLight1);
 	//dirLight1->Enable(enableDirLight1);
+}
+
+void GUIUpdateAfterEngineUpdate()
+{
+	wchar_t text[MAX_STR_LEN];
+	YString::Format(text, TEXT("fps:%d"), gEngine->GetFrameTimer()->GetFPS());
+	gGUISystem.GUILabel(text, Rect(10, 10, 300, 25), leftAlignStyle);
 }
 
 void AppDestroy()

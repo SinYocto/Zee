@@ -150,8 +150,6 @@ void SceneManager::FrameUpdate()
 	if(extraCamera)
 		extraCamera->FrameUpdate();
 
-	root->FrameUpdate();
-
 	collectSceneEntities();
 }
 
@@ -214,7 +212,7 @@ void SceneManager::collectSceneNode(SceneNode* sceneNode)
 			_Assert(NULL != meshMaterial);
 
 			ShadingMethod method = meshMaterial->GetShadingMethod();
-
+ 
 			ShadingMethodMeshNodeListMap::iterator iter = mMeshNodeLists.find(method);
 			if(iter != mMeshNodeLists.end())
 			{
@@ -249,8 +247,9 @@ void SceneManager::collectSceneNode(SceneNode* sceneNode)
 		mPointLihgtNodes.push_back(pointLightNode);
 	}
 
-	std::list<Object*> children = sceneNode->GetChildren();
-	for(std::list<Object*>::iterator iter = children.begin(); iter != children.end(); ++iter)
+	std::list<Object*>* children = NULL;
+	sceneNode->GetChildrenV2(children);
+	for(std::list<Object*>::iterator iter = (*children).begin(); iter != (*children).end(); ++iter)
 	{
 		SceneNode* node = static_cast<SceneNode*>(*iter);
 		collectSceneNode(node);

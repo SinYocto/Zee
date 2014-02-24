@@ -105,6 +105,9 @@ void Billboard::Draw(const Vector3& pos, Camera* camera)
 	//effect->BeginPass(0);
 
 	d3dDevice->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, 2);
+	Profiler::AddDrawCalls();
+	Profiler::AddNumVerts(4);
+	Profiler::AddNumTris(2);
 
 	//effect->EndPass();
 	//effect->End();

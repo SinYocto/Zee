@@ -400,3 +400,24 @@ void YString::GetDirFiles(const wchar_t* dirPath, const wchar_t* suffix, std::ve
 
 	_findclose(handle);
 }
+
+void YString::GetParentDirPath(wchar_t* resultPath, int size, const wchar_t* path)
+{
+	wchar_t pathStr[MAX_PATH_LEN];
+	Copy(pathStr, _countof(pathStr), path);
+
+	NormalizePath(pathStr);
+
+	int ptrPos = 0;
+	while(pathStr[ptrPos] != 0)
+		++ptrPos;
+
+	while(pathStr[ptrPos] != '/' && ptrPos > 0)
+		--ptrPos;
+
+	if(ptrPos > 0)
+		pathStr[ptrPos] = 0;
+
+	YString::Copy(resultPath, size, pathStr);
+	return;
+}

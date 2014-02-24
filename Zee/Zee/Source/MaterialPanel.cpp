@@ -275,8 +275,8 @@ void MaterialInfoPanel::createWxCtrls()
 	fgSizer3->Add(textTex1, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 	fgSizer3->Add(mBitmapBtnTex1, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
 
-	mTex0 = New wxImagePanel(this, wxT("./Assets/Textures/black128x128.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
-	mTex1 = New wxImagePanel(this, wxT("./Assets/Textures/black128x128.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
+	mTex0 = New wxImagePanel(this, wxT("./Assets/Textures/black128x128.jpg"), wxSize(128, 128));
+	mTex1 = New wxImagePanel(this, wxT("./Assets/Textures/black128x128.jpg"), wxSize(128, 128));
 
 
 	boxSizer1->Add(fgSizer1, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
@@ -347,13 +347,13 @@ void MaterialInfoPanel::LoadDataFromMaterial(Material* mtl)
 
 	if(texLayerCounts > 0)
 	{
-		mTex0->SetImage(mtl->GetTexture(0)->GetFilePath(), wxBITMAP_TYPE_JPEG);	// TODO: 类型
+		mTex0->SetImage(mtl->GetTexture(0)->GetFilePath());
 		mTex0->Show();
 	}
 
 	if(texLayerCounts > 1)
 	{
-		mTex1->SetImage(mtl->GetTexture(1)->GetFilePath(), wxBITMAP_TYPE_JPEG);	// TODO: 类型
+		mTex1->SetImage(mtl->GetTexture(1)->GetFilePath());
 		mTex1->Show();
 	}
 

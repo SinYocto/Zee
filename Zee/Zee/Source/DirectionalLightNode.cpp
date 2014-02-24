@@ -25,7 +25,7 @@ DirectionalLightNode::~DirectionalLightNode()
 	SAFE_DROP(mBillboard);
 }
 
-void DirectionalLightNode::updateAABBox()
+void DirectionalLightNode::updateAABBoxSelf()
 {
 	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();
 

@@ -584,6 +584,9 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 		int numVerts = chunk->mSize * chunk->mSize;
 
 		d3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, chunk->GetTriCounts());
+		Profiler::AddDrawCalls();
+		Profiler::AddNumVerts(numVerts);
+		Profiler::AddNumTris(chunk->GetTriCounts());
 
 		if(mDrawBBox && chunk->mNode->GetAABBox().isValid())
 		{

@@ -13,6 +13,7 @@
 #include "Time.h"
 #include "IDAllocator.h"
 #include "Gizmo.h"
+#include "Profiler.h"
 
 class Engine
 {

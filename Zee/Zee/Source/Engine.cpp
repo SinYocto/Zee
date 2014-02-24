@@ -73,6 +73,8 @@ void Engine::FrameUpdate()
 	mLightMgr->FrameUpdate();
 	mMaterialMgr->FrameUpdate();
 	mGizmo->FrameUpdate();
+
+	Profiler::FrameUpdate();
 }
 
 void Engine::Destroy()

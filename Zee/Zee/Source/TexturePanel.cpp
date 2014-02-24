@@ -201,7 +201,7 @@ void TextureInfoPanel::createWxCtrls()
 {
 	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
-	mImage = New wxImagePanel(this, wxT("./Assets/Textures/black128x128.jpg"), wxBITMAP_TYPE_JPEG, wxSize(128, 128));
+	mImage = New wxImagePanel(this, wxT("./Assets/Textures/black128x128.jpg"), wxSize(128, 128));
 
 	boxSizer1->Add(mImage, 0, wxALL | wxALIGN_CENTER_VERTICAL, 2);
 
@@ -215,5 +215,5 @@ void TextureInfoPanel::LoadDataFromTexture(Texture* texture)
 	if(!texture)
 		return;
 
-	mImage->SetImage(texture->GetFilePath(), wxBITMAP_TYPE_JPEG);	// TODO: ÀàÐÍ
+	mImage->SetImage(texture->GetFilePath());
 }

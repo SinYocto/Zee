@@ -19,7 +19,7 @@ public:
 	Billboard* GetBillboard();
 
 private:
-	virtual void updateAABBox();
+	virtual void updateAABBoxSelf();
 
 private:
 	Billboard* mBillboard;

@@ -19,7 +19,7 @@ public:
 	virtual void OnTransformChanged();
 
 private:
-	virtual void updateAABBox();
+	virtual void updateAABBoxSelf();
 
 private:
 	DirectionalLight* mDirLight;

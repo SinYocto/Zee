@@ -36,9 +36,7 @@ public:
 	static bool Exist(const wchar_t* filePath);
 
 	bool Close();
-
-private:
-	bool reachEnd();
+	bool ReachEnd();
 
 public:
 	FILE* pFile;
