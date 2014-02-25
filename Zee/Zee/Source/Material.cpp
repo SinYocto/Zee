@@ -57,6 +57,42 @@ Material::Material( const Material& mtl ) :mParamsVec1(mtl.mParamsVec1)
 	}
 }
 
+Material::Material(const wchar_t* name, Material* mtl) :mParamsVec1(mtl->mParamsVec1)
+,mParamsVec2(mtl->mParamsVec2)
+,mShader(NULL)
+{
+	YString::Empty(mFilePath);
+	YString::Copy(mName, _countof(mName), name);
+
+	mMtlData.ambientColor = mtl->mMtlData.ambientColor;
+	mMtlData.diffColor = mtl->mMtlData.diffColor;
+	mMtlData.specColor = mtl->mMtlData.specColor;
+	mMtlData.shiness = mtl->mMtlData.shiness;
+	mMtlData.gloss = mtl->mMtlData.gloss;
+	mMtlData.tilesU = mtl->mMtlData.tilesU;
+	mMtlData.tilesV = mtl->mMtlData.tilesV;
+	mMtlData.offsetU = mtl->mMtlData.offsetU;
+	mMtlData.offsetV = mtl->mMtlData.offsetV;
+	mMtlData.shadingMethod = mtl->mMtlData.shadingMethod;
+
+	for(int i = 0; i < MAX_MATERIAL_TEXTURE_LAYERS; ++i)
+	{
+		YString::Copy(mMtlData.texFilesPath[i], MAX_PATH_LEN, mtl->mMtlData.texFilesPath[i]);
+	}
+
+	SetShader(mMtlData.shadingMethod);
+
+	for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
+	{
+		mTextureLayer[layerIx] = mtl->mTextureLayer[layerIx];
+
+		if(mTextureLayer[layerIx])
+			mTextureLayer[layerIx]->Grab();
+	}
+
+	gEngine->GetIDAllocator()->AllocateMaterialID(this);
+}
+
 Material::~Material()
 {
 	for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)

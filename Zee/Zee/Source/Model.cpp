@@ -29,6 +29,22 @@ Model::Model(const wchar_t* name)
 	gEngine->GetModelManager()->AddModel(this);
 }
 
+Model::Model(const wchar_t* name, Model* model)
+{
+	YString::Copy(mName, _countof(mName), name);
+
+	std::list<Mesh*> meshList = model->GetSubMeshList();
+	for(std::list<Mesh*>::iterator iter = meshList.begin(); iter != meshList.end(); ++iter)
+	{
+		Mesh* mesh = new Mesh(L"mesh", *iter);
+
+		AddSubMesh(mesh);
+		SAFE_DROP(mesh);
+	}
+
+	gEngine->GetModelManager()->AddModel(this);
+}
+
 Model::~Model()
 {
 	for(std::list<Mesh*>::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter)

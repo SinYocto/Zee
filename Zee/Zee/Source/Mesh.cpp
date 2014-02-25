@@ -18,6 +18,27 @@ Mesh::Mesh(const wchar_t* name, Geometry* geo, Material* material)
 	}
 }
 
+Mesh::Mesh(const wchar_t* name, Mesh* mesh)
+{
+	YString::Copy(mName, _countof(mName), name);
+
+	mGeo = mesh->GetGeometry();
+
+	Material* mtl = mesh->GetMaterial();
+	mMaterial = new Material(mtl->GetName(), mtl);
+	gEngine->GetMaterialManager()->AddMaterial(mMaterial);
+
+	if(NULL != mGeo)
+	{
+		mGeo->Grab();
+	}
+
+	if(NULL != mMaterial)
+	{
+		mMaterial->Grab();
+	}
+}
+
 void Mesh::Draw(const D3DXMATRIX& matWorld, Camera* camera, bool isSolid)
 {
 	if(NULL == mGeo || NULL == mMaterial)

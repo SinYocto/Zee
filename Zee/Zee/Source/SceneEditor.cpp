@@ -211,34 +211,34 @@ void CreateScene()
 	mainCamera->SetCameraController(fpCameraController);
 
 	// lights
-	DirectionalLight* dirLight1 = New DirectionalLight(L"dirLight1", D3DXCOLOR_WHITE, Vector3(1.0f, -1.0f, 1.0f));
-	PointLight* pointLight1 = New PointLight(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(0, 0, 0), Vector3(1.0f, 0.05f, 0));
+	//DirectionalLight* dirLight1 = New DirectionalLight(L"dirLight1", D3DXCOLOR_WHITE, Vector3(1.0f, -1.0f, 1.0f));
+	//PointLight* pointLight1 = New PointLight(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(0, 0, 0), Vector3(1.0f, 0.05f, 0));
 
-	LightManager* lightMgr = gEngine->GetLightManager();
-	lightMgr->SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
+	//LightManager* lightMgr = gEngine->GetLightManager();
+	//lightMgr->SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
 
-	lightMgr->AddDirectionalLight(dirLight1);
-	lightMgr->AddPointLight(pointLight1);
-	pointLight1->Enable(false);
+	//lightMgr->AddDirectionalLight(dirLight1);
+	//lightMgr->AddPointLight(pointLight1);
+	//pointLight1->Enable(false);
 
-	DirectionalLightNode* dirLightNode1 = New DirectionalLightNode(NULL, dirLight1);
-	sceneMgr->AddSceneNode(dirLightNode1);
+	//DirectionalLightNode* dirLightNode1 = New DirectionalLightNode(NULL, dirLight1);
+	//sceneMgr->AddSceneNode(dirLightNode1);
 
-	PointLightNode* pointLightNode1 = New PointLightNode(NULL, pointLight1);
-	sceneMgr->AddSceneNode(pointLightNode1);
+	//PointLightNode* pointLightNode1 = New PointLightNode(NULL, pointLight1);
+	//sceneMgr->AddSceneNode(pointLightNode1);
 
 	// geo
-	GeometryManager* geometryMgr = gEngine->GetGeometryManager();
+	//GeometryManager* geometryMgr = gEngine->GetGeometryManager();
 
-	Geometry* cubeGeo = New Geometry(L"cubeGeo", L"Assets/Geometries/defaultCube.geo");
-	Geometry* coneGeo = New Geometry(L"coneGeo", L"Assets/Geometries/defaultCone.geo");
-	Geometry* cylinderGeo = New Geometry(L"cylinderGeo", L"Assets/Geometries/defaultCylinder.geo");
-	Geometry* torusGeo = New Geometry(L"torusGeo", L"Assets/Geometries/defaultTorus.geo");
- 
-	geometryMgr->AddGeometry(cubeGeo);
-	geometryMgr->AddGeometry(coneGeo);
-	geometryMgr->AddGeometry(cylinderGeo);
-	geometryMgr->AddGeometry(torusGeo);
+	//Geometry* cubeGeo = New Geometry(L"cubeGeo", L"Assets/Geometries/defaultCube.geo");
+	//Geometry* coneGeo = New Geometry(L"coneGeo", L"Assets/Geometries/defaultCone.geo");
+	//Geometry* cylinderGeo = New Geometry(L"cylinderGeo", L"Assets/Geometries/defaultCylinder.geo");
+	//Geometry* torusGeo = New Geometry(L"torusGeo", L"Assets/Geometries/defaultTorus.geo");
+ //
+	//geometryMgr->AddGeometry(cubeGeo);
+	//geometryMgr->AddGeometry(coneGeo);
+	//geometryMgr->AddGeometry(cylinderGeo);
+	//geometryMgr->AddGeometry(torusGeo);
 
 	// textures
 	TextureManager* textureMgr = gEngine->GetTextureManger();
@@ -252,19 +252,19 @@ void CreateScene()
 	}
 
 	// material
-	MaterialManager* materialMgr = gEngine->GetMaterialManager();
+	//MaterialManager* materialMgr = gEngine->GetMaterialManager();
 
-	Material* mtlFlat = New Material(L"mtlFlat", L"Assets/Materials/flat.material");
-	Material* mtlView = New Material(L"mtlView", L"Assets/Materials/view.material");
-	Material* mtlDiff = New Material(L"mtlDiff", L"Assets/Materials/diff.material");
-	Material* mtlSpec = New Material(L"mtlSpec", L"Assets/Materials/spec.material");
-	Material* mtlBump = New Material(L"mtlBump", L"Assets/Materials/bump.material");
+	//Material* mtlFlat = New Material(L"mtlFlat", L"Assets/Materials/flat.material");
+	//Material* mtlView = New Material(L"mtlView", L"Assets/Materials/view.material");
+	//Material* mtlDiff = New Material(L"mtlDiff", L"Assets/Materials/diff.material");
+	//Material* mtlSpec = New Material(L"mtlSpec", L"Assets/Materials/spec.material");
+	//Material* mtlBump = New Material(L"mtlBump", L"Assets/Materials/bump.material");
 
-	materialMgr->AddMaterial(mtlFlat);
-	materialMgr->AddMaterial(mtlView);
-	materialMgr->AddMaterial(mtlDiff);
-	materialMgr->AddMaterial(mtlSpec);
-	materialMgr->AddMaterial(mtlBump);
+	//materialMgr->AddMaterial(mtlFlat);
+	//materialMgr->AddMaterial(mtlView);
+	//materialMgr->AddMaterial(mtlDiff);
+	//materialMgr->AddMaterial(mtlSpec);
+	//materialMgr->AddMaterial(mtlBump);
 
 	// model
 

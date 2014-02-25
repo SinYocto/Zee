@@ -55,6 +55,7 @@ class Material : public IReferenceCounted
 public:
 	Material(const wchar_t* name, const wchar_t* filePath = NULL);
 	Material(const Material& mtl);		// 用于复制一个临时使用的mtl, 不纳入manager管理, 不关心id和name
+	Material(const wchar_t* name, Material* mtl);
 
 	~Material();
 

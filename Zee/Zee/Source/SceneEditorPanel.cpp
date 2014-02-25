@@ -190,10 +190,14 @@ void SceneEditorPanel::OnPageChanged(wxNotebookEvent& event)
 // 在ModelPanel中将model加入场景时, 需要更新SceneGraphPanel, MaterialPanel, GeometryPanel
 void SceneEditorPanel::OnAddModelNode(wxCommandEvent& event)
 {
-	Model* model = (Model*)event.GetClientData();
-	ModelNode* modelNode = New ModelNode(model->GetName(), NULL, model);
-
 	SceneManager* sceneMgr = gEngine->GetSceneManager();
+	ModelManager* modelMgr = gEngine->GetModelManager();
+
+	Model* model = (Model*)event.GetClientData();
+	Model* newModelInstance = new Model(model->GetName(), model);
+
+	ModelNode* modelNode = New ModelNode(newModelInstance->GetName(), NULL, newModelInstance);
+
 	sceneMgr->AddSceneNode(modelNode);
 	modelNode->OnTransformChanged();
 
@@ -207,7 +211,7 @@ void SceneEditorPanel::OnAddModelNode(wxCommandEvent& event)
 	wxNotebookPage* materialPage = GetPage(MATERIAL_PAGE);
 	MaterialPanel* materialPanel = static_cast<MaterialPanel*>(materialPage);
 
-	std::list<Mesh*> meshList = model->GetSubMeshList();
+	std::list<Mesh*> meshList = newModelInstance->GetSubMeshList();
 
 	for(std::list<Mesh*>::iterator iter = meshList.begin(); iter != meshList.end(); ++iter)
 	{

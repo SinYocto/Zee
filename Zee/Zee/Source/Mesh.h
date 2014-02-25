@@ -8,6 +8,7 @@ class Mesh : public IReferenceCounted
 {
 public:
 	Mesh(const wchar_t* name, Geometry* geo, Material* material);
+	Mesh(const wchar_t* name, Mesh* mesh);
 
 	~Mesh()
 	{
