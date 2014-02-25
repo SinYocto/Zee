@@ -2,7 +2,7 @@
 #define BASIC_DEFINE_H
 
 #define MAX_NUM_DIRECTIONAL_LIGHTS 1
-#define MAX_NUM_POINT_LIGHTS 1
+#define MAX_NUM_POINT_LIGHTS 8
 
 struct DirectionalLight
 {

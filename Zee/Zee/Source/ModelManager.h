@@ -8,14 +8,17 @@ class ModelManager
 public:
 	ModelManager();
 
+	void Init();
 	void Destroy();
 
 	void AddModel(Model* model);
 
 	std::list<Model*> GetModelList();
+	Model* GetDefaultCube();
 
 private:
 	std::list<Model*> modelList;
+	Model* defaultCube;
 };
 
 

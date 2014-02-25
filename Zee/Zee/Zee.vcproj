@@ -601,6 +601,10 @@
 			Name="wxWnd"
 			>
 			<File
+				RelativePath=".\Source\CustomEventType.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\GeometryPanel.cpp"
 				>
 			</File>

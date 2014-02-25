@@ -199,7 +199,7 @@ void SceneEditorPanel::OnAddModelNode(wxCommandEvent& event)
 
 	// 更新SceneGraphPanel
 	wxNotebookPage* sceneGraphPage = GetPage(SCENE_GRAPH_PAGE);
-	SceneGraphPanel* sceneGraphPanel = static_cast<SceneGraphPanel*>(sceneGraphPage);
+	SceneGraphPanel* sceneGraphPanel = static_cast<SceneGraphPanel*>(sceneGraphPage); 
 
 	sceneGraphPanel->AppendSceneNode(modelNode);
 

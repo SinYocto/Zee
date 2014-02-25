@@ -7,6 +7,7 @@
 #include "Engine.h"
 #include "Renderer.h"
 #include "DebugDrawer.h"
+#include "ModelNode.h"
 
 SceneManager::SceneManager()
 :root(NULL)
@@ -254,5 +255,14 @@ void SceneManager::collectSceneNode(SceneNode* sceneNode)
 		SceneNode* node = static_cast<SceneNode*>(*iter);
 		collectSceneNode(node);
 	}	
+}
+
+SceneNode* SceneManager::AddPrimitiveCube()
+{	
+	ModelNode* cube = New ModelNode(L"cube", NULL, new Model(L"cube", L"Assets/Models/defaultCube.model"));
+	AddSceneNode(cube);
+	cube->OnTransformChanged();
+
+	return cube;
 }
 

@@ -10,6 +10,16 @@ void MaterialManager::AddMaterial(Material* material)	// 注意没有grab, 每增加mtl
 {
 	_Assert(NULL != material);
 
+	if(YString::isEmpty(material->GetFilePath()))
+	{
+		wchar_t mtlName[MAX_STR_LEN];
+		YString::Copy(mtlName, _countof(mtlName), material->GetName());
+		YString::Format(mtlName, L"%s_%d", mtlName, material->GetID());
+		material->SetName(mtlName);
+
+		material->SaveToFile(L"Assets/Materials");
+	}
+
 	_Assert(!YString::isEmpty(material->GetFilePath()));
 	MtlHashMap::iterator iter = mMaterials.find(material->GetFilePath());
 	if(iter != mMaterials.end())

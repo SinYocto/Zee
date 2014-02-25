@@ -2,6 +2,7 @@
 #include "Engine.h"
 
 ModelManager::ModelManager()
+:defaultCube(NULL)
 {
 
 }
@@ -26,4 +27,15 @@ void ModelManager::Destroy()
 std::list<Model*> ModelManager::GetModelList()
 {
 	return modelList;
+}
+
+void ModelManager::Init()
+{
+	defaultCube = new Model(L"cube", L"Assets/Models/defaultCube.model");		// 会被加入到modeList, 所以不需要专门delete
+}
+
+Model* ModelManager::GetDefaultCube()
+{
+	_Assert(NULL != defaultCube);
+	return defaultCube;
 }

@@ -20,6 +20,8 @@ Material::Material(const wchar_t* name, const wchar_t* filePath /*= NULL*/)
 		LoadDataFromFile(filePath);
 		YString::Copy(mFilePath, _countof(mFilePath), filePath);
 	}
+
+	gEngine->GetIDAllocator()->AllocateMaterialID(this);
 }
 
 Material::Material( const Material& mtl ) :mParamsVec1(mtl.mParamsVec1)
@@ -432,6 +434,16 @@ void Material::LoadDataFromFile(const wchar_t* filePath)
 wchar_t* Material::GetFilePath()
 {	
 	return mFilePath;
+}
+
+void Material::SetName(const wchar_t* name)
+{
+	YString::Copy(mName, _countof(mName), name);
+}
+
+DWORD Material::GetID()
+{
+	return mID;
 }
 
 //bool Material::AcceptGeometry(Geometry* geo)

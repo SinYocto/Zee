@@ -267,48 +267,22 @@ void CreateScene()
 	materialMgr->AddMaterial(mtlBump);
 
 	// model
-	//Model* coneModel = new Model(L"cone", L"Assets/Models/cone.model");
-
-	//const int COUNTS = 10;
-	//const float INTERVAL = 2.0f;
-
-	//for(int i = 0; i < COUNTS; ++i)
-	//{
-	//	float z = - (COUNTS - 1) * INTERVAL / 2.0f + i * INTERVAL;
-	//	for(int j = 0; j < COUNTS; ++j)
-	//	{
-	//		float x = - (COUNTS - 1) * INTERVAL / 2.0f + j * INTERVAL;
-
-	//		for(int k = 0; k < COUNTS; ++k)
-	//		{
-	//			float y = - (COUNTS - 1) * INTERVAL / 2.0f + k * INTERVAL;
-
-	//			wchar_t name[MAX_STR_LEN];
-	//			YString::Format(name, L"cone[%d][%d][%d]", i, j, k);
-
-	//			ModelNode* instance = New ModelNode(name, NULL, new Model(name, L"Assets/Models/cone.model"));	
-	//			sceneMgr->AddSceneNode(instance);
-
-	//			instance->Translate(x, y, z);
-	//		}
-	//	}
-	//}
 
 
-	ModelNode* cube = New ModelNode(L"cube", NULL, new Model(L"cube", L"Assets/Models/cube.model"));	
-	ModelNode* cylinder = New ModelNode(L"cylinder", NULL, new Model(L"cylinder", L"Assets/Models/cylinder.model"));	
-	ModelNode* cone = New ModelNode(L"cone", NULL, new Model(L"cone", L"Assets/Models/cone.model"));	
-	ModelNode* torus = New ModelNode(L"torus", NULL, new Model(L"torus", L"Assets/Models/torus.model"));	
+	//ModelNode* cube = New ModelNode(L"cube", NULL, new Model(L"cube", L"Assets/Models/cube.model"));	
+	//ModelNode* cylinder = New ModelNode(L"cylinder", NULL, new Model(L"cylinder", L"Assets/Models/cylinder.model"));	
+	//ModelNode* cone = New ModelNode(L"cone", NULL, new Model(L"cone", L"Assets/Models/cone.model"));	
+	//ModelNode* torus = New ModelNode(L"torus", NULL, new Model(L"torus", L"Assets/Models/torus.model"));	
 
-	sceneMgr->AddSceneNode(cube);
-	sceneMgr->AddSceneNode(cylinder);
-	sceneMgr->AddSceneNode(cone);
-	sceneMgr->AddSceneNode(torus);
+	//sceneMgr->AddSceneNode(cube);
+	//sceneMgr->AddSceneNode(cylinder);
+	//sceneMgr->AddSceneNode(cone);
+	//sceneMgr->AddSceneNode(torus);
 
-	cube->Translate(2, 0, 0);
-	cylinder->Translate(-2, 0, 0);
-	cone->Translate(0, 0, -2);
-	torus->Translate(0, 0, 2);
+	//cube->Translate(2, 0, 0);
+	//cylinder->Translate(-2, 0, 0);
+	//cone->Translate(0, 0, -2);
+	//torus->Translate(0, 0, 2);
 
 	//Model* barrelModel = NULL;
 	//OBJParser::Parse(L"Assets/Models_Extra/barrel01.obj", &barrelModel);
@@ -321,16 +295,15 @@ void CreateScene()
 	//barrel->Translate(0, 0, -4);
 	//barrel->Scale(0.01f, 0.01f, 0.01f);
 
-	Model* crateModel = NULL;
-	OBJParser::Parse(L"Assets/Models_Extra/crate.obj", &crateModel);
+	//Model* crateModel = NULL;
+	//OBJParser::Parse(L"Assets/Models_Extra/crate.obj", &crateModel);
 
-	//bunnyModel->SaveToFile(L"Assets/Models");
 
-	ModelNode* crate = New ModelNode(L"crate", NULL, crateModel);
+	//ModelNode* crate = New ModelNode(L"crate", NULL, crateModel);
 
-	sceneMgr->AddSceneNode(crate);
-	crate->Translate(0, 0, -6);
-	crate->Scale(0.01f, 0.01f, 0.01f);
+	//sceneMgr->AddSceneNode(crate);
+	//crate->Translate(0, 0, -6);
+	//crate->Scale(0.01f, 0.01f, 0.01f);
 	
 
 

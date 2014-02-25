@@ -21,6 +21,19 @@ enum
 	ID_TEXT_SCALEX,
 	ID_TEXT_SCALEY,
 	ID_TEXT_SCALEZ,
+
+	ID_MENU_ADD_DIRLIGHT,
+	ID_MENU_ADD_POINTLIGHT,
+	ID_MENU_ADD_CUBE,
+};
+
+enum
+{
+	ICON_EMPTY = 0,
+	ICON_MESH = 1,
+	ICON_MODEL = 2,
+	ICON_BILLBOARD = 3,
+	ICON_LIGHT = 4,
 };
 
 class SceneNodeTreeItemData : public wxTreeItemData
@@ -72,6 +85,11 @@ public:
 	void OnItemActivated(wxTreeEvent& event);
 	void OnEndLabelEdit(wxTreeEvent& event);
 	void OnItemSelected(wxTreeEvent& event);
+
+	void OnContextMenu(wxContextMenuEvent& event);
+	void OnContextMenuAddDirLight(wxCommandEvent& event);
+	void OnContextMenuAddPointLight(wxCommandEvent& event);
+	void OnContextMenuAddCube(wxCommandEvent& event);
 
 	void AttachInspectorPanel(SceneNodeInspectorPanel* inspectorPanel);
 

@@ -31,6 +31,7 @@ public:
 
 	void AddSceneNode(SceneNode* node, SceneNode* parent = NULL);
 	void GetSceneNode(const wchar_t* name, SceneNode** sceneNode);
+	SceneNode* AddPrimitiveCube();
 
 	SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
 

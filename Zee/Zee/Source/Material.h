@@ -59,7 +59,10 @@ public:
 	~Material();
 
 	wchar_t* GetName();
+	DWORD GetID();
+
 	void SetID(DWORD id);
+	void SetName(const wchar_t* name);
 
 	void SetShader(ShadingMethod shadingMethod);
 	void SetTexture(int layerIx, wchar_t* texFileName);	// TODO: 改为使用texture,而不是直接从文件创建texture

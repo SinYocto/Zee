@@ -43,6 +43,7 @@ void Engine::Init(D3DDeviceParams params)
 	mMaterialMgr->Init();
 
 	mModelMgr = New ModelManager();
+	mModelMgr->Init();
 
 	mResourceMgr = New ResourceMgr();
 

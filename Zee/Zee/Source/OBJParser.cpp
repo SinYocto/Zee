@@ -284,11 +284,21 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 				}
 				else if(((mDataContentType & UV_DATA) != 0) && ((mDataContentType & NORMAL_DATA) != 0))
 				{
-					YString::Scan(lineContent, L"%*c %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",		// TODO:face可能是三角面, 也可能是四边面
+					YString::Scan(lineContent, L"%*c %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d",
 						&posIndex[0], &uvIndex[0], &normalIndex[0], 
 						&posIndex[1], &uvIndex[1], &normalIndex[1], 
 						&posIndex[2], &uvIndex[2], &normalIndex[2], 
 						&posIndex[3], &uvIndex[3], &normalIndex[3]);
+
+					if(uvIndex[0] == -1 && uvIndex[1] == -1 && uvIndex[2] == -1 && uvIndex[3] == -1)
+					{
+						// 包含uvData但face未使用的情况
+						YString::Scan(lineContent, L"%*c %d//%d %d//%d %d//%d %d//%d",
+							&posIndex[0], &normalIndex[0],
+							&posIndex[1], &normalIndex[1],
+							&posIndex[2], &normalIndex[2],
+							&posIndex[3], &normalIndex[3]);
+					}
 				}
 
 				int vertIndex[4] = { -1, -1, -1, -1 };
@@ -325,10 +335,8 @@ void OBJParser::parseTrianglesBlockLine(const wchar_t* lineContent, Geometry** c
 						posIndexMap[posIndex[i]] = curGeoPosIndex;
 					}
 
-					if((mDataContentType & UV_DATA) != 0)
+					if((mDataContentType & UV_DATA) != 0 && (uvIndex[i] -= 1) >= 0)		// 有包含uvData但face未使用的情况
 					{
-						Assert((uvIndex[i] -= 1) >= 0);
-
 						bool uvIndexExist = uvIndexMap.find(uvIndex[i]) != uvIndexMap.end();
 
 						if(uvIndexExist)

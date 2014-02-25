@@ -79,30 +79,30 @@ void SceneGraphPanel::AppendSceneNode(wxTreeItemId parentItemId, SceneNode* node
 {
 	SceneNodeTreeItemData* itemData = New SceneNodeTreeItemData(node);
 
-	int sceneNodeIcon = 0;
+	int sceneNodeIcon = ICON_EMPTY;
 
 	SceneNode::NODE_TYPE nodeType = node->GetNodeType();
 	switch(nodeType)
 	{
 	case SceneNode::SCENE_NODE_NULL:
-		sceneNodeIcon = 0;
+		sceneNodeIcon = ICON_EMPTY;
 		break;
 
 	case SceneNode::SCENE_NODE_MESH:
-		sceneNodeIcon = 1;
+		sceneNodeIcon = ICON_MESH;
 		break;
 
 	case SceneNode::SCENE_NODE_MODEL:
-		sceneNodeIcon = 2;
+		sceneNodeIcon = ICON_MODEL;
 		break;
 
 	case SceneNode::SCENE_NODE_BILLBOARD:
-		sceneNodeIcon = 3;
+		sceneNodeIcon = ICON_BILLBOARD;
 		break;
 
 	case SceneNode::SCENE_NODE_DIR_LIGHT:
 	case SceneNode::SCENE_NODE_POINT_LIGHT:
-		sceneNodeIcon = 4;
+		sceneNodeIcon = ICON_LIGHT;
 		break;
 
 	default:
@@ -123,30 +123,30 @@ void SceneGraphPanel::AppendSceneNode(SceneNode* node)
 {
 	SceneNodeTreeItemData* itemData = New SceneNodeTreeItemData(node);
 
-	int sceneNodeIcon = 0;
+	int sceneNodeIcon = ICON_EMPTY;
 
 	SceneNode::NODE_TYPE nodeType = node->GetNodeType();
 	switch(nodeType)
 	{
 	case SceneNode::SCENE_NODE_NULL:
-		sceneNodeIcon = 0;
+		sceneNodeIcon = ICON_EMPTY;
 		break;
 
 	case SceneNode::SCENE_NODE_MESH:
-		sceneNodeIcon = 1;
+		sceneNodeIcon = ICON_MESH;
 		break;
 
 	case SceneNode::SCENE_NODE_MODEL:
-		sceneNodeIcon = 2;
+		sceneNodeIcon = ICON_MODEL;
 		break;
 
 	case SceneNode::SCENE_NODE_BILLBOARD:
-		sceneNodeIcon = 3;
+		sceneNodeIcon = ICON_BILLBOARD;
 		break;
 
 	case SceneNode::SCENE_NODE_DIR_LIGHT:
 	case SceneNode::SCENE_NODE_POINT_LIGHT:
-		sceneNodeIcon = 4;
+		sceneNodeIcon = ICON_LIGHT;
 		break;
 
 	default:
@@ -184,9 +184,13 @@ SceneNode* SceneNodeTreeItemData::GetSceneNode()
 
 
 BEGIN_EVENT_TABLE(SceneGraphTree, wxTreeCtrl)
-EVT_TREE_ITEM_ACTIVATED (ID_SCENE_GRAPH_TREE, SceneGraphTree::OnItemActivated)
-EVT_TREE_END_LABEL_EDIT(ID_SCENE_GRAPH_TREE, SceneGraphTree::OnEndLabelEdit)
-EVT_TREE_SEL_CHANGED(ID_SCENE_GRAPH_TREE, SceneGraphTree::OnItemSelected)
+	EVT_TREE_ITEM_ACTIVATED (ID_SCENE_GRAPH_TREE, SceneGraphTree::OnItemActivated)
+	EVT_TREE_END_LABEL_EDIT(ID_SCENE_GRAPH_TREE, SceneGraphTree::OnEndLabelEdit)
+	EVT_TREE_SEL_CHANGED(ID_SCENE_GRAPH_TREE, SceneGraphTree::OnItemSelected)
+	EVT_CONTEXT_MENU(SceneGraphTree::OnContextMenu)
+	EVT_MENU(ID_MENU_ADD_DIRLIGHT, SceneGraphTree::OnContextMenuAddDirLight)
+	EVT_MENU(ID_MENU_ADD_POINTLIGHT, SceneGraphTree::OnContextMenuAddPointLight)
+	EVT_MENU(ID_MENU_ADD_CUBE, SceneGraphTree::OnContextMenuAddCube)
 END_EVENT_TABLE()
 
 SceneGraphTree::SceneGraphTree( wxWindow* parent, wxWindowID id /*= wxID_ANY*/, const wxPoint& pos /*= wxDefaultPosition*/, 
@@ -277,6 +281,60 @@ wxTreeItemId SceneGraphTree::findItemBySceneNode(SceneNode* sceneNode, wxTreeIte
 	}
 
 	return resultItemId;
+}
+
+void SceneGraphTree::OnContextMenu(wxContextMenuEvent& event)
+{
+	wxPoint pt = event.GetPosition();
+	wxPoint clientPt = ScreenToClient(pt);
+
+	wxMenu menu;  
+	menu.Append(ID_MENU_ADD_DIRLIGHT, wxT("add directional light"));
+	menu.Append(ID_MENU_ADD_POINTLIGHT, wxT("add point light"));
+	menu.Append(ID_MENU_ADD_CUBE, wxT("add cube"));
+
+	PopupMenu(&menu, clientPt);
+}
+
+void SceneGraphTree::OnContextMenuAddDirLight(wxCommandEvent& event)
+{
+	DirectionalLight* dirLight = New DirectionalLight(L"dirLight");
+
+	LightManager* lightMgr = gEngine->GetLightManager();
+	SceneManager* sceneMgr = gEngine->GetSceneManager();
+
+	lightMgr->AddDirectionalLight(dirLight);
+
+	DirectionalLightNode* dirLightNode = New DirectionalLightNode(NULL, dirLight);
+	sceneMgr->AddSceneNode(dirLightNode);
+
+	SceneNodeTreeItemData* itemData = New SceneNodeTreeItemData(dirLightNode);
+	AppendItem(GetRootItem(), dirLightNode->GetName(), ICON_LIGHT, ICON_LIGHT, itemData);
+}
+
+void SceneGraphTree::OnContextMenuAddPointLight(wxCommandEvent& event)
+{
+	PointLight* pointLight = New PointLight(L"pointLight");
+
+	LightManager* lightMgr = gEngine->GetLightManager();
+	SceneManager* sceneMgr = gEngine->GetSceneManager();
+
+	lightMgr->AddPointLight(pointLight);
+
+	PointLightNode* pointLightNode = New PointLightNode(NULL, pointLight);
+	sceneMgr->AddSceneNode(pointLightNode);
+
+	SceneNodeTreeItemData* itemData = New SceneNodeTreeItemData(pointLightNode);
+	AppendItem(GetRootItem(), pointLightNode->GetName(), ICON_LIGHT, ICON_LIGHT, itemData);
+}
+
+void SceneGraphTree::OnContextMenuAddCube(wxCommandEvent& event)
+{
+	SceneManager* sceneMgr = gEngine->GetSceneManager();
+	SceneNode* cube = sceneMgr->AddPrimitiveCube();
+
+	SceneGraphPanel* sceneGraphPanel = (SceneGraphPanel*)(GetParent()->GetParent());
+	sceneGraphPanel->AppendSceneNode(cube);
 }
 
 SceneNodeInspectorPanel::SceneNodeInspectorPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 

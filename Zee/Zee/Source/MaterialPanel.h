@@ -11,6 +11,7 @@
 enum
 {
 	ID_MATERIALLIST_TREE,
+	ID_MENU_ADD_NEW_MATERIAL,
 };
 
 class MaterialTreeItemData : public wxTreeItemData
@@ -60,6 +61,10 @@ public:
 
 	void OnItemActivated(wxTreeEvent& event);
 	void OnItemSelected(wxTreeEvent& event);
+	void OnEndLabelEdit(wxTreeEvent& event);
+
+	void OnContextMenu(wxContextMenuEvent& event);
+	void OnContextMenuAddNewMaterial(wxCommandEvent& event);
 
 	void AttachInspectorPanel(MaterialInspectorPanel* inspectorPanel);
 

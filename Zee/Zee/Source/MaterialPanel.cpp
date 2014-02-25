@@ -25,7 +25,7 @@ void MaterialPanel::createWxCtrls()
 	wxBoxSizer* boxSizer2 = New wxBoxSizer(wxVERTICAL);
 
 	mTreeCtrl = New MaterialListTree(mTreePanel, ID_MATERIALLIST_TREE, wxDefaultPosition, wxDefaultSize, 
-		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES | wxTR_HIDE_ROOT);
+		wxTR_HAS_BUTTONS | wxTR_SINGLE | wxTR_NO_LINES | wxTR_HIDE_ROOT | wxTR_EDIT_LABELS);
 
 	mTreeCtrl->SetMinSize(wxSize(170, 240));
 	mTreeCtrl->AssignImageList(mIconList);
@@ -92,8 +92,11 @@ Material* MaterialTreeItemData::GetMaterial()
 
 
 BEGIN_EVENT_TABLE(MaterialListTree, wxTreeCtrl)
-EVT_TREE_ITEM_ACTIVATED (ID_MATERIALLIST_TREE, MaterialListTree::OnItemActivated)
-EVT_TREE_SEL_CHANGED(ID_MATERIALLIST_TREE, MaterialListTree::OnItemSelected)
+	EVT_TREE_END_LABEL_EDIT(ID_MATERIALLIST_TREE, MaterialListTree::OnEndLabelEdit)
+	EVT_TREE_ITEM_ACTIVATED (ID_MATERIALLIST_TREE, MaterialListTree::OnItemActivated)
+	EVT_TREE_SEL_CHANGED(ID_MATERIALLIST_TREE, MaterialListTree::OnItemSelected)
+	EVT_CONTEXT_MENU(MaterialListTree::OnContextMenu)
+	EVT_MENU(ID_MENU_ADD_NEW_MATERIAL, MaterialListTree::OnContextMenuAddNewMaterial)
 END_EVENT_TABLE()
 
 MaterialListTree::MaterialListTree(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, const wxPoint& pos /*= wxDefaultPosition*/, 
@@ -126,6 +129,37 @@ void MaterialListTree::OnItemSelected(wxTreeEvent& event)
 
 	mInspectorPanel->AttachMaterial(mtl);
 	mInspectorPanel->GetMaterialInfoPanel()->LoadDataFromMaterial(mtl);
+}
+
+void MaterialListTree::OnEndLabelEdit(wxTreeEvent& event)
+{
+	MaterialTreeItemData* itemData = (MaterialTreeItemData*)GetItemData(event.GetItem());
+	Material* mtl = itemData->GetMaterial();
+
+	mtl->SetName(event.GetLabel().wchar_str());
+}
+
+void MaterialListTree::OnContextMenu(wxContextMenuEvent& event)
+{
+	wxPoint pt = event.GetPosition();
+	wxPoint clientPt = ScreenToClient(pt);
+
+	wxMenu menu;  
+	menu.Append(ID_MENU_ADD_NEW_MATERIAL, wxT("add new material"));
+
+	PopupMenu(&menu, clientPt);
+}
+
+void MaterialListTree::OnContextMenuAddNewMaterial(wxCommandEvent& event)
+{
+	MaterialManager* materialMgr = gEngine->GetMaterialManager();
+
+	Material* material = new Material(L"newMtl");
+	material->SetShader(Diffuse);
+	materialMgr->AddMaterial(material);
+
+	MaterialPanel* materialPanel = (MaterialPanel*)(GetParent()->GetParent());
+	materialPanel->AppendMaterial(material);
 }
 
 MaterialInspectorPanel::MaterialInspectorPanel(wxWindow* parent, wxWindowID id /*= wxID_ANY*/, 

@@ -24,6 +24,7 @@ ModelNode::ModelNode(const wchar_t* name, SceneNode* parent, Geometry* geo, Mate
 {
 	mType = SCENE_NODE_MODEL;
 	mModel = New Model(name, geo, material);
+	mModel->Grab();
 
 	MeshNode* meshNode = New MeshNode(L"mesh", this, geo, material);
 }
