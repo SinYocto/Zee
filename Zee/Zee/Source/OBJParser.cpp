@@ -725,39 +725,39 @@ bool OBJParser::getMTLSpecifier(const wchar_t* lineContent, MTL_SPECIFIER* speci
 	{
 		*specifier = MTL_COMMENT;
 	}
-	else if(YString::Compare(lineSpecifier, L"newmtl") == 0)
+	else if(YString::Compare(lineSpecifier, L"newmtl", true) == 0)
 	{
 		*specifier = NEW_MTL;
 	}
-	else if(YString::Compare(lineSpecifier, L"Ka") == 0)
+	else if(YString::Compare(lineSpecifier, L"Ka", true) == 0)
 	{
 		*specifier = AMBIENT_COLOR;
 	}
-	else if(YString::Compare(lineSpecifier, L"Kd") == 0)
+	else if(YString::Compare(lineSpecifier, L"Kd", true) == 0)
 	{
 		*specifier = DIFFUSE_COLOR;
 	}
-	else if(YString::Compare(lineSpecifier, L"Ks") == 0)
+	else if(YString::Compare(lineSpecifier, L"Ks", true) == 0)
 	{
 		*specifier = SPEC_COLOR;
 	}
-	else if(YString::Compare(lineSpecifier, L"Ns") == 0)
+	else if(YString::Compare(lineSpecifier, L"Ns", true) == 0)
 	{
 		*specifier = SPEC_GLOSS;
 	}
-	else if(YString::Compare(lineSpecifier, L"map_Ka") == 0)
+	else if(YString::Compare(lineSpecifier, L"map_Ka", true) == 0)
 	{
 		*specifier = AMBIENT_TEX;
 	}
-	else if(YString::Compare(lineSpecifier, L"map_Kd") == 0)
+	else if(YString::Compare(lineSpecifier, L"map_Kd", true) == 0)
 	{
 		*specifier = DIFFUSE_TEX;
 	}
-	else if(YString::Compare(lineSpecifier, L"map_Ks") == 0)
+	else if(YString::Compare(lineSpecifier, L"map_Ks", true) == 0)
 	{
 		*specifier = SPEC_TEX;
 	}
-	else if(YString::Compare(lineSpecifier, L"map_Kb") == 0)
+	else if(YString::Compare(lineSpecifier, L"map_Kb", true) == 0)
 	{
 		*specifier = BUMP_TEX;
 	}

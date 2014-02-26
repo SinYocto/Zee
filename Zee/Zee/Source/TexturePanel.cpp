@@ -54,13 +54,13 @@ void TexturePanel::createWxCtrls()
 void TexturePanel::LoadDataFromScene()
 {
 	TextureManager* textureMgr = gEngine->GetTextureManger();
-	TexHashMap texHashMap = textureMgr->GetTextureHashMap();
+	std::vector<Texture*> texList = textureMgr->GetAllTextures();
 
 	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, New TextureTreeItemData(NULL));
 
-	for(TexHashMap::iterator iter = texHashMap.begin(); iter != texHashMap.end(); ++iter)
+	for(std::vector<Texture*>::iterator iter = texList.begin(); iter != texList.end(); ++iter)
 	{
-		appendTexture(rootId, iter->second);
+		appendTexture(rootId, *iter);
 	}
 }
 

@@ -6,20 +6,15 @@ Texture* TextureManager::GetOrCreateTexture(const wchar_t* filePath)
 {
 	Texture* resultTexture = NULL;
 
-	TexHashMap::iterator iter = mTextures.find(filePath);
-	if(iter != mTextures.end())
-	{
-		resultTexture = iter->second;
-		_Assert(NULL != resultTexture);
-	}
-	else
+	resultTexture = mTextures.Find(filePath);
+	if(resultTexture == NULL)
 	{
 		_Assert(YFile::Exist(filePath));
 
 		resultTexture = New Texture();
 		resultTexture->CreateFromFile(filePath);
 
-		mTextures[filePath] = resultTexture;
+		mTextures.Insert(filePath, resultTexture);
 	}
 
 	return resultTexture;
@@ -27,16 +22,35 @@ Texture* TextureManager::GetOrCreateTexture(const wchar_t* filePath)
 
 void TextureManager::Destory()
 {
-	for(TexHashMap::iterator iter = mTextures.begin(); iter != mTextures.end(); ++iter)
+	int size = mTextures.GetSize();
+	for(int i = 0; i < size; ++i)
 	{
-		SAFE_DROP(iter->second);
+		std::vector<Texture*> texList = mTextures.GetDataList(i);
+
+		for(std::vector<Texture*>::iterator iter = texList.begin(); iter != texList.end(); ++iter)
+		{
+			SAFE_DROP(*iter);
+		}
 	}
 
-	mTextures.clear();
+	mTextures.Destory();
 }
 
-TexHashMap TextureManager::GetTextureHashMap()
+std::vector<Texture*> TextureManager::GetAllTextures()
 {
-	return mTextures;
+	std::vector<Texture*> totalTexList;
+
+	int size = mTextures.GetSize();
+	for(int i = 0; i < size; ++ i)
+	{
+		std::vector<Texture*> texList = mTextures.GetDataList(i);
+		for(std::vector<Texture*>::iterator iter = texList.begin(); iter != texList.end(); ++iter)
+		{
+			if(*iter != NULL)
+				totalTexList.push_back(*iter);
+		}
+	}
+
+	return totalTexList;
 }
 

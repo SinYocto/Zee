@@ -20,8 +20,8 @@ void Clamp(int& val, const int min, const int max);
 float RandomFloat(float a, float b);
 float RandomVariation(float val, float variation);
 
-template <typename T>
-int sign(T t) 
+template <typename DATA>
+int sign(DATA t) 
 {
 	return (t > 0) - (t < 0);
 }

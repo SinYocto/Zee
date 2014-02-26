@@ -39,9 +39,10 @@ Material::Material( const Material& mtl ) :mParamsVec1(mtl.mParamsVec1)
 	mMtlData.offsetV = mtl.mMtlData.offsetV;
 	mMtlData.shadingMethod = mtl.mMtlData.shadingMethod;
 
-	for(int i = 0; i < MAX_MATERIAL_TEXTURE_LAYERS; ++i)
+	for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
 	{
-		YString::Copy(mMtlData.texFilesPath[i], MAX_PATH_LEN, mtl.mMtlData.texFilesPath[i]);
+		YString::Copy(mMtlData.texFilesPath[layerIx], MAX_PATH_LEN, mtl.mMtlData.texFilesPath[layerIx]);
+		mTextureLayer[layerIx] = NULL;
 	}
 
 	YString::Copy(mName, _countof(mName), L"clone");
@@ -75,9 +76,10 @@ Material::Material(const wchar_t* name, Material* mtl) :mParamsVec1(mtl->mParams
 	mMtlData.offsetV = mtl->mMtlData.offsetV;
 	mMtlData.shadingMethod = mtl->mMtlData.shadingMethod;
 
-	for(int i = 0; i < MAX_MATERIAL_TEXTURE_LAYERS; ++i)
+	for(int layerIx = 0; layerIx < MAX_MATERIAL_TEXTURE_LAYERS; ++layerIx)
 	{
-		YString::Copy(mMtlData.texFilesPath[i], MAX_PATH_LEN, mtl->mMtlData.texFilesPath[i]);
+		YString::Copy(mMtlData.texFilesPath[layerIx], MAX_PATH_LEN, mtl->mMtlData.texFilesPath[layerIx]);
+		mTextureLayer[layerIx] = NULL;
 	}
 
 	SetShader(mMtlData.shadingMethod);
@@ -104,7 +106,7 @@ Material::~Material()
 }
 
 
-void Material::SetTexture(int layerIx, wchar_t* texFileName)	// TODO:不应该直接从文件中CreateTexture再Set, 增加TextureManager类
+void Material::SetTexture(int layerIx, wchar_t* texFileName)
 {
 	if(layerIx < 0 || layerIx >= MAX_MATERIAL_TEXTURE_LAYERS)
 		return;
@@ -166,8 +168,8 @@ void Material::SetShader(ShadingMethod shadingMethod)
 	case BumpSpecular:
 		SAFE_DROP(mShader);
 		mShader = New BumpSpecularShader(this);
-		mShader->SetColorTex(L"./Assets/Textures/white_128x128.jpg");
-		mShader->SetNormalTex(L"./Assets/Textures/default_normal_128x128.jpg");
+		//mShader->SetColorTex(L"./Assets/Textures/white_128x128.jpg");
+		//mShader->SetNormalTex(L"./Assets/Textures/default_normal_128x128.jpg");
 		break;
 
 	default:

@@ -69,7 +69,7 @@
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				StackReserveSize="0"
-				StackCommitSize="0"
+				StackCommitSize="100000000"
 				TargetMachine="1"
 				Profile="false"
 			/>
@@ -147,6 +147,8 @@
 				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;;&quot;D:\Program Files (x86)\wxMSW-2.8.12\lib\vc_dll&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
+				StackReserveSize="0"
+				StackCommitSize="100000000"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -546,6 +548,14 @@
 			>
 			<File
 				RelativePath=".\Source\Common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\HashMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\HashMap.h"
 				>
 			</File>
 			<File
