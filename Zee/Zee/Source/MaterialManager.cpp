@@ -21,26 +21,32 @@ void MaterialManager::AddMaterial(Material* material)	// 注意没有grab, 每增加mtl
 	}
 
 	_Assert(!YString::isEmpty(material->GetFilePath()));
-	MtlHashMap::iterator iter = mMaterials.find(material->GetFilePath());
-	if(iter != mMaterials.end())
+
+	if(mMaterials.Find(material->GetFilePath()) != NULL)
 	{
 		Log(L"warning: MaterialManager::AddMaterial() mtl already exists!\n");
 		return;
 	}
 	else
 	{
-		mMaterials[material->GetFilePath()] = material;
+		mMaterials.Insert(material->GetFilePath(), material);
 	}
 }
 
 void MaterialManager::Destroy()
 {
-	for(MtlHashMap::iterator iter = mMaterials.begin(); iter != mMaterials.end(); ++iter)
+	int size = mMaterials.GetSize();
+	for(int i = 0; i < size; ++i)
 	{
-		SAFE_DROP(iter->second);
+		std::vector<Material*> mtlList = mMaterials.GetDataList(i);
+
+		for(std::vector<Material*>::iterator iter = mtlList.begin(); iter != mtlList.end(); ++iter)
+		{
+			SAFE_DROP(*iter);
+		}
 	}
 
-	mMaterials.clear();
+	mMaterials.Destory();
 }
 
 void MaterialManager::Init()
@@ -101,22 +107,12 @@ Material* MaterialManager::GetDefaultSpecMtl()
 	return GetOrCreateMaterial(L"Assets/Materials/defaultSpec.material");
 }
 
-MtlHashMap MaterialManager::GetMtlHashMap()
-{
-	return mMaterials;
-}
-
 Material* MaterialManager::GetOrCreateMaterial(const wchar_t* filePath)
 {
 	Material* resultMtl = NULL;
 
-	MtlHashMap::iterator iter = mMaterials.find(filePath);
-	if(iter != mMaterials.end())
-	{
-		resultMtl = iter->second;
-		_Assert(NULL != resultMtl);
-	}
-	else
+	resultMtl = mMaterials.Find(filePath);
+	if(resultMtl == NULL)
 	{
 		_Assert(YFile::Exist(filePath));
 
@@ -124,9 +120,26 @@ Material* MaterialManager::GetOrCreateMaterial(const wchar_t* filePath)
 		YString::GetFileName(fileName, _countof(fileName), filePath, false);
 
 		resultMtl = New Material(fileName, filePath);
-
-		mMaterials[filePath] = resultMtl;
+		mMaterials.Insert(filePath, resultMtl);
 	}
 
 	return resultMtl;
+}
+
+std::vector<Material*> MaterialManager::GetAllMaterials()
+{
+	std::vector<Material*> totalMtlList;
+
+	int size = mMaterials.GetSize();
+	for(int i = 0; i < size; ++ i)
+	{
+		std::vector<Material*> mtlList = mMaterials.GetDataList(i);
+		for(std::vector<Material*>::iterator iter = mtlList.begin(); iter != mtlList.end(); ++iter)
+		{
+			if(*iter != NULL)
+				totalMtlList.push_back(*iter);
+		}
+	}
+
+	return totalMtlList;
 }

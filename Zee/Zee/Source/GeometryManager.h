@@ -2,9 +2,9 @@
 #define GEOMETRYMANAGER_H
 
 #include "Geometry.h"
-#include "ResourceHashMap.h"
+#include "HashMap.h"
 
-typedef stdext::hash_map<const wchar_t*, Geometry*, stdext::hash_compare<const wchar_t*, WCharLess>> GeoHashMap;
+typedef HashMap<Geometry> GeoHashMap;
 
 class GeometryManager
 {
@@ -19,7 +19,7 @@ public:
 	Geometry* GetOrCreateGeometry(const wchar_t* filePath);
 	void AddGeometry(Geometry* geo);
 
-	GeoHashMap GetGeoHashMap();
+	std::vector<Geometry*> GetAllGeometries();
 
 private:
 	std::list<Geometry*> geoList;

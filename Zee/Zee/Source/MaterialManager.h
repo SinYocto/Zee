@@ -2,9 +2,9 @@
 #define MATERIALMANAGER_H
 
 #include "Material.h"
-#include "ResourceHashMap.h"
+#include "HashMap.h"
 
-typedef stdext::hash_map<const wchar_t*, Material*, stdext::hash_compare<const wchar_t*, WCharLess>> MtlHashMap;
+typedef HashMap<Material> MtlHashMap;
 
 class MaterialManager
 {
@@ -27,7 +27,7 @@ public:
 	Material* GetDefaultDiffMtl();
 	Material* GetDefaultSpecMtl();
 
-	MtlHashMap GetMtlHashMap();
+	std::vector<Material*> GetAllMaterials();
 
 private:
 	MtlHashMap mMaterials;

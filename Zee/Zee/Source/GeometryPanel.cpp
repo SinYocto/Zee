@@ -52,13 +52,13 @@ void GeometryPanel::createWxCtrls()
 void GeometryPanel::LoadDataFromScene()
 {
 	GeometryManager* geoMgr = gEngine->GetGeometryManager();
-	GeoHashMap geometries = geoMgr->GetGeoHashMap();
+	std::vector<Geometry*> geoList = geoMgr->GetAllGeometries();
 
 	wxTreeItemId rootId = mTreeCtrl->AddRoot(L"root", 0, 0, New GeometryTreeItemData(NULL));
 
-	for(GeoHashMap::iterator iter = geometries.begin(); iter != geometries.end(); ++iter)
+	for(std::vector<Geometry*>::iterator iter = geoList.begin(); iter != geoList.end(); ++iter)
 	{
-		appendGeometry(rootId, iter->second);
+		appendGeometry(rootId, *iter);
 	}
 }
 

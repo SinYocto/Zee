@@ -11,43 +11,60 @@ void GeometryManager::AddGeometry(Geometry* geo)
 	_Assert(NULL != geo);
 
 	//_Assert(!YString::isEmpty(geo->GetFilePath()));
-	GeoHashMap::iterator iter = mGeometries.find(geo->GetFilePath());
-	if(iter != mGeometries.end())
+	if(mGeometries.Find(geo->GetFilePath()) != NULL)
 	{
 		Log(L"warning: GeometryManage::AddGeometry() geo already exists!\n");
 		return;
 	}
 	else
 	{
-		mGeometries[geo->GetFilePath()] = geo;
+		mGeometries.Insert(geo->GetFilePath(), geo);
 	}
 }
 
 void GeometryManager::Destroy()
 {
-	for(GeoHashMap::iterator iter = mGeometries.begin(); iter != mGeometries.end(); ++iter)
+	int size = mGeometries.GetSize();
+	for(int i = 0; i < size; ++i)
 	{
-		SAFE_DROP(iter->second);
+		std::vector<Geometry*> geoList = mGeometries.GetDataList(i);
+
+		for(std::vector<Geometry*>::iterator iter = geoList.begin(); iter != geoList.end(); ++iter)
+		{
+			SAFE_DROP(*iter);
+		}
 	}
 
-	mGeometries.clear();
+	mGeometries.Destory();
 }
 
 void GeometryManager::OnLostDevice()
 {
-	for(GeoHashMap::iterator iter = mGeometries.begin(); iter != mGeometries.end(); ++iter)
+	int size = mGeometries.GetSize();
+	for(int i = 0; i < size; ++i)
 	{
-		Geometry* geo = iter->second;
-		geo->OnLostDevice();
+		std::vector<Geometry*> geoList = mGeometries.GetDataList(i);
+
+		for(std::vector<Geometry*>::iterator iter = geoList.begin(); iter != geoList.end(); ++iter)
+		{
+			if(*iter)
+				(*iter)->OnLostDevice();
+		}
 	}
 }
 
 void GeometryManager::OnResetDevice()
 {
-	for(GeoHashMap::iterator iter = mGeometries.begin(); iter != mGeometries.end(); ++iter)
+	int size = mGeometries.GetSize();
+	for(int i = 0; i < size; ++i)
 	{
-		Geometry* geo = iter->second;
-		geo->OnResetDevice();
+		std::vector<Geometry*> geoList = mGeometries.GetDataList(i);
+
+		for(std::vector<Geometry*>::iterator iter = geoList.begin(); iter != geoList.end(); ++iter)
+		{
+			if(*iter)
+				(*iter)->OnResetDevice();
+		}
 	}
 }
 
@@ -55,13 +72,8 @@ Geometry* GeometryManager::GetOrCreateGeometry(const wchar_t* filePath)
 {
 	Geometry* resultGeo = NULL;
 
-	GeoHashMap::iterator iter = mGeometries.find(filePath);
-	if(iter != mGeometries.end())
-	{
-		resultGeo = iter->second;
-		_Assert(NULL != resultGeo);
-	}
-	else
+	resultGeo = mGeometries.Find(filePath);
+	if(resultGeo == NULL)
 	{
 		_Assert(YFile::Exist(filePath));
 
@@ -70,13 +82,26 @@ Geometry* GeometryManager::GetOrCreateGeometry(const wchar_t* filePath)
 
 		resultGeo = New Geometry(fileName, filePath);
 
-		mGeometries[filePath] = resultGeo;
+		mGeometries.Insert(filePath, resultGeo);
 	}
 
 	return resultGeo;
 }
 
-GeoHashMap GeometryManager::GetGeoHashMap()
+std::vector<Geometry*> GeometryManager::GetAllGeometries()
 {
-	return mGeometries;
+	std::vector<Geometry*> totalGeoList;
+
+	int size = mGeometries.GetSize();
+	for(int i = 0; i < size; ++ i)
+	{
+		std::vector<Geometry*> geoList = mGeometries.GetDataList(i);
+		for(std::vector<Geometry*>::iterator iter = geoList.begin(); iter != geoList.end(); ++iter)
+		{
+			if(*iter != NULL)
+				totalGeoList.push_back(*iter);
+		}
+	}
+
+	return totalGeoList;
 }
