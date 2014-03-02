@@ -16,6 +16,8 @@ public:
 	void SetLightIntensity(float intensity);
 	void SetLightColor(D3DXCOLOR color);
 
+	bool IsLightEnabled();
+
 	virtual void OnTransformChanged();
 
 private:

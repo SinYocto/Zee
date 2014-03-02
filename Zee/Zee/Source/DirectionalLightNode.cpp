@@ -98,3 +98,8 @@ void DirectionalLightNode::SetLightColor(D3DXCOLOR color)
 	mDirLight->SetColor(color);
 	mBillboard->SetColor(mDirLight->GetFinalColor());
 }
+
+bool DirectionalLightNode::IsLightEnabled()
+{
+	return mDirLight->IsEnabled();
+}

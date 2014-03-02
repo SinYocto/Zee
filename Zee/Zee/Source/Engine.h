@@ -14,6 +14,7 @@
 #include "IDAllocator.h"
 #include "Gizmo.h"
 #include "Profiler.h"
+#include "ShadowMapRenderer.h"
 
 class Engine
 {

@@ -8,11 +8,13 @@
 #include "Renderer.h"
 #include "DebugDrawer.h"
 #include "ModelNode.h"
+#include "ShadowMapRenderer.h"
 
 SceneManager::SceneManager()
 :root(NULL)
 ,mainCamera(NULL)
 ,extraCamera(NULL)
+,mShadowMapDirLightNode(NULL)
 {
 
 }
@@ -70,12 +72,19 @@ void SceneManager::DrawAll()
 
 void SceneManager::DrawAllUseRenderer()
 {
+	if(mShadowMapDirLightNode != NULL)
+		drawShadowMapPass();
+
 	// AABBoxes
 	for(std::list<AABBox>::iterator iter = mAABBoxes.begin(); iter != mAABBoxes.end(); ++iter)
 	{
 		AABBox& box = *iter;
 		DebugDrawer::DrawAABBox(box, 0xffff0000, mainCamera);
 	}
+
+	AABBox lightSceneBound(Vector3::Zero, 200, 80, 200);
+	DebugDrawer::DrawAABBox(lightSceneBound, 0xff00ff00, mainCamera);
+
 
 	// wireframe
 	Renderer::Begin(WireFrame);
@@ -152,6 +161,7 @@ void SceneManager::FrameUpdate()
 		extraCamera->FrameUpdate();
 
 	collectSceneEntities();
+	collectLightViewSceneEntities();
 }
 
 SceneNode* SceneManager::RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist)
@@ -264,5 +274,54 @@ SceneNode* SceneManager::AddPrimitiveCube()
 	cube->OnTransformChanged();
 
 	return cube;
+}
+
+void SceneManager::drawShadowMapPass()
+{
+	ShadowMapRenderer::Begin();
+	ShadowMapRenderer::SetupVirtualLightCamera(mShadowMapDirLightNode);
+	for(MeshNodeList::iterator iter = mShadowMapMeshNodeList.begin(); iter != mShadowMapMeshNodeList.end(); ++iter)
+	{
+		MeshNode* meshNode = *iter;
+		Mesh* mesh = meshNode->GetMesh();
+
+		ShadowMapRenderer::DrawMesh(meshNode->LocalToWorldMatrix(), mesh->GetGeometry());
+	}
+	ShadowMapRenderer::End();
+}
+
+void SceneManager::collectLightViewSceneEntities()
+{
+	mShadowMapMeshNodeList.clear();
+	mShadowMapDirLightNode = NULL;
+	collectLightViewSceneNode(root);
+}
+
+void SceneManager::collectLightViewSceneNode( SceneNode* sceneNode )
+{
+	// TODO: 判断是否在light的viewBound里面
+
+	if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_MESH)
+	{
+		MeshNode* meshNode = static_cast<MeshNode*>(sceneNode);
+		mShadowMapMeshNodeList.push_back(meshNode);
+	}
+	else if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_DIR_LIGHT)
+	{
+		DirectionalLightNode* dirLightNode = static_cast<DirectionalLightNode*>(sceneNode);
+
+		if(mShadowMapDirLightNode == NULL && dirLightNode->IsLightEnabled())
+		{
+			mShadowMapDirLightNode = dirLightNode;
+		}
+	}
+
+	std::list<Object*>* children = NULL;
+	sceneNode->GetChildrenV2(children);
+	for(std::list<Object*>::iterator iter = (*children).begin(); iter != (*children).end(); ++iter)
+	{
+		SceneNode* node = static_cast<SceneNode*>(*iter);
+		collectLightViewSceneNode(node);
+	}	
 }
 

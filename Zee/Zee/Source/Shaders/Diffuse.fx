@@ -55,7 +55,7 @@ float4 DiffusePS(float2 tex : TEXCOORD0,
 {
 	float4 oColor = float4(0, 0, 0, 1);
 	
-	normal = normalize(normal);
+	normal = normalize(normal); 
 
 	float4 Ka = mtlAmbient;
 	float4 Kd = mtlDiffuse;

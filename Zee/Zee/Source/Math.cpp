@@ -579,6 +579,20 @@ Vector3 GetWorldPos(const Vector3& pos, const Quaternion& orient, const Vector3&
 	return resultPos;
 }
 
+Vector3 PosVecTransform(const Vector3& pos, const D3DXMATRIX& mat)
+{
+	D3DXVECTOR3 dxPos(pos.x, pos.y, pos.z);
+	D3DXVec3TransformCoord(&dxPos, &dxPos, &mat);
+	return Vector3(dxPos.x, dxPos.y, dxPos.z);
+}
+
+Vector3 VecVecTransform( const Vector3& vec, const D3DXMATRIX& mat )
+{
+	D3DXVECTOR3 dxVec(vec.x, vec.y, vec.z);
+	D3DXVec3TransformNormal(&dxVec, &dxVec, &mat);
+	return Vector3(dxVec.x, dxVec.y, dxVec.z);
+}
+
 float Vector2::Length() const
 {
 	return sqrt(x*x + y*y);

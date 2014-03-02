@@ -43,6 +43,11 @@ private:
 	void collectSceneEntities();
 	void collectSceneNode(SceneNode* sceneNode);
 
+	void collectLightViewSceneEntities();
+	void collectLightViewSceneNode(SceneNode* sceneNode);
+
+	void drawShadowMapPass();
+
 private:
 	SceneNode* root;
 	Camera* mainCamera;
@@ -58,6 +63,9 @@ private:
 
 	std::list<DirectionalLightNode*> mDirLightNodes;
 	std::list<PointLightNode*> mPointLihgtNodes; 
+
+	std::list<MeshNode*> mShadowMapMeshNodeList;
+	DirectionalLightNode* mShadowMapDirLightNode;
 };
 
 #endif

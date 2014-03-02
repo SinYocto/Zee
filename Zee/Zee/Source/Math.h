@@ -99,6 +99,9 @@ Vector3 operator+(const Vector3& vec1, const Vector3& vec2);
 Vector3 operator-(const Vector3& vec1, const Vector3& vec2);
 Vector3 operator*(float value, const Vector3& vec);
 
+Vector3 PosVecTransform(const Vector3& pos, const D3DXMATRIX& mat);
+Vector3 VecVecTransform(const Vector3& vec, const D3DXMATRIX& mat);
+
 float VectorAngle(const Vector3& vec1, const Vector3& vec2);
 float VectorLength(const Vector3& vec);
 float VectorLengthSquared(const Vector3& vec);

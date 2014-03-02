@@ -11,6 +11,7 @@ public:
 	~Texture();
 
 	void CreateFromFile(const wchar_t* filePath);
+	void Create(int width, int height, D3DFORMAT format, DWORD usage);
 
 	wchar_t* GetFilePath();
 	wchar_t* GetName();

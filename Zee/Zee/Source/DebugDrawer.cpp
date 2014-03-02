@@ -192,7 +192,7 @@ bool DebugDrawer::DrawAABBox(const AABBox& box, D3DCOLOR color, Camera* camera)
 	Vector3 center = 0.5f * (box.mMin + box.mMax);
 	Vector3 size = box.mMax - box.mMin;
 
-	return DrawBox(center, Quaternion(0, 0, 0), size, 0xffff0000, camera);
+	return DrawBox(center, Quaternion(0, 0, 0), size, color, camera);
 }
 
 bool DebugDrawer::drawSolidTriFan(const std::vector<Vector3>& points, D3DCOLOR color, Camera* camera)

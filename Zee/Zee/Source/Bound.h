@@ -25,6 +25,7 @@ public:
 	bool isValid();
 
 	static AABBox CombineBBox(const AABBox& box1, const AABBox& box2);
+	static AABBox CombinePoint(const AABBox& box, const Vector3& point);
 
 public:
 	Vector3 mMin;

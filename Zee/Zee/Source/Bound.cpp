@@ -107,6 +107,32 @@ Vector3 AABBox::GetCenter()
 	return 0.5f * (mMin + mMax);
 }
 
+AABBox AABBox::CombinePoint(const AABBox& box, const Vector3& point)
+{
+	AABBox resultBox = box;
+
+	if(point.x < resultBox.mMin.x)
+		resultBox.mMin.x = point.x;
+
+	if(point.y < resultBox.mMin.y)
+		resultBox.mMin.y = point.y;
+
+	if(point.z < resultBox.mMin.z)
+		resultBox.mMin.z = point.z;
+
+	if(point.x > resultBox.mMax.x)
+		resultBox.mMax.x = point.x;
+
+	if(point.y > resultBox.mMax.y)
+		resultBox.mMax.y = point.y;
+
+	if(point.z > resultBox.mMax.z)
+		resultBox.mMax.z = point.z;
+
+	return resultBox;
+
+}
+
 Ray::Ray(const Vector3& pos /*= Vector3::Zero*/, const Vector3& dir /*= Vector3(0, 0, 1)*/)
 {
 	mPos = pos;

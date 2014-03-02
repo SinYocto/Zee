@@ -4,7 +4,8 @@
 Texture::Texture()
 :mD3DTexture(NULL)
 {
-
+	YString::Empty(mFilePath);
+	YString::Copy(mName, _countof(mName), L"null");
 }
 
 Texture::~Texture()
@@ -36,4 +37,12 @@ void Texture::CreateFromFile(const wchar_t* filePath)
 wchar_t* Texture::GetName()
 {
 	return mName;
+}
+
+void Texture::Create(int width, int height, D3DFORMAT format, DWORD usage)
+{
+	_Assert(NULL == mD3DTexture);
+	D3DXCreateTexture(gEngine->GetDriver()->GetD3DDevice(), width, height, 1, usage, format, D3DPOOL_DEFAULT, &mD3DTexture);
+
+	_Assert(NULL != mD3DTexture);
 }

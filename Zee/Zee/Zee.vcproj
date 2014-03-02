@@ -68,8 +68,8 @@
 				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;;&quot;D:\Program Files (x86)\wxMSW-2.8.12\lib\vc_lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
-				StackReserveSize="0"
-				StackCommitSize="100000000"
+				StackReserveSize="16000000"
+				StackCommitSize="0"
 				TargetMachine="1"
 				Profile="false"
 			/>
@@ -147,8 +147,8 @@
 				AdditionalLibraryDirectories="&quot;D:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x86&quot;;&quot;D:\Program Files (x86)\wxMSW-2.8.12\lib\vc_dll&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
-				StackReserveSize="0"
-				StackCommitSize="100000000"
+				StackReserveSize="16000000"
+				StackCommitSize="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -290,6 +290,14 @@
 					</File>
 					<File
 						RelativePath=".\Source\Shaders\Flat.fx"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Shaders\ShadowMap.fx"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Shaders\ShadowTex.fx"
 						>
 					</File>
 					<File
@@ -729,6 +737,14 @@
 		</File>
 		<File
 			RelativePath=".\Source\SceneEditor.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\ShadowMapRenderer.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\ShadowMapRenderer.h"
 			>
 		</File>
 		<File

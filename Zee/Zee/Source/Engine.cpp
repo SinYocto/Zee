@@ -50,6 +50,8 @@ void Engine::Init(D3DDeviceParams params)
 	mSceneMgr = New SceneManager();
 	mSceneMgr->Init();
 
+	ShadowMapRenderer::Init();
+
 	mGizmo = New Gizmo();
 	mGizmo->Init();
 	mGizmo->SetActiveType(Gizmo::GIZMO_TRANS);
