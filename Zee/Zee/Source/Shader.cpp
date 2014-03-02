@@ -230,6 +230,16 @@ void DiffuseShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* ca
 		DiffuseShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0)->GetD3DTexture());
 	}
 
+	if(gEngine->GetSceneManager()->NeedDirLightShadow())
+	{
+		DiffuseShader::mEffect->SetBool("calcShadow", true);
+		DiffuseShader::mEffect->SetTexture("shadowTex", ShadowMapRenderer::GetShadowTex()->GetD3DTexture());
+	}
+	else
+	{
+		DiffuseShader::mEffect->SetBool("calcShadow", false);
+	}
+
 	DiffuseShader::mEffect->SetRawValue("mtlAmbient", &(mMaterial->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
 	DiffuseShader::mEffect->SetRawValue("mtlDiffuse", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
 

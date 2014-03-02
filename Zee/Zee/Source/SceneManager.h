@@ -39,6 +39,8 @@ public:
 
 	void DrawAllUseRenderer();
 
+	bool NeedDirLightShadow();
+
 private:
 	void collectSceneEntities();
 	void collectSceneNode(SceneNode* sceneNode);
@@ -47,6 +49,7 @@ private:
 	void collectLightViewSceneNode(SceneNode* sceneNode);
 
 	void drawShadowMapPass();
+	void drawShadowTexPass();
 
 private:
 	SceneNode* root;

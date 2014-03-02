@@ -73,7 +73,10 @@ void SceneManager::DrawAll()
 void SceneManager::DrawAllUseRenderer()
 {
 	if(mShadowMapDirLightNode != NULL)
+	{
 		drawShadowMapPass();
+		drawShadowTexPass();
+	}
 
 	// AABBoxes
 	for(std::list<AABBox>::iterator iter = mAABBoxes.begin(); iter != mAABBoxes.end(); ++iter)
@@ -278,17 +281,39 @@ SceneNode* SceneManager::AddPrimitiveCube()
 
 void SceneManager::drawShadowMapPass()
 {
-	ShadowMapRenderer::Begin();
+	ShadowMapRenderer::BeginShadowMapPass();
 	ShadowMapRenderer::SetupVirtualLightCamera(mShadowMapDirLightNode);
 	for(MeshNodeList::iterator iter = mShadowMapMeshNodeList.begin(); iter != mShadowMapMeshNodeList.end(); ++iter)
 	{
 		MeshNode* meshNode = *iter;
 		Mesh* mesh = meshNode->GetMesh();
 
-		ShadowMapRenderer::DrawMesh(meshNode->LocalToWorldMatrix(), mesh->GetGeometry());
+		ShadowMapRenderer::DrawMeshShadowMapPass(meshNode->LocalToWorldMatrix(), mesh->GetGeometry());
 	}
-	ShadowMapRenderer::End();
+	ShadowMapRenderer::EndShadowMapPass();
 }
+
+void SceneManager::drawShadowTexPass()
+{
+	ShadowMapRenderer::BeginShadowTexPass();
+
+	for(ShadingMethodMeshNodeListMap::iterator mapIter = mMeshNodeLists.begin(); mapIter != mMeshNodeLists.end(); ++mapIter)
+	{
+		ShadingMethod method = mapIter->first;
+		MeshNodeList& meshNodeList = mapIter->second;
+
+		for(MeshNodeList::iterator listIter = meshNodeList.begin(); listIter != meshNodeList.end(); ++listIter)
+		{
+			MeshNode* meshNode = *listIter;
+			Mesh* mesh = meshNode->GetMesh();
+
+			ShadowMapRenderer::DrawMeshShadowTexPass(meshNode->LocalToWorldMatrix(), mesh->GetGeometry(), mainCamera);
+		}
+	}
+
+	ShadowMapRenderer::EndShadowTexPass();
+}
+
 
 void SceneManager::collectLightViewSceneEntities()
 {
@@ -325,3 +350,7 @@ void SceneManager::collectLightViewSceneNode( SceneNode* sceneNode )
 	}	
 }
 
+bool SceneManager::NeedDirLightShadow()
+{
+	return (mShadowMapDirLightNode != NULL);
+}

@@ -4,6 +4,7 @@
 #include "D3DUtility.h"
 
 #define SHADOW_MAP_SIZE 1024
+#define SHADOW_TEX_SIZE 1024
 
 class Geometry;
 class Material;
@@ -25,11 +26,17 @@ public:
 	static void OnLostDevice();
 	static void OnResetDevice();
 
-	static void Begin();
-	static void End();
+	static void BeginShadowMapPass();
+	static void EndShadowMapPass();
+
+	static void BeginShadowTexPass();
+	static void EndShadowTexPass();
 
 	static void SetupVirtualLightCamera(DirectionalLightNode* lightNode);
-	static void DrawMesh(const D3DXMATRIX& matWorld, Geometry* geo);
+	static void DrawMeshShadowMapPass(const D3DXMATRIX& matWorld, Geometry* geo);
+	static void DrawMeshShadowTexPass(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
+
+	static Texture* GetShadowTex();
 
 private:
 	static void createEffect();
@@ -38,9 +45,11 @@ private:
 
 
 private:
-	static LPD3DXEFFECT mEffect;
+	static LPD3DXEFFECT mShadowMapEffect;
+	static LPD3DXEFFECT mShadowTexEffect;
 
 	static Texture* mShadowMapTex;
+	static Texture* mShadowTex;
 	static IDirect3DSurface9* mDepthStencilSurface;
 
 	static VirtualLightCamera mVirtualCamera;

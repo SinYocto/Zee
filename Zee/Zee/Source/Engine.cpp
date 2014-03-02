@@ -135,6 +135,8 @@ void Engine::OnLostDevice()
 	mMaterialMgr->OnLostDevice();
 	mResourceMgr->OnLostDevice();
 	mGizmo->OnLostDevice();
+
+	ShadowMapRenderer::OnLostDevice();
 }
 
 void Engine::OnResetDevice()
@@ -144,6 +146,8 @@ void Engine::OnResetDevice()
 	mMaterialMgr->OnResetDevice();
 	mResourceMgr->OnResetDevice();
 	mGizmo->OnResetDevice();
+
+	ShadowMapRenderer::OnResetDevice();
 }
 
 SceneManager* Engine::GetSceneManager()
