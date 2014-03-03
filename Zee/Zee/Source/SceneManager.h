@@ -9,11 +9,15 @@ class MeshNode;
 class BillboardNode;
 class DirectionalLightNode;
 class PointLightNode;
+class Terrain;
 
 class SceneManager
 {
 public:
 	SceneManager();
+
+	void OnLostDevice();
+	void OnResetDevice();
 
 	void Init();
 	void Destory();
@@ -32,6 +36,8 @@ public:
 	void AddSceneNode(SceneNode* node, SceneNode* parent = NULL);
 	void GetSceneNode(const wchar_t* name, SceneNode** sceneNode);
 	SceneNode* AddPrimitiveCube();
+
+	void AddTerrain(Terrain* terrain);
 
 	SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
 
@@ -69,6 +75,8 @@ private:
 
 	std::list<MeshNode*> mShadowMapMeshNodeList;
 	DirectionalLightNode* mShadowMapDirLightNode;
+
+	Terrain* mTerrain;
 };
 
 #endif

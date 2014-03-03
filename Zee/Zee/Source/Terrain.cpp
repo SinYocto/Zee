@@ -334,6 +334,27 @@ void TerrainChunk::ResetLODLevel()
 	mNeighbLODLevel = 0xffffffff;
 }
 
+void TerrainChunk::SetVertexStream()
+{
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
+	d3dDevice->SetStreamSource(0, mVertexBuffer, 0, SizeofVertex(XYZ_UV_N));
+	d3dDevice->SetIndices(mIndexBuffer);
+	d3dDevice->SetFVF(VertexUVN::FVF);
+}
+
+void TerrainChunk::Draw()
+{
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
+	int numVerts = mSize * mSize;
+
+	d3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, GetTriCounts());
+	Profiler::AddDrawCalls();
+	Profiler::AddNumVerts(numVerts);
+	Profiler::AddNumTris(GetTriCounts());
+}
+
 Terrain::Terrain(int size, float length, float height)
 :mSize(size)
 ,mLength(length)
@@ -562,6 +583,16 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 	sEffect->SetRawValue("mtlAmbient", &mMaterial.ambientColor, 0, sizeof(D3DXCOLOR));
 	sEffect->SetRawValue("mtlDiffuse", &mMaterial.diffuseColor, 0, sizeof(D3DXCOLOR));
 
+	if(gEngine->GetSceneManager()->NeedDirLightShadow())
+	{
+		sEffect->SetBool("calcShadow", true);
+		sEffect->SetTexture("shadowTex", ShadowMapRenderer::GetShadowTex()->GetD3DTexture());
+	}
+	else
+	{
+		sEffect->SetBool("calcShadow", false);
+	}
+
 	if(isSolid)
 		d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	else
@@ -577,16 +608,8 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 		if(!chunk->mNode->IsInFrustum())
 			continue;
 
-		d3dDevice->SetStreamSource(0, chunk->mVertexBuffer, 0, SizeofVertex(XYZ_UV_N));
-		d3dDevice->SetIndices(chunk->mIndexBuffer);
-		d3dDevice->SetFVF(VertexUVN::FVF);
-
-		int numVerts = chunk->mSize * chunk->mSize;
-
-		d3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, numVerts, 0, chunk->GetTriCounts());
-		Profiler::AddDrawCalls();
-		Profiler::AddNumVerts(numVerts);
-		Profiler::AddNumTris(chunk->GetTriCounts());
+		chunk->SetVertexStream();
+		chunk->Draw();
 
 		if(mDrawBBox && chunk->mNode->GetAABBox().isValid())
 		{
@@ -643,4 +666,9 @@ TerrainChunk* Terrain::getChunk(int row, int column)
 	_Assert(chunkIndex < (int)mChunks.size());
 
 	return mChunks[chunkIndex];
+}
+
+std::vector<TerrainChunk*> Terrain::GetChunks()
+{
+	return mChunks;
 }

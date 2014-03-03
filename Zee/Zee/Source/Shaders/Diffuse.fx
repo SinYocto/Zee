@@ -111,7 +111,9 @@ float4 DiffusePS(float2 tex : TEXCOORD0,
 		shadow = tex2D(ShadowS, posTex).x;
 	}
 
-	return shadow * oColor;
+	oColor.rgb *= shadow;
+
+	return oColor;
 }
 
 technique Diffuse

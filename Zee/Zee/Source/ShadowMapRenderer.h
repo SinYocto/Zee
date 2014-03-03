@@ -11,6 +11,7 @@ class Material;
 class Texture;
 class Camera;
 class DirectionalLightNode;
+class Terrain;
 
 struct VirtualLightCamera
 {
@@ -34,8 +35,12 @@ public:
 	static void EndShadowTexPass();
 
 	static void SetupVirtualLightCamera(DirectionalLightNode* lightNode);
+
 	static void DrawMeshShadowMapPass(const D3DXMATRIX& matWorld, Geometry* geo);
 	static void DrawMeshShadowTexPass(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
+
+	static void DrawTerrainShadowMapPass(Terrain* terrain);
+	static void DrawTerrainShadowTexPass(Terrain* terrain, Camera* camera);
 
 	static void ShadowMapGaussianBlur();
 

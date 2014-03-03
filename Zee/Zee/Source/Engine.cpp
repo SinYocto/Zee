@@ -137,6 +137,7 @@ void Engine::OnLostDevice()
 	mMaterialMgr->OnLostDevice();
 	mResourceMgr->OnLostDevice();
 	mGizmo->OnLostDevice();
+	mSceneMgr->OnLostDevice();
 
 	ShadowMapRenderer::OnLostDevice();
 }
@@ -148,6 +149,7 @@ void Engine::OnResetDevice()
 	mMaterialMgr->OnResetDevice();
 	mResourceMgr->OnResetDevice();
 	mGizmo->OnResetDevice();
+	mSceneMgr->OnResetDevice();
 
 	ShadowMapRenderer::OnResetDevice();
 }

@@ -40,6 +40,9 @@ public:
 	void CreateVertexBuffer();
 	void CreateIndexBuffer(int lodLeft, int lodTop, int lodRight, int lodBottom);
 
+	void SetVertexStream();
+	void Draw();
+
 	void CalcChunkLODDist(Camera* camera, float pixelTolerance);
 	void AdjustLODLevel(const Vector3 cameraPos);
 
@@ -108,6 +111,8 @@ public:
 
 	void Draw(Camera* camera, bool isSolid);
 	void createEffect();
+
+	std::vector<TerrainChunk*> GetChunks();
 
 private:
 	//void createEffect();

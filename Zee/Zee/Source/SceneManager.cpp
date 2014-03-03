@@ -9,14 +9,28 @@
 #include "DebugDrawer.h"
 #include "ModelNode.h"
 #include "ShadowMapRenderer.h"
+#include "Terrain.h"
 
 SceneManager::SceneManager()
 :root(NULL)
 ,mainCamera(NULL)
 ,extraCamera(NULL)
 ,mShadowMapDirLightNode(NULL)
+,mTerrain(NULL)
 {
 
+}
+
+void SceneManager::OnLostDevice()
+{
+	if(mTerrain)
+		mTerrain->OnLostDevice();
+}
+
+void SceneManager::OnResetDevice()
+{
+	if(mTerrain)
+		mTerrain->OnResetDevice();
 }
 
 void SceneManager::Init()
@@ -49,6 +63,7 @@ void SceneManager::Destory()
 	SAFE_DELETE(root);
 	SAFE_DELETE(mainCamera);
 	SAFE_DELETE(extraCamera);
+	SAFE_DELETE(mTerrain);
 }
 
 void SceneManager::CreateMainCamera( const Vector3 pos /*= Vector3(0, 0, -200)*/, const Vector3 target /*= Vector3::Zero*/, 
@@ -153,6 +168,10 @@ void SceneManager::DrawAllUseRenderer()
 		}
 		Renderer::End(BillboardMethod);
 	}
+
+	// terrain
+	if(mTerrain)
+		mTerrain->Draw(mainCamera, true);
 }
 
 void SceneManager::FrameUpdate()
@@ -162,6 +181,9 @@ void SceneManager::FrameUpdate()
 
 	if(extraCamera)
 		extraCamera->FrameUpdate();
+
+	if(mTerrain)
+		mTerrain->FrameUpdate(mainCamera);
 
 	collectSceneEntities();
 	collectLightViewSceneEntities();
@@ -290,6 +312,9 @@ void SceneManager::drawShadowMapPass()
 
 		ShadowMapRenderer::DrawMeshShadowMapPass(meshNode->LocalToWorldMatrix(), mesh->GetGeometry());
 	}
+
+	ShadowMapRenderer::DrawTerrainShadowMapPass(mTerrain);
+
 	ShadowMapRenderer::EndShadowMapPass();
 
 	ShadowMapRenderer::ShadowMapGaussianBlur();
@@ -312,6 +337,8 @@ void SceneManager::drawShadowTexPass()
 			ShadowMapRenderer::DrawMeshShadowTexPass(meshNode->LocalToWorldMatrix(), mesh->GetGeometry(), mainCamera);
 		}
 	}
+
+	ShadowMapRenderer::DrawTerrainShadowTexPass(mTerrain, mainCamera);
 
 	ShadowMapRenderer::EndShadowTexPass();
 }
@@ -355,4 +382,10 @@ void SceneManager::collectLightViewSceneNode( SceneNode* sceneNode )
 bool SceneManager::NeedDirLightShadow()
 {
 	return (mShadowMapDirLightNode != NULL);
+}
+
+void SceneManager::AddTerrain(Terrain* terrain)
+{
+	_Assert(mTerrain == NULL);
+	mTerrain = terrain;
 }

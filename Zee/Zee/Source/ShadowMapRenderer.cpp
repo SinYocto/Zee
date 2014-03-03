@@ -3,6 +3,7 @@
 #include "Texture.h"
 #include "DirectionalLightNode.h"
 #include "Camera.h"
+#include "Terrain.h"
 
 LPD3DXEFFECT ShadowMapRenderer::mShadowMapEffect = NULL;
 LPD3DXEFFECT ShadowMapRenderer::mShadowTexEffect = NULL;
@@ -170,10 +171,34 @@ void ShadowMapRenderer::DrawMeshShadowMapPass(const D3DXMATRIX& matWorld, Geomet
 	geo->Draw();
 }
 
+void ShadowMapRenderer::DrawTerrainShadowMapPass(Terrain* terrain)
+{
+	_Assert(NULL != terrain);
+
+	mShadowMapEffect->SetTechnique("Depth");
+
+	mShadowMapEffect->SetMatrix("matWVP", &mVirtualCamera.matVP);
+	mShadowMapEffect->SetMatrix("matWorld", &IDENTITY_MATRIX);
+	mShadowMapEffect->SetRawValue("lightPos", &(mVirtualCamera.pos), 0, sizeof(Vector3));
+
+	mShadowMapEffect->CommitChanges();
+
+	std::vector<TerrainChunk*> chunks = terrain->GetChunks();
+
+	for(std::vector<TerrainChunk*>::iterator iter = chunks.begin(); iter != chunks.end(); ++iter)
+	{
+		// TODO: bound判断
+		TerrainChunk* chunk = *iter;
+
+		chunk->SetVertexStream();
+		chunk->Draw();
+	}
+}
+
 void ShadowMapRenderer::SetupVirtualLightCamera(DirectionalLightNode* lightNode)
 {
 	// 计算light视角下所需渲染的场景bound
-	AABBox lightSceneBound(Vector3::Zero, 50, 20, 50);
+	AABBox lightSceneBound(Vector3::Zero, 200, 80, 200);
 
 	// 由上面得到的bound计算光源虚拟摄像机的位置和正交投影矩阵(pos, nearZ, farZ, width, height)
 	DirectionalLight* dirLight = lightNode->GetDirLight();
@@ -286,6 +311,35 @@ void ShadowMapRenderer::DrawMeshShadowTexPass(const D3DXMATRIX& matWorld, Geomet
 
 	geo->Draw();
 }
+
+void ShadowMapRenderer::DrawTerrainShadowTexPass(Terrain* terrain, Camera* camera)
+{
+	_Assert(NULL != terrain);
+
+	mShadowTexEffect->SetTechnique("Shadow");
+
+	mShadowTexEffect->SetMatrix("matWVP", &(camera->ViewMatrix() * camera->ProjMatrix()));
+	mShadowTexEffect->SetMatrix("matWorld", &IDENTITY_MATRIX);
+	mShadowTexEffect->SetMatrix("matLightVP", &mVirtualCamera.matVP);
+	mShadowTexEffect->SetRawValue("lightPos", &(mVirtualCamera.pos), 0, sizeof(Vector3));
+
+	_Assert(mShadowMapTex != NULL);
+	mShadowTexEffect->SetTexture("shadowMapTex", mShadowMapBluredTex->GetD3DTexture());
+
+	mShadowTexEffect->CommitChanges();
+
+	std::vector<TerrainChunk*> chunks = terrain->GetChunks();
+
+	for(std::vector<TerrainChunk*>::iterator iter = chunks.begin(); iter != chunks.end(); ++iter)
+	{
+		// TODO: bound判断
+		TerrainChunk* chunk = *iter;
+
+		chunk->SetVertexStream();
+		chunk->Draw();
+	}
+}
+
 
 Texture* ShadowMapRenderer::GetShadowTex()
 {

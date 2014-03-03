@@ -14,6 +14,9 @@ texture colorTex2;
 texture colorTex3;
 texture splatMapTex;
 
+bool calcShadow;
+texture shadowTex;
+
 sampler ColorS0 = sampler_state
 {
 	Texture = <colorTex0>;
@@ -69,6 +72,17 @@ sampler SplatS = sampler_state
     AddressV  = WRAP;
 };
 
+sampler ShadowS = sampler_state
+{
+	Texture = <shadowTex>;
+	MinFilter = linear;
+	MaxAnisotropy = 4;
+	MagFilter = linear;
+	MipFilter = linear;
+	AddressU  = WRAP;
+    AddressV  = WRAP;
+};
+
 struct VS_IN
 {
 	float3 pos : POSITION0;
@@ -83,6 +97,7 @@ struct VS_OUT
 	float2 texSplat : TEXCOORD1;
 	float3 normal : TEXCOORD2;
 	float3 posW : TEXCOORD3;
+	float3 posRaw : TEXCOORD4;
 };
 
 
@@ -95,6 +110,7 @@ VS_OUT TerrainVS(VS_IN vIn)
 	vOut.tex = (mul(float4(vIn.tex, 0, 1.0f), matUVTransform)).xy; 
 	vOut.normal = (mul(float4(vIn.normal, 0), matWorld)).xyz;
 	vOut.texSplat = vIn.tex;
+	vOut.posRaw = vIn.pos;
 
 	return vOut;
 }
@@ -102,7 +118,8 @@ VS_OUT TerrainVS(VS_IN vIn)
 float4 TerrainPS(float2 tex : TEXCOORD0, 
 				 float2 texSplat : TEXCOORD1, 
 				 float3 normal : TEXCOORD2, 
-				 float3 posW : TEXCOORD3) : COLOR0
+				 float3 posW : TEXCOORD3,
+				 float3 posRaw : TEXCOORD4) : COLOR0
 {
 	float4 oColor =  float4(0, 0, 0, 1);
 	
@@ -130,8 +147,19 @@ float4 TerrainPS(float2 tex : TEXCOORD0,
 		CalcORadianceLambert(oColor, atten * pointLights[i].color, dirL, normal, Kd);
 	}
 
-	//oColor = float4(1,1,1,1);
+	float shadow = 1.0f;
+	if(calcShadow)
+	{
+		float4 posClip = mul(float4(posRaw, 1.0f), matWVP);
+		posClip.xyz /= posClip.w;
 
+		float2 posTex = float2(posClip.x * 0.5 + 0.5, -posClip.y * 0.5 + 0.5);
+		shadow = tex2D(ShadowS, posTex).x;
+	}
+
+	shadow = clamp(shadow, 0, 1.0f);
+
+	oColor.rgb *= shadow;
 	return oColor;
 }
 

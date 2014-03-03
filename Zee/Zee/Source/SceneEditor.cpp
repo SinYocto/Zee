@@ -31,8 +31,6 @@
 #include "Terrain.h"
 
 // ------------------------------------------
-Terrain* terrain = NULL;
-
 LabelStyle* leftAlignStyle;
 
 void AppDestroy();
@@ -335,7 +333,7 @@ void CreateScene()
 
 	// terrain
 	PerformanceTimer::Begin(L"building 257 terrain");
-	terrain = New Terrain(257, 200.0f, 40.0f);
+	Terrain* terrain = New Terrain(257, 200.0f, 40.0f);
 	terrain->LoadFromHeightMap(L"./Assets/Textures/Terrain/heightMap257_bit16.raw", 257);
 	terrain->BuildTerrain(4);
 	terrain->CalcChunkLODDist(mainCamera, 1.0f);
@@ -346,6 +344,8 @@ void CreateScene()
 	terrain->SetSplatMapTex(L"./Assets/Textures/Terrain/splat.tga");
 	terrain->SetMtlParameters(30.0f, 30.0f, D3DXCOLOR_WHITE, D3DXCOLOR_WHITE);
 	PerformanceTimer::End();
+
+	sceneMgr->AddTerrain(terrain);
 }
 
 void SceneEditorCanvas::RenderLoop()
@@ -369,8 +369,6 @@ void SceneEditorCanvas::RenderLoop()
 			if(wxWindow::FindFocus() == this)
 				mainCamera->ApplyCameraController();
 
-			terrain->FrameUpdate(mainCamera);
-
 			if(input->GetKeyDown(DIK_R))
 			{
 				mainCamera->DampMoveTo(Vector3::Zero, 0.5f, 0.01f);
@@ -380,8 +378,6 @@ void SceneEditorCanvas::RenderLoop()
 			driver->RenderToSwapChain(0);
 			driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
 			driver->BeginScene();
-
-			terrain->Draw(mainCamera, true);
 
 			sceneMgr->GetRoot()->SetDrawBBoxFlag(true);
 			sceneMgr->DrawAllUseRenderer();
@@ -464,8 +460,6 @@ void AppDestroy()
 {
 	SAFE_DELETE(leftAlignStyle);
 
-	SAFE_DELETE(terrain);
-
 	gEngine->Destroy();
 	SAFE_DELETE(gEngine);
 }
@@ -473,7 +467,6 @@ void AppDestroy()
 void OnLostDevice()
 {
 	leftAlignStyle->OnLostDevice();
-	terrain->OnLostDevice();
 
 	gDefaultLabelStyle.OnLostDevice();
 	gGUISystem.OnLostDevice();
@@ -487,8 +480,6 @@ void OnResetDevice()
 		return;
 
 	leftAlignStyle->OnResetDevice();
-
-	terrain->OnResetDevice();
 
 	gDefaultLabelStyle.OnResetDevice();
 	gGUISystem.OnResetDevice();
