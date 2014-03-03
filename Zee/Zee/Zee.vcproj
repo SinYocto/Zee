@@ -293,6 +293,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\Source\Shaders\GaussianBlur.fx"
+						>
+					</File>
+					<File
 						RelativePath=".\Source\Shaders\ShadowMap.fx"
 						>
 					</File>

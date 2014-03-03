@@ -22,6 +22,7 @@ class ShadowMapRenderer
 {
 public:
 	static void Init();
+	static void Destory();
 
 	static void OnLostDevice();
 	static void OnResetDevice();
@@ -36,21 +37,31 @@ public:
 	static void DrawMeshShadowMapPass(const D3DXMATRIX& matWorld, Geometry* geo);
 	static void DrawMeshShadowTexPass(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
 
+	static void ShadowMapGaussianBlur();
+
 	static Texture* GetShadowTex();
 
 private:
 	static void createEffect();
+	static void createGaussianBlurQuadVB();
 	static void setRenderState();
 
-
+	static void shadowMapGaussianBlurH();
+	static void shadowMapGaussianBlurV();
 
 private:
 	static LPD3DXEFFECT mShadowMapEffect;
 	static LPD3DXEFFECT mShadowTexEffect;
+	static LPD3DXEFFECT mGaussianBlurEffect;
 
+	static IDirect3DSurface9* mShadowMapRTSurface;	// 需要先使用这个surface作为启用了MSAA的rendertarget
 	static Texture* mShadowMapTex;
 	static Texture* mShadowTex;
 	static IDirect3DSurface9* mDepthStencilSurface;
+
+	static IDirect3DVertexBuffer9* mBlurQuadVB;
+	static Texture* mShadowMapBluredTexH;
+	static Texture* mShadowMapBluredTex;
 
 	static VirtualLightCamera mVirtualCamera;
 

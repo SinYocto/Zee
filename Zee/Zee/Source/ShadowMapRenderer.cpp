@@ -6,10 +6,16 @@
 
 LPD3DXEFFECT ShadowMapRenderer::mShadowMapEffect = NULL;
 LPD3DXEFFECT ShadowMapRenderer::mShadowTexEffect = NULL;
+LPD3DXEFFECT ShadowMapRenderer::mGaussianBlurEffect = NULL;
 
+IDirect3DSurface9* ShadowMapRenderer::mShadowMapRTSurface = NULL;
 Texture* ShadowMapRenderer::mShadowMapTex = NULL;
 Texture* ShadowMapRenderer::mShadowTex = NULL;
 IDirect3DSurface9* ShadowMapRenderer::mDepthStencilSurface = NULL;
+
+IDirect3DVertexBuffer9* ShadowMapRenderer::mBlurQuadVB = NULL;
+Texture* ShadowMapRenderer::mShadowMapBluredTexH = NULL;
+Texture* ShadowMapRenderer::mShadowMapBluredTex = NULL;
 
 VirtualLightCamera ShadowMapRenderer::mVirtualCamera;
 
@@ -20,34 +26,56 @@ void ShadowMapRenderer::createEffect()
 {
 	SAFE_RELEASE(mShadowMapEffect);
 	SAFE_RELEASE(mShadowTexEffect);
+	SAFE_RELEASE(mGaussianBlurEffect);
 
-	D3DXCreateEffectFromFile(gEngine->GetDriver()->GetD3DDevice(), L"./Source/Shaders/ShadowMap.fx", NULL, NULL, 
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+	D3DXCreateEffectFromFile(d3dDevice, L"./Source/Shaders/ShadowMap.fx", NULL, NULL, 
 		D3DXSHADER_DEBUG, UtilityShader::pool, &mShadowMapEffect, NULL);
-	D3DXCreateEffectFromFile(gEngine->GetDriver()->GetD3DDevice(), L"./Source/Shaders/ShadowTex.fx", NULL, NULL, 
+
+	D3DXCreateEffectFromFile(d3dDevice, L"./Source/Shaders/ShadowTex.fx", NULL, NULL, 
 		D3DXSHADER_DEBUG, UtilityShader::pool, &mShadowTexEffect, NULL);
+
+	D3DXCreateEffectFromFile(d3dDevice, L"./Source/Shaders/GaussianBlur.fx", NULL, NULL, 
+		D3DXSHADER_DEBUG, UtilityShader::pool, &mGaussianBlurEffect, NULL);
 
 	_Assert(NULL != mShadowMapEffect);
 	_Assert(NULL != mShadowTexEffect);
+	_Assert(NULL != mGaussianBlurEffect);
 }
 
 void ShadowMapRenderer::OnLostDevice()
 {
 	mShadowMapEffect->OnLostDevice();
 	mShadowTexEffect->OnLostDevice();
+	mGaussianBlurEffect->OnLostDevice();
+
+	SAFE_RELEASE(mBlurQuadVB);
 }
 
 void ShadowMapRenderer::OnResetDevice()
 {
 	mShadowMapEffect->OnResetDevice();
-	mShadowTexEffect->OnLostDevice();
+	mShadowTexEffect->OnResetDevice();
+	mGaussianBlurEffect->OnResetDevice();
+
+	createGaussianBlurQuadVB();
 }
 
 void ShadowMapRenderer::Init()
 {
 	createEffect();
+	createGaussianBlurQuadVB();
+
+	gEngine->GetDriver()->GetD3DDevice()->CreateRenderTarget(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, 
+		D3DMULTISAMPLE_8_SAMPLES, 0, false, &mShadowMapRTSurface, NULL);
 
 	mShadowMapTex = new Texture;
 	mShadowMapTex->Create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, D3DUSAGE_RENDERTARGET);
+
+	mShadowMapBluredTexH = new Texture;
+	mShadowMapBluredTex = new Texture;
+	mShadowMapBluredTexH->Create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, D3DUSAGE_RENDERTARGET);
+	mShadowMapBluredTex->Create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, D3DUSAGE_RENDERTARGET);
 
 	mShadowTex = new Texture;
 	mShadowTex->Create(SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, D3DFMT_A8R8G8B8, D3DUSAGE_RENDERTARGET);
@@ -58,6 +86,19 @@ void ShadowMapRenderer::Init()
 	_Assert(mShadowMapTex != NULL);
 	_Assert(mShadowTex != NULL);
 	_Assert(mDepthStencilSurface != NULL);
+}
+
+void ShadowMapRenderer::Destory()
+{
+	SAFE_DROP(mShadowMapTex);
+	SAFE_DROP(mShadowMapBluredTexH);
+	SAFE_DROP(mShadowMapBluredTex);
+	SAFE_DROP(mShadowTex);
+
+	SAFE_RELEASE(mShadowMapRTSurface);
+	SAFE_RELEASE(mDepthStencilSurface);
+
+	SAFE_RELEASE(mBlurQuadVB);
 }
 
 void ShadowMapRenderer::setRenderState()
@@ -75,16 +116,15 @@ void ShadowMapRenderer::setRenderState()
 
 void ShadowMapRenderer::BeginShadowMapPass()
 {
-	gEngine->GetDriver()->GetD3DDevice()->GetRenderTarget(0, &mPrevRenderTarget);
-	gEngine->GetDriver()->GetD3DDevice()->GetDepthStencilSurface(&mPrevDepthStencil);
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
 
-	IDirect3DSurface9* shadowTexSurface = NULL; 
-	mShadowMapTex->GetD3DTexture()->GetSurfaceLevel(0, &shadowTexSurface);
+	d3dDevice->GetRenderTarget(0, &mPrevRenderTarget);
+	d3dDevice->GetDepthStencilSurface(&mPrevDepthStencil);
 
-	gEngine->GetDriver()->GetD3DDevice()->SetRenderTarget(0, shadowTexSurface);
-	gEngine->GetDriver()->GetD3DDevice()->SetDepthStencilSurface(mDepthStencilSurface);
+	d3dDevice->SetRenderTarget(0, mShadowMapRTSurface);
+	d3dDevice->SetDepthStencilSurface(mDepthStencilSurface);
 
-	gEngine->GetDriver()->GetD3DDevice()->Clear(0, 0, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+	d3dDevice->Clear(0, 0, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
 
 	setRenderState();
 	
@@ -94,11 +134,18 @@ void ShadowMapRenderer::BeginShadowMapPass()
 
 void ShadowMapRenderer::EndShadowMapPass()
 {
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
 	mShadowMapEffect->EndPass();
 	mShadowMapEffect->End();
 
-	gEngine->GetDriver()->GetD3DDevice()->SetRenderTarget(0, mPrevRenderTarget);
-	gEngine->GetDriver()->GetD3DDevice()->SetDepthStencilSurface(mPrevDepthStencil);
+	d3dDevice->SetRenderTarget(0, mPrevRenderTarget);
+	d3dDevice->SetDepthStencilSurface(mPrevDepthStencil);
+
+	IDirect3DSurface9* shadowTexSurface = NULL; 
+	mShadowMapTex->GetD3DTexture()->GetSurfaceLevel(0, &shadowTexSurface);
+
+	d3dDevice->StretchRect(mShadowMapRTSurface, NULL, shadowTexSurface, NULL, D3DTEXF_NONE);
 
 	bool shouldSaveToFile = false;
 	if(shouldSaveToFile && mShadowMapTex->GetD3DTexture() != NULL)
@@ -126,7 +173,7 @@ void ShadowMapRenderer::DrawMeshShadowMapPass(const D3DXMATRIX& matWorld, Geomet
 void ShadowMapRenderer::SetupVirtualLightCamera(DirectionalLightNode* lightNode)
 {
 	// 计算light视角下所需渲染的场景bound
-	AABBox lightSceneBound(Vector3::Zero, 200, 80, 200);
+	AABBox lightSceneBound(Vector3::Zero, 50, 20, 50);
 
 	// 由上面得到的bound计算光源虚拟摄像机的位置和正交投影矩阵(pos, nearZ, farZ, width, height)
 	DirectionalLight* dirLight = lightNode->GetDirLight();
@@ -233,7 +280,7 @@ void ShadowMapRenderer::DrawMeshShadowTexPass(const D3DXMATRIX& matWorld, Geomet
 	mShadowTexEffect->SetRawValue("lightPos", &(mVirtualCamera.pos), 0, sizeof(Vector3));
 
 	_Assert(mShadowMapTex != NULL);
-	mShadowTexEffect->SetTexture("shadowMapTex", mShadowMapTex->GetD3DTexture());
+	mShadowTexEffect->SetTexture("shadowMapTex", mShadowMapBluredTex->GetD3DTexture());
 
 	mShadowTexEffect->CommitChanges();
 
@@ -243,5 +290,92 @@ void ShadowMapRenderer::DrawMeshShadowTexPass(const D3DXMATRIX& matWorld, Geomet
 Texture* ShadowMapRenderer::GetShadowTex()
 {
 	return mShadowTex;
+}
+
+void ShadowMapRenderer::createGaussianBlurQuadVB()
+{
+	SAFE_RELEASE(mBlurQuadVB);
+
+	VertexXYZRHWUV quadVerts[4];
+	quadVerts[0] = VertexXYZRHWUV(0, 0, 0, 1, 0, 0); 
+	quadVerts[1] = VertexXYZRHWUV(SHADOW_MAP_SIZE, 0, 0, 1, 1, 0); 
+	quadVerts[2] = VertexXYZRHWUV(0, SHADOW_MAP_SIZE, 0, 1, 0, 1); 
+	quadVerts[3] = VertexXYZRHWUV(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 0, 1, 1, 1);
+
+	CreateVB(gEngine->GetDriver()->GetD3DDevice(), &mBlurQuadVB, quadVerts, 4, XYZRHW_UV);
+}
+
+void ShadowMapRenderer::ShadowMapGaussianBlur()
+{
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
+	d3dDevice->GetRenderTarget(0, &mPrevRenderTarget);
+	d3dDevice->GetDepthStencilSurface(&mPrevDepthStencil);
+
+	setRenderState();
+
+	shadowMapGaussianBlurH();
+	shadowMapGaussianBlurV();
+
+	d3dDevice->SetRenderTarget(0, mPrevRenderTarget);
+	d3dDevice->SetDepthStencilSurface(mPrevDepthStencil);
+}
+
+void ShadowMapRenderer::shadowMapGaussianBlurH()
+{
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
+	IDirect3DSurface9* texSurface = NULL; 
+	mShadowMapBluredTexH->GetD3DTexture()->GetSurfaceLevel(0, &texSurface);
+
+	d3dDevice->SetRenderTarget(0, texSurface);
+	d3dDevice->SetDepthStencilSurface(mDepthStencilSurface);
+
+	d3dDevice->Clear(0, 0, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+
+	mGaussianBlurEffect->Begin(0, 0);
+	mGaussianBlurEffect->BeginPass(0);
+
+	d3dDevice->SetStreamSource(0, mBlurQuadVB, 0, SizeofVertex(XYZRHW_UV));
+	d3dDevice->SetFVF(VertexXYZRHWUV::FVF);
+
+	mGaussianBlurEffect->SetTechnique("GaussianBlurH");
+	mGaussianBlurEffect->SetTexture("sourceTex", mShadowMapTex->GetD3DTexture());
+	mGaussianBlurEffect->SetInt("sourceTexSize", SHADOW_MAP_SIZE);
+	mGaussianBlurEffect->CommitChanges();
+
+	d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+	mGaussianBlurEffect->EndPass();
+	mGaussianBlurEffect->End();
+}
+
+void ShadowMapRenderer::shadowMapGaussianBlurV()
+{
+	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
+
+	IDirect3DSurface9* texSurface = NULL; 
+	mShadowMapBluredTex->GetD3DTexture()->GetSurfaceLevel(0, &texSurface);
+
+	d3dDevice->SetRenderTarget(0, texSurface);
+	d3dDevice->SetDepthStencilSurface(mDepthStencilSurface);
+
+	d3dDevice->Clear(0, 0, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+
+	mGaussianBlurEffect->Begin(0, 0);
+	mGaussianBlurEffect->BeginPass(0);
+
+	d3dDevice->SetStreamSource(0, mBlurQuadVB, 0, SizeofVertex(XYZRHW_UV));
+	d3dDevice->SetFVF(VertexXYZRHWUV::FVF);
+
+	mGaussianBlurEffect->SetTechnique("GaussianBlurV");
+	mGaussianBlurEffect->SetTexture("sourceTex", mShadowMapBluredTexH->GetD3DTexture());
+	mGaussianBlurEffect->SetInt("sourceTexSize", SHADOW_MAP_SIZE);
+	mGaussianBlurEffect->CommitChanges();
+
+	d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+	mGaussianBlurEffect->EndPass();
+	mGaussianBlurEffect->End();
 }
 

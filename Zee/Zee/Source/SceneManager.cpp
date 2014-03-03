@@ -291,6 +291,8 @@ void SceneManager::drawShadowMapPass()
 		ShadowMapRenderer::DrawMeshShadowMapPass(meshNode->LocalToWorldMatrix(), mesh->GetGeometry());
 	}
 	ShadowMapRenderer::EndShadowMapPass();
+
+	ShadowMapRenderer::ShadowMapGaussianBlur();
 }
 
 void SceneManager::drawShadowTexPass()

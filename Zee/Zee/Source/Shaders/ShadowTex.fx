@@ -8,15 +8,18 @@ float3 lightPos;
 
 texture	shadowMapTex;
 
+const float MIN_VARIANCE = 0.4f;
+const float THRESHOLD = 0.2f;
+
 sampler ShadowMapS = sampler_state
 {
 	Texture = <shadowMapTex>;
-	MinFilter = linear;
-	MaxAnisotropy = 4;
+	MinFilter = anisotropic;
+	MaxAnisotropy = 8;
 	MagFilter = linear;
 	MipFilter = linear;
-	AddressU  = WRAP;
-    AddressV  = WRAP;
+	AddressU  = Clamp;
+    AddressV  = Clamp;
 };
 
 struct VS_IN
@@ -56,13 +59,17 @@ float4 ShadowPS(float3 posW : TEXCOORD0) : COLOR0
 	
 	float pixelDepth = length(lightPos - posW.xyz);
 
-	if(pixelDepth < shadowMapValues.x + 0.5 f)
+	if(pixelDepth < shadowMapValues.x)
 	{
 		shadow = 1;
 	}
 	else
 	{
-		shadow = 0;
+		float variance = shadowMapValues.y - shadowMapValues.x * shadowMapValues.x;
+		variance = clamp(variance, MIN_VARIANCE, 10000.0f);
+		shadow = variance / (variance + (pixelDepth - shadowMapValues.x)*(pixelDepth - shadowMapValues.x));
+		shadow = clamp((shadow - THRESHOLD)/(1 - THRESHOLD), 0, 1.0f);
+		//shadow = 0;
 	}
 
 	return float4(shadow, shadow, shadow, 1);

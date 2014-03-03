@@ -91,6 +91,8 @@ void Engine::Destroy()
 	mTextureMgr->Destory();
 	mSceneMgr->Destory();
 
+	ShadowMapRenderer::Destory();
+
 	mInput->Destroy();
 	mDriver->Destory();
 
