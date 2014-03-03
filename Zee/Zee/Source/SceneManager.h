@@ -3,6 +3,7 @@
 
 #include "SceneNode.h"
 #include "Shader.h"
+#include "ShadowMapRenderer.h"
 
 class Camera;
 class MeshNode;
@@ -73,7 +74,7 @@ private:
 	std::list<DirectionalLightNode*> mDirLightNodes;
 	std::list<PointLightNode*> mPointLihgtNodes; 
 
-	std::list<MeshNode*> mShadowMapMeshNodeList;
+	std::list<MeshNode*> mShadowMapMeshNodeList[CASCADE_COUNTS];
 	DirectionalLightNode* mShadowMapDirLightNode;
 
 	Terrain* mTerrain;

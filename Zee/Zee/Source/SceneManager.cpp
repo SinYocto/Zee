@@ -298,21 +298,25 @@ SceneNode* SceneManager::AddPrimitiveCube()
 
 void SceneManager::drawShadowMapPass()
 {
-	ShadowMapRenderer::BeginShadowMapPass();
-	ShadowMapRenderer::SetupVirtualLightCamera(mShadowMapDirLightNode);
-	for(MeshNodeList::iterator iter = mShadowMapMeshNodeList.begin(); iter != mShadowMapMeshNodeList.end(); ++iter)
+	ShadowMapRenderer::SetupVirtualLightCameras(mainCamera, mShadowMapDirLightNode);
+
+	for(int i = 0; i < CASCADE_COUNTS; ++i)
 	{
-		MeshNode* meshNode = *iter;
-		Mesh* mesh = meshNode->GetMesh();
+		ShadowMapRenderer::BeginShadowMapPass();
 
-		ShadowMapRenderer::DrawMeshShadowMapPass(meshNode->LocalToWorldMatrix(), mesh->GetGeometry());
+		for(MeshNodeList::iterator iter = mShadowMapMeshNodeList[i].begin(); iter != mShadowMapMeshNodeList[i].end(); ++iter)
+		{
+			MeshNode* meshNode = *iter;
+			Mesh* mesh = meshNode->GetMesh();
+
+			ShadowMapRenderer::DrawMeshShadowMapPass(meshNode->LocalToWorldMatrix(), mesh->GetGeometry(), i);
+		}
+
+		ShadowMapRenderer::DrawTerrainShadowMapPass(mTerrain, i);
+		ShadowMapRenderer::EndShadowMapPass();
+
+		ShadowMapRenderer::ShadowMapGaussianBlur(i);
 	}
-
-	ShadowMapRenderer::DrawTerrainShadowMapPass(mTerrain);
-
-	ShadowMapRenderer::EndShadowMapPass();
-
-	ShadowMapRenderer::ShadowMapGaussianBlur();
 }
 
 void SceneManager::drawShadowTexPass()
@@ -341,8 +345,13 @@ void SceneManager::drawShadowTexPass()
 
 void SceneManager::collectLightViewSceneEntities()
 {
-	mShadowMapMeshNodeList.clear();
+	for(int i = 0; i < CASCADE_COUNTS; ++i)
+	{
+		mShadowMapMeshNodeList[i].clear();
+	}
+
 	mShadowMapDirLightNode = NULL;
+
 	collectLightViewSceneNode(root);
 }
 
@@ -350,10 +359,13 @@ void SceneManager::collectLightViewSceneNode( SceneNode* sceneNode )
 {
 	if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_MESH)
 	{
-		if(sceneNode->GetAABBox().IntersectedWith(ShadowMapRenderer::GetVirtualCameraBound()))
+		for(int i = 0; i < CASCADE_COUNTS; ++i)
 		{
-			MeshNode* meshNode = static_cast<MeshNode*>(sceneNode);
-			mShadowMapMeshNodeList.push_back(meshNode);
+			if(sceneNode->GetAABBox().IntersectedWith(ShadowMapRenderer::GetVirtualCameraBound(i)))
+			{
+				MeshNode* meshNode = static_cast<MeshNode*>(sceneNode);
+				mShadowMapMeshNodeList[i].push_back(meshNode);
+			}
 		}
 	}
 	else if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_DIR_LIGHT)

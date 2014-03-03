@@ -202,37 +202,13 @@ void CreateScene()
 
 	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(0);
 	sceneMgr->CreateMainCamera(Vector3(0, 4.0f, -14.0f), Vector3::Zero,
-		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 1000.0f);
+		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 300.0f);
 
 	Camera* mainCamera = sceneMgr->GetMainCamera();
 
 	FPCameraController* fpCameraController = New FPCameraController(6.0f, 2.0f, 4.0f);
 	//HoverCameraController* hoverCameraController = new HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
 	mainCamera->SetCameraController(fpCameraController);
-
-	//int a = 4;
-	//int b = 12;
-
-	//int* ip0 = &a;
-	//int* ip1 = &b;
-
-	//HashMap<int> hashMap(1024);
-	//hashMap.Insert(L"path0", ip0);
-	//hashMap.Insert(L"path1", ip1);
-
-	//int* ip = hashMap.Find(L"path0");
-	//if(ip)
-	//{
-	//	int val = *ip;
-	//}
-
-	//ip = hashMap.Find(L"path1");
-	//if(ip)
-	//{
-	//	int val = *ip;
-	//}
-
-
 
 	// lights
 	//DirectionalLight* dirLight1 = New DirectionalLight(L"dirLight1", D3DXCOLOR_WHITE, Vector3(1.0f, -1.0f, 1.0f));

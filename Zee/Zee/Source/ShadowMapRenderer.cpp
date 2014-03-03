@@ -17,9 +17,9 @@ IDirect3DSurface9* ShadowMapRenderer::mDepthStencilSurface = NULL;
 
 IDirect3DVertexBuffer9* ShadowMapRenderer::mBlurQuadVB = NULL;
 Texture* ShadowMapRenderer::mShadowMapBluredTexH = NULL;
-Texture* ShadowMapRenderer::mShadowMapBluredTex = NULL;
+Texture* ShadowMapRenderer::mShadowMapBluredTex[CASCADE_COUNTS];
 
-VirtualLightCamera ShadowMapRenderer::mVirtualCamera;
+VirtualLightCamera ShadowMapRenderer::mVirtualCamera[CASCADE_COUNTS];
 
 LPDIRECT3DSURFACE9 ShadowMapRenderer::mPrevRenderTarget = NULL;
 LPDIRECT3DSURFACE9 ShadowMapRenderer::mPrevDepthStencil = NULL;
@@ -75,9 +75,15 @@ void ShadowMapRenderer::Init()
 	mShadowMapTex->Create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, D3DUSAGE_RENDERTARGET);
 
 	mShadowMapBluredTexH = new Texture;
-	mShadowMapBluredTex = new Texture;
 	mShadowMapBluredTexH->Create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, D3DUSAGE_RENDERTARGET);
-	mShadowMapBluredTex->Create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, D3DUSAGE_RENDERTARGET);
+
+	for(int i = 0; i < CASCADE_COUNTS; ++i)
+	{
+		mShadowMapBluredTex[i] = new Texture;
+		mShadowMapBluredTex[i]->Create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, D3DUSAGE_RENDERTARGET);
+
+		_Assert(mShadowMapBluredTex[i] != NULL);
+	}
 
 	mShadowTex = new Texture;
 	mShadowTex->Create(SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, D3DFMT_A8R8G8B8, D3DUSAGE_RENDERTARGET);
@@ -92,9 +98,13 @@ void ShadowMapRenderer::Init()
 
 void ShadowMapRenderer::Destory()
 {
-	SAFE_DROP(mShadowMapTex);
+	for(int i = 0; i < CASCADE_COUNTS; ++i)
+	{
+		SAFE_DROP(mShadowMapBluredTex[i]);
+	}
+
 	SAFE_DROP(mShadowMapBluredTexH);
-	SAFE_DROP(mShadowMapBluredTex);
+	SAFE_DROP(mShadowMapTex);
 	SAFE_DROP(mShadowTex);
 
 	SAFE_RELEASE(mShadowMapRTSurface);
@@ -154,7 +164,7 @@ void ShadowMapRenderer::EndShadowMapPass()
 		D3DXSaveTextureToFile(L"E:/Temp/shadowMap.jpg", D3DXIFF_JPG, mShadowMapTex->GetD3DTexture(), NULL);
 }
 
-void ShadowMapRenderer::DrawMeshShadowMapPass(const D3DXMATRIX& matWorld, Geometry* geo)
+void ShadowMapRenderer::DrawMeshShadowMapPass(const D3DXMATRIX& matWorld, Geometry* geo, int cascadeIndex)
 {
 	_Assert(NULL != geo);
 
@@ -163,24 +173,24 @@ void ShadowMapRenderer::DrawMeshShadowMapPass(const D3DXMATRIX& matWorld, Geomet
 
 	mShadowMapEffect->SetTechnique("Depth");
 
-	mShadowMapEffect->SetMatrix("matWVP", &(matWorld * mVirtualCamera.matVP));
+	mShadowMapEffect->SetMatrix("matWVP", &(matWorld * mVirtualCamera[cascadeIndex].matVP));
 	mShadowMapEffect->SetMatrix("matWorld", &matWorld);
-	mShadowMapEffect->SetRawValue("lightPos", &(mVirtualCamera.pos), 0, sizeof(Vector3));
+	mShadowMapEffect->SetRawValue("lightPos", &(mVirtualCamera[cascadeIndex].pos), 0, sizeof(Vector3));
 
 	mShadowMapEffect->CommitChanges();
 
 	geo->Draw();
 }
 
-void ShadowMapRenderer::DrawTerrainShadowMapPass(Terrain* terrain)
+void ShadowMapRenderer::DrawTerrainShadowMapPass(Terrain* terrain, int cascadeIndex)
 {
 	_Assert(NULL != terrain);
 
 	mShadowMapEffect->SetTechnique("Depth");
 
-	mShadowMapEffect->SetMatrix("matWVP", &mVirtualCamera.matVP);
+	mShadowMapEffect->SetMatrix("matWVP", &mVirtualCamera[cascadeIndex].matVP);
 	mShadowMapEffect->SetMatrix("matWorld", &IDENTITY_MATRIX);
-	mShadowMapEffect->SetRawValue("lightPos", &(mVirtualCamera.pos), 0, sizeof(Vector3));
+	mShadowMapEffect->SetRawValue("lightPos", &(mVirtualCamera[cascadeIndex].pos), 0, sizeof(Vector3));
 
 	mShadowMapEffect->CommitChanges();
 
@@ -190,7 +200,7 @@ void ShadowMapRenderer::DrawTerrainShadowMapPass(Terrain* terrain)
 	{
 		TerrainChunk* chunk = *iter;
 
-		if(!chunk->IntersectWithBBox(mVirtualCamera.bound))
+		if(!chunk->IntersectWithBBox(mVirtualCamera[cascadeIndex].bound))
 			continue;
 
 		chunk->SetVertexStream();
@@ -198,18 +208,47 @@ void ShadowMapRenderer::DrawTerrainShadowMapPass(Terrain* terrain)
 	}
 }
 
-void ShadowMapRenderer::SetupVirtualLightCamera(DirectionalLightNode* lightNode)
+void ShadowMapRenderer::SetupVirtualLightCameras(Camera* camera, DirectionalLightNode* lightNode)
 {
-	// 计算light视角下所需渲染的场景bound
-	AABBox sceneBound(Vector3::Zero, 200, 80, 200);
-	AABBox viewFrustumBound = gEngine->GetSceneManager()->GetMainCamera()->GetFrustumAABBox();
+	for(int i = 0; i < CASCADE_COUNTS; ++i)
+	{
+		setupVirtualLightCamera(camera, lightNode, i);
+	}
+}
 
-	// TODO: 使用真正的viewFrustum代替当前使用的viewFrustumAABB来计算lightSceneBount, 还可以更tight
-	AABBox lightSceneBound = AABBox::Intersection(sceneBound, viewFrustumBound);
+void ShadowMapRenderer::setupVirtualLightCamera(Camera* camera, DirectionalLightNode* lightNode, int cascadeIndex)
+{
+	const float BOUND_EXPAND_FACTOR = 0.4f;
 
-	// 由上面得到的bound计算光源虚拟摄像机的位置和正交投影矩阵(pos, nearZ, farZ, width, height)
+	_Assert(camera != NULL);
+	_Assert(cascadeIndex >= 0 && cascadeIndex < CASCADE_COUNTS);
+
 	DirectionalLight* dirLight = lightNode->GetDirLight();
 	Vector3 lightDir = dirLight->GetDirection();
+	lightDir.Normalize();
+
+	Vector3 frustumPos[5];
+	{
+		float farZ = 0;
+		float aspect = 0;
+		float fov = 0;
+
+		camera->GetCameraParams(NULL, &farZ, &fov, &aspect);
+		farZ *= (float)(cascadeIndex + 1) / CASCADE_COUNTS;
+
+
+		float fy = farZ * tanf(fov / 2.0f);
+		float fx = aspect * fy;
+
+		frustumPos[0] = Vector3::Zero;
+		frustumPos[1] = Vector3(-fx,  fy, farZ);
+		frustumPos[2] = Vector3( fx,  fy, farZ);
+		frustumPos[3] = Vector3(-fx, -fy, farZ);
+		frustumPos[4] = Vector3( fx, -fy, farZ);
+	}
+
+	D3DXMATRIX matCameraViewInv;
+	D3DXMatrixInverse(&matCameraViewInv, 0, &camera->ViewMatrix());
 
 	D3DXMATRIX matLightView;
 	{
@@ -222,9 +261,9 @@ void ShadowMapRenderer::SetupVirtualLightCamera(DirectionalLightNode* lightNode)
 	}
 
 	AABBox lightSpaceBound;
-	for(int i = 0; i < 8; ++i)
+	for(int i = 0; i < 5; ++i)
 	{
-		Vector3 posW = lightSceneBound.GetVertex(i);
+		Vector3 posW = PosVecTransform(frustumPos[i], matCameraViewInv);
 		Vector3	posL = PosVecTransform(posW, matLightView);	
 
 		lightSpaceBound = AABBox::CombinePoint(lightSpaceBound, posL);
@@ -235,6 +274,12 @@ void ShadowMapRenderer::SetupVirtualLightCamera(DirectionalLightNode* lightNode)
 	float width = 0;
 	float height = 0;
 	{
+		Vector3 lookDir = camera->GetWorldForward();
+		lookDir.Normalize();
+
+		float adjustFactor = lookDir.Dot(lightDir);		// lookDir与lightDir贴近时, 向后扩展virtualCamera范围
+		float expandDist = adjustFactor * BOUND_EXPAND_FACTOR * fabsf(lightSpaceBound.mMax.z - lightSpaceBound.mMin.z);
+
 		Vector3 centerL = lightSpaceBound.GetCenter();
 		D3DXMATRIX matLightViewInv;
 		D3DXMatrixInverse(&matLightViewInv, 0, &matLightView);
@@ -244,8 +289,8 @@ void ShadowMapRenderer::SetupVirtualLightCamera(DirectionalLightNode* lightNode)
 		width = fabsf(lightSpaceBound.mMax.x - lightSpaceBound.mMin.x);
 		height = fabsf(lightSpaceBound.mMax.y - lightSpaceBound.mMin.y);
 
-		farZ = 2.0f * lightDist;
-		mVirtualCamera.pos = centerW - lightDist * lightDir;
+		farZ = 2.0f * lightDist + expandDist;
+		mVirtualCamera[cascadeIndex].pos = centerW - (lightDist + expandDist) * lightDir;
 	}
 
 	D3DXMATRIX matLightProj;
@@ -253,18 +298,18 @@ void ShadowMapRenderer::SetupVirtualLightCamera(DirectionalLightNode* lightNode)
 
 	D3DXMATRIX matVirtualCameraView;
 	{
-		Vector3 virtualCameraPos = mVirtualCamera.pos;
+		Vector3 virtualCameraPos = mVirtualCamera[cascadeIndex].pos;
 
 		D3DXMATRIX matRotTranspose, matTransInverse;
 		D3DXMatrixTranspose(&matRotTranspose, &(lightNode->GetWorldOrient().Matrix()));
 		D3DXMatrixTranslation(&matTransInverse, -virtualCameraPos.x, -virtualCameraPos.y, -virtualCameraPos.z);
 		matVirtualCameraView = matTransInverse * matRotTranspose; 
 
-		mVirtualCamera.bound = AABBox::MatTransform(AABBox(Vector3(0, 0, farZ/2.0f), width, height, farZ), 
+		mVirtualCamera[cascadeIndex].bound = AABBox::MatTransform(AABBox(Vector3(0, 0, farZ/2.0f), width, height, farZ), 
 			InversedMatrix(matVirtualCameraView));
 	}
 
-	mVirtualCamera.matVP = matVirtualCameraView * matLightProj;
+	mVirtualCamera[cascadeIndex].matVP = matVirtualCameraView * matLightProj;
 }
 
 void ShadowMapRenderer::BeginShadowTexPass()
@@ -297,14 +342,6 @@ void ShadowMapRenderer::EndShadowTexPass()
 	bool shouldSaveToFile = false;
 	if(shouldSaveToFile && mShadowTex->GetD3DTexture() != NULL)
 		D3DXSaveTextureToFile(L"E:/Temp/shadowTex.jpg", D3DXIFF_JPG, mShadowTex->GetD3DTexture(), NULL);
-
-
-	static AABBox db_box;
-	if(gEngine->GetInput()->GetKeyUp(DIK_B))
-		db_box = mVirtualCamera.bound;
-
-	if(db_box.isValid())
-		DebugDrawer::DrawAABBox(db_box, 0xff00ff00, gEngine->GetSceneManager()->GetMainCamera());
 }
 
 void ShadowMapRenderer::DrawMeshShadowTexPass(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
@@ -318,11 +355,23 @@ void ShadowMapRenderer::DrawMeshShadowTexPass(const D3DXMATRIX& matWorld, Geomet
 
 	mShadowTexEffect->SetMatrix("matWVP", &(matWorld * camera->ViewMatrix() * camera->ProjMatrix()));
 	mShadowTexEffect->SetMatrix("matWorld", &matWorld);
-	mShadowTexEffect->SetMatrix("matLightVP", &mVirtualCamera.matVP);
-	mShadowTexEffect->SetRawValue("lightPos", &(mVirtualCamera.pos), 0, sizeof(Vector3));
 
-	_Assert(mShadowMapTex != NULL);
-	mShadowTexEffect->SetTexture("shadowMapTex", mShadowMapBluredTex->GetD3DTexture());
+	_Assert(CASCADE_COUNTS >= 3);
+	mShadowTexEffect->SetMatrix("matLightVP0", &mVirtualCamera[0].matVP);
+	mShadowTexEffect->SetMatrix("matLightVP1", &mVirtualCamera[1].matVP);
+	mShadowTexEffect->SetMatrix("matLightVP2", &mVirtualCamera[2].matVP);
+
+	mShadowTexEffect->SetRawValue("lightPos0", &(mVirtualCamera[0].pos), 0, sizeof(Vector3));
+	mShadowTexEffect->SetRawValue("lightPos1", &(mVirtualCamera[1].pos), 0, sizeof(Vector3));
+	mShadowTexEffect->SetRawValue("lightPos2", &(mVirtualCamera[2].pos), 0, sizeof(Vector3));
+
+	mShadowTexEffect->SetTexture("shadowMapTex0", mShadowMapBluredTex[0]->GetD3DTexture());
+	mShadowTexEffect->SetTexture("shadowMapTex1", mShadowMapBluredTex[1]->GetD3DTexture());
+	mShadowTexEffect->SetTexture("shadowMapTex2", mShadowMapBluredTex[2]->GetD3DTexture());
+
+	float farZ = 0;
+	camera->GetCameraParams(NULL, &farZ, NULL, NULL);
+	mShadowTexEffect->SetFloat("farZ", farZ);
 
 	mShadowTexEffect->CommitChanges();
 
@@ -337,11 +386,23 @@ void ShadowMapRenderer::DrawTerrainShadowTexPass(Terrain* terrain, Camera* camer
 
 	mShadowTexEffect->SetMatrix("matWVP", &(camera->ViewMatrix() * camera->ProjMatrix()));
 	mShadowTexEffect->SetMatrix("matWorld", &IDENTITY_MATRIX);
-	mShadowTexEffect->SetMatrix("matLightVP", &mVirtualCamera.matVP);
-	mShadowTexEffect->SetRawValue("lightPos", &(mVirtualCamera.pos), 0, sizeof(Vector3));
 
-	_Assert(mShadowMapTex != NULL);
-	mShadowTexEffect->SetTexture("shadowMapTex", mShadowMapBluredTex->GetD3DTexture());
+	_Assert(CASCADE_COUNTS >= 3);
+	mShadowTexEffect->SetMatrix("matLightVP0", &mVirtualCamera[0].matVP);
+	mShadowTexEffect->SetMatrix("matLightVP1", &mVirtualCamera[1].matVP);
+	mShadowTexEffect->SetMatrix("matLightVP2", &mVirtualCamera[2].matVP);
+
+	mShadowTexEffect->SetRawValue("lightPos0", &(mVirtualCamera[0].pos), 0, sizeof(Vector3));
+	mShadowTexEffect->SetRawValue("lightPos1", &(mVirtualCamera[1].pos), 0, sizeof(Vector3));
+	mShadowTexEffect->SetRawValue("lightPos2", &(mVirtualCamera[2].pos), 0, sizeof(Vector3));
+
+	mShadowTexEffect->SetTexture("shadowMapTex0", mShadowMapBluredTex[0]->GetD3DTexture());
+	mShadowTexEffect->SetTexture("shadowMapTex1", mShadowMapBluredTex[1]->GetD3DTexture());
+	mShadowTexEffect->SetTexture("shadowMapTex2", mShadowMapBluredTex[2]->GetD3DTexture());
+
+	float farZ = 0;
+	camera->GetCameraParams(NULL, &farZ, NULL, NULL);
+	mShadowTexEffect->SetFloat("farZ", farZ);
 
 	mShadowTexEffect->CommitChanges();
 
@@ -376,7 +437,7 @@ void ShadowMapRenderer::createGaussianBlurQuadVB()
 	CreateVB(gEngine->GetDriver()->GetD3DDevice(), &mBlurQuadVB, quadVerts, 4, XYZRHW_UV);
 }
 
-void ShadowMapRenderer::ShadowMapGaussianBlur()
+void ShadowMapRenderer::ShadowMapGaussianBlur(int cascadeIndex)
 {
 	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
 
@@ -386,7 +447,7 @@ void ShadowMapRenderer::ShadowMapGaussianBlur()
 	setRenderState();
 
 	shadowMapGaussianBlurH();
-	shadowMapGaussianBlurV();
+	shadowMapGaussianBlurV(cascadeIndex);
 
 	d3dDevice->SetRenderTarget(0, mPrevRenderTarget);
 	d3dDevice->SetDepthStencilSurface(mPrevDepthStencil);
@@ -421,12 +482,14 @@ void ShadowMapRenderer::shadowMapGaussianBlurH()
 	mGaussianBlurEffect->End();
 }
 
-void ShadowMapRenderer::shadowMapGaussianBlurV()
+void ShadowMapRenderer::shadowMapGaussianBlurV(int cascadeIndex)
 {
+	_Assert(cascadeIndex >= 0 && cascadeIndex < CASCADE_COUNTS);
+
 	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
 
 	IDirect3DSurface9* texSurface = NULL; 
-	mShadowMapBluredTex->GetD3DTexture()->GetSurfaceLevel(0, &texSurface);
+	mShadowMapBluredTex[cascadeIndex]->GetD3DTexture()->GetSurfaceLevel(0, &texSurface);
 
 	d3dDevice->SetRenderTarget(0, texSurface);
 	d3dDevice->SetDepthStencilSurface(mDepthStencilSurface);
@@ -450,8 +513,8 @@ void ShadowMapRenderer::shadowMapGaussianBlurV()
 	mGaussianBlurEffect->End();
 }
 
-AABBox ShadowMapRenderer::GetVirtualCameraBound()
+AABBox ShadowMapRenderer::GetVirtualCameraBound(int cascadeIndex)
 {
-	return mVirtualCamera.bound;
+	_Assert(cascadeIndex >= 0 && cascadeIndex < CASCADE_COUNTS);
+	return mVirtualCamera[cascadeIndex].bound;
 }
-

@@ -346,6 +346,16 @@ void SpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camera* c
 		SpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0)->GetD3DTexture());
 	}
 
+	if(gEngine->GetSceneManager()->NeedDirLightShadow())
+	{
+		SpecularShader::mEffect->SetBool("calcShadow", true);
+		SpecularShader::mEffect->SetTexture("shadowTex", ShadowMapRenderer::GetShadowTex()->GetD3DTexture());
+	}
+	else
+	{
+		SpecularShader::mEffect->SetBool("calcShadow", false);
+	}
+
 	SpecularShader::mEffect->SetRawValue("mtlAmbient", &(mMaterial->GetAmbientColor()), 0, sizeof(D3DXCOLOR));
 	SpecularShader::mEffect->SetRawValue("mtlDiffuse", &(mMaterial->GetDiffuseColor()), 0, sizeof(D3DXCOLOR));
 	SpecularShader::mEffect->SetRawValue("mtlSpec", &(mMaterial->GetFinalSpecularColor()), 0, sizeof(D3DXCOLOR));
@@ -456,6 +466,16 @@ void BumpSpecularShader::Render(const D3DXMATRIX& matWorld, Geometry* geo, Camer
 	{
 		BumpSpecularShader::mEffect->SetBool("useColorTex", true);	
 		BumpSpecularShader::mEffect->SetTexture("colorTex", mMaterial->GetTexture(0)->GetD3DTexture());
+	}
+
+	if(gEngine->GetSceneManager()->NeedDirLightShadow())
+	{
+		BumpSpecularShader::mEffect->SetBool("calcShadow", true);
+		BumpSpecularShader::mEffect->SetTexture("shadowTex", ShadowMapRenderer::GetShadowTex()->GetD3DTexture());
+	}
+	else
+	{
+		BumpSpecularShader::mEffect->SetBool("calcShadow", false);
 	}
 
 	BumpSpecularShader::mEffect->SetTexture("normalTex", mMaterial->GetTexture(1)->GetD3DTexture());

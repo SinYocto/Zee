@@ -7,6 +7,8 @@
 #define SHADOW_MAP_SIZE 1024
 #define SHADOW_TEX_SIZE 1024
 
+#define CASCADE_COUNTS 3
+
 class Geometry;
 class Material;
 class Texture;
@@ -37,18 +39,18 @@ public:
 	static void BeginShadowTexPass();
 	static void EndShadowTexPass();
 
-	static void SetupVirtualLightCamera(DirectionalLightNode* lightNode);
+	static void SetupVirtualLightCameras(Camera* camera, DirectionalLightNode* lightNode);
 
-	static void DrawMeshShadowMapPass(const D3DXMATRIX& matWorld, Geometry* geo);
+	static void DrawMeshShadowMapPass(const D3DXMATRIX& matWorld, Geometry* geo, int cascadeIndex);
 	static void DrawMeshShadowTexPass(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera);
 
-	static void DrawTerrainShadowMapPass(Terrain* terrain);
+	static void DrawTerrainShadowMapPass(Terrain* terrain, int cascadeIndex);
 	static void DrawTerrainShadowTexPass(Terrain* terrain, Camera* camera);
 
-	static void ShadowMapGaussianBlur();
+	static void ShadowMapGaussianBlur(int cascadeIndex);
 
 	static Texture* GetShadowTex();
-	static AABBox GetVirtualCameraBound();
+	static AABBox GetVirtualCameraBound(int cascadeIndex);
 
 private:
 	static void createEffect();
@@ -56,7 +58,9 @@ private:
 	static void setRenderState();
 
 	static void shadowMapGaussianBlurH();
-	static void shadowMapGaussianBlurV();
+	static void shadowMapGaussianBlurV(int cascadeIndex);
+
+	static void setupVirtualLightCamera(Camera* camera, DirectionalLightNode* lightNode, int cascadeIndex);
 
 private:
 	static LPD3DXEFFECT mShadowMapEffect;
@@ -70,9 +74,9 @@ private:
 
 	static IDirect3DVertexBuffer9* mBlurQuadVB;
 	static Texture* mShadowMapBluredTexH;
-	static Texture* mShadowMapBluredTex;
+	static Texture* mShadowMapBluredTex[CASCADE_COUNTS];
 
-	static VirtualLightCamera mVirtualCamera;
+	static VirtualLightCamera mVirtualCamera[CASCADE_COUNTS];
 
 	static IDirect3DSurface9* mPrevRenderTarget;
 	static IDirect3DSurface9* mPrevDepthStencil;

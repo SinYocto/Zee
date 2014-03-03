@@ -244,8 +244,6 @@ void Camera::calcFrustumAABBox()
 		Vector3 posW = PosVecTransform(frustumPos[i], matViewInv);
 		mFrustumAABBox = AABBox::CombinePoint(mFrustumAABBox, posW);
 	}
-
-	mFrustumAABBox;
 }
 
 AABBox Camera::GetFrustumAABBox()

@@ -17,9 +17,23 @@ float gloss;
 
 float3 eyePos;
 
+bool calcShadow;
+texture shadowTex;
+
 sampler ColorS = sampler_state
 {
 	Texture = <colorTex>;
+	MinFilter = linear;
+	MaxAnisotropy = 4;
+	MagFilter = linear;
+	MipFilter = linear;
+	AddressU  = WRAP;
+    AddressV  = WRAP;
+};
+
+sampler ShadowS = sampler_state
+{
+	Texture = <shadowTex>;
 	MinFilter = linear;
 	MaxAnisotropy = 4;
 	MagFilter = linear;
@@ -41,6 +55,7 @@ struct VS_OUT
 	float2 tex : TEXCOORD0;
 	float3 normal : TEXCOORD1;
 	float3 posW : TEXCOORD2;
+	float3 posRaw : TEXCOORD3;
 };
 
 VS_OUT SpecularVS(VS_IN vIn)
@@ -51,14 +66,17 @@ VS_OUT SpecularVS(VS_IN vIn)
 	vOut.posW = (mul(float4(vIn.pos, 1.0f), matWorld)).xyz;
 	vOut.tex = (mul(float4(vIn.tex, 0, 1.0f), matUVTransform)).xy;
 	vOut.normal = (mul(float4(vIn.normal, 0), matWorld)).xyz;
+	vOut.posRaw = vIn.pos;
 
 	return vOut;
 }
 
 float4 SpecularPS(float2 tex : TEXCOORD0, 
 				  float3 normal : TEXCOORD1, 
-				  float3 posW : TEXCOORD2) : COLOR0
+				  float3 posW : TEXCOORD2,
+				  float3 posRaw : TEXCOORD3) : COLOR0
 {
+	float4 oColorAmbient = float4(0, 0, 0, 1);
 	float4 oColor = float4(0, 0, 0, 1);
 
 	float3 dirV = normalize(eyePos - posW);
@@ -77,7 +95,7 @@ float4 SpecularPS(float2 tex : TEXCOORD0,
 		Kd *= texColor;
 	}
 	
-	CalcORadianceAmbient(oColor, ambientLight.color, Ka);
+	CalcORadianceAmbient(oColorAmbient, ambientLight.color, Ka);
 
 	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
 	{
@@ -92,6 +110,17 @@ float4 SpecularPS(float2 tex : TEXCOORD0,
 		CalcORadianceBlinnPhong(oColor, atten * pointLights[i].color, dirL, normal, dirV, Kd, Ks, Ns);
 	}
 
+	float shadow = 1.0f;
+	if(calcShadow)
+	{
+		float4 posClip = mul(float4(posRaw, 1.0f), matWVP);
+		posClip.xyz /= posClip.w;
+
+		float2 posTex = float2(posClip.x * 0.5 + 0.5, -posClip.y * 0.5 + 0.5);
+		shadow = tex2D(ShadowS, posTex).x;
+	}
+
+	oColor.rgb = oColorAmbient.rgb + shadow * oColor.rgb;
 	return oColor;
 }
 
