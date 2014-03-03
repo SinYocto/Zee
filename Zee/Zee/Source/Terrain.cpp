@@ -355,6 +355,13 @@ void TerrainChunk::Draw()
 	Profiler::AddNumTris(GetTriCounts());
 }
 
+bool TerrainChunk::IntersectWithBBox(const AABBox& box)
+{
+	AABBox intersection = AABBox::Intersection(mNode->GetAABBox(), box);
+
+	return intersection.isValid();
+}
+
 Terrain::Terrain(int size, float length, float height)
 :mSize(size)
 ,mLength(length)

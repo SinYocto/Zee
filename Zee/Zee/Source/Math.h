@@ -198,6 +198,8 @@ Vector3 operator*(const Vector3& vec, const Quaternion& q);
 Vector3 WorldVectorToLocal(const Vector3& worldVec, const Quaternion& orient);	// 世界坐标下的vec转到orient坐标下的vec
 Quaternion WorldRotationToLocal(const Quaternion& worldRotation, const Quaternion& orient);	// 世界坐标下的rotation转到orient坐标下的rotation
 
+D3DXMATRIX InversedMatrix(const D3DXMATRIX& mat);
+
 class Rect
 {
 public:

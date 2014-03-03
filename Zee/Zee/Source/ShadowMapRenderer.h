@@ -2,6 +2,7 @@
 #define SHADOWMAP_RENDERER
 
 #include "D3DUtility.h"
+#include "Bound.h"
 
 #define SHADOW_MAP_SIZE 1024
 #define SHADOW_TEX_SIZE 1024
@@ -17,6 +18,8 @@ struct VirtualLightCamera
 {
 	Vector3 pos;
 	D3DXMATRIX matVP;
+
+	AABBox bound;
 };
 
 class ShadowMapRenderer
@@ -45,6 +48,7 @@ public:
 	static void ShadowMapGaussianBlur();
 
 	static Texture* GetShadowTex();
+	static AABBox GetVirtualCameraBound();
 
 private:
 	static void createEffect();

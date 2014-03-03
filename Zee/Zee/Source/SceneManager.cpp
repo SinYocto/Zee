@@ -92,6 +92,9 @@ void SceneManager::DrawAllUseRenderer()
 		drawShadowMapPass();
 		drawShadowTexPass();
 	}
+	// terrain
+	if(mTerrain)
+		mTerrain->Draw(mainCamera, true);
 
 	// AABBoxes
 	for(std::list<AABBox>::iterator iter = mAABBoxes.begin(); iter != mAABBoxes.end(); ++iter)
@@ -99,10 +102,6 @@ void SceneManager::DrawAllUseRenderer()
 		AABBox& box = *iter;
 		DebugDrawer::DrawAABBox(box, 0xffff0000, mainCamera);
 	}
-
-	AABBox lightSceneBound(Vector3::Zero, 200, 80, 200);
-	DebugDrawer::DrawAABBox(lightSceneBound, 0xff00ff00, mainCamera);
-
 
 	// wireframe
 	Renderer::Begin(WireFrame);
@@ -168,10 +167,6 @@ void SceneManager::DrawAllUseRenderer()
 		}
 		Renderer::End(BillboardMethod);
 	}
-
-	// terrain
-	if(mTerrain)
-		mTerrain->Draw(mainCamera, true);
 }
 
 void SceneManager::FrameUpdate()
@@ -353,12 +348,13 @@ void SceneManager::collectLightViewSceneEntities()
 
 void SceneManager::collectLightViewSceneNode( SceneNode* sceneNode )
 {
-	// TODO: 判断是否在light的viewBound里面
-
 	if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_MESH)
 	{
-		MeshNode* meshNode = static_cast<MeshNode*>(sceneNode);
-		mShadowMapMeshNodeList.push_back(meshNode);
+		if(sceneNode->GetAABBox().IntersectedWith(ShadowMapRenderer::GetVirtualCameraBound()))
+		{
+			MeshNode* meshNode = static_cast<MeshNode*>(sceneNode);
+			mShadowMapMeshNodeList.push_back(meshNode);
+		}
 	}
 	else if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_DIR_LIGHT)
 	{

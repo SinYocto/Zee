@@ -5,6 +5,7 @@
 #include "Bound.h"
 
 class CameraController;
+class AABBox;
 
 struct DampContext
 {
@@ -112,12 +113,16 @@ public:
 
 	virtual void OnTransformChanged();
 
+	AABBox GetFrustumAABBox();
+
 private:
 	void recalculateCameraMatrix();
 	void recalculateViewMatrix();
 	void recalculateProjMatrix();
 
 	void extractFrustumPlanes();
+
+	void calcFrustumAABBox();
 
 private:
 	float mFOV;
@@ -126,6 +131,7 @@ private:
 	float mFarZ;
 
 	D3DXPLANE mFrustumPlanes[6];
+	AABBox mFrustumAABBox;
 
 	D3DXMATRIX mMatProj;
 	D3DXMATRIX mMatView;

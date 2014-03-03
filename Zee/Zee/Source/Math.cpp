@@ -593,6 +593,14 @@ Vector3 VecVecTransform( const Vector3& vec, const D3DXMATRIX& mat )
 	return Vector3(dxVec.x, dxVec.y, dxVec.z);
 }
 
+D3DXMATRIX InversedMatrix(const D3DXMATRIX& mat)
+{
+	D3DXMATRIX matInv;
+	D3DXMatrixInverse(&matInv, 0, &mat);
+
+	return matInv;
+}
+
 float Vector2::Length() const
 {
 	return sqrt(x*x + y*y);

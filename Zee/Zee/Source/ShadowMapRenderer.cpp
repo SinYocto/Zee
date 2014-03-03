@@ -4,6 +4,7 @@
 #include "DirectionalLightNode.h"
 #include "Camera.h"
 #include "Terrain.h"
+#include "Input.h"
 
 LPD3DXEFFECT ShadowMapRenderer::mShadowMapEffect = NULL;
 LPD3DXEFFECT ShadowMapRenderer::mShadowTexEffect = NULL;
@@ -187,8 +188,10 @@ void ShadowMapRenderer::DrawTerrainShadowMapPass(Terrain* terrain)
 
 	for(std::vector<TerrainChunk*>::iterator iter = chunks.begin(); iter != chunks.end(); ++iter)
 	{
-		// TODO: bound判断
 		TerrainChunk* chunk = *iter;
+
+		if(!chunk->IntersectWithBBox(mVirtualCamera.bound))
+			continue;
 
 		chunk->SetVertexStream();
 		chunk->Draw();
@@ -198,7 +201,11 @@ void ShadowMapRenderer::DrawTerrainShadowMapPass(Terrain* terrain)
 void ShadowMapRenderer::SetupVirtualLightCamera(DirectionalLightNode* lightNode)
 {
 	// 计算light视角下所需渲染的场景bound
-	AABBox lightSceneBound(Vector3::Zero, 200, 80, 200);
+	AABBox sceneBound(Vector3::Zero, 200, 80, 200);
+	AABBox viewFrustumBound = gEngine->GetSceneManager()->GetMainCamera()->GetFrustumAABBox();
+
+	// TODO: 使用真正的viewFrustum代替当前使用的viewFrustumAABB来计算lightSceneBount, 还可以更tight
+	AABBox lightSceneBound = AABBox::Intersection(sceneBound, viewFrustumBound);
 
 	// 由上面得到的bound计算光源虚拟摄像机的位置和正交投影矩阵(pos, nearZ, farZ, width, height)
 	DirectionalLight* dirLight = lightNode->GetDirLight();
@@ -239,7 +246,6 @@ void ShadowMapRenderer::SetupVirtualLightCamera(DirectionalLightNode* lightNode)
 
 		farZ = 2.0f * lightDist;
 		mVirtualCamera.pos = centerW - lightDist * lightDir;
-
 	}
 
 	D3DXMATRIX matLightProj;
@@ -253,6 +259,9 @@ void ShadowMapRenderer::SetupVirtualLightCamera(DirectionalLightNode* lightNode)
 		D3DXMatrixTranspose(&matRotTranspose, &(lightNode->GetWorldOrient().Matrix()));
 		D3DXMatrixTranslation(&matTransInverse, -virtualCameraPos.x, -virtualCameraPos.y, -virtualCameraPos.z);
 		matVirtualCameraView = matTransInverse * matRotTranspose; 
+
+		mVirtualCamera.bound = AABBox::MatTransform(AABBox(Vector3(0, 0, farZ/2.0f), width, height, farZ), 
+			InversedMatrix(matVirtualCameraView));
 	}
 
 	mVirtualCamera.matVP = matVirtualCameraView * matLightProj;
@@ -288,6 +297,14 @@ void ShadowMapRenderer::EndShadowTexPass()
 	bool shouldSaveToFile = false;
 	if(shouldSaveToFile && mShadowTex->GetD3DTexture() != NULL)
 		D3DXSaveTextureToFile(L"E:/Temp/shadowTex.jpg", D3DXIFF_JPG, mShadowTex->GetD3DTexture(), NULL);
+
+
+	static AABBox db_box;
+	if(gEngine->GetInput()->GetKeyUp(DIK_B))
+		db_box = mVirtualCamera.bound;
+
+	if(db_box.isValid())
+		DebugDrawer::DrawAABBox(db_box, 0xff00ff00, gEngine->GetSceneManager()->GetMainCamera());
 }
 
 void ShadowMapRenderer::DrawMeshShadowTexPass(const D3DXMATRIX& matWorld, Geometry* geo, Camera* camera)
@@ -431,5 +448,10 @@ void ShadowMapRenderer::shadowMapGaussianBlurV()
 
 	mGaussianBlurEffect->EndPass();
 	mGaussianBlurEffect->End();
+}
+
+AABBox ShadowMapRenderer::GetVirtualCameraBound()
+{
+	return mVirtualCamera.bound;
 }
 

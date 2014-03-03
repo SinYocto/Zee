@@ -121,6 +121,7 @@ float4 TerrainPS(float2 tex : TEXCOORD0,
 				 float3 posW : TEXCOORD3,
 				 float3 posRaw : TEXCOORD4) : COLOR0
 {
+	float4 oColorAmbient = float4(0, 0, 0, 1);
 	float4 oColor =  float4(0, 0, 0, 1);
 	
 	normal = normalize(normal);
@@ -132,7 +133,7 @@ float4 TerrainPS(float2 tex : TEXCOORD0,
 	float4 Ka = mtlAmbient * texColor;
 	float4 Kd = mtlDiffuse * texColor;
 	
-	CalcORadianceAmbient(oColor, ambientLight.color, Ka);	
+	CalcORadianceAmbient(oColorAmbient, ambientLight.color, Ka);	
 
 	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
 	{
@@ -159,7 +160,7 @@ float4 TerrainPS(float2 tex : TEXCOORD0,
 
 	shadow = clamp(shadow, 0, 1.0f);
 
-	oColor.rgb *= shadow;
+	oColor.rgb = oColorAmbient.rgb + shadow * oColor.rgb;
 	return oColor;
 }
 

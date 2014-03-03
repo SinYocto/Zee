@@ -49,6 +49,8 @@ public:
 	bool IsInFrustum();
 	bool NeedForceRebuildIB();
 
+	bool IntersectWithBBox(const AABBox& box);
+
 	int GetLODLevel();
 	int GetTriCounts();
 	DWORD GetNeighbLODLevel();

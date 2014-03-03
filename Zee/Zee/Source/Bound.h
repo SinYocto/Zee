@@ -23,9 +23,13 @@ public:
 	Vector3 GetCenter();
 	bool isPointInside(Vector3 vert);
 	bool isValid();
+	bool IntersectedWith(const AABBox& box);
 
 	static AABBox CombineBBox(const AABBox& box1, const AABBox& box2);
 	static AABBox CombinePoint(const AABBox& box, const Vector3& point);
+	static AABBox Intersection(const AABBox& box1, const AABBox& box2);
+
+	static AABBox MatTransform(AABBox box, const D3DXMATRIX& mat);
 
 public:
 	Vector3 mMin;

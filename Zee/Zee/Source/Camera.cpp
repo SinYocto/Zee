@@ -139,6 +139,7 @@ void Camera::FrameUpdate()
 	{
 		recalculateViewMatrix();
 		extractFrustumPlanes();
+		calcFrustumAABBox();
 
 		SetTransformDirty(false);
 	}
@@ -218,4 +219,36 @@ void Camera::FocusAt(Object* obj)
 
 	Vector3 targetPos = obj->GetWorldPosition() - DIST * GetWorldForward().Normalized();
 	DampMoveTo(targetPos, 0.5f, 0);
+}
+
+void Camera::calcFrustumAABBox()
+{
+	Vector3 frustumPos[5];
+
+	float fy = mFarZ * tanf(mFOV / 2.0f);
+	float fx = mAspect * fy;
+
+	frustumPos[0] = Vector3::Zero;
+	frustumPos[1] = Vector3(-fx,  fy, mFarZ);
+	frustumPos[2] = Vector3( fx,  fy, mFarZ);
+	frustumPos[3] = Vector3(-fx, -fy, mFarZ);
+	frustumPos[4] = Vector3( fx, -fy, mFarZ);
+
+	mFrustumAABBox = AABBox();
+
+	D3DXMATRIX matViewInv;
+	D3DXMatrixInverse(&matViewInv, 0, &mMatView);
+
+	for(int i = 0; i < 5; ++i)
+	{
+		Vector3 posW = PosVecTransform(frustumPos[i], matViewInv);
+		mFrustumAABBox = AABBox::CombinePoint(mFrustumAABBox, posW);
+	}
+
+	mFrustumAABBox;
+}
+
+AABBox Camera::GetFrustumAABBox()
+{
+	return mFrustumAABBox;
 }

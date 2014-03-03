@@ -86,6 +86,31 @@ AABBox AABBox::CombineBBox(const AABBox& box1, const AABBox& box2)
 	return resultBox;
 }
 
+AABBox AABBox::Intersection(const AABBox& box1, const AABBox& box2)
+{
+	AABBox resultBox = box1;
+
+	if(box2.mMin.x > resultBox.mMin.x)
+		resultBox.mMin.x = box2.mMin.x;
+
+	if(box2.mMin.y > resultBox.mMin.y)
+		resultBox.mMin.y = box2.mMin.y;
+
+	if(box2.mMin.z > resultBox.mMin.z)
+		resultBox.mMin.z = box2.mMin.z;
+
+	if(box2.mMax.x < resultBox.mMax.x)
+		resultBox.mMax.x = box2.mMax.x;
+
+	if(box2.mMax.y < resultBox.mMax.y)
+		resultBox.mMax.y = box2.mMax.y;
+
+	if(box2.mMax.z < resultBox.mMax.z)
+		resultBox.mMax.z = box2.mMax.z;
+
+	return resultBox;
+}
+
 bool AABBox::isValid()
 {
 	if(mMin.x > mMax.x)
@@ -131,6 +156,27 @@ AABBox AABBox::CombinePoint(const AABBox& box, const Vector3& point)
 
 	return resultBox;
 
+}
+
+AABBox AABBox::MatTransform(AABBox box, const D3DXMATRIX& mat)
+{
+	AABBox resultBox;
+	
+	for(int i = 0; i < 8; ++i)
+	{
+		Vector3 vertPos = box.GetVertex(i);
+		vertPos = PosVecTransform(vertPos, mat);
+
+		resultBox = CombinePoint(resultBox, vertPos);
+	}
+
+	return resultBox;
+}
+
+bool AABBox::IntersectedWith(const AABBox& box)
+{
+	AABBox intersect = Intersection(*this, box);
+	return intersect.isValid();
 }
 
 Ray::Ray(const Vector3& pos /*= Vector3::Zero*/, const Vector3& dir /*= Vector3(0, 0, 1)*/)

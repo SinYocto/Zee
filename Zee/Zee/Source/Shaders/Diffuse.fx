@@ -71,6 +71,7 @@ float4 DiffusePS(float2 tex : TEXCOORD0,
 				 float3 posRaw : TEXCOORD3
 				 ) : COLOR0
 {
+	float4 oColorAmbient = float4(0, 0, 0, 1);
 	float4 oColor = float4(0, 0, 0, 1);
 	
 	normal = normalize(normal); 
@@ -86,7 +87,7 @@ float4 DiffusePS(float2 tex : TEXCOORD0,
 		Kd *= texColor;
 	}
 	
-	CalcORadianceAmbient(oColor, ambientLight.color, Ka);	
+	CalcORadianceAmbient(oColorAmbient, ambientLight.color, Ka);	
 
 	for(int i = 0; i < MAX_NUM_DIRECTIONAL_LIGHTS; ++i)
 	{
@@ -111,8 +112,7 @@ float4 DiffusePS(float2 tex : TEXCOORD0,
 		shadow = tex2D(ShadowS, posTex).x;
 	}
 
-	oColor.rgb *= shadow;
-
+	oColor.rgb = oColorAmbient.rgb + shadow * oColor.rgb;
 	return oColor;
 }
 

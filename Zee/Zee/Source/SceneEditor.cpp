@@ -238,8 +238,8 @@ void CreateScene()
 	//DirectionalLight* dirLight1 = New DirectionalLight(L"dirLight1", D3DXCOLOR_WHITE, Vector3(1.0f, -1.0f, 1.0f));
 	//PointLight* pointLight1 = New PointLight(L"pointLight1", D3DXCOLOR_YELLOW, Vector3(0, 0, 0), Vector3(1.0f, 0.05f, 0));
 
-	//LightManager* lightMgr = gEngine->GetLightManager();
-	//lightMgr->SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
+	LightManager* lightMgr = gEngine->GetLightManager();
+	lightMgr->SetAmbientLight(D3DXCOLOR_WHITE, 0.2f);
 
 	//lightMgr->AddDirectionalLight(dirLight1);
 	//lightMgr->AddPointLight(pointLight1);
@@ -439,14 +439,6 @@ void GUIUpdate()
 	YString::Format(text, L"screenPos:%d, %d(%f, %f)", cursorPos.x, cursorPos.y, 
 		screenLocation.x, screenLocation.y);
 	gGUISystem.GUILabel(text, Rect(10, 130, 300, 25), leftAlignStyle);
-
-
-	//static bool enableDirLight1 = true;
-	//// enableDirLight1 = gGUISystem.GUIToggle(Rect(10, 150, 20, 20), enableDirLight1);
-
-	//DirectionalLight* dirLight1 = NULL;
-	//gEngine->GetLightManager()->GetDirLight(L"dirLight1", &dirLight1);
-	//dirLight1->Enable(enableDirLight1);
 }
 
 void GUIUpdateAfterEngineUpdate()
