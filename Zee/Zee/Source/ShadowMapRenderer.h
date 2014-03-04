@@ -61,6 +61,7 @@ private:
 	static void shadowMapGaussianBlurV(int cascadeIndex);
 
 	static void setupVirtualLightCamera(Camera* camera, DirectionalLightNode* lightNode, int cascadeIndex);
+	static float calcCascadeDist(int cascadeIndex);
 
 private:
 	static LPD3DXEFFECT mShadowMapEffect;

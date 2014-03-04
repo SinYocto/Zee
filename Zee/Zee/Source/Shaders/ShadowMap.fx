@@ -30,7 +30,6 @@ float4 DepthPS(float4 posW : TEXCOORD0) : COLOR0
 {
 	float depth = length(lightPos - posW.xyz);
 	return float4(depth, depth*depth, 0, 1);
-	//return float4(0.5f, 0.5f, 0, 1);
 }
 
 technique Depth

@@ -87,10 +87,10 @@ float4 ShadowPS(float3 posW : TEXCOORD0,
 	{
 		float pixelZ = mul(float4(posRaw, 1.0f), matWVP).w;
 
-		if(pixelZ > farZ / CASCADE_COUNTS)
+		if(pixelZ > 3.0f * farZ / 7.0f)
 			cascadeIndex += 1;
 
-		if(pixelZ > 2.0f * farZ / CASCADE_COUNTS)
+		if(pixelZ > 1.0f * farZ / 7.0f)
 			cascadeIndex += 1;
 	}
 

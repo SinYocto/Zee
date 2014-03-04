@@ -218,7 +218,7 @@ void ShadowMapRenderer::SetupVirtualLightCameras(Camera* camera, DirectionalLigh
 
 void ShadowMapRenderer::setupVirtualLightCamera(Camera* camera, DirectionalLightNode* lightNode, int cascadeIndex)
 {
-	const float BOUND_EXPAND_FACTOR = 0.4f;
+	const float BOUND_EXPAND_FACTOR = 0.8f;
 
 	_Assert(camera != NULL);
 	_Assert(cascadeIndex >= 0 && cascadeIndex < CASCADE_COUNTS);
@@ -234,7 +234,7 @@ void ShadowMapRenderer::setupVirtualLightCamera(Camera* camera, DirectionalLight
 		float fov = 0;
 
 		camera->GetCameraParams(NULL, &farZ, &fov, &aspect);
-		farZ *= (float)(cascadeIndex + 1) / CASCADE_COUNTS;
+		farZ *= calcCascadeDist(cascadeIndex);
 
 
 		float fy = farZ * tanf(fov / 2.0f);
@@ -517,4 +517,22 @@ AABBox ShadowMapRenderer::GetVirtualCameraBound(int cascadeIndex)
 {
 	_Assert(cascadeIndex >= 0 && cascadeIndex < CASCADE_COUNTS);
 	return mVirtualCamera[cascadeIndex].bound;
+}
+
+// 划分cascade的算法: 划分比例为1:2:4:8:...
+float ShadowMapRenderer::calcCascadeDist(int cascadeIndex)
+{
+	_Assert(cascadeIndex >= 0 && cascadeIndex < CASCADE_COUNTS);
+
+	float sumTotal = 0;
+	float sumCurCascade = 0;
+	for(int i = 0; i < CASCADE_COUNTS; ++i)
+	{
+		sumTotal += powf(2.0f, (float)i);
+
+		if(i <= cascadeIndex)
+			sumCurCascade += powf(2.0f, (float)i);
+	}
+
+	return sumCurCascade / sumTotal;
 }
