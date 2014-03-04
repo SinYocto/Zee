@@ -345,11 +345,6 @@ void SceneEditorCanvas::RenderLoop()
 			if(wxWindow::FindFocus() == this)
 				mainCamera->ApplyCameraController();
 
-			if(input->GetKeyDown(DIK_R))
-			{
-				mainCamera->DampMoveTo(Vector3::Zero, 0.5f, 0.01f);
-			}
-
 			// render
 			driver->RenderToSwapChain(0);
 			driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
@@ -412,9 +407,9 @@ void GUIUpdate()
 	YString::Format(text, TEXT("tris:%d"), Profiler::GetNumTris());
 	gGUISystem.GUILabel(text, Rect(10, 100, 300, 25), leftAlignStyle);
 
-	YString::Format(text, L"screenPos:%d, %d(%f, %f)", cursorPos.x, cursorPos.y, 
-		screenLocation.x, screenLocation.y);
-	gGUISystem.GUILabel(text, Rect(10, 130, 300, 25), leftAlignStyle);
+	//YString::Format(text, L"screenPos:%d, %d(%f, %f)", cursorPos.x, cursorPos.y, 
+	//	screenLocation.x, screenLocation.y);
+	//gGUISystem.GUILabel(text, Rect(10, 130, 300, 25), leftAlignStyle);
 }
 
 void GUIUpdateAfterEngineUpdate()

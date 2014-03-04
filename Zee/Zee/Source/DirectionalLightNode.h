@@ -16,6 +16,9 @@ public:
 	void SetLightIntensity(float intensity);
 	void SetLightColor(D3DXCOLOR color);
 
+	void SetEnableShadow(bool enableShadow);
+	bool isShadowEnabled();
+
 	bool IsLightEnabled();
 
 	virtual void OnTransformChanged();
@@ -26,4 +29,6 @@ private:
 private:
 	DirectionalLight* mDirLight;
 	Billboard* mBillboard;
+
+	bool mEnableShadow;
 };

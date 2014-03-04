@@ -93,6 +93,7 @@ VS_OUT BumpSpecularVS(VS_IN vIn)
 float4 BumpSpecularPS(VS_OUT pIn) : COLOR0
 {
 	float4 oColorAmbient = float4(0, 0, 0, 1);
+	float4 oColorPointLights = float4(0, 0, 0, 1);
 	float4 oColor = float4(0, 0, 0, 1);
 
 	float3x3 TBN;
@@ -131,7 +132,7 @@ float4 BumpSpecularPS(VS_OUT pIn) : COLOR0
 		float3 dirL = normalize(pointLights[i].position - pIn.posW);
 		float atten = CalcAttenuation(pIn.posW, pointLights[i].position, pointLights[i].atten);
 		
-		CalcORadianceBlinnPhong(oColor, atten * pointLights[i].color, dirL, normal, dirV, Kd, Ks, Ns);
+		CalcORadianceBlinnPhong(oColorPointLights, atten * pointLights[i].color, dirL, normal, dirV, Kd, Ks, Ns);
 	}
 
 	float shadow = 1.0f;
@@ -144,7 +145,7 @@ float4 BumpSpecularPS(VS_OUT pIn) : COLOR0
 		shadow = tex2D(ShadowS, posTex).x;
 	}
 
-	oColor.rgb = oColorAmbient.rgb + shadow * oColor.rgb;
+	oColor.rgb = oColorAmbient.rgb + oColorPointLights.rgb + shadow * oColor.rgb;
 	return oColor;
 }
 

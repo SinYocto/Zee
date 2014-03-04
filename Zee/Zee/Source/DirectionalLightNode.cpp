@@ -6,6 +6,7 @@
 DirectionalLightNode::DirectionalLightNode(SceneNode* parent, DirectionalLight* dirLight)
 :SceneNode(dirLight->GetName(), parent)
 ,mDirLight(dirLight)
+,mEnableShadow(false)
 {
 	mType = SCENE_NODE_DIR_LIGHT;
 	mBillboard = New Billboard();
@@ -102,4 +103,14 @@ void DirectionalLightNode::SetLightColor(D3DXCOLOR color)
 bool DirectionalLightNode::IsLightEnabled()
 {
 	return mDirLight->IsEnabled();
+}
+
+void DirectionalLightNode::SetEnableShadow(bool enableShadow)
+{
+	mEnableShadow = enableShadow;
+}
+
+bool DirectionalLightNode::isShadowEnabled()
+{
+	return mEnableShadow;
 }

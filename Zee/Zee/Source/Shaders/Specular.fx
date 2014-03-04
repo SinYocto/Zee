@@ -77,6 +77,7 @@ float4 SpecularPS(float2 tex : TEXCOORD0,
 				  float3 posRaw : TEXCOORD3) : COLOR0
 {
 	float4 oColorAmbient = float4(0, 0, 0, 1);
+	float4 oColorPointLights = float4(0, 0, 0, 1);
 	float4 oColor = float4(0, 0, 0, 1);
 
 	float3 dirV = normalize(eyePos - posW);
@@ -107,7 +108,7 @@ float4 SpecularPS(float2 tex : TEXCOORD0,
 		float3 dirL = normalize(pointLights[i].position - posW);
 		float atten = CalcAttenuation(posW, pointLights[i].position, pointLights[i].atten);
 		
-		CalcORadianceBlinnPhong(oColor, atten * pointLights[i].color, dirL, normal, dirV, Kd, Ks, Ns);
+		CalcORadianceBlinnPhong(oColorPointLights, atten * pointLights[i].color, dirL, normal, dirV, Kd, Ks, Ns);
 	}
 
 	float shadow = 1.0f;
@@ -120,7 +121,7 @@ float4 SpecularPS(float2 tex : TEXCOORD0,
 		shadow = tex2D(ShadowS, posTex).x;
 	}
 
-	oColor.rgb = oColorAmbient.rgb + shadow * oColor.rgb;
+	oColor.rgb = oColorAmbient.rgb + oColorPointLights.rgb + shadow * oColor.rgb;
 	return oColor;
 }
 

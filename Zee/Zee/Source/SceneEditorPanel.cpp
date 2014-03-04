@@ -6,9 +6,11 @@
 #include "TexturePanel.h"
 #include "ModelPanel.h"
 #include "LightPanel.h"
+#include "TerrainPanel.h"
 #include "Engine.h"
 #include "MeshNode.h"
 #include "ModelNode.h"
+#include "Camera.h"
 
 BEGIN_EVENT_TABLE(SceneEditorPanel, wxNotebook)
 	EVT_CLOSE(SceneEditorPanel::OnClose)
@@ -63,6 +65,10 @@ void SceneEditorPanel::OnCreateScene()
 	wxNotebookPage* texturePage = GetPage(TEXTURE_PAGE);
 	TexturePanel* texturePanel = static_cast<TexturePanel*>(texturePage);
 	texturePanel->LoadDataFromScene();
+
+	wxNotebookPage* terrainPage = GetPage(TERRAIN_PAGE);
+	TerrainPanel* terrainPanel = static_cast<TerrainPanel*>(terrainPage);
+	terrainPanel->LoadDataFromScene();
 }
 
 void SceneEditorPanel::CleanupAndDestory()
@@ -88,8 +94,11 @@ void SceneEditorPanel::CreateEditorPages()
 	ModelPanel* modelPanel = New ModelPanel(this, -1);
 	AddPage(modelPanel, L"Model", false, MODEL_PAGE);
 
-	LightPanel* lightPanel = New LightPanel(this, -1);
-	AddPage(lightPanel, L"Light", false, LIGHT_PAGE);
+	//LightPanel* lightPanel = New LightPanel(this, -1);
+	//AddPage(lightPanel, L"Light", false, LIGHT_PAGE);
+
+	TerrainPanel* terrainPanel = New TerrainPanel(this, -1);
+	AddPage(terrainPanel, L"Terrain", false, TERRAIN_PAGE);
 
 	this->Fit();
 	this->Layout();
@@ -197,6 +206,11 @@ void SceneEditorPanel::OnAddModelNode(wxCommandEvent& event)
 	Model* newModelInstance = new Model(model->GetName(), model);
 
 	ModelNode* modelNode = New ModelNode(newModelInstance->GetName(), NULL, newModelInstance);
+
+	const float DIST = 10.0f;
+	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();
+	Vector3 pos = camera->GetWorldPosition() + DIST * camera->GetWorldForward();
+	modelNode->SetWorldPosition(pos);
 
 	sceneMgr->AddSceneNode(modelNode);
 	modelNode->OnTransformChanged();

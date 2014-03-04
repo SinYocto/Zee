@@ -94,7 +94,7 @@ void SceneManager::DrawAllUseRenderer()
 	}
 	// terrain
 	if(mTerrain)
-		mTerrain->Draw(mainCamera, true);
+		mTerrain->Draw(mainCamera);
 
 	// AABBoxes
 	for(std::list<AABBox>::iterator iter = mAABBoxes.begin(); iter != mAABBoxes.end(); ++iter)
@@ -372,7 +372,7 @@ void SceneManager::collectLightViewSceneNode( SceneNode* sceneNode )
 	{
 		DirectionalLightNode* dirLightNode = static_cast<DirectionalLightNode*>(sceneNode);
 
-		if(mShadowMapDirLightNode == NULL && dirLightNode->IsLightEnabled())
+		if(mShadowMapDirLightNode == NULL && dirLightNode->IsLightEnabled() && dirLightNode->isShadowEnabled())
 		{
 			mShadowMapDirLightNode = dirLightNode;
 		}
@@ -396,4 +396,9 @@ void SceneManager::AddTerrain(Terrain* terrain)
 {
 	_Assert(mTerrain == NULL);
 	mTerrain = terrain;
+}
+
+Terrain* SceneManager::GetTerrain()
+{
+	return mTerrain;
 }

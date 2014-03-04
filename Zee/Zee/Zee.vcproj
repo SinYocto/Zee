@@ -675,6 +675,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\TerrainPanel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\TerrainPanel.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\TexturePanel.cpp"
 				>
 			</File>

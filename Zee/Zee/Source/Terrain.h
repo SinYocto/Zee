@@ -109,12 +109,15 @@ public:
 	void SetSplatMapTex(const wchar_t* texFile);
 	void SetMtlParameters(float tilesU, float tilesV, D3DXCOLOR ambient, D3DXCOLOR diffuse);
 
+	void SetWireFrameMode(bool isWireFrame);
+
 	void FrameUpdate(Camera* camera);
 
-	void Draw(Camera* camera, bool isSolid);
+	void Draw(Camera* camera);
 	void createEffect();
 
 	std::vector<TerrainChunk*> GetChunks();
+	float GetLodTolerance();
 
 private:
 	//void createEffect();
@@ -138,6 +141,9 @@ private:
 	WORD* mHeightMapData;
 
 	bool mDrawBBox;
+	bool mIsWireFrame;
+
+	float mLodTolerance;
 
 	struct TerrainMaterial
 	{

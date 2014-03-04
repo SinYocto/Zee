@@ -72,6 +72,7 @@ float4 DiffusePS(float2 tex : TEXCOORD0,
 				 ) : COLOR0
 {
 	float4 oColorAmbient = float4(0, 0, 0, 1);
+	float4 oColorPointLights = float4(0, 0, 0, 1);
 	float4 oColor = float4(0, 0, 0, 1);
 	
 	normal = normalize(normal); 
@@ -99,7 +100,7 @@ float4 DiffusePS(float2 tex : TEXCOORD0,
 		float3 dirL = normalize(pointLights[i].position - posW);
 		float atten = CalcAttenuation(posW, pointLights[i].position, pointLights[i].atten);
 
-		CalcORadianceLambert(oColor, atten * pointLights[i].color, dirL, normal, Kd);
+		CalcORadianceLambert(oColorPointLights, atten * pointLights[i].color, dirL, normal, Kd);
 	}
 
 	float shadow = 1.0f;
@@ -112,7 +113,7 @@ float4 DiffusePS(float2 tex : TEXCOORD0,
 		shadow = tex2D(ShadowS, posTex).x;
 	}
 
-	oColor.rgb = oColorAmbient.rgb + shadow * oColor.rgb;
+	oColor.rgb = oColorAmbient.rgb + oColorPointLights.rgb + shadow * oColor.rgb;
 	return oColor;
 }
 

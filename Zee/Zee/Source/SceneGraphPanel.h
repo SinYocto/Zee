@@ -183,6 +183,7 @@ class LightInfoPanel : public wxPanel
 	enum
 	{
 		ID_CHECKBOX_ENABLE,
+		ID_CHECKBOX_ENABLE_SHADOW,
 		ID_SLIDER_INTENSITY,
 		ID_LIGHT_COLOR,
 	};
@@ -194,8 +195,11 @@ public:
 	void LoadDataFromSceneNode(SceneNode* sceneNode);
 
 	void OnCheckBoxEnable(wxCommandEvent& event);
+	void OnCheckBoxEnableShadow(wxCommandEvent& event);
 	void OnSliderIntensity(wxScrollEvent& event);
 	void OnColorPick(wxColourPickerEvent& event);
+
+	wxCheckBox* GetCheckBoxEnableShadow();
 
 	DECLARE_EVENT_TABLE()
 
@@ -204,6 +208,7 @@ private:
 
 private:
 	wxCheckBox* mCheckBoxEnable;
+	wxCheckBox* mCheckBoxEnableShadow;
 	wxSlider* mSliderIntensity;
 	wxColourPickerCtrl* mColorPicker;
 };

@@ -14,6 +14,7 @@ const D3DXMATRIX IDENTITY_MATRIX = D3DXMATRIX(1, 0, 0, 0,
 bool FloatEqual(const float& f1, const float& f2, const float& tolerance);
 bool FloatUnequal(const float& f1, const float& f2, const float& tolerance);
 void Clamp(float& val, const float min, const float max);
+void Clamp(double& val, const double min, const double max);
 
 void Clamp(int& val, const int min, const int max);
 

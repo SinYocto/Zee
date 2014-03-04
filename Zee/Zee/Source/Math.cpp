@@ -26,6 +26,15 @@ void Clamp(float& val, const float min, const float max)
 		val = min;
 }
 
+void Clamp(double& val, const double min, const double max)
+{
+	if(val - max > DBL_MIN)
+		val = max;
+
+	if(min - val > DBL_MIN)
+		val = min;
+}
+
 void Clamp(int& val, const int min, const int max)
 {
 	if(val > max)

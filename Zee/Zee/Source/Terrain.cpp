@@ -252,6 +252,9 @@ void TerrainChunk::CalcChunkLODDist(Camera* camera, float pixelTolerance)
 	_Assert(mPosData.size() == mSize * mSize);
 	_Assert(pixelTolerance > 0);
 
+	mLODDelta.clear();
+	mLODDist.clear();
+
 	float factor = 0;
 	{
 		float nz = 0;
@@ -369,6 +372,8 @@ Terrain::Terrain(int size, float length, float height)
 ,mHeightMapData(NULL)
 ,mRootNode(NULL)
 ,mDrawBBox(false)
+,mIsWireFrame(false)
+,mLodTolerance(0)
 {
 	if(!sEffect)
 		createEffect();
@@ -501,6 +506,8 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 
 void Terrain::CalcChunkLODDist(Camera* camera, float pixelTolerance)
 {
+	mLodTolerance = pixelTolerance;
+
 	for(size_t i = 0; i < mChunks.size(); ++i)
 	{
 		TerrainChunk* chunk = mChunks[i];
@@ -572,7 +579,7 @@ void Terrain::FrameUpdate(Camera* camera)
 	//Log(L"chunks: %d\n", numVisibleChunks);
 }
 
-void Terrain::Draw(Camera* camera, bool isSolid)
+void Terrain::Draw(Camera* camera)
 {
 	_Assert(sEffect);
 
@@ -600,10 +607,10 @@ void Terrain::Draw(Camera* camera, bool isSolid)
 		sEffect->SetBool("calcShadow", false);
 	}
 
-	if(isSolid)
-		d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-	else
+	if(mIsWireFrame)
 		d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	else
+		d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
 	sEffect->Begin(0, 0);
 	sEffect->BeginPass(0);
@@ -678,4 +685,14 @@ TerrainChunk* Terrain::getChunk(int row, int column)
 std::vector<TerrainChunk*> Terrain::GetChunks()
 {
 	return mChunks;
+}
+
+float Terrain::GetLodTolerance()
+{
+	return mLodTolerance;
+}
+
+void Terrain::SetWireFrameMode(bool isWireFrame)
+{
+	mIsWireFrame = isWireFrame;
 }

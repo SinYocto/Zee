@@ -308,6 +308,11 @@ void SceneGraphTree::OnContextMenuAddDirLight(wxCommandEvent& event)
 	DirectionalLightNode* dirLightNode = New DirectionalLightNode(NULL, dirLight);
 	sceneMgr->AddSceneNode(dirLightNode);
 
+	const float DIST = 10.0f;
+	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();
+	Vector3 pos = camera->GetWorldPosition() + DIST * camera->GetWorldForward();
+	dirLightNode->SetWorldPosition(pos);
+
 	SceneNodeTreeItemData* itemData = New SceneNodeTreeItemData(dirLightNode);
 	AppendItem(GetRootItem(), dirLightNode->GetName(), ICON_LIGHT, ICON_LIGHT, itemData);
 }
@@ -324,6 +329,11 @@ void SceneGraphTree::OnContextMenuAddPointLight(wxCommandEvent& event)
 	PointLightNode* pointLightNode = New PointLightNode(NULL, pointLight);
 	sceneMgr->AddSceneNode(pointLightNode);
 
+	const float DIST = 10.0f;
+	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();
+	Vector3 pos = camera->GetWorldPosition() + DIST * camera->GetWorldForward();
+	pointLightNode->SetWorldPosition(pos);
+
 	SceneNodeTreeItemData* itemData = New SceneNodeTreeItemData(pointLightNode);
 	AppendItem(GetRootItem(), pointLightNode->GetName(), ICON_LIGHT, ICON_LIGHT, itemData);
 }
@@ -332,6 +342,11 @@ void SceneGraphTree::OnContextMenuAddCube(wxCommandEvent& event)
 {
 	SceneManager* sceneMgr = gEngine->GetSceneManager();
 	SceneNode* cube = sceneMgr->AddPrimitiveCube();
+
+	const float DIST = 10.0f;
+	Camera* camera = gEngine->GetSceneManager()->GetMainCamera();
+	Vector3 pos = camera->GetWorldPosition() + DIST * camera->GetWorldForward();
+	cube->SetWorldPosition(pos);
 
 	SceneGraphPanel* sceneGraphPanel = (SceneGraphPanel*)(GetParent()->GetParent());
 	sceneGraphPanel->AppendSceneNode(cube);
@@ -388,10 +403,15 @@ void SceneNodeInspectorPanel::AttachSceneNode(SceneNode* sceneNode)
 	mLightInfoPanel->Hide();
 	mAttributeInfoPanel->Hide();
 
+	mLightInfoPanel->GetCheckBoxEnableShadow()->Disable();
+
 	SceneNode::NODE_TYPE type = sceneNode->GetNodeType();
 	switch(type)
 	{
 	case SceneNode::SCENE_NODE_DIR_LIGHT:
+		mLightInfoPanel->Show();
+		mLightInfoPanel->GetCheckBoxEnableShadow()->Enable();
+
 	case SceneNode::SCENE_NODE_POINT_LIGHT:
 		mLightInfoPanel->Show();
 		break;
@@ -641,6 +661,7 @@ void TransformPanel::OnTextEnter(wxCommandEvent& event)
 
 BEGIN_EVENT_TABLE(LightInfoPanel, wxPanel)
 EVT_CHECKBOX(ID_CHECKBOX_ENABLE, LightInfoPanel::OnCheckBoxEnable)
+EVT_CHECKBOX(ID_CHECKBOX_ENABLE_SHADOW, LightInfoPanel::OnCheckBoxEnableShadow)
 EVT_COMMAND_SCROLL(ID_SLIDER_INTENSITY, LightInfoPanel::OnSliderIntensity)
 EVT_COLOURPICKER_CHANGED(ID_LIGHT_COLOR, LightInfoPanel::OnColorPick)
 END_EVENT_TABLE()
@@ -656,6 +677,7 @@ void LightInfoPanel::createWxCtrls()
 	wxBoxSizer* boxSizer1 = New wxBoxSizer(wxVERTICAL);
 
 	mCheckBoxEnable = New wxCheckBox(this, ID_CHECKBOX_ENABLE, wxT("Enable"));
+	mCheckBoxEnableShadow = New wxCheckBox(this, ID_CHECKBOX_ENABLE_SHADOW, wxT("Shadow"));
 
 	wxFlexGridSizer* fgSizer1 = New wxFlexGridSizer(2, 2, 0, 0); 
 
@@ -672,6 +694,7 @@ void LightInfoPanel::createWxCtrls()
 	fgSizer1->Add(mColorPicker, 0, wxALL | wxALIGN_CENTER_VERTICAL | wxEXPAND, 2);
 
 	boxSizer1->Add(mCheckBoxEnable, 0, wxALL, 5);
+	boxSizer1->Add(mCheckBoxEnableShadow, 0, wxALL, 5);
 	boxSizer1->Add(fgSizer1, 0, wxALL, 5);
 
 	this->SetSizer(boxSizer1);
@@ -689,6 +712,7 @@ void LightInfoPanel::LoadDataFromSceneNode(SceneNode* sceneNode)
 		DirectionalLight* dirLight = lightNode->GetDirLight();
 
 		mCheckBoxEnable->SetValue(dirLight->IsEnabled());
+		mCheckBoxEnableShadow->SetValue(lightNode->isShadowEnabled());
 		mSliderIntensity->SetValue(dirLight->GetIntensity() * 100);
 
 		D3DXCOLOR color = dirLight->GetColor();
@@ -723,6 +747,20 @@ void LightInfoPanel::OnCheckBoxEnable(wxCommandEvent& event)
 	{
 		PointLightNode* lightNode = static_cast<PointLightNode*>(sceneNode);
 		lightNode->GetPointLight()->Enable(enable);
+	}
+}
+
+void LightInfoPanel::OnCheckBoxEnableShadow(wxCommandEvent& event)
+{
+	SceneNodeInspectorPanel* inspectorPanel = (SceneNodeInspectorPanel*)GetParent();
+	SceneNode* sceneNode = inspectorPanel->GetAttachedSceneNode();
+
+	bool enable = mCheckBoxEnableShadow->GetValue();
+
+	if(sceneNode->GetNodeType() == SceneNode::SCENE_NODE_DIR_LIGHT)
+	{
+		DirectionalLightNode* lightNode = static_cast<DirectionalLightNode*>(sceneNode);
+		lightNode->SetEnableShadow(enable);
 	}
 }
 
@@ -763,6 +801,11 @@ void LightInfoPanel::OnColorPick(wxColourPickerEvent& event)
 		PointLightNode* lightNode = static_cast<PointLightNode*>(sceneNode);
 		lightNode->SetLightColor(d3dColor);
 	}
+}
+
+wxCheckBox* LightInfoPanel::GetCheckBoxEnableShadow()
+{
+	return mCheckBoxEnableShadow;
 }
 
 BEGIN_EVENT_TABLE(MeshNodeInfoPanel, wxPanel)
