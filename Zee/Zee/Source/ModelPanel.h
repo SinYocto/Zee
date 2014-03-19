@@ -107,6 +107,7 @@ public:
 	void RenderWindow();
 
 	void SetPreviewModel(Model* model);
+	void AddjustCameraPos();
 
 	void CleanUp();
 

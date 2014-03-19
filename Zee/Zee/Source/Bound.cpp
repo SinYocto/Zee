@@ -179,6 +179,13 @@ bool AABBox::IntersectedWith(const AABBox& box)
 	return intersect.isValid();
 }
 
+Vector3 AABBox::GetSize()
+{
+	_Assert(isValid());
+
+	return mMax - mMin;
+}
+
 Ray::Ray(const Vector3& pos /*= Vector3::Zero*/, const Vector3& dir /*= Vector3(0, 0, 1)*/)
 {
 	mPos = pos;

@@ -1,6 +1,8 @@
 #ifndef CAMERA_CONTROLLER_H
 #define CAMERA_CONTROLLER_H
 
+#include "Math.h"
+
 class Camera;
 
 class CameraController
@@ -25,7 +27,7 @@ class HoverCameraController : public CameraController
 {
 public:
 	HoverCameraController(float rotateSpeed, float zoomSpeed, float minTiltAngle, float maxTiltAngle, 
-		float minDist, float maxDist);
+		float minDist, float maxDist, const Vector3& pivotPos = Vector3::Zero, float dist = 10.0f);
 
 	virtual void Apply(Camera* camera, float deltaTime);
 
@@ -40,6 +42,8 @@ private:
 	float mTiltAngle;
 	float mPanAngle;
 	float mDist;
+
+	Vector3 mPivotPos;
 };
 
 #endif

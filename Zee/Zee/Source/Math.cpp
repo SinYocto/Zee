@@ -610,6 +610,11 @@ D3DXMATRIX InversedMatrix(const D3DXMATRIX& mat)
 	return matInv;
 }
 
+float Max(const float val1, const float val2)
+{
+	return (val1 > val2) ? val1 : val2;
+}
+
 float Vector2::Length() const
 {
 	return sqrt(x*x + y*y);

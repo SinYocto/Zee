@@ -21,6 +21,7 @@ public:
 
 	Vector3 GetVertex(int ix);
 	Vector3 GetCenter();
+	Vector3 GetSize();
 	bool isPointInside(Vector3 vert);
 	bool isValid();
 	bool IntersectedWith(const AABBox& box);

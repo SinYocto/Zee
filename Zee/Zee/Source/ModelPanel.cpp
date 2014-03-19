@@ -118,6 +118,7 @@ void ModelListTree::OnItemSelected(wxTreeEvent& event)
 
 	mInspectorPanel->AttachModel(model);
 	mInspectorPanel->GetModelPreviewCanvas()->SetPreviewModel(model);
+	mInspectorPanel->GetModelPreviewCanvas()->AddjustCameraPos();
 }
 
 void ModelListTree::OnBeginDrag(wxTreeEvent& event)
@@ -237,9 +238,6 @@ ModelPreviewCanvas::ModelPreviewCanvas(wxWindow* parent, wxWindowID id /*= wxID_
 
 	mCamera = New Camera(Vector3(0, 0, -10.0f), Vector3::Zero,
 		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 1000.0f);
-
-	HoverCameraController* hoverCameraController = New HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 2.0f, 100.0f);
-	mCamera->SetCameraController(hoverCameraController);
 }
 
 void ModelPreviewCanvas::OnIdle( wxIdleEvent& event )
@@ -276,7 +274,6 @@ void ModelPreviewCanvas::RenderWindow()
 
 	if(mModel)
 	{
-		//mModel->DrawUseMtl(IDENTITY_MATRIX, mCamera, diffMtl);
 		mModel->Draw(IDENTITY_MATRIX, mCamera, true);
 	}
 
@@ -297,4 +294,35 @@ void ModelPreviewCanvas::SetPreviewModel(Model* model)
 void ModelPreviewCanvas::CleanUp()
 {
 	SAFE_DELETE(mCamera);
+}
+
+void ModelPreviewCanvas::AddjustCameraPos()
+{
+	_Assert(mCamera != NULL);
+	_Assert(mModel != NULL);
+
+	AABBox bound;
+	mModel->CalcDynamicAABBox(IDENTITY_MATRIX, &bound);
+
+	float width = bound.GetSize().x;
+	float height = bound.GetSize().y;
+	float length = bound.GetSize().z;
+
+	float aspect = 0;
+	float fov = 0;
+	mCamera->GetCameraParams(NULL, NULL, &fov, &aspect);
+
+	float distY = (height / 2.0f) / tan(fov / 2.0f);
+	float distX = (height / 2.0f) / (aspect * tan(fov / 2.0f));
+
+	float dist = Max(distX, distY);
+
+	mCamera->SetWorldPosition(bound.GetCenter());
+	mCamera->Translate(0, 0, -dist - length);
+	mCamera->LookAt(bound.GetCenter());
+
+	HoverCameraController* hoverCameraController = New HoverCameraController(5.0f, 20.0f, -4*PI/9, 4*PI/9, 
+		2.0f, 1000.0f, bound.GetCenter(), dist + length);
+
+	mCamera->SetCameraController(hoverCameraController);
 }

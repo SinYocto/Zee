@@ -18,6 +18,8 @@ void Clamp(double& val, const double min, const double max);
 
 void Clamp(int& val, const int min, const int max);
 
+float Max(const float val1, const float val2);
+
 float RandomFloat(float a, float b);
 float RandomVariation(float val, float variation);
 

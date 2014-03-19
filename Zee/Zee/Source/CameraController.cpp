@@ -62,7 +62,8 @@ void FPCameraController::Apply(Camera* camera, float deltaTime)
 
 
 HoverCameraController::HoverCameraController(float rotateSpeed, float zoomSpeed, float minTiltAngle, float maxTiltAngle, 
-											 float minDist, float maxDist)
+											 float minDist, float maxDist, 
+											 const Vector3& pivotPos /*= Vector3::Zero*/, float dist /*= 10.0f*/)
 											 :mRotateSpeed(rotateSpeed)
 											 ,mZoomSpeed(zoomSpeed)
 											 ,mMinTiltAngle(minTiltAngle)
@@ -71,7 +72,8 @@ HoverCameraController::HoverCameraController(float rotateSpeed, float zoomSpeed,
 											 ,mMaxDist(maxDist)
 											 ,mTiltAngle(0)
 											 ,mPanAngle(-PI/2)
-											 ,mDist(10.0f)
+											 ,mPivotPos(pivotPos)
+											 ,mDist(dist)
 {
 
 }
@@ -117,6 +119,7 @@ void HoverCameraController::Apply(Camera* camera, float deltaTime)
 	float x = mDist * cos(mTiltAngle) * cos(mPanAngle);
 	float z = mDist * cos(mTiltAngle) * sin(mPanAngle);
 
-	camera->SetWorldPosition(x, y, z);
-	camera->LookAt(Vector3::Zero);
+	camera->SetWorldPosition(mPivotPos);
+	camera->Translate(x, y, z);
+	camera->LookAt(mPivotPos);
 }
