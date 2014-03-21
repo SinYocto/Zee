@@ -585,6 +585,11 @@ void Terrain::Draw(Camera* camera)
 
 	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
 
+	d3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, true);
+	d3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	d3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+
 	sEffect->SetTechnique("Terrain");
 	sEffect->SetMatrix("matWVP", &(camera->ViewMatrix() * camera->ProjMatrix()));
 	sEffect->SetMatrix("matWorld", &(IDENTITY_MATRIX));

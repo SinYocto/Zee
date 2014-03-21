@@ -55,6 +55,8 @@ public:
 private:
 	static void createEffect();
 	static void createGaussianBlurQuadVB();
+	static void createRendertargetDepthStencil();
+	static void createTextures();
 	static void setRenderState();
 
 	static void shadowMapGaussianBlurH();
