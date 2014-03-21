@@ -585,6 +585,7 @@ void Terrain::Draw(Camera* camera)
 
 	IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
 
+	d3dDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	d3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, true);
 	d3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
 	d3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);

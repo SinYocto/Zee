@@ -24,11 +24,10 @@
 #include "DirectionalLightNode.h"
 #include "PointLightNode.h"
 
-#include <hash_map>
 #include "HashMap.h"
 
-
 #include "Terrain.h"
+#include "SkyBox.h"
 
 // ------------------------------------------
 LabelStyle* leftAlignStyle;
@@ -202,7 +201,7 @@ void CreateScene()
 
 	D3DVIEWPORT9 viewPort = gEngine->GetDriver()->GetViewPort(0);
 	sceneMgr->CreateMainCamera(Vector3(0, 4.0f, -14.0f), Vector3::Zero,
-		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 300.0f);
+		PI/3, (float)viewPort.Width / (float)viewPort.Height, 0.1f, 500.0f);
 
 	Camera* mainCamera = sceneMgr->GetMainCamera();
 
@@ -250,6 +249,14 @@ void CreateScene()
 	{
 		textureMgr->GetOrCreateTexture((*iter).c_str());
 	}
+
+	textureMgr->CreateCubeTexture(L"skybox_sunny", 
+		L"Assets/Textures/CubeMaps/Sunny1_right.jpg",
+		L"Assets/Textures/CubeMaps/Sunny1_left.jpg",
+		L"Assets/Textures/CubeMaps/Sunny1_up.jpg",
+		L"Assets/Textures/CubeMaps/Sunny1_down.jpg",
+		L"Assets/Textures/CubeMaps/Sunny1_front.jpg",
+		L"Assets/Textures/CubeMaps/Sunny1_back.jpg");
 
 	// material
 	//MaterialManager* materialMgr = gEngine->GetMaterialManager();
@@ -306,6 +313,10 @@ void CreateScene()
 	//crate->Scale(0.01f, 0.01f, 0.01f);
 	
 
+	// skybox
+	SkyBox* skyBox = New SkyBox();
+	skyBox->SetCubeTex(L"skybox_sunny");
+	sceneMgr->AddSkyBox(skyBox);
 
 	// terrain
 	PerformanceTimer::Begin(L"building 257 terrain");

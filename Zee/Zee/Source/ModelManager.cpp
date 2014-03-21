@@ -31,7 +31,7 @@ std::list<Model*> ModelManager::GetModelList()
 
 void ModelManager::Init()
 {
-	defaultCube = new Model(L"cube", L"Assets/Models/defaultCube.model");		// 会被加入到modeList, 所以不需要专门delete
+	defaultCube = New Model(L"cube", L"Assets/Models/defaultCube.model");		// 会被加入到modeList, 所以不需要专门delete
 }
 
 Model* ModelManager::GetDefaultCube()

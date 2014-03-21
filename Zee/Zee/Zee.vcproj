@@ -305,6 +305,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\Source\Shaders\SkyBox.fx"
+						>
+					</File>
+					<File
 						RelativePath=".\Source\Shaders\Specular.fx"
 						>
 					</File>
@@ -708,6 +712,14 @@
 			</File>
 		</Filter>
 		<File
+			RelativePath=".\Source\CubeTexture.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\CubeTexture.h"
+			>
+		</File>
+		<File
 			RelativePath=".\Source\IDAllocator.cpp"
 			>
 		</File>
@@ -757,6 +769,14 @@
 		</File>
 		<File
 			RelativePath=".\Source\ShadowMapRenderer.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\SkyBox.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\SkyBox.h"
 			>
 		</File>
 		<File

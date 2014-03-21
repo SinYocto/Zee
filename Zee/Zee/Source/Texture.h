@@ -11,7 +11,7 @@ public:
 	~Texture();
 
 	void CreateFromFile(const wchar_t* filePath);
-	void Create(int width, int height, D3DFORMAT format, DWORD usage);
+	void Create(int width, int height, D3DFORMAT format, DWORD usage);	// 作为renderTarget创建时需要进行设备恢复
 
 	wchar_t* GetFilePath();
 	wchar_t* GetName();

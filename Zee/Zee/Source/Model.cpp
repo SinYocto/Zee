@@ -36,7 +36,7 @@ Model::Model(const wchar_t* name, Model* model)
 	std::list<Mesh*> meshList = model->GetSubMeshList();
 	for(std::list<Mesh*>::iterator iter = meshList.begin(); iter != meshList.end(); ++iter)
 	{
-		Mesh* mesh = new Mesh(L"mesh", *iter);
+		Mesh* mesh = New Mesh(L"mesh", *iter);
 
 		AddSubMesh(mesh);
 		SAFE_DROP(mesh);

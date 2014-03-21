@@ -154,7 +154,7 @@ void MaterialListTree::OnContextMenuAddNewMaterial(wxCommandEvent& event)
 {
 	MaterialManager* materialMgr = gEngine->GetMaterialManager();
 
-	Material* material = new Material(L"newMtl");
+	Material* material = New Material(L"newMtl");
 	material->SetShader(Diffuse);
 	materialMgr->AddMaterial(material);
 

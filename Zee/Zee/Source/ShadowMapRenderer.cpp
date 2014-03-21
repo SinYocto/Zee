@@ -99,21 +99,21 @@ void ShadowMapRenderer::createTextures()
 	for(int i = 0; i < CASCADE_COUNTS; ++i)
 		SAFE_DELETE(mShadowMapBluredTex[i]);
 
-	mShadowMapTex = new Texture;
+	mShadowMapTex = New Texture;
 	mShadowMapTex->Create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, D3DUSAGE_RENDERTARGET);
 
-	mShadowMapBluredTexH = new Texture;
+	mShadowMapBluredTexH = New Texture;
 	mShadowMapBluredTexH->Create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, D3DUSAGE_RENDERTARGET);
 
 	for(int i = 0; i < CASCADE_COUNTS; ++i)
 	{
-		mShadowMapBluredTex[i] = new Texture;
+		mShadowMapBluredTex[i] = New Texture;
 		mShadowMapBluredTex[i]->Create(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, D3DFMT_G32R32F, D3DUSAGE_RENDERTARGET);
 
 		_Assert(mShadowMapBluredTex[i] != NULL);
 	}
 
-	mShadowTex = new Texture;
+	mShadowTex = New Texture;
 	mShadowTex->Create(SHADOW_TEX_SIZE, SHADOW_TEX_SIZE, D3DFMT_A8R8G8B8, D3DUSAGE_RENDERTARGET);
 
 	_Assert(mShadowMapTex != NULL);

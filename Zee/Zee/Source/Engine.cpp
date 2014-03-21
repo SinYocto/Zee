@@ -1,5 +1,4 @@
 #include "Engine.h"
-//#include "LightManager.h"
 
 Engine* gEngine = NULL;
 
@@ -134,6 +133,7 @@ void Engine::OnLostDevice()
 {
 	mDriver->OnLostDevice();
 	mGeometryMgr->OnLostDevice();
+	mTextureMgr->OnLostDevice();
 	mMaterialMgr->OnLostDevice();
 	mResourceMgr->OnLostDevice();
 	mGizmo->OnLostDevice();
@@ -146,6 +146,7 @@ void Engine::OnResetDevice()
 {
 	mDriver->OnResetDevice();
 	mGeometryMgr->OnResetDevice();
+	mTextureMgr->OnResetDevice();
 	mMaterialMgr->OnResetDevice();
 	mResourceMgr->OnResetDevice();
 	mGizmo->OnResetDevice();

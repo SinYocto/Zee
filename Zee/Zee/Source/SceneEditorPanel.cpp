@@ -203,7 +203,7 @@ void SceneEditorPanel::OnAddModelNode(wxCommandEvent& event)
 	ModelManager* modelMgr = gEngine->GetModelManager();
 
 	Model* model = (Model*)event.GetClientData();
-	Model* newModelInstance = new Model(model->GetName(), model);
+	Model* newModelInstance = New Model(model->GetName(), model);
 
 	ModelNode* modelNode = New ModelNode(newModelInstance->GetName(), NULL, newModelInstance);
 

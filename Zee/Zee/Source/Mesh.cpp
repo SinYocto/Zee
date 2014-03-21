@@ -25,7 +25,7 @@ Mesh::Mesh(const wchar_t* name, Mesh* mesh)
 	mGeo = mesh->GetGeometry();
 
 	Material* mtl = mesh->GetMaterial();
-	mMaterial = new Material(mtl->GetName(), mtl);
+	mMaterial = New Material(mtl->GetName(), mtl);
 	gEngine->GetMaterialManager()->AddMaterial(mMaterial);
 
 	if(NULL != mGeo)

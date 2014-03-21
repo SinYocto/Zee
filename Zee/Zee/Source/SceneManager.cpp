@@ -10,6 +10,7 @@
 #include "ModelNode.h"
 #include "ShadowMapRenderer.h"
 #include "Terrain.h"
+#include "SkyBox.h"
 
 SceneManager::SceneManager()
 :root(NULL)
@@ -17,6 +18,7 @@ SceneManager::SceneManager()
 ,extraCamera(NULL)
 ,mShadowMapDirLightNode(NULL)
 ,mTerrain(NULL)
+,mSkyBox(NULL)
 {
 
 }
@@ -25,12 +27,18 @@ void SceneManager::OnLostDevice()
 {
 	if(mTerrain)
 		mTerrain->OnLostDevice();
+
+	if(mSkyBox)
+		mSkyBox->OnLostDevice();
 }
 
 void SceneManager::OnResetDevice()
 {
 	if(mTerrain)
 		mTerrain->OnResetDevice();
+
+	if(mSkyBox)
+		mSkyBox->OnResetDevice();
 }
 
 void SceneManager::Init()
@@ -64,6 +72,7 @@ void SceneManager::Destory()
 	SAFE_DELETE(mainCamera);
 	SAFE_DELETE(extraCamera);
 	SAFE_DELETE(mTerrain);
+	SAFE_DELETE(mSkyBox);
 }
 
 void SceneManager::CreateMainCamera( const Vector3 pos /*= Vector3(0, 0, -200)*/, const Vector3 target /*= Vector3::Zero*/, 
@@ -92,6 +101,11 @@ void SceneManager::DrawAllUseRenderer()
 		drawShadowMapPass();
 		drawShadowTexPass();
 	}
+
+	// skybox
+	if(mSkyBox)
+		mSkyBox->Draw(mainCamera);
+
 	// terrain
 	if(mTerrain)
 		mTerrain->Draw(mainCamera);
@@ -289,7 +303,7 @@ void SceneManager::collectSceneNode(SceneNode* sceneNode)
 
 SceneNode* SceneManager::AddPrimitiveCube()
 {	
-	ModelNode* cube = New ModelNode(L"cube", NULL, new Model(L"cube", L"Assets/Models/defaultCube.model"));
+	ModelNode* cube = New ModelNode(L"cube", NULL, New Model(L"cube", L"Assets/Models/defaultCube.model"));
 	AddSceneNode(cube);
 	cube->OnTransformChanged();
 
@@ -401,4 +415,10 @@ void SceneManager::AddTerrain(Terrain* terrain)
 Terrain* SceneManager::GetTerrain()
 {
 	return mTerrain;
+}
+
+void SceneManager::AddSkyBox(SkyBox* skyBox)
+{
+	_Assert(mSkyBox == NULL);
+	mSkyBox = skyBox;
 }

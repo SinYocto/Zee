@@ -50,7 +50,7 @@ public:
 			prevNode = node;
 		}
 
-		node = new HashNode(key_lower);		// TODO: delete
+		node = New HashNode(key_lower);		// TODO: delete
 		node->data = data;
 
 		if(prevNode != NULL)

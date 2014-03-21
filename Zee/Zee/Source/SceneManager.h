@@ -11,6 +11,7 @@ class BillboardNode;
 class DirectionalLightNode;
 class PointLightNode;
 class Terrain;
+class SkyBox;
 
 class SceneManager
 {
@@ -40,6 +41,8 @@ public:
 
 	void AddTerrain(Terrain* terrain);
 	Terrain* GetTerrain();
+
+	void AddSkyBox(SkyBox* skyBox);
 
 	SceneNode* RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
 
@@ -79,6 +82,7 @@ private:
 	DirectionalLightNode* mShadowMapDirLightNode;
 
 	Terrain* mTerrain;
+	SkyBox* mSkyBox;
 };
 
 #endif

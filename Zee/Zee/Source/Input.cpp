@@ -1,5 +1,4 @@
 #include"Input.h"
-#include "Common.h"
 #include"D3DUtility.h"
 
 Input::Input()
