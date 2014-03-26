@@ -8,7 +8,7 @@
 
 LPD3DXEFFECT Terrain::sEffect = NULL;
 
-void TerrainChunk::CalculateChunkNormals()
+void TerrainChunk::CalculateChunkNormals()		// TODO: chunk之间接缝处normal不平滑
 {
 	int numVerts = mSize * mSize;
 	int numTris = (mSize - 1) * (mSize - 1) * 2;
@@ -30,11 +30,15 @@ void TerrainChunk::CalculateChunkNormals()
 
 	mNormalData.clear();
 
-	for(int i = 0; i < numVerts; ++i){
+	for(int i = 0; i < numVerts; ++i)
+	{
 		mNormalData.push_back(Vector3::Zero);
 	}
 
-	for(int i = 0; i < numTris; ++i){
+	neighbourChunkNormalInfluence();	// chunk边界处顶点的normal要考虑neighbour chunk
+
+	for(int i = 0; i < numTris; ++i)
+	{
 		Vector3 v0 = mPosData[indices[3*i + 0]];
 		Vector3 v1 = mPosData[indices[3*i + 1]];
 		Vector3 v2 = mPosData[indices[3*i + 2]];
@@ -57,6 +61,202 @@ void TerrainChunk::CalculateChunkNormals()
 	}
 
 	delete[] indices;
+}
+
+void TerrainChunk::neighbourChunkNormalInfluence()
+{
+	_Assert(NULL != mTerrain);
+	int chunkCounts = mTerrain->GetChunkCounts();
+	std::vector<TerrainChunk*> chunks = mTerrain->GetChunks();
+
+	if(mColumn > 0 && mRow > 0)		// 左上
+	{
+		TerrainChunk* chunkLeftTop = chunks[chunkCounts * (mRow - 1) + mColumn - 1];
+		std::vector<Vector3> posData = chunkLeftTop->GetPosData();
+
+		Vector3 v1 = posData[mSize * (mSize - 2) + mSize - 1];
+		Vector3 v2 = posData[mSize * (mSize - 1) + mSize - 2];
+		Vector3 v3 = posData[mSize * (mSize - 1) + mSize - 1];
+
+		Vector3 v2v1 = v1 - v2;
+		Vector3 v2v3 = v3 - v2;
+
+		Vector3 normal = v2v3.Cross(v2v1);
+		normal.Normalize();
+
+		mNormalData[0] += normal;
+	}
+
+	if(mColumn < chunkCounts - 1 && mRow > 0)		// 右上
+	{
+		TerrainChunk* chunkRightTop = chunks[chunkCounts * (mRow - 1) + mColumn + 1];
+		std::vector<Vector3> posData = chunkRightTop->GetPosData();
+
+		Vector3 v0 = posData[mSize * (mSize - 2)];
+		Vector3 v1 = posData[mSize * (mSize - 2) + 1];
+		Vector3 v2 = posData[mSize * (mSize - 1)];
+		Vector3 v3 = posData[mSize * (mSize - 1) + 1];
+
+		Vector3 v2v0 = v0 - v2;
+		Vector3 v2v1 = v1 - v2;
+		Vector3 v2v3 = v3 - v2;
+
+		Vector3 normal0 = v2v1.Cross(v2v0);
+		Vector3 normal1 = v2v3.Cross(v2v1);
+		normal0.Normalize();
+		normal1.Normalize();
+
+		mNormalData[mSize - 1] += normal0 + normal1;
+	}
+
+	if(mColumn > 0 && mRow < chunkCounts - 1)	// 左下
+	{
+		TerrainChunk* chunkLeftBottom = chunks[chunkCounts * (mRow + 1) + mColumn - 1];
+		std::vector<Vector3> posData = chunkLeftBottom->GetPosData();
+
+		Vector3 v0 = posData[mSize - 2];
+		Vector3 v1 = posData[mSize - 1];
+		Vector3 v2 = posData[mSize + mSize - 2];
+		Vector3 v3 = posData[mSize + mSize - 1];
+
+		Vector3 v0v2 = v2 - v0;
+		Vector3 v1v2 = v2 - v1;
+		Vector3 v2v3 = v3 - v2;
+
+		Vector3 normal0 = v0v2.Cross(v1v2);
+		Vector3 normal1 = v2v3.Cross(v1v2);
+		normal0.Normalize();
+		normal1.Normalize();
+
+		mNormalData[mSize * (mSize - 1)] += normal0 + normal1;	
+	}
+
+	if(mColumn < chunkCounts - 1 && mRow < chunkCounts - 1)		// 右下
+	{
+		TerrainChunk* chunkRightBottom = chunks[chunkCounts * (mRow + 1) + mColumn + 1];
+		std::vector<Vector3> posData = chunkRightBottom->GetPosData();
+
+		Vector3 v0 = posData[0];
+		Vector3 v1 = posData[1];
+		Vector3 v2 = posData[mSize];
+
+		Vector3 v0v1 = v1 - v0;
+		Vector3 v0v2 = v2 - v0;
+
+		Vector3 normal = v0v2.Cross(v0v1);
+		normal.Normalize();
+
+		mNormalData[mSize * (mSize - 1) + mSize - 1] += normal;
+	}
+
+	if(mColumn > 0)		// 左
+	{
+		TerrainChunk* chunkLeft = chunks[chunkCounts * mRow + mColumn - 1];
+		std::vector<Vector3> posData = chunkLeft->GetPosData();
+
+		for(int i = 0; i < mSize - 1; ++i)
+		{
+			Vector3 v0 = posData[mSize * i + mSize - 2];
+			Vector3 v1 = posData[mSize * i + mSize - 1];
+			Vector3 v2 = posData[mSize * (i+1) + mSize - 2];
+			Vector3 v3 = posData[mSize * (i+1) + mSize - 1];
+
+			Vector3 v2v0 = v0 - v2;
+			Vector3 v2v1 = v1 - v2;
+			Vector3 v2v3 = v3 - v2;
+
+			Vector3 normal0 = v2v1.Cross(v2v0);
+			Vector3 normal1 = v2v3.Cross(v2v1);
+			normal0.Normalize();
+			normal1.Normalize();
+
+			mNormalData[mSize * i] += normal0 + normal1;
+			mNormalData[mSize * (i+1)] += normal1;
+		}
+	}
+
+	if(mColumn < chunkCounts - 1)		// 右
+	{
+		TerrainChunk* chunkRight = chunks[chunkCounts * mRow + mColumn + 1];
+		std::vector<Vector3> posData = chunkRight->GetPosData();
+
+		for(int i = 0; i < mSize - 1; ++i)
+		{
+			Vector3 v0 = posData[mSize * i];
+			Vector3 v1 = posData[mSize * i + 1];
+			Vector3 v2 = posData[mSize * (i+1)];
+			Vector3 v3 = posData[mSize * (i+1) + 1];
+
+			Vector3 v2v0 = v0 - v2;
+			Vector3 v2v1 = v1 - v2;
+			Vector3 v2v3 = v3 - v2;
+
+			Vector3 normal0 = v2v1.Cross(v2v0);
+			Vector3 normal1 = v2v3.Cross(v2v1);
+			normal0.Normalize();
+			normal1.Normalize();
+
+			mNormalData[mSize * i + mSize - 1] += normal0;
+			mNormalData[mSize * (i+1) + mSize - 1] += normal1 + normal1;
+		}
+	}
+
+	if(mRow > 0)		// 上
+	{
+		TerrainChunk* chunkTop = chunks[chunkCounts * (mRow - 1) + mColumn];
+		std::vector<Vector3> posData = chunkTop->GetPosData();
+
+		for(int i = 0; i < mSize - 1; ++i)
+		{
+			Vector3 v0 = posData[mSize * (mSize - 2) + i];
+			Vector3 v1 = posData[mSize * (mSize - 2) + i + 1];
+			Vector3 v2 = posData[mSize * (mSize - 1) + i];
+			Vector3 v3 = posData[mSize * (mSize - 1) + i + 1];
+
+			Vector3 v2v0 = v0 - v2;
+			Vector3 v2v1 = v1 - v2;
+			Vector3 v2v3 = v3 - v2;
+
+			Vector3 normal0 = v2v1.Cross(v2v0);
+			Vector3 normal1 = v2v3.Cross(v2v1);
+			normal0.Normalize();
+			normal1.Normalize();
+
+			mNormalData[i] += normal0 + normal1;
+			mNormalData[i + 1] += normal1;
+		}
+	}
+
+	if(mRow < chunkCounts - 1)		// 下
+	{
+		TerrainChunk* chunkBottom = chunks[chunkCounts * (mRow + 1) + mColumn];
+		std::vector<Vector3> posData = chunkBottom->GetPosData();
+
+		for(int i = 0; i < mSize - 1; ++i)
+		{
+			Vector3 v0 = posData[i];
+			Vector3 v1 = posData[i + 1];
+			Vector3 v2 = posData[mSize + i];
+			Vector3 v3 = posData[mSize + i + 1];
+
+			Vector3 v2v0 = v0 - v2;
+			Vector3 v2v1 = v1 - v2;
+			Vector3 v2v3 = v3 - v2;
+
+			Vector3 normal0 = v2v1.Cross(v2v0);
+			Vector3 normal1 = v2v3.Cross(v2v1);
+			normal0.Normalize();
+			normal1.Normalize();
+
+			mNormalData[mSize * (mSize - 1) + i] += normal0;
+			mNormalData[mSize * (mSize - 1) + i + 1] += normal1 + normal1;
+		}
+	}
+}
+
+std::vector<Vector3> TerrainChunk::GetPosData()
+{
+	return mPosData;
 }
 
 void TerrainChunk::CreateVertexBuffer()
@@ -432,6 +632,15 @@ void Terrain::BuildTerrain(int depth)
 	mChunkCounts = (int)pow(2.0f, depth);
 	mChunks.resize(mChunkCounts * mChunkCounts, NULL);
 	buildChunks(mRootNode, depth);
+
+	for(size_t i = 0; i < mChunks.size(); ++i)
+	{
+		TerrainChunk* chunk = mChunks[i];
+
+		chunk->CalculateChunkNormals();
+		chunk->CreateVertexBuffer();
+		chunk->mNode->CalculateBoundingBox(chunk->mMinY, chunk->mMaxY);
+	}
 }
 
 void Terrain::buildChunks(QuadTreeNode* node, int depth)
@@ -454,6 +663,7 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 		int numChunkTris = (chunkSize - 1) * (chunkSize - 1) * 2;
 
 		TerrainChunk* chunk = New TerrainChunk(node, chunkSize);
+		chunk->mTerrain = this;
 		chunk->mRow = chunkRow;
 		chunk->mColumn = chunkColumn;
 		chunk->mPosData.reserve(numChunkVerts);
@@ -487,9 +697,8 @@ void Terrain::buildChunks(QuadTreeNode* node, int depth)
 			chunk->mUVData.push_back(Vector2(u, v)); 
 		}
 
-		chunk->CalculateChunkNormals();
-		chunk->CreateVertexBuffer();
-		chunk->mNode->CalculateBoundingBox(minY, maxY);
+		chunk->mMinY = minY;
+		chunk->mMaxY = maxY;
 
 		int chunkIndex = mChunkCounts * chunkRow + chunkColumn;
 		_Assert(chunkIndex < mChunkCounts * mChunkCounts);
@@ -701,4 +910,9 @@ float Terrain::GetLodTolerance()
 void Terrain::SetWireFrameMode(bool isWireFrame)
 {
 	mIsWireFrame = isWireFrame;
+}
+
+int Terrain::GetChunkCounts()
+{
+	return mChunkCounts;
 }

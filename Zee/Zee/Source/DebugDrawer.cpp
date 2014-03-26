@@ -29,6 +29,8 @@ bool DebugDrawer::DrawLine(const std::vector<Vector3>& points, D3DCOLOR color, C
 		d3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
 
 		d3dDevice->DrawPrimitiveUP(D3DPT_LINESTRIP, points.size() - 1, &verts[0], sizeof(VertexXYZD));
+		Profiler::AddDrawCalls();
+		Profiler::AddNumVerts((int)points.size());
 	}
 
 	isSucceed = true;
@@ -213,7 +215,7 @@ bool DebugDrawer::drawSolidTriFan(const std::vector<Vector3>& points, D3DCOLOR c
 		IDirect3DDevice9* d3dDevice = gEngine->GetDriver()->GetD3DDevice();
 
 		D3DXMATRIX matWorld;
-		D3DXMatrixIdentity(&matWorld);
+		D3DXMatrixIdentity(&matWorld);  
 		d3dDevice->SetTransform(D3DTS_WORLD, &matWorld);
 		d3dDevice->SetTransform(D3DTS_VIEW, &camera->ViewMatrix());
 		d3dDevice->SetTransform(D3DTS_PROJECTION, &camera->ProjMatrix());
@@ -227,7 +229,10 @@ bool DebugDrawer::drawSolidTriFan(const std::vector<Vector3>& points, D3DCOLOR c
 		d3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 		d3dDevice->SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
 
-		d3dDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, points.size() - 1, &verts[0], sizeof(VertexXYZD));
+		d3dDevice->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, points.size() - 2, &verts[0], sizeof(VertexXYZD));
+		Profiler::AddDrawCalls();
+		Profiler::AddNumVerts(points.size());
+		Profiler::AddNumTris(points.size() - 2);
 
 		d3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	}

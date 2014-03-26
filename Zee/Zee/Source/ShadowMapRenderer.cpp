@@ -530,6 +530,9 @@ void ShadowMapRenderer::shadowMapGaussianBlurH()
 	mGaussianBlurEffect->CommitChanges();
 
 	d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+	Profiler::AddDrawCalls();
+	Profiler::AddNumVerts(4);
+	Profiler::AddNumTris(2);
 
 	mGaussianBlurEffect->EndPass();
 	mGaussianBlurEffect->End();
@@ -563,6 +566,9 @@ void ShadowMapRenderer::shadowMapGaussianBlurV(int cascadeIndex)
 	mGaussianBlurEffect->CommitChanges();
 
 	d3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+	Profiler::AddDrawCalls();
+	Profiler::AddNumVerts(4);
+	Profiler::AddNumTris(2);
 
 	mGaussianBlurEffect->EndPass();
 	mGaussianBlurEffect->End();

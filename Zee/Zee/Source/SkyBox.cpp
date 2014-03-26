@@ -194,6 +194,9 @@ void SkyBox::Draw(Camera* camera)
 	effect->BeginPass(0);
 
 	d3dDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, NUM_VERTICES, 0, NUM_TRIES);
+	Profiler::AddDrawCalls();
+	Profiler::AddNumVerts(NUM_VERTICES);
+	Profiler::AddNumTris(NUM_TRIES);
 
 	effect->EndPass();
 	effect->End();

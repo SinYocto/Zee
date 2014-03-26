@@ -12,6 +12,7 @@ enum
 	INVALID_VALUE = -1
 };
 
+class Terrain;
 class TerrainChunk
 {
 	friend class Terrain;
@@ -26,6 +27,9 @@ public:
 		,mForceRebuildIB(true)
 		,mNeighbLODLevel(0xffffffff)
 		,mNumTris(0)
+		,mMinY(FLT_MAX)
+		,mMaxY(-FLT_MAX)
+		,mTerrain(NULL)
 	{
 
 	}
@@ -55,13 +59,21 @@ public:
 	int GetTriCounts();
 	DWORD GetNeighbLODLevel();
 	int GetChunkSize();
+	std::vector<Vector3> GetPosData();
 
 	void SetNeighbLODLevel(DWORD neighbLod);
 	void ResetLODLevel();
+
+private:
+	void neighbourChunkNormalInfluence();		// chunk边界处顶点的normal要考虑neighbour chunk
+
 private:
 	int mSize;
 	int mRow;
 	int mColumn;
+
+	float mMinY;
+	float mMaxY;
 
 	int mLODLevel;
 	DWORD mNeighbLODLevel;				// neightbour的lodLevel, left,top,right,bottom各占8位
@@ -80,6 +92,7 @@ private:
 	IDirect3DIndexBuffer9* mIndexBuffer;
 
 	QuadTreeNode* mNode;
+	Terrain* mTerrain;
 };
 
 class Terrain
@@ -118,6 +131,7 @@ public:
 
 	std::vector<TerrainChunk*> GetChunks();
 	float GetLodTolerance();
+	int GetChunkCounts();
 
 private:
 	//void createEffect();
