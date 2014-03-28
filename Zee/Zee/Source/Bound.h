@@ -42,4 +42,8 @@ public:
 bool IntersectRayAABB(const Vector3& rayPos, const Vector3& rayDir, const AABBox& box, Vector3* hitPos, float* dist);
 bool IntersectRayPlane(const Vector3& rayPos, const Vector3& rayDir, const D3DXPLANE& plane, Vector3* hitPos, float* dist);
 
+bool IsPointInsideTriangle(const Vector3& point, const Vector3& triVertA, const Vector3& triVertB, const Vector3& triVertC);
+bool IntersectRayTriangle(const Vector3& rayPos, const Vector3& rayDir, const Vector3& triVertA, 
+						  const Vector3& triVertB, const Vector3& triVertC, Vector3* hitPos, float* dist);
+
 #endif

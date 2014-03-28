@@ -13,7 +13,7 @@ void GeometryManager::AddGeometry(Geometry* geo)
 	//_Assert(!YString::isEmpty(geo->GetFilePath()));
 	if(mGeometries.Find(geo->GetFilePath()) != NULL)
 	{
-		Log(L"warning: GeometryManage::AddGeometry() geo already exists!\n");
+		ConsolePrint(L"warning: GeometryManage::AddGeometry() geo already exists!\n");
 		return;
 	}
 	else

@@ -137,7 +137,7 @@ void TerrainChunk::neighbourChunkNormalInfluence()
 		std::vector<Vector3> posData = chunkRightBottom->GetPosData();
 
 		Vector3 v0 = posData[0];
-		Vector3 v1 = posData[1];
+		Vector3 v1 = posData[1]; 
 		Vector3 v2 = posData[mSize];
 
 		Vector3 v0v1 = v1 - v0;

@@ -27,7 +27,7 @@ void PerformanceTimer::Begin(const wchar_t* desc)
 		}
 
 		YString::Concat(temp, _countof(temp), L"start %s\n");	// log消息加上前面的"--"层级符
-		Log(temp, performanceList[curPerformanceIndex].desc);
+		ConsolePrint(temp, performanceList[curPerformanceIndex].desc);
 	}
 
 	for(int i = 0; i < curPerformanceIndex; ++i)
@@ -53,7 +53,7 @@ void PerformanceTimer::End()
 		}
 
 		YString::Concat(temp, _countof(temp), L"finish %s. Time used(%fs)\n");	// log消息加上前面的"--"层级符
-		Log(temp, performanceList[curPerformanceIndex].desc, performanceList[curPerformanceIndex].timeUsed);
+		ConsolePrint(temp, performanceList[curPerformanceIndex].desc, performanceList[curPerformanceIndex].timeUsed);
 	}
 
 	performanceList.pop_back();

@@ -69,7 +69,7 @@ bool CreateD3DDevice(HWND hWnd, int bufferWidth, int bufferHeight, _D3DMULTISAMP
 		HRESULT hr = (*ppD3D)->GetAdapterIdentifier(D3DADAPTER_DEFAULT, 0, &adapterIdentifier);
 		Assert(SUCCEEDED(hr));
 
-		Log(L"graphics card:%S\n", adapterIdentifier.Description);
+		ConsolePrint(L"graphics card:%S\n", adapterIdentifier.Description);
 
 		// device capacity
 		D3DCAPS9 d3dcaps;

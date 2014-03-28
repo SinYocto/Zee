@@ -24,7 +24,7 @@ void MaterialManager::AddMaterial(Material* material)	// 注意没有grab, 每增加mtl
 
 	if(mMaterials.Find(material->GetFilePath()) != NULL)
 	{
-		Log(L"warning: MaterialManager::AddMaterial() mtl already exists!\n");
+		ConsolePrint(L"warning: MaterialManager::AddMaterial() mtl already exists!\n");
 		return;
 	}
 	else

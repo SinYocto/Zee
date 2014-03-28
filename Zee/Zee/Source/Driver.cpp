@@ -19,7 +19,7 @@ void Driver::CreateD3DDevice(D3DDeviceParams params)
 	HRESULT hr = D3D->GetAdapterIdentifier(D3DADAPTER_DEFAULT, 0, &adapterIdentifier);
 	_Assert(SUCCEEDED(hr));
 
-	Log(L"graphics card:%S\n", adapterIdentifier.Description);
+	ConsolePrint(L"graphics card:%S\n", adapterIdentifier.Description);
 
 	// device capacity
 	D3DCAPS9 d3dcaps;

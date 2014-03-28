@@ -352,7 +352,6 @@ void SceneEditorCanvas::RenderLoop()
 			gEngine->FrameUpdate();
 			GUIUpdateAfterEngineUpdate();
 
-
 			if(wxWindow::FindFocus() == this)
 				mainCamera->ApplyCameraController();
 

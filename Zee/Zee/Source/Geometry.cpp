@@ -1213,7 +1213,7 @@ void Geometry::SaveToFile(const wchar_t* dirPath)
 
 	if(YFile::Exist(filePath))
 	{
-		Log(L"warning: file already exists. Geometry::SaveToFile(%s)\n", filePath);
+		ConsolePrint(L"warning: file already exists. Geometry::SaveToFile(%s)\n", filePath);
 		return;
 	}
 

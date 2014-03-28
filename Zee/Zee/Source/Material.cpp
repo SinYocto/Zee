@@ -341,7 +341,7 @@ void Material::SaveToFile(const wchar_t* dirPath)
 
 	if(YFile::Exist(filePath))
 	{
-		Log(L"warning: file already exists. Material::SaveToFile(%s)\n", filePath);
+		ConsolePrint(L"warning: file already exists. Material::SaveToFile(%s)\n", filePath);
 		return;
 	}
 

@@ -125,7 +125,7 @@ void Model::SaveToFile(const wchar_t* dirPath)
 
 	if(YFile::Exist(filePath))
 	{
-		Log(L"warning: file already exists. Model::SaveToFile(%s)\n", filePath);
+		ConsolePrint(L"warning: file already exists. Model::SaveToFile(%s)\n", filePath);
 		return;
 	}
 

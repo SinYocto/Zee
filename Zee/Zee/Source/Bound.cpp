@@ -262,3 +262,55 @@ bool IntersectRayPlane(const Vector3& rayPos, const Vector3& rayDir, const D3DXP
 
 	return true;
 }
+
+bool IsPointInsideTriangle(const Vector3& point, const Vector3& triVertA, const Vector3& triVertB, const Vector3& triVertC)
+{
+	// http://www.cnblogs.com/graphics/archive/2010/08/05/1793393.html Í¬Ïò·¨
+	bool inside = true;
+
+	Vector3 vecAB = triVertB - triVertA;
+	Vector3 vecAC = triVertC - triVertA;
+	Vector3 vecBC = triVertC - triVertB;
+
+	Vector3 vecAP = point - triVertA;
+	Vector3 vecBP = point - triVertB;
+	Vector3 vecCP = point - triVertC;
+
+	if((vecAB.Cross(vecAP)).Dot((vecAB.Cross(vecAC))) < 0)
+		inside = false;
+
+	if((vecBC.Cross(vecBP)).Dot((vecBC.Cross(-vecAB))) < 0)
+		inside = false;
+
+	if((vecAC.Cross(-vecCP)).Dot((vecAC.Cross(vecBC))) < 0)
+		inside = false;
+
+	return inside;
+}
+
+bool IntersectRayTriangle(const Vector3& rayPos, const Vector3& rayDir, const Vector3& triVertA, const Vector3& triVertB, 
+						  const Vector3& triVertC, Vector3* hitPos, float* dist)
+{
+	D3DXPLANE plane;
+	D3DXPlaneFromPoints(&plane, (D3DXVECTOR3*)&triVertA, (D3DXVECTOR3*)&triVertB, (D3DXVECTOR3*)&triVertC);
+
+	Vector3 hitP;
+	float hitDist = 0;
+	if(IntersectRayPlane(rayPos, rayDir, plane, &hitP, &hitDist))
+	{
+		if(IsPointInsideTriangle(hitP, triVertA, triVertB, triVertC))
+		{
+			if(hitPos)
+				*hitPos = hitP;
+
+			if(dist)
+				*dist = hitDist;
+
+			return true;
+		}
+
+		ConsolePrint(L"not hit tir, hitpos(%f,%f,%f)\n", hitP.x, hitP.y, hitP.z);
+	}
+
+	return false;
+}

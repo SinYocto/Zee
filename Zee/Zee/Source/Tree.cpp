@@ -184,7 +184,7 @@ void TreeStem::Build(TreeSegment* parentSeg, float offset, TreeGeneralParams gen
 {
 	static int dbNumStems[4];
 	dbNumStems[levelParams.level]++;
-	Log(L"current numStems: (0-%d),(1-%d),(2-%d),(3-%d)\n", dbNumStems[0], dbNumStems[1], dbNumStems[2], dbNumStems[3]);
+	ConsolePrint(L"current numStems: (0-%d),(1-%d),(2-%d),(3-%d)\n", dbNumStems[0], dbNumStems[1], dbNumStems[2], dbNumStems[3]);
 
 	SAFE_DELETE(mFirstSeg);
 	mParentSeg = parentSeg;
@@ -240,7 +240,7 @@ void TreeStem::buildSegment(TreeGeneralParams generalParams, TreeSegment* prevSe
 
 	static int dbNumSegs[4];
 	dbNumSegs[mLevelParams.level]++;
-	Log(L"current numSegs: (0-%d),(1-%d),(2-%d),(3-%d)\n", dbNumSegs[0], dbNumSegs[1], dbNumSegs[2], dbNumSegs[3]);
+	ConsolePrint(L"current numSegs: (0-%d),(1-%d),(2-%d),(3-%d)\n", dbNumSegs[0], dbNumSegs[1], dbNumSegs[2], dbNumSegs[3]);
 
 	int numSegs = mLevelParams.curveRes;
 	float segLength = mLength / numSegs;
