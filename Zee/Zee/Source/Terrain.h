@@ -64,6 +64,8 @@ public:
 	void SetNeighbLODLevel(DWORD neighbLod);
 	void ResetLODLevel();
 
+	bool RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
+
 private:
 	void neighbourChunkNormalInfluence();		// chunk边界处顶点的normal要考虑neighbour chunk
 
@@ -122,6 +124,7 @@ public:
 	void SetSplatMapTex(const wchar_t* texFile);
 	void SetBrushTex(const wchar_t* texFile);
 	void SetMtlParameters(float tilesU, float tilesV, D3DXCOLOR ambient, D3DXCOLOR diffuse);
+	void SetBrushRect(const Vector4& brushRect);
 
 	void SetWireFrameMode(bool isWireFrame);
 
@@ -130,9 +133,12 @@ public:
 	void Draw(Camera* camera);
 	void createEffect();
 
+	bool RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist);
+
 	std::vector<TerrainChunk*> GetChunks();
 	float GetLodTolerance();
 	int GetChunkCounts();
+	float GetLength();
 
 private:
 	//void createEffect();
@@ -193,6 +199,8 @@ private:
 
 		float tilesU;
 		float tilesV;
+
+		Vector4 brushRect;
 	};
 
 	TerrainMaterial mMaterial;

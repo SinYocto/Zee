@@ -565,6 +565,56 @@ bool TerrainChunk::IntersectWithBBox(const AABBox& box)
 	return intersection.isValid();
 }
 
+bool TerrainChunk::RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist)
+{
+	Vector3 hitP;
+	float hitDist = FLT_MAX;
+	bool intersect = false;
+
+	for(int row = 0; row < mSize - 1; ++row)
+	{
+		for(int column = 0; column < mSize - 1; ++column)
+		{
+			Vector3 v0 = mPosData[mSize * row + column];
+			Vector3 v1 = mPosData[mSize * row + column + 1];
+			Vector3 v2 = mPosData[mSize * (row + 1) + column];
+			Vector3 v3 = mPosData[mSize * (row + 1) + column + 1];
+
+			Vector3 curHitP;
+			float curHitDist;
+			if(IntersectRayTriangle(rayPos, rayDir, v0, v1, v2, &curHitP, &curHitDist))
+			{
+				intersect = true;
+
+				if(curHitDist < hitDist)
+				{
+					hitDist = curHitDist;
+					hitP = curHitP;
+				}
+			}
+
+			if(IntersectRayTriangle(rayPos, rayDir, v1, v2, v3, &curHitP, &curHitDist))
+			{
+				intersect = true;
+
+				if(curHitDist < hitDist)
+				{
+					hitDist = curHitDist;
+					hitP = curHitP;
+				}
+			}
+		}
+	}
+
+	if(intersect && hitPos != NULL)
+		*hitPos = hitP;
+
+	if(intersect && dist != NULL)
+		*dist = hitDist;
+
+	return intersect;
+}
+
 Terrain::Terrain(int size, float length, float height)
 :mSize(size)
 ,mLength(length)
@@ -813,7 +863,7 @@ void Terrain::Draw(Camera* camera)
 	sEffect->SetRawValue("mtlDiffuse", &mMaterial.diffuseColor, 0, sizeof(D3DXCOLOR));
 
 	sEffect->SetBool("drawBrushTex", true);
-	sEffect->SetRawValue("brushRect", &Vector4(0.2f, 0.2f, 0.4f, 0.4f), 0, sizeof(Vector4));
+	sEffect->SetRawValue("brushRect", &mMaterial.brushRect, 0, sizeof(Vector4));
 	sEffect->SetTexture("brushTex", mMaterial.brushTex);
 
 	if(gEngine->GetSceneManager()->NeedDirLightShadow())
@@ -925,4 +975,62 @@ void Terrain::SetWireFrameMode(bool isWireFrame)
 int Terrain::GetChunkCounts()
 {
 	return mChunkCounts;
+}
+
+bool Terrain::RayIntersect(const Vector3& rayPos, const Vector3& rayDir, Vector3* hitPos, float* dist)
+{
+	bool intersect = false;
+	Vector3 hitP;
+	float hitDist = FLT_MAX;
+
+	std::map<float, TerrainChunk*> intersectedChunks;	// hitDist -> chunk, chunk自动按hitDist排好序
+
+	for(std::vector<TerrainChunk*>::iterator iter = mChunks.begin(); iter != mChunks.end(); ++iter)
+	{
+		TerrainChunk* chunk = *iter;
+
+		if(!chunk->mNode->IsInFrustum())	// 这里只和当前可见的chunk碰撞
+			continue;
+
+		float curHitDist = 0;
+		if(IntersectRayAABB(rayPos, rayDir, chunk->mNode->GetAABBox(), NULL, &curHitDist))
+		{
+			intersectedChunks[curHitDist] = chunk;
+		}
+	}
+
+	for(std::map<float, TerrainChunk*>::iterator iter = intersectedChunks.begin(); iter != intersectedChunks.end(); ++iter)
+	{
+		TerrainChunk* chunk = iter->second;
+
+		Vector3 curHitPos;
+		float curHitDist = 0;
+		if(chunk->RayIntersect(rayPos, rayDir, &curHitPos, &curHitDist))
+		{
+			intersect = true;
+			if(curHitDist < hitDist)
+			{
+				hitDist = curHitDist;
+				hitP = curHitPos;
+			}
+		}
+	}
+
+	if(intersect && hitPos != NULL)
+		*hitPos = hitP;
+
+	if(intersect && dist != NULL)
+		*dist = hitDist;
+
+	return intersect;
+}
+
+float Terrain::GetLength()
+{
+	return mLength;
+}
+
+void Terrain::SetBrushRect(const Vector4& brushRect)
+{
+	mMaterial.brushRect = brushRect;
 }

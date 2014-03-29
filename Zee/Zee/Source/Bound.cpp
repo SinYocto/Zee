@@ -308,8 +308,6 @@ bool IntersectRayTriangle(const Vector3& rayPos, const Vector3& rayDir, const Ve
 
 			return true;
 		}
-
-		ConsolePrint(L"not hit tir, hitpos(%f,%f,%f)\n", hitP.x, hitP.y, hitP.z);
 	}
 
 	return false;

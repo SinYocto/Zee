@@ -356,6 +356,34 @@ void SceneEditorCanvas::RenderLoop()
 			if(wxWindow::FindFocus() == this)
 				mainCamera->ApplyCameraController();
 
+			Terrain* terrain =sceneMgr->GetTerrain();
+			if(input->GetLeftButtonDown())
+			{
+				Vector2 screenPos((float)input->GetCursorPos().x, (float)input->GetCursorPos().y);
+
+				Vector3 rayPos;
+				Vector3 rayDir;
+				mainCamera->GetScreenRay(screenPos, &rayPos, &rayDir);
+
+				Vector3 hitPos;
+				if(terrain->RayIntersect(rayPos, rayDir, &hitPos, NULL))
+				{
+					float terrainLength = terrain->GetLength();
+					float x = hitPos.x / terrainLength + 0.5f;
+					float z = 0.5f - hitPos.z / terrainLength;
+
+					const float BRUSH_RECT_SIZE = 0.2f;
+
+					Vector4 brushRect(x - 0.5f * BRUSH_RECT_SIZE, z - 0.5f * BRUSH_RECT_SIZE,
+						x + 0.5f * BRUSH_RECT_SIZE, z + 0.5f * BRUSH_RECT_SIZE);
+
+					terrain->SetBrushRect(brushRect);
+
+					ConsolePrint(L"hitPos(%f, %f, %f) rect(%f, %f, %f, %f)\n", hitPos.x, hitPos.y, hitPos.z, 
+						brushRect.x, brushRect.y, brushRect.z, brushRect.w);
+				}
+			}
+
 			// render
 			driver->RenderToSwapChain(0);
 			driver->Clear(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x7f36404a, 1.0f);
