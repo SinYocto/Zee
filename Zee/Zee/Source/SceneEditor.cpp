@@ -328,7 +328,8 @@ void CreateScene()
 	terrain->SetColorTexes(L"./Assets/Textures/Terrain/Cliff.jpg", L"./Assets/Textures/Terrain/Grass_Hill.jpg", 
 		L"./Assets/Textures/Terrain/DirtGrass.jpg", L"./Assets/Textures/Terrain/Pebbles.jpg");
 
-	terrain->SetSplatMapTex(L"./Assets/Textures/Terrain/splat.tga");
+	terrain->SetSplatMapTex(L"Assets/Textures/Terrain/splat.tga");
+	terrain->SetBrushTex(L"Assets/Textures/Editor/pointLight.jpg");
 	terrain->SetMtlParameters(30.0f, 30.0f, D3DXCOLOR_WHITE, D3DXCOLOR_WHITE);
 	PerformanceTimer::End();
 

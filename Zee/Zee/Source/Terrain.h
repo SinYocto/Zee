@@ -120,6 +120,7 @@ public:
 
 	void SetColorTexes(const wchar_t* texFile0, const wchar_t* texFile1, const wchar_t* texFile2, const wchar_t* texFile3);
 	void SetSplatMapTex(const wchar_t* texFile);
+	void SetBrushTex(const wchar_t* texFile);
 	void SetMtlParameters(float tilesU, float tilesV, D3DXCOLOR ambient, D3DXCOLOR diffuse);
 
 	void SetWireFrameMode(bool isWireFrame);
@@ -167,6 +168,7 @@ private:
 			,tilesU(10.0f)
 			,tilesV(10.0f)
 			,splatMapTex(NULL)
+			,brushTex(NULL)
 		{
 			colorTexes[0] = NULL;
 			colorTexes[1] = NULL;
@@ -176,6 +178,7 @@ private:
 		~TerrainMaterial()
 		{
 			SAFE_RELEASE(splatMapTex);
+			SAFE_RELEASE(brushTex);
 
 			for(int i = 0; i < 4; ++i)
 				SAFE_RELEASE(colorTexes[i]);
@@ -183,6 +186,7 @@ private:
 
 		IDirect3DTexture9* colorTexes[4];
 		IDirect3DTexture9* splatMapTex;
+		IDirect3DTexture9* brushTex;
 
 		D3DXCOLOR ambientColor;
 		D3DXCOLOR diffuseColor;

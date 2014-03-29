@@ -812,6 +812,10 @@ void Terrain::Draw(Camera* camera)
 	sEffect->SetRawValue("mtlAmbient", &mMaterial.ambientColor, 0, sizeof(D3DXCOLOR));
 	sEffect->SetRawValue("mtlDiffuse", &mMaterial.diffuseColor, 0, sizeof(D3DXCOLOR));
 
+	sEffect->SetBool("drawBrushTex", true);
+	sEffect->SetRawValue("brushRect", &Vector4(0.2f, 0.2f, 0.4f, 0.4f), 0, sizeof(Vector4));
+	sEffect->SetTexture("brushTex", mMaterial.brushTex);
+
 	if(gEngine->GetSceneManager()->NeedDirLightShadow())
 	{
 		sEffect->SetBool("calcShadow", true);
@@ -879,6 +883,12 @@ void Terrain::SetSplatMapTex(const wchar_t* texFile)
 {
 	SAFE_RELEASE(mMaterial.splatMapTex);
 	D3DXCreateTextureFromFile(gEngine->GetDriver()->GetD3DDevice(), texFile, &mMaterial.splatMapTex);
+}
+
+void Terrain::SetBrushTex(const wchar_t* texFile)
+{
+	SAFE_RELEASE(mMaterial.brushTex);
+	D3DXCreateTextureFromFile(gEngine->GetDriver()->GetD3DDevice(), texFile, &mMaterial.brushTex);
 }
 
 void Terrain::SetMtlParameters(float tilesU, float tilesV, D3DXCOLOR ambient, D3DXCOLOR diffuse)

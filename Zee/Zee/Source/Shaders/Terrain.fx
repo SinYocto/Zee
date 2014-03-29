@@ -8,11 +8,15 @@ float4x4 matUVTransform;
 float4 mtlAmbient;
 float4 mtlDiffuse;
 
+bool drawBrushTex;
+float4 brushRect;
+
 texture colorTex0;
 texture colorTex1;
 texture colorTex2;
 texture colorTex3;
 texture splatMapTex;
+texture brushTex;
 
 bool calcShadow;
 texture shadowTex;
@@ -64,6 +68,17 @@ sampler ColorS3 = sampler_state
 sampler SplatS = sampler_state
 {
 	Texture = <splatMapTex>;
+	MinFilter = linear;
+	MaxAnisotropy = 4;
+	MagFilter = linear;
+	MipFilter = linear;
+	AddressU  = WRAP;
+    AddressV  = WRAP;
+};
+
+sampler BrushS = sampler_state
+{
+	Texture = <brushTex>;
 	MinFilter = linear;
 	MaxAnisotropy = 4;
 	MagFilter = linear;
@@ -162,6 +177,22 @@ float4 TerrainPS(float2 tex : TEXCOORD0,
 	shadow = clamp(shadow, 0, 1.0f);
 
 	oColor.rgb = oColorAmbient.rgb + oColorPointLights.rgb + shadow * oColor.rgb;
+
+	// ¼ÓÉÏbrushÌùÍ¼
+	if(drawBrushTex)
+	{
+		float2 brushTexUV;
+		brushTexUV.x = (texSplat.x - brushRect.x) / (brushRect.z - brushRect.x);
+		brushTexUV.y = (texSplat.y - brushRect.y) / (brushRect.w - brushRect.y);
+
+		if(brushTexUV.x > 0 && brushTexUV.x < 1 && brushTexUV.y > 0 && brushTexUV.y < 1)
+		{
+			float3 brushColor = tex2D(BrushS, brushTexUV).rgb;
+			float alpha = GetAlphaFromColor(brushColor);
+			oColor.rgb = alpha * float3(0.36f, 0.655f, 0.729f) * brushColor + (1.0f - alpha) * oColor.rgb;
+		}
+	}
+
 	return oColor;
 }
 
